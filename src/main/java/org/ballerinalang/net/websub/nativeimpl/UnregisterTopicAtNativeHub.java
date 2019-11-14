@@ -22,23 +22,31 @@ import org.ballerinalang.jvm.scheduling.Strand;
 import org.ballerinalang.model.types.TypeKind;
 import org.ballerinalang.natives.annotations.Argument;
 import org.ballerinalang.natives.annotations.BallerinaFunction;
+import org.ballerinalang.natives.annotations.ReturnType;
+import org.ballerinalang.net.websub.BallerinaWebSubException;
+import org.ballerinalang.net.websub.WebSubUtils;
 import org.ballerinalang.net.websub.hub.Hub;
 
 /**
- * Extern function to remove a subscription from the default Ballerina Hub's underlying broker.
+ * Extern function to unregister a topic in the Ballerina Hub.
  *
  * @since 0.965.0
  */
 @BallerinaFunction(
         orgName = "ballerina", packageName = "websub",
-        functionName = "removeSubscription",
-        args = {@Argument(name = "topic", type = TypeKind.STRING),
-                @Argument(name = "callback", type = TypeKind.STRING)},
+        functionName = "unregisterTopicAtNativeHub",
+        args = {@Argument(name = "topic", type = TypeKind.STRING)},
+        returnType = {@ReturnType(type = TypeKind.OBJECT)},
         isPublic = true
 )
-public class RemoveSubscription {
+public class UnregisterTopicAtNativeHub {
 
-    public static void removeSubscription(Strand strand, String topic, String callback) {
-        Hub.getInstance().unregisterSubscription(strand, topic, callback);
+    public static Object unregisterTopicAtNativeHub(Strand strand, String topic) {
+        try {
+            Hub.getInstance().unregisterTopic(topic);
+        } catch (BallerinaWebSubException e) {
+            return WebSubUtils.createError(e.getMessage());
+        }
+        return null;
     }
 }
