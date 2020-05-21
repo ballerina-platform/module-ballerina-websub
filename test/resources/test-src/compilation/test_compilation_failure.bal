@@ -14,13 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
-
 import ballerina/http;
-import ballerina/websub;
 
-service websubSubscriber =
-@websub:SubscriberServiceConfig {
+service websubSubscriber = SubscriberServiceConfig {
     path: "/websub",
     subscribeOnStartUp: true,
     target: ["http://websubpubhub.com", "http://websubpubtopic.com"]
@@ -33,8 +29,7 @@ service {
     }
 };
 
-service websubSubscriberTwo =
-@websub:SubscriberServiceConfig {
+service websubSubscriberTwo = SubscriberServiceConfig {
     path: "/websub",
     subscribeOnStartUp: true,
     target: ["http://websubpubhubtwo.com", "http://websubpubtopictwo.com"]
@@ -47,8 +42,7 @@ service {
     }
 };
 
-service websubSubscriberThree =
-@websub:SubscriberServiceConfig {
+service websubSubscriberThree = SubscriberServiceConfig {
     path: "/websub",
     subscribeOnStartUp: true,
     target: ["http://websubpubhubtwo.com", "http://websubpubtopictwo.com"]
@@ -58,8 +52,7 @@ service {
     }
 };
 
-service websubSubscriberFour =
-@websub:SubscriberServiceConfig {
+service websubSubscriberFour = SubscriberServiceConfig {
     path: "/websub",
     subscribeOnStartUp: true,
     target: ["http://websubpubhubtwo.com", "http://websubpubtopictwo.com"]
@@ -69,8 +62,7 @@ service {
     }
 };
 
-service websubSubscriberFive =
-@websub:SubscriberServiceConfig {
+service websubSubscriberFive = SubscriberServiceConfig {
     path: "/websub",
     subscribeOnStartUp: true,
     target: ["http://websubpubhubtwo.com", "http://websubpubtopictwo.com"]
@@ -83,8 +75,7 @@ service {
     }
 };
 
-service websubSubscriberSix =
-@websub:SubscriberServiceConfig {
+service websubSubscriberSix = SubscriberServiceConfig {
     path: "/websub",
     subscribeOnStartUp: true,
     target: ["http://websubpubhubtwo.com", "http://websubpubtopictwo.com"]
@@ -97,8 +88,7 @@ service {
     }
 };
 
-service websubSubscriberSeven =
-@websub:SubscriberServiceConfig {
+service websubSubscriberSeven = SubscriberServiceConfig {
     path: "/websub",
     subscribeOnStartUp: true,
     target: ["http://websubpubhubtwo.com", "http://websubpubtopictwo.com"]
@@ -111,8 +101,7 @@ service {
     }
 };
 
-service websubSubscriberEight =
-service {
+service websubSubscriberEight = service {
     resource function noSubscriberServiceConfig (websub:Notification notification) {
     }
 };
