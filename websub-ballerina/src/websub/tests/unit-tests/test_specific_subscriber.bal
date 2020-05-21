@@ -15,38 +15,38 @@
 // under the License.
 
 import ballerina/lang.'object as lang;
-import ballerina/websub;
+import ballerina/test;
 
-public type MockActionEvent record {|
+public type SpecificSubMockActionEvent record {|
     string action;
 |};
 
-public type MockDomainEvent record {|
+public type SpecificSubMockDomainEvent record {|
     string domain;
 |};
 
-public type WebhookServerForPayload object {
+public type SpecificSubWebhookServerForPayload object {
 
     *lang:Listener;
 
-    private websub:Listener websubListener;
+    private Listener websubListener;
 
     public function __init(int port, string? host = ()) {
-        websub:ExtensionConfig extensionConfig = {
-            topicIdentifier: websub:TOPIC_ID_PAYLOAD_KEY,
+        ExtensionConfig extensionConfig = {
+            topicIdentifier: TOPIC_ID_PAYLOAD_KEY,
             payloadKeyResourceMap: {
                 "action" : {
-                    "created" : ["onCreated", MockActionEvent],
-                    "deleted" : ["onDeleted", MockActionEvent],
-                    "statuscheck" : ["onStatus", MockActionEvent]
+                    "created" : ["onCreated", SpecificSubMockActionEvent],
+                    "deleted" : ["onDeleted", SpecificSubMockActionEvent],
+                    "statuscheck" : ["onStatus", SpecificSubMockActionEvent]
                 },
                 "domain" : {
-                    "issue" : ["onIssue", MockDomainEvent],
-                    "feature" : ["onFeature", MockDomainEvent]
+                    "issue" : ["onIssue", SpecificSubMockDomainEvent],
+                    "feature" : ["onFeature", SpecificSubMockDomainEvent]
                 }
             }
         };
-        websub:SubscriberListenerConfiguration sseConfig = {
+        SubscriberListenerConfiguration sseConfig = {
             host: host ?: "",
             extensionConfig: extensionConfig
         };
@@ -75,46 +75,57 @@ public type WebhookServerForPayload object {
 };
 
 service keyWebhook1 =
-@websub:SubscriberServiceConfig {
+@SubscriberServiceConfig {
     path:"/key"
 }
-@websub:SpecificSubscriber
+@SpecificSubscriber
 service {
-    resource function onOpened(websub:Notification notification, MockActionEvent event) {
+    resource function onOpened(Notification notification, SpecificSubMockActionEvent event) {
     }
 
-    resource function onFeature(websub:Notification notification, MockDomainEvent event) {
+    resource function onFeature(Notification notification, SpecificSubMockDomainEvent event) {
     }
 
-    resource function onStatus(websub:Notification notification, MockActionEvent event) {
+    resource function onStatus(Notification notification, SpecificSubMockActionEvent event) {
     }
 
-    resource function onReopened(websub:Notification notification, MockActionEvent event) {
+    resource function onReopened(Notification notification, SpecificSubMockActionEvent event) {
     }
 };
 
 service keyWebhook2 =
-@websub:SubscriberServiceConfig {
+@SubscriberServiceConfig {
     path:"/key"
 }
-@websub:SpecificSubscriber
+@SpecificSubscriber
 service {
-    resource function onCreated(websub:Notification notification, MockActionEvent event) {
+    resource function onCreated(Notification notification, SpecificSubMockActionEvent event) {
     }
 
-    resource function onFeature(websub:Notification notification, MockDomainEvent event) {
+    resource function onFeature(Notification notification, SpecificSubMockDomainEvent event) {
     }
 
-    resource function onStatus(websub:Notification notification, MockDomainEvent event) {
+    resource function onStatus(Notification notification, SpecificSubMockDomainEvent event) {
     }
 };
 
+@test:Config {
+}
 public function testInvalidResourceFunctions() {
-    WebhookServerForPayload l = new(8081);
-    checkpanic l.__attach(keyWebhook1);
+    SpecificSubWebhookServerForPayload l = new(8081);
+    error? err = trap l.__attach(keyWebhook1);
+    if !(err is error) {
+        test:assertFail("Expected: panic, but not found");
+    }
 }
 
+@test:Config {
+    dependsOn: ["testInvalidResourceFunctions"]
+}
 public function testInvalidParam() {
-    WebhookServerForPayload l = new(8081);
-    checkpanic l.__attach(keyWebhook2);
+    SpecificSubWebhookServerForPayload l = new(8081);
+    error? err = trap l.__attach(keyWebhook2);
+    if !(err is error) {
+        test:assertFail("Expected: panic, but not found");
+    }
 }
