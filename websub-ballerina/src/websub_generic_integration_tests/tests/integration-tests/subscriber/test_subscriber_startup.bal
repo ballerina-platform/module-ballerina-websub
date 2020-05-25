@@ -124,31 +124,3 @@ function testMultipleSubscribersStartUpInSamePort() {
     test:assertEquals(responseDetails.responseMessage, expectedResponseMsg, msg = "Mismatched");
 
 }
-
-@test:Config {
-    dependsOn: ["testMultipleSubscribersStartUpInSamePort"]
-}
-function testHubStartUp() {
-    http:Client clientEndpoint = new ("http://0.0.0.0:23190");
-    var response = clientEndpoint->get("/startupHub/startup");
-    HttpResponseDetails responseDetails = fetchHttpResponse(response);
-
-    string expectedResponseMsg = "hub(lis2) start successfully";
-    //test:assertEquals(responseDetails.statusCode, http:STATUS_OK, msg = "Response code mismatched");
-    //test:assertEquals(responseDetails.responseMessage, expectedResponseMsg, msg = "Mismatched");
-
-}
-
-@test:Config {
-    dependsOn: ["testHubStartUp"]
-}
-function testPublisherAndSubscriptionInvalidSameResourcePath() {
-    http:Client clientEndpoint = new ("http://0.0.0.0:23190");
-    var response = clientEndpoint->get("/startupHub/testPublisherAndSubscriptionInvalidSameResourcePath");
-    HttpResponseDetails responseDetails = fetchHttpResponse(response);
-
-    string expectedResponseMsg = "publisher and subscription resource paths cannot be the same";
-    //test:assertEquals(responseDetails.statusCode, http:STATUS_OK, msg = "Response code mismatched");
-    //test:assertEquals(responseDetails.responseMessage, expectedResponseMsg, msg = "Mismatched");
-
-}
