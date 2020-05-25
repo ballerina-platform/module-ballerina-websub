@@ -14,9 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// -- Done
 import ballerina/lang.'object as lang;
 import ballerina/test;
 import ballerina/http;
+import websub;
 
 public type CustomSubWebhookListenerConf record {
     string host = "";
@@ -30,79 +32,79 @@ public type CustomSubMockDomainEvent record {|
     string domain;
 |};
 
-@SubscriberServiceConfig {
+@websub:SubscriberServiceConfig {
     path:"/key"
 }
 service customSubKeyWebhook on new CustomSubWebhookServerForPayload(23585) {
-    resource function onIntentVerification(Caller caller, IntentVerificationRequest verRequest) {
+    resource function onIntentVerification(websub:Caller caller, websub:IntentVerificationRequest verRequest) {
         storeOutput(ID_INTENT_VER_REQ_RECEIVED_LOG, "Intent verification request received");
         checkpanic caller->accepted();
     }
 
-    resource function onCreated(Notification notification, CustomSubMockActionEvent event) {
+    resource function onCreated(websub:Notification notification, CustomSubMockActionEvent event) {
         storeOutput(ID_BY_KEY_CREATED_LOG,  "Created Notification Received, action: " + <@untainted>event.action);
     }
 
-    resource function onFeature(Notification notification, CustomSubMockDomainEvent event) {
+    resource function onFeature(websub:Notification notification, CustomSubMockDomainEvent event) {
         storeOutput(ID_BY_KEY_FEATURE_LOG, "Feature Notification Received, domain: " +  <@untainted>event.domain);
     }
 
-    resource function onStatus(Notification notification, CustomSubMockActionEvent event) {
+    resource function onStatus(websub:Notification notification, CustomSubMockActionEvent event) {
         // do nothing - test start up
     }
 }
 
-@SubscriberServiceConfig {
+@websub:SubscriberServiceConfig {
     path:"/header"
 }
 service customSubHeaderWebhook on new CustomSubWebhookServerForHeader(23686) {
-    resource function onIssue(Notification notification, CustomSubMockActionEvent event) {
+    resource function onIssue(websub:Notification notification, CustomSubMockActionEvent event) {
         string msg = "Issue Notification Received, header value: " + <@untainted>notification.getHeader(CUSTOM_SUB_MOCK_HEADER) +
                                  " action: " +  <@untainted>event.action;
         storeOutput(ID_BY_HEADER_ISSUE_LOG, msg);
     }
 
-    resource function onCommit(Notification notification, CustomSubMockActionEvent event) {
+    resource function onCommit(websub:Notification notification, CustomSubMockActionEvent event) {
         string msg = "Commit Notification Received, header value: " + <@untainted>notification.getHeader(CUSTOM_SUB_MOCK_HEADER) +
                                  " action: " + <@untainted>event.action;
         storeOutput(ID_BY_HEADER_COMMIT_LOG, msg);
     }
 
-    resource function onStatus(Notification notification, CustomSubMockActionEvent event) {
+    resource function onStatus(websub:Notification notification, CustomSubMockActionEvent event) {
         // do nothing - test start up
     }
 }
 
-@SubscriberServiceConfig {
+@websub:SubscriberServiceConfig {
     path:"/headerAndPayload"
 }
 service customSubHeaderAndPayloadWebhook on new CustomSubWebhookServerForHeaderAndPayload(23787) {
-    resource function onIssueCreated(Notification notification, CustomSubMockActionEvent event) {
+    resource function onIssueCreated(websub:Notification notification, CustomSubMockActionEvent event) {
         string msg = "Issue Created Notification Received, header value: " + <@untainted>notification.getHeader(CUSTOM_SUB_MOCK_HEADER) +
             " action: " +  <@untainted>event.action;
         storeOutput(ID_BY_HEADER_AND_PAYLOAD_ISSUE_CREATED_LOG, msg);
 
     }
 
-    resource function onFeaturePull(Notification notification, CustomSubMockDomainEvent event) {
+    resource function onFeaturePull(websub:Notification notification, CustomSubMockDomainEvent event) {
         string msg = "Feature Pull Notification Received, header value: " + <@untainted>notification.getHeader(CUSTOM_SUB_MOCK_HEADER) +
             " domain: " +  <@untainted>event.domain;
         storeOutput(ID_BY_HEADER_AND_PAYLOAD_FEATURE_PULL_LOG, msg);
     }
 
-    resource function onHeaderOnly(Notification notification, CustomSubMockActionEvent event) {
+    resource function onHeaderOnly(websub:Notification notification, CustomSubMockActionEvent event) {
         string msg = "HeaderOnly Notification Received, header value: " + <@untainted>notification.getHeader(CUSTOM_SUB_MOCK_HEADER) +
             " action: " +  <@untainted>event.action;
         storeOutput(ID_BY_HEADER_AND_PAYLOAD_HEADER_ONLY_LOG, msg);
     }
 
-    resource function onKeyOnly(Notification notification, CustomSubMockActionEvent event) {
+    resource function onKeyOnly(websub:Notification notification, CustomSubMockActionEvent event) {
         string msg = "KeyOnly Notification Received, header value: " + <@untainted>notification.getHeader(CUSTOM_SUB_MOCK_HEADER) +
             " action: " +  <@untainted>event.action;
         storeOutput(ID_BY_HEADER_AND_PAYLOAD_KEY_ONLY_LOG, msg);
     }
 
-    resource function onStatus(Notification notification, CustomSubMockActionEvent event) {
+    resource function onStatus(websub:Notification notification, CustomSubMockActionEvent event) {
         // do nothing - test start up
     }
 }
@@ -112,11 +114,11 @@ public type CustomSubWebhookServerForPayload object {
 
     *lang:Listener;
 
-    private Listener websubListener;
+    private websub:Listener websubListener;
 
     public function __init(int port, CustomSubWebhookListenerConf? config = ()) {
-        ExtensionConfig extensionConfig = {
-            topicIdentifier: TOPIC_ID_PAYLOAD_KEY,
+        websub:ExtensionConfig extensionConfig = {
+            topicIdentifier: websub:TOPIC_ID_PAYLOAD_KEY,
             payloadKeyResourceMap: {
                 "action" : {
                     "created" : ["onCreated", CustomSubMockActionEvent],
@@ -130,7 +132,7 @@ public type CustomSubWebhookServerForPayload object {
             }
         };
         string host = config is () ? "" : config.host;
-        SubscriberListenerConfiguration sseConfig = {
+        websub:SubscriberListenerConfiguration sseConfig = {
             host: host,
             extensionConfig: extensionConfig
         };
@@ -163,11 +165,11 @@ public type CustomSubWebhookServerForHeader object {
 
     *lang:Listener;
 
-    private Listener websubListener;
+    private websub:Listener websubListener;
 
     public function __init(int port, CustomSubWebhookListenerConf? config = ()) {
-        ExtensionConfig extensionConfig = {
-            topicIdentifier: TOPIC_ID_HEADER,
+        websub:ExtensionConfig extensionConfig = {
+            topicIdentifier: websub:TOPIC_ID_HEADER,
             topicHeader: CUSTOM_SUB_MOCK_HEADER,
             headerResourceMap: {
                 "issue" : ["onIssue", CustomSubMockActionEvent],
@@ -176,7 +178,7 @@ public type CustomSubWebhookServerForHeader object {
             }
         };
         string host = config is () ? "" : config.host;
-        SubscriberListenerConfiguration sseConfig = {
+        websub:SubscriberListenerConfiguration sseConfig = {
             host: host,
             extensionConfig: extensionConfig
         };
@@ -209,11 +211,11 @@ public type CustomSubWebhookServerForHeaderAndPayload object {
 
     *lang:Listener;
 
-    private Listener websubListener;
+    private websub:Listener websubListener;
 
     public function __init(int port, CustomSubWebhookListenerConf? config = ()) {
-        ExtensionConfig extensionConfig = {
-            topicIdentifier: TOPIC_ID_HEADER_AND_PAYLOAD,
+        websub:ExtensionConfig extensionConfig = {
+            topicIdentifier: websub:TOPIC_ID_HEADER_AND_PAYLOAD,
             topicHeader: CUSTOM_SUB_MOCK_HEADER,
             headerResourceMap: {
                 "headeronly" : ["onHeaderOnly", CustomSubMockActionEvent],
@@ -243,7 +245,7 @@ public type CustomSubWebhookServerForHeaderAndPayload object {
             }
         };
         string host = config is () ? "" : config.host;
-        SubscriberListenerConfiguration sseConfig = {
+        websub:SubscriberListenerConfiguration sseConfig = {
             host: host,
             extensionConfig: extensionConfig
         };
@@ -294,7 +296,7 @@ function testDispatchingByKey() {
     req2.setJsonPayload(jsonPayload2);
 
     var response = clientEndpoint->post("/key", req1);
-    HttpResposeDetails responseDetails = fetchHttpResponse(response);
+    HttpResponseDetails responseDetails = fetchHttpResponse(response);
     test:assertEquals(responseDetails.statusCode, http:STATUS_ACCEPTED, msg = "Response code mismatched");
     test:assertEquals(fetchOutput(ID_BY_KEY_CREATED_LOG), BY_KEY_CREATED_LOG);
 
@@ -321,12 +323,12 @@ function testDispatchingByHeader() {
     req2.setJsonPayload(jsonPayload2);
 
     var response1 = clientEndpoint->post("/header", req1);
-    HttpResposeDetails responseDetails1 = fetchHttpResponse(response1);
+    HttpResponseDetails responseDetails1 = fetchHttpResponse(response1);
     test:assertEquals(responseDetails1.statusCode, http:STATUS_ACCEPTED, msg = "Response code mismatched");
     test:assertEquals(fetchOutput(ID_BY_HEADER_ISSUE_LOG), BY_HEADER_ISSUE_LOG);
 
     var response2 = clientEndpoint->post("/header", req2);
-    HttpResposeDetails responseDetails2 = fetchHttpResponse(response2);
+    HttpResponseDetails responseDetails2 = fetchHttpResponse(response2);
     test:assertEquals(responseDetails2.statusCode, http:STATUS_ACCEPTED, msg = "Response code mismatched");
     test:assertEquals(fetchOutput(ID_BY_HEADER_COMMIT_LOG), BY_HEADER_COMMIT_LOG);
 }
@@ -348,12 +350,12 @@ function testDispatchingByHeaderAndPayloadKey() {
     req2.setJsonPayload(jsonPayload2);
 
     var response1 = clientEndpoint->post("/headerAndPayload", req1);
-    HttpResposeDetails responseDetails1 = fetchHttpResponse(response1);
+    HttpResponseDetails responseDetails1 = fetchHttpResponse(response1);
     test:assertEquals(responseDetails1.statusCode, http:STATUS_ACCEPTED, msg = "Response code mismatched");
     test:assertEquals(fetchOutput(ID_BY_HEADER_AND_PAYLOAD_ISSUE_CREATED_LOG), BY_HEADER_AND_PAYLOAD_ISSUE_CREATED_LOG);
 
     var response2 = clientEndpoint->post("/headerAndPayload", req2);
-    HttpResposeDetails responseDetails2 = fetchHttpResponse(response2);
+    HttpResponseDetails responseDetails2 = fetchHttpResponse(response2);
     test:assertEquals(responseDetails2.statusCode, http:STATUS_ACCEPTED, msg = "Response code mismatched");
     test:assertEquals(fetchOutput(ID_BY_HEADER_AND_PAYLOAD_FEATURE_PULL_LOG), BY_HEADER_AND_PAYLOAD_FEATURE_PULL_LOG);
 }
@@ -370,7 +372,7 @@ function testDispatchingByHeaderAndPayloadKeyForOnlyHeader() {
     req.setJsonPayload(jsonPayload);
 
     var response = clientEndpoint->post("/headerAndPayload", req);
-    HttpResposeDetails responseDetails = fetchHttpResponse(response);
+    HttpResponseDetails responseDetails = fetchHttpResponse(response);
     test:assertEquals(responseDetails.statusCode, http:STATUS_ACCEPTED, msg = "Response code mismatched");
     test:assertEquals(fetchOutput(ID_BY_HEADER_AND_PAYLOAD_HEADER_ONLY_LOG), BY_HEADER_AND_PAYLOAD_HEADER_ONLY_LOG);
 }
@@ -387,7 +389,7 @@ function testDispatchingByHeaderAndPayloadKeyForOnlyKey() {
     req.setJsonPayload(jsonPayload);
 
     var response = clientEndpoint->post("/headerAndPayload", req);
-    HttpResposeDetails responseDetails = fetchHttpResponse(response);
+    HttpResponseDetails responseDetails = fetchHttpResponse(response);
     test:assertEquals(responseDetails.statusCode, http:STATUS_ACCEPTED, msg = "Response code mismatched");
     test:assertEquals(fetchOutput(ID_BY_HEADER_AND_PAYLOAD_KEY_ONLY_LOG), BY_HEADER_AND_PAYLOAD_KEY_ONLY_LOG);
 }
