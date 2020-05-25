@@ -16,7 +16,7 @@
 
 import ballerina/http;
 
-type HttpResposeDetails record {
+type HttpResponseDetails record {
     int statusCode;
     string responseMessage;
 };
@@ -31,7 +31,7 @@ public function fetchOutput(string key) returns (any|error) {
     return outputs[key];
 }
 
-function fetchHttpResponse(http:Response|error response) returns HttpResposeDetails {
+function fetchHttpResponse(http:Response|error response) returns HttpResponseDetails {
     string responseMessage = "";
     int statusCode = -1;
     if (response is http:Response) {
@@ -45,9 +45,9 @@ function fetchHttpResponse(http:Response|error response) returns HttpResposeDeta
     } else {
         responseMessage = "Error when calling the backend";
     }
-    HttpResposeDetails httpResposeDetails = {
+    HttpResponseDetails httpResponseDetails = {
         statusCode: statusCode,
         responseMessage: responseMessage
     };
-    return httpResposeDetails;
+    return httpResponseDetails;
 }

@@ -18,13 +18,14 @@ import ballerina/http;
 import ballerina/io;
 import ballerina/log;
 import ballerina/runtime;
+import ballerina/websub;
 
 
 boolean remoteTopicRegistered = false;
 
-Hub webSubHub = startHubAndRegisterTopic();
+websub:Hub webSubHub = startHubAndRegisterTopic();
 
-PublisherClient websubHubClientEP = new (webSubHub.publishUrl);
+websub:PublisherClient websubHubClientEP = new (webSubHub.publishUrl);
 
 listener http:Listener publisherServiceEP = new http:Listener(23080);
 
@@ -35,7 +36,7 @@ service publisher on publisherServiceEP {
     resource function discover(http:Caller caller, http:Request req) {
         http:Response response = new;
         // Add a link header indicating the hub and topic
-        addWebSubLinkHeader(response, [webSubHub.subscriptionUrl], WEBSUB_TOPIC_ONE);
+        websub:addWebSubLinkHeader(response, [webSubHub.subscriptionUrl], WEBSUB_TOPIC_ONE);
         var err = caller->accepted(response);
         if (err is error) {
             log:printError("Error responding on ordering", err);
@@ -83,7 +84,7 @@ service publisher on publisherServiceEP {
     resource function topicInfo(http:Caller caller, http:Request req) {
         if (req.hasHeader("x-topic")) {
             string topicName = req.getHeader("x-topic");
-            SubscriberDetails[] details = webSubHub.getSubscribers(topicName);
+            websub:SubscriberDetails[] details = webSubHub.getSubscribers(topicName);
             var err = caller->respond(details.toString());
             if (err is error) {
                 log:printError("Error responding on topicInfo request", err);
@@ -121,7 +122,7 @@ service publisherTwo on publisherServiceEP {
     resource function discover(http:Caller caller, http:Request req) {
         http:Response response = new;
         // Add a link header indicating the hub and topic
-        addWebSubLinkHeader(response, [webSubHub.subscriptionUrl], WEBSUB_TOPIC_FOUR);
+        websub:addWebSubLinkHeader(response, [webSubHub.subscriptionUrl], WEBSUB_TOPIC_FOUR);
         var err = caller->accepted(response);
         if (err is error) {
             log:printError("Error responding on ordering", err);
@@ -188,8 +189,8 @@ function checkSubscrberAvailabilityAndPublishDirectly(string topic, string subsc
     }
 }
 
-function startHubAndRegisterTopic() returns Hub {
-    Hub internalHub = startWebSubHub();
+function startHubAndRegisterTopic() returns websub:Hub {
+    websub:Hub internalHub = startWebSubHub();
     var err = internalHub.registerTopic(WEBSUB_TOPIC_ONE);
     if (err is error) {
         log:printError("Error registering topic directly", err);
@@ -213,12 +214,12 @@ function startHubAndRegisterTopic() returns Hub {
     return internalHub;
 }
 
-function startWebSubHub() returns Hub {
-    var result = startHub(new http:Listener(23191), "/websub", "/hub",
+function startWebSubHub() returns websub:Hub {
+    var result = websub:startHub(new http:Listener(23191), "/websub", "/hub",
                                  hubConfiguration = { remotePublish : { enabled : true }});
-    if (result is Hub) {
+    if (result is websub:Hub) {
         return result;
-    } else if (result is HubStartedUpError) {
+    } else if (result is websub:HubStartedUpError) {
         return result.startedUpHub;
     } else {
         panic result;
@@ -258,7 +259,7 @@ function getPayloadContent(string contentType, string mode) returns string|xml|j
     } else if (contentType == "byte[]" || contentType == "io:ReadableByteChannel") {
         errorMessage = "content type " + contentType + " not yet supported with WebSub tests";
     }
-    error e = error(WEBSUB_ERROR_CODE, message = errorMessage);
+    error e = error(websub:WEBSUB_ERROR_CODE, message = errorMessage);
     panic e;
 }
 
@@ -266,7 +267,7 @@ function checkSubscriberAvailability(string topic, string callback) {
     int count = 0;
     boolean subscriberAvailable = false;
     while (!subscriberAvailable && count < 60) {
-        SubscriberDetails[] topicDetails = webSubHub.getSubscribers(topic);
+        websub:SubscriberDetails[] topicDetails = webSubHub.getSubscribers(topic);
         if (isSubscriberAvailable(topicDetails, callback)) {
             return;
         }
@@ -275,7 +276,7 @@ function checkSubscriberAvailability(string topic, string callback) {
     }
 }
 
-function isSubscriberAvailable(SubscriberDetails[] topicDetails, string callback) returns boolean {
+function isSubscriberAvailable(websub:SubscriberDetails[] topicDetails, string callback) returns boolean {
     foreach var detail in topicDetails {
         if (detail.callback == callback) {
             return true;

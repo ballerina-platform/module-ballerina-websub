@@ -13,11 +13,12 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
+// -- Done
 import ballerina/http;
 import ballerina/log;
 import ballerina/test;
 import ballerina/io;
+import websub;
 
 listener http:Listener testSubscriber = new(23386);
 listener http:Listener testHub = new(23190);
@@ -25,8 +26,8 @@ listener http:Listener testHub = new(23190);
 service subscriber on testSubscriber {
     resource function start(http:Caller caller, http:Request request) returns error? {
 
-        Listener l1 = new(23387);
-        Listener l2 = new(23387);
+        websub:Listener l1 = new(23387);
+        websub:Listener l2 = new(23387);
 
         string responseMsg = "";
         var l1Error = l1.__start();
@@ -55,10 +56,10 @@ service startupHub on testHub {
     resource function startup(http:Caller caller, http:Request request) returns error? {
         http:Listener lis0 = new (23391);
         http:Listener lis1 = new (23392);
-        Hub|HubStartedUpError|HubStartupError res =
-            startHub(lis0, "/websub", "/hub", "/pub", publicUrl = "https://localhost:23391");
+        websub:Hub|websub:HubStartedUpError|websub:HubStartupError res =
+            websub:startHub(lis0, "/websub", "/hub", "/pub", publicUrl = "https://localhost:23391");
 
-        if (res is Hub) {
+        if (res is websub:Hub) {
             if (res.publishUrl != "https://localhost:23391/websub/pub" ||
                     res.subscriptionUrl != "https://localhost:23391/websub/hub") {
                 return caller->respond("invalid publishUrl and subscriptionUrl");
@@ -69,14 +70,14 @@ service startupHub on testHub {
         }
 
         // testHubStartUpWhenStarted
-        Hub|HubStartedUpError|HubStartupError res2 = startHub(lis1);
+        websub:Hub|websub:HubStartedUpError|websub:HubStartupError res2 = websub:startHub(lis1);
 
-        if !(res2 is HubStartedUpError) || res2.startedUpHub !== res {
+        if !(res2 is websub:HubStartedUpError) || res2.startedUpHub !== res {
             return caller->respond("seperate hub(lis1) has started");
         }
 
         // testHubShutdownAndStart
-        Hub hub = <Hub> res;
+        websub:Hub hub = <websub:Hub> res;
         error? err = hub.stop();
         if (err is error) {
             io:println(err);
@@ -84,8 +85,8 @@ service startupHub on testHub {
         }
 
         http:Listener lis2 = new (23393);
-        res2 = startHub(lis2);
-        if res2 is Hub {
+        res2 = websub:startHub(lis2);
+        if res2 is websub:Hub {
             string responseMsg = res2.publishUrl == "http://localhost:23393/publish" && res2.subscriptionUrl ==
                             "http://localhost:23393/" ? "hub(lis2) start successfully" :
                             "incorrect hub(lis2) has started";
@@ -98,12 +99,12 @@ service startupHub on testHub {
     resource function testPublisherAndSubscriptionInvalidSameResourcePath(http:Caller caller, http:Request request)
                                                                                                     returns error? {
         http:Listener lis = new (23394);
-        Hub|HubStartedUpError|HubStartupError res =
-            startHub(lis, "/websub", "/hub", "/hub");
+        websub:Hub|websub:HubStartedUpError|websub:HubStartupError res =
+            websub:startHub(lis, "/websub", "/hub", "/hub");
 
         var err = lis.__gracefulStop();
 
-        if (res is HubStartupError) {
+        if (res is websub:HubStartupError) {
             return caller->respond(res.detail().message);
         }
         return caller->respond("Unexpected result");
@@ -111,11 +112,12 @@ service startupHub on testHub {
 }
 
 @test:Config {
+    dependsOn: ["testTopicRedirectFoundAndHubPermanentRedirect"]
 }
 function testMultipleSubscribersStartUpInSamePort() {
     http:Client clientEndpoint = new ("http://0.0.0.0:23386");
     var response = clientEndpoint->get("/subscriber/start");
-    HttpResposeDetails responseDetails = fetchHttpResponse(response);
+    HttpResponseDetails responseDetails = fetchHttpResponse(response);
 
     string expectedResponseMsg = "failed to start server connector '0.0.0.0:23387': Address already in use";
     test:assertEquals(responseDetails.statusCode, http:STATUS_OK, msg = "Response code mismatched");
@@ -129,7 +131,7 @@ function testMultipleSubscribersStartUpInSamePort() {
 function testHubStartUp() {
     http:Client clientEndpoint = new ("http://0.0.0.0:23190");
     var response = clientEndpoint->get("/startupHub/startup");
-    HttpResposeDetails responseDetails = fetchHttpResponse(response);
+    HttpResponseDetails responseDetails = fetchHttpResponse(response);
 
     string expectedResponseMsg = "hub(lis2) start successfully";
     //test:assertEquals(responseDetails.statusCode, http:STATUS_OK, msg = "Response code mismatched");
@@ -143,7 +145,7 @@ function testHubStartUp() {
 function testPublisherAndSubscriptionInvalidSameResourcePath() {
     http:Client clientEndpoint = new ("http://0.0.0.0:23190");
     var response = clientEndpoint->get("/startupHub/testPublisherAndSubscriptionInvalidSameResourcePath");
-    HttpResposeDetails responseDetails = fetchHttpResponse(response);
+    HttpResponseDetails responseDetails = fetchHttpResponse(response);
 
     string expectedResponseMsg = "publisher and subscription resource paths cannot be the same";
     //test:assertEquals(responseDetails.statusCode, http:STATUS_OK, msg = "Response code mismatched");

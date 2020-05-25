@@ -14,12 +14,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// -- Done
 import ballerina/io;
 import ballerina/test;
+import websub;
 
-listener Listener redirectWebsubEP = new Listener(23484);
+listener websub:Listener redirectWebsubEP = new websub:Listener(23484);
 
-@SubscriberServiceConfig {
+@websub:SubscriberServiceConfig {
     path:"/websub",
     subscribeOnStartUp:true,
     target: "http://localhost:23081/original/one",
@@ -35,7 +37,7 @@ listener Listener redirectWebsubEP = new Listener(23484);
     }
 }
 service redirectWebsubSubscriber on redirectWebsubEP {
-    resource function onNotification (Notification notification) {
+    resource function onNotification (websub:Notification notification) {
         var payload = notification.getJsonPayload();
         if (payload is json) {
             io:println("WebSub Notification Received: " + payload.toJsonString());
@@ -45,7 +47,7 @@ service redirectWebsubSubscriber on redirectWebsubEP {
     }
 }
 
-@SubscriberServiceConfig {
+@websub:SubscriberServiceConfig {
     path:"/websubTwo",
     target: "http://localhost:23081/original/two",
     leaseSeconds: 1200,
@@ -60,7 +62,7 @@ service redirectWebsubSubscriber on redirectWebsubEP {
     }
 }
 service redirectWebsubSubscriberTwo on redirectWebsubEP {
-    resource function onNotification (Notification notification) {
+    resource function onNotification (websub:Notification notification) {
         var payload = notification.getJsonPayload();
         if (payload is json) {
             io:println("WebSub Notification Received: " + payload.toJsonString());
@@ -71,7 +73,7 @@ service redirectWebsubSubscriberTwo on redirectWebsubEP {
 }
 
 @test:Config {
-    dependsOn: ["testDispatchingByHeaderAndPayloadKeyForOnlyKey"]
+    dependsOn: ["testContentReceipt"]
 }
 function testTopicMovedPermanentlyAndHubTemporaryRedirect() {
     test:assertEquals(fetchOutput(ID_REDIRECT_SUBSCRIBER_ONE_LOG), REDIRECT_SUBSCRIBER_ONE_LOG);

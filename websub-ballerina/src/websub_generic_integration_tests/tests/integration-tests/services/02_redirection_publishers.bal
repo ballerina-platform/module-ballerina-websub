@@ -16,6 +16,7 @@
 
 import ballerina/http;
 import ballerina/log;
+import websub;
 
 listener http:Listener publisherServiceEPTwo = new http:Listener(23081);
 
@@ -34,7 +35,7 @@ service original on publisherServiceEPTwo {
 service redirected on publisherServiceEPTwo {
     resource function one(http:Caller caller, http:Request req) {
         http:Response res = new;
-        addWebSubLinkHeader(res, ["http://localhost:23081/hub/one"], WEBSUB_TOPIC_FIVE);
+        websub:addWebSubLinkHeader(res, ["http://localhost:23081/hub/one"], WEBSUB_TOPIC_FIVE);
         var err = caller->respond(res);
         if (err is error) {
             log:printError("Error sending response", err);
@@ -45,7 +46,7 @@ service redirected on publisherServiceEPTwo {
 
     resource function two(http:Caller caller, http:Request req) {
         http:Response res = new;
-        addWebSubLinkHeader(res, ["http://localhost:23081/hub/two"], WEBSUB_TOPIC_SIX);
+        websub:addWebSubLinkHeader(res, ["http://localhost:23081/hub/two"], WEBSUB_TOPIC_SIX);
         var err = caller->respond(res);
         if (err is error) {
             log:printError("Error sending response", err);
