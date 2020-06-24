@@ -116,7 +116,7 @@ public type CustomSubWebhookServerForPayload object {
 
     private websub:Listener websubListener;
 
-    public function __init(int port, CustomSubWebhookListenerConf? config = ()) {
+    public function init(int port, CustomSubWebhookListenerConf? config = ()) {
         websub:ExtensionConfig extensionConfig = {
             topicIdentifier: websub:TOPIC_ID_PAYLOAD_KEY,
             payloadKeyResourceMap: {
@@ -167,7 +167,7 @@ public type CustomSubWebhookServerForHeader object {
 
     private websub:Listener websubListener;
 
-    public function __init(int port, CustomSubWebhookListenerConf? config = ()) {
+    public function init(int port, CustomSubWebhookListenerConf? config = ()) {
         websub:ExtensionConfig extensionConfig = {
             topicIdentifier: websub:TOPIC_ID_HEADER,
             topicHeader: CUSTOM_SUB_MOCK_HEADER,
@@ -213,7 +213,7 @@ public type CustomSubWebhookServerForHeaderAndPayload object {
 
     private websub:Listener websubListener;
 
-    public function __init(int port, CustomSubWebhookListenerConf? config = ()) {
+    public function init(int port, CustomSubWebhookListenerConf? config = ()) {
         websub:ExtensionConfig extensionConfig = {
             topicIdentifier: websub:TOPIC_ID_HEADER_AND_PAYLOAD,
             topicHeader: CUSTOM_SUB_MOCK_HEADER,

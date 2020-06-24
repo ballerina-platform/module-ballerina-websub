@@ -33,7 +33,7 @@ service subscriber on testSubscriber {
         var l1Error = l1.__start();
         if (l1Error is error) {
             log:printError("listener_1 has not started");
-            string errMsg = l1Error.message() ?: "l1 error unavailable";
+            string errMsg = l1Error.message();
             return caller->respond(errMsg);
         }
         log:printInfo("listener_1 has started");
@@ -41,7 +41,7 @@ service subscriber on testSubscriber {
         var l2Error = l2.__start();
         if (l2Error is error) {
             log:printError("listener_2 has not started");
-            responseMsg = l2Error.message() ?: "l2 error unavailable";
+            responseMsg = l2Error.message();
         } else {
             responseMsg = "listener_2 has started";
         }

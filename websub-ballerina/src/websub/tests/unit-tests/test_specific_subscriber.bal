@@ -31,7 +31,7 @@ public type SpecificSubWebhookServerForPayload object {
 
     private Listener websubListener;
 
-    public function __init(int port, string? host = ()) {
+    public function init(int port, string? host = ()) {
         ExtensionConfig extensionConfig = {
             topicIdentifier: TOPIC_ID_PAYLOAD_KEY,
             payloadKeyResourceMap: {
