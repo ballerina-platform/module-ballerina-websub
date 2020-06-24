@@ -36,7 +36,7 @@ function testTopicAndSingleHubAsSingleLinkHeader() {
         test:assertEquals(hubs.length(), 1, msg = "incorrect no. of hubs extracted from discovery response");
         test:assertEquals(hubs[0], HUB_ONE, msg = "incorrect hub extraction from discovery response");
     } else {
-        string? errMsg = results.detail()?.message;
+        string? errMsg = results.message();
         test:assertFail(msg = errMsg is string ? errMsg : "error in extractTopicAndHubUrls");
     }
 }
@@ -56,7 +56,7 @@ function testTopicAndSingleHubAsMultipleLinkHeaders() {
         test:assertEquals(hubs.length(), 1, msg = "incorrect no. of hubs extracted from discovery response");
         test:assertEquals(hubs[0], HUB_ONE, msg = "incorrect hub extraction from discovery response");
     } else {
-        string? errMsg = results.detail()?.message;
+        string? errMsg = results.message();
         test:assertFail(msg = errMsg is string ? errMsg : "error in extractTopicAndHubUrls");
     }
 }
@@ -79,7 +79,7 @@ function testTopicAndMultipleHubsAsSingleLinkHeader() {
         test:assertEquals(hubs[1], HUB_TWO, msg = "incorrect hub extraction from discovery response");
         test:assertEquals(hubs[2], HUB_THREE, msg = "incorrect hub extraction from discovery response");
     } else {
-        string? errMsg = results.detail()?.message;
+        string? errMsg = results.message();
         test:assertFail(msg = errMsg is string ? errMsg : "error in extractTopicAndHubUrls");
     }
 }
@@ -104,7 +104,7 @@ function testTopicAndMultipleHubsAsMultipleLinkHeaders() {
         test:assertEquals(hubs[1], HUB_TWO, msg = "incorrect hub extraction from discovery response");
         test:assertEquals(hubs[2], HUB_THREE, msg = "incorrect hub extraction from discovery response");
     } else {
-        string? errMsg = results.detail()?.message;
+        string? errMsg = results.message();
         test:assertFail(msg = errMsg is string ? errMsg : "error in extractTopicAndHubUrls");
     }
 }
@@ -117,7 +117,7 @@ function testMissingTopicWithSingleLinkHeader() {
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\", <" + TOPIC_ONE + ">; rel=\"not_self\"");
     var results = extractTopicAndHubUrls(response);
     if (results is error) {
-        string? errMsg = results.detail()?.message;
+        string? errMsg = results.message();
         string expectedErrMsg = "Hub and/or Topic URL(s) not identified in link header of discovery response";
         test:assertEquals(errMsg, expectedErrMsg, msg = "invalid error message on unavailable topic");
     } else {
@@ -134,7 +134,7 @@ function testMissingTopicWithMultipleLinkHeaders() {
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"not_self\"");
     var results = extractTopicAndHubUrls(response);
     if (results is error) {
-        string? errMsg = results.detail()?.message;
+        string? errMsg = results.message();
         string expectedErrMsg = "Hub and/or Topic URL(s) not identified in link header of discovery response";
         test:assertEquals(errMsg, expectedErrMsg, msg = "invalid error message on unavailable topic");
     } else {
@@ -150,7 +150,7 @@ function testMissingHubWithSingleLinkHeader() {
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\", <" + TOPIC_ONE + ">; rel=\"self\"");
     var results = extractTopicAndHubUrls(response);
     if (results is error) {
-        string? errMsg = results.detail()?.message;
+        string? errMsg = results.message();
         string expectedErrMsg = "Hub and/or Topic URL(s) not identified in link header of discovery response";
         test:assertEquals(errMsg, expectedErrMsg, msg = "invalid error message on unavailable topic");
     } else {
@@ -167,7 +167,7 @@ function testMissingHubWithMultipleLinkHeaders() {
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"self\"");
     var results = extractTopicAndHubUrls(response);
     if (results is error) {
-        string? errMsg = results.detail()?.message;
+        string? errMsg = results.message();
         string expectedErrMsg = "Hub and/or Topic URL(s) not identified in link header of discovery response";
         test:assertEquals(errMsg, expectedErrMsg, msg = "invalid error message on unavailable topic");
     } else {
@@ -182,7 +182,7 @@ function testMissingLinkHeader() {
     http:Response response = new;
     var results = extractTopicAndHubUrls(response);
     if (results is error) {
-        string? errMsg = results.detail()?.message;
+        string? errMsg = results.message();
         string expectedErrMsg = "Link header unavailable in discovery response";
         test:assertEquals(errMsg, expectedErrMsg, msg = "invalid error message on unavailable link headers(s)");
     } else {
@@ -199,7 +199,7 @@ function testSingleLinkHeaderWithMultipleTopics() {
             HUB_TWO + ">; rel=\"self\"");
     var results = extractTopicAndHubUrls(response);
     if (results is error) {
-        string? errMsg = results.detail()?.message;
+        string? errMsg = results.message();
         string expectedErrMsg = "Link Header contains > 1 self URLs";
         test:assertEquals(errMsg, expectedErrMsg, msg = "invalid error message on > 1 topics");
     } else {
@@ -217,7 +217,7 @@ function testMultipleLinkHeadersWithMultipleTopics() {
     response.addHeader("Link", "<" + HUB_TWO + ">; rel=\"self\"");
     var results = extractTopicAndHubUrls(response);
     if (results is error) {
-        string? errMsg = results.detail()?.message;
+        string? errMsg = results.message();
         string expectedErrMsg = "Link Header contains > 1 self URLs";
         test:assertEquals(errMsg, expectedErrMsg, msg = "invalid error message on > 1 topics");
     } else {
