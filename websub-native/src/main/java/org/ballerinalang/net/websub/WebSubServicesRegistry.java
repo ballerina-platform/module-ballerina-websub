@@ -19,6 +19,7 @@
 package org.ballerinalang.net.websub;
 
 import org.ballerinalang.jvm.BallerinaErrors;
+import org.ballerinalang.jvm.StringUtils;
 import org.ballerinalang.jvm.TypeChecker;
 import org.ballerinalang.jvm.types.BObjectType;
 import org.ballerinalang.jvm.types.BRecordType;
@@ -26,6 +27,7 @@ import org.ballerinalang.jvm.types.BType;
 import org.ballerinalang.jvm.types.TypeTags;
 import org.ballerinalang.jvm.values.MapValue;
 import org.ballerinalang.jvm.values.ObjectValue;
+import org.ballerinalang.jvm.values.api.BString;
 import org.ballerinalang.net.http.HTTPServicesRegistry;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
@@ -56,13 +58,14 @@ import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB_SERV
 public class WebSubServicesRegistry extends HTTPServicesRegistry {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSubServicesRegistry.class);
+    private static final String message = "Invalid parameter type '%s' in resource '%s'. Requires '%s:%s'";
 
     private String topicIdentifier;
     private String topicHeader;
 
-    private MapValue<String, Object> headerResourceMap;
-    private MapValue<String, MapValue<String, Object>> payloadKeyResourceMap;
-    private MapValue<String, MapValue<String, MapValue<String, Object>>> headerAndPayloadKeyResourceMap;
+    private MapValue<BString, Object> headerResourceMap;
+    private MapValue<BString, MapValue<BString, Object>> payloadKeyResourceMap;
+    private MapValue<BString, MapValue<BString, MapValue<BString, Object>>> headerAndPayloadKeyResourceMap;
     private HashMap<String, BRecordType> resourceDetails;
 
     private static final int CUSTOM_RESOURCE_PARAM_COUNT = 2;
@@ -73,9 +76,9 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
 
     public WebSubServicesRegistry(WebSocketServicesRegistry webSocketServicesRegistry,
                                   String topicIdentifier, String topicHeader,
-                                  MapValue<String, Object> headerResourceMap,
-                                  MapValue<String, MapValue<String, Object>> payloadKeyResourceMap,
-                                  MapValue<String, MapValue<String, MapValue<String, Object>>>
+                                  MapValue<BString, Object> headerResourceMap,
+                                  MapValue<BString, MapValue<BString, Object>> payloadKeyResourceMap,
+                                  MapValue<BString, MapValue<BString, MapValue<BString, Object>>>
                                           headerAndPayloadKeyResourceMap,
                                   HashMap<String, BRecordType> resourceDetails) {
         super(webSocketServicesRegistry);
@@ -106,11 +109,11 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
         return topicHeader;
     }
 
-    MapValue<String, Object> getHeaderResourceMap() {
+    MapValue<BString, Object> getHeaderResourceMap() {
         return headerResourceMap;
     }
 
-    MapValue<String, MapValue<String, Object>> getPayloadKeyResourceMap() {
+    MapValue<BString, MapValue<BString, Object>> getPayloadKeyResourceMap() {
         return payloadKeyResourceMap;
     }
 
@@ -119,7 +122,7 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
      *
      * @return the topic-resource map specified for the service
      */
-    MapValue<String, MapValue<String, MapValue<String, Object>>> getHeaderAndPayloadKeyResourceMap() {
+    MapValue<BString, MapValue<BString, MapValue<BString, Object>>> getHeaderAndPayloadKeyResourceMap() {
         return headerAndPayloadKeyResourceMap;
     }
 
@@ -161,8 +164,8 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
                                                                          serviceRegistry.getResourceDetails());
 
         if (!invalidResourceNames.isEmpty()) {
-            throw BallerinaErrors.createError("Resource name(s) not included in the topic-resource mapping " +
-                                                      "found: " + invalidResourceNames);
+            throw BallerinaErrors.createError(StringUtils.fromString("Resource name(s) not included in " +
+                    "the topic-resource mapping found: " + invalidResourceNames));
         }
     }
 
@@ -204,44 +207,40 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
     private static void validateParamCount(List<BType> paramTypes, int expectedCount, String resourceName) {
         int paramCount = paramTypes.size();
         if (paramCount < expectedCount) {
-            throw BallerinaErrors.createError(String.format("Invalid param count for WebSub Resource '%s': expected " +
-                                                                    "'%d', found '%d'",
-                                                            resourceName, expectedCount, paramCount));
+            throw BallerinaErrors.createError(StringUtils.fromString(String.format(
+                    "Invalid param count for WebSub Resource '%s': expected '%d', found '%d'",
+                                                            resourceName, expectedCount, paramCount)));
         }
     }
 
     private static void validateCallerParam(BType paramVarType) {
         if (!isExpectedObjectParam(paramVarType, WEBSUB_SERVICE_CALLER)) {
-            throw BallerinaErrors.createError(
-                    String.format("Invalid parameter type '%s' in resource '%s'. Requires '%s:%s'",
-                                  paramVarType.getQualifiedName(), RESOURCE_NAME_ON_INTENT_VERIFICATION, WEBSUB_PACKAGE,
-                                  WEBSUB_SERVICE_CALLER));
+            throw BallerinaErrors.createError(StringUtils.fromString(String.format(message,
+                    paramVarType.getQualifiedName(), RESOURCE_NAME_ON_INTENT_VERIFICATION, WEBSUB_PACKAGE,
+                    WEBSUB_SERVICE_CALLER)));
         }
     }
 
     private static void validateIntentVerificationParam(BType paramVarType) {
         if (!isExpectedObjectParam(paramVarType, WEBSUB_INTENT_VERIFICATION_REQUEST)) {
-            throw BallerinaErrors.createError(
-                    String.format("Invalid parameter type '%s' in resource '%s'. Requires '%s:%s'",
-                                  paramVarType.getQualifiedName(), RESOURCE_NAME_ON_INTENT_VERIFICATION, WEBSUB_PACKAGE,
-                                  WEBSUB_INTENT_VERIFICATION_REQUEST));
+            throw BallerinaErrors.createError(StringUtils.fromString(String.format(message,
+                    paramVarType.getQualifiedName(), RESOURCE_NAME_ON_INTENT_VERIFICATION,
+                    WEBSUB_PACKAGE, WEBSUB_INTENT_VERIFICATION_REQUEST)));
         }
     }
 
     private static void validateNotificationParam(String resourceName, BType paramVarType) {
         if (!isExpectedObjectParam(paramVarType, WEBSUB_NOTIFICATION_REQUEST)) {
-            throw BallerinaErrors.createError(
-                    String.format("Invalid parameter type '%s' in resource '%s'. Requires '%s:%s'",
-                                  paramVarType.getQualifiedName(), resourceName, WEBSUB_PACKAGE,
-                                  WEBSUB_NOTIFICATION_REQUEST));
+            throw BallerinaErrors.createError(StringUtils.fromString(String.format(message,
+                    paramVarType.getQualifiedName(), resourceName, WEBSUB_PACKAGE, WEBSUB_NOTIFICATION_REQUEST)));
         }
     }
 
     private static void validateRecordType(String resourceName, BType paramVarType, BRecordType recordType) {
         if (!TypeChecker.isSameType(paramVarType, recordType)) {
-            throw BallerinaErrors.createError(
-                    String.format("Invalid parameter type '%s' in resource '%s'. Requires '%s'",
-                                  paramVarType.getQualifiedName(), resourceName, recordType.getQualifiedName()));
+            throw BallerinaErrors.createError(StringUtils.fromString(String.format("Invalid parameter type '%s' in " +
+                            "resource '%s'. Requires '%s'", paramVarType.getQualifiedName(), resourceName,
+                            recordType.getQualifiedName())));
         }
     }
 
