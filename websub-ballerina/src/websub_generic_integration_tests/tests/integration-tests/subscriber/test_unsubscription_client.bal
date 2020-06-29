@@ -33,9 +33,7 @@ function sendUnsubscription() {
         io:println("Unsubscription Request successful at Hub [" + response.hub + "] for Topic [" +
                         response.topic + "]");
     } else {
-        error err = response;
-        string errCause = <string> err.detail()["message"];
-        io:println("Error occurred with Unsubscription Request: ", errCause);
+        io:println("Error occurred with Unsubscription Request: ", response.cause());
     }
 
     // Confirm unsubscription - no notifications should be received.
