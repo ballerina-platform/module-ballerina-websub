@@ -140,8 +140,7 @@ service websubSubscriberFour on websubEP {
     }
 }
 
-@test:Config{
-}
+@test:Config{}
 function testDiscoveryAndIntentVerification() {
     http:Client clientEndpoint = new ("http://localhost:23080");
     json jsonPayload = {mode: "internal", content_type: "json"};

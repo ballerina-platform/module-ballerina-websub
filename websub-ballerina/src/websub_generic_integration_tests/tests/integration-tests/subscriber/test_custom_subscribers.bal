@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// -- Done
+
 import ballerina/lang.'object as lang;
 import ballerina/test;
 import ballerina/http;
@@ -273,8 +273,7 @@ public type CustomSubWebhookServerForHeaderAndPayload object {
     }
 };
 
-@test:Config {
-}
+@test:Config {}
 function testOnIntentVerificationInvocation() {
     http:Client clientEndpoint = new ("http://localhost:23585");
     var response = clientEndpoint->get("/key");

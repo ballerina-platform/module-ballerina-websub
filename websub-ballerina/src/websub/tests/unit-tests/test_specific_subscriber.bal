@@ -109,8 +109,7 @@ service {
     }
 };
 
-@test:Config {
-}
+@test:Config {}
 public function testInvalidResourceFunctions() {
     SpecificSubWebhookServerForPayload l = new(8081);
     error? err = trap l.__attach(keyWebhook1);
