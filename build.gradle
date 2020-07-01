@@ -20,7 +20,6 @@ plugins {
     id "com.github.johnrengelman.shadow" version "5.2.0"
     id "de.undercouch.download" version "4.0.4"
     id "net.researchgate.release" version "2.6.0"
-    id 'maven-publish'
 }
 
 ext.ballerinaLangVersion = project.ballerinaLangVersion
@@ -44,6 +43,7 @@ allprojects {
     version = project.version
 
     apply plugin: 'jacoco'
+    apply plugin: 'maven-publish'
 
     repositories {
         mavenLocal()
