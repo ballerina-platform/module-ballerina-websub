@@ -36,6 +36,7 @@ ext.wso2SnakeYamlVersion = project.wso2SnakeYamlVersion
 ext.bouncycastleVersion = project.bouncycastleVersion
 ext.guavaVersion = project.guavaVersion
 ext.wso2CarbonMetricsVersion = project.wso2CarbonMetricsVersion
+ext.stdlibEncodingVersion = project.stdlibEncodingVersion
 
 allprojects {
     group = project.group
@@ -72,11 +73,27 @@ allprojects {
         maven {
             url = 'https://mvnrepository.com/artifact/io.ballerina.messaging/broker-common'
         }
+
+        maven {
+            url "https://maven.pkg.github.com/ballerina-platform/module-ballerina-encoding"
+            credentials {
+                username System.getenv("packageUser")
+                password System.getenv("packagePAT")
+            }
+        }
     }
 }
 
 subprojects {
     apply plugin: 'java'
+
+    configurations {
+        ballerinaStdLibs
+    }
+    dependencies {
+        /* Standard libraries */
+        ballerinaStdLibs "org.ballerinalang:encoding-ballerina:${stdlibEncodingVersion}"
+    }
 }
 
 task codeCoverageReport(type: JacocoReport) {
