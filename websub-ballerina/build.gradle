@@ -141,7 +141,6 @@ task copyStdlibs(type: Copy) {
     /* Standard Libraries */
     configurations.ballerinaStdLibs.resolvedConfiguration.resolvedArtifacts.each { artifact ->
         def artifactExtractedPath = "${buildDir}/target/extracted-distributions/" + artifact.name + "-zip"
-        println(artifactExtractedPath)
         into("bir-cache/") {
             from "${artifactExtractedPath}/caches/bir"
         }
@@ -224,10 +223,14 @@ task ballerinaBuild {
         copy {
             from file("$project.projectDir/target/caches/bir_cache")
             into file("$artifactCacheParent/caches/bir")
+            exclude "ballerina/websub_advanced_integration_tests"
+            exclude "ballerina/websub_generic_integration_tests"
         }
         copy {
             from file("$project.projectDir/target/balo")
             into file("$artifactCacheParent/caches/balo/${moduleOrg}/${moduleName}/${tomlVersion}")
+            exclude "websub_advanced_integration_tests*"
+            exclude "websub_generic_integration_tests*"
         }
         copy {
             from targetBallerinaJar
