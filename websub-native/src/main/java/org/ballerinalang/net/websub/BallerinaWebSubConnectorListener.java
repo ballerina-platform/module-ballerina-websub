@@ -215,8 +215,8 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
         CallableUnitCallback callback = new WebSubEmptyCallableUnitCallback();
         //TODO handle BallerinaConnectorException
         ObjectValue service = httpResource.getParentService().getBalService();
-        Executor.submit(scheduler, service, balResource.getName(), callback, null,
-                        signatureParams);
+        Executor.submit(scheduler, service, balResource.getName(), null, null,
+                callback, null, signatureParams);
     }
 
     @SuppressWarnings("unchecked")
@@ -226,7 +226,7 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
         Object returnValue;
         try {
             Object[] args = {request, httpResource.getParentService().getBalService()};
-            returnValue = Executor.executeFunction(scheduler, this.getClass().getClassLoader(), BALLERINA,
+            returnValue = Executor.executeFunction(scheduler, null, null, this.getClass().getClassLoader(), BALLERINA,
                                                    WEBSUB, GENERATED_PACKAGE_VERSION, "commons",
                                                    "processWebSubNotification", args);
         } catch (BallerinaException ex) {
