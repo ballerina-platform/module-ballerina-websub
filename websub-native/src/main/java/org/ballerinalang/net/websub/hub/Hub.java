@@ -222,7 +222,7 @@ public class Hub {
                 String subscribeUrl = populateSubscribeUrl(publicUrl, hubListener);
 
                 started = true;
-                Object setupResult = executeFunction(strand.scheduler, classLoader, BALLERINA, WEBSUB,
+                Object setupResult = executeFunction(strand.scheduler, null, null, classLoader, BALLERINA, WEBSUB,
                                                      GENERATED_PACKAGE_VERSION, HUB_SERVICE, "setupOnStartup");
                 if (TypeChecker.getType(setupResult).getTag() == TypeTags.ERROR) {
                     started = false;
