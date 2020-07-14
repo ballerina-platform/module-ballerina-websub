@@ -23,7 +23,7 @@ configurations {
     jbalTools
     websubBallerinaBirDir
     websubBallerinaJar
-    enternalJars
+    externalJars
 }
 
 dependencies {
@@ -32,73 +32,73 @@ dependencies {
     }
     compile project(':websub-native')
     compile group: 'org.ballerinalang', name: 'toml-parser', version: "${ballerinaTomlParserVersion}"
-    enternalJars (group: 'io.netty', name: 'netty-common', version: "${nettyVersion}") {
+    externalJars (group: 'io.netty', name: 'netty-common', version: "${nettyVersion}") {
         transitive = false
     }
-    enternalJars (group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}") {
+    externalJars (group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}") {
         transitive = false
     }
-    enternalJars (group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}") {
+    externalJars (group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}") {
         transitive = false
     }
-    enternalJars (group: 'io.netty', name: 'netty-resolver', version: "${nettyVersion}") {
+    externalJars (group: 'io.netty', name: 'netty-resolver', version: "${nettyVersion}") {
         transitive = false
     }
-    enternalJars (group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}") {
+    externalJars (group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}") {
         transitive = false
     }
-    enternalJars (group: 'io.netty', name: 'netty-codec-http', version: "${nettyVersion}") {
+    externalJars (group: 'io.netty', name: 'netty-codec-http', version: "${nettyVersion}") {
         transitive = false
     }
-    enternalJars (group: 'io.netty', name: 'netty-codec', version: "${nettyVersion}") {
+    externalJars (group: 'io.netty', name: 'netty-codec', version: "${nettyVersion}") {
         transitive = false
     }
-    enternalJars (group: 'io.netty', name: 'netty-handler-proxy', version: "${nettyVersion}") {
+    externalJars (group: 'io.netty', name: 'netty-handler-proxy', version: "${nettyVersion}") {
         transitive = false
     }
-    enternalJars (group: 'io.netty', name: 'netty-codec-http2', version: "${nettyVersion}") {
+    externalJars (group: 'io.netty', name: 'netty-codec-http2', version: "${nettyVersion}") {
         transitive = false
     }
-    enternalJars (group: 'io.netty', name: 'netty-tcnative-boringssl-static', version: "${nettyTcnativeVersion}") {
+    externalJars (group: 'io.netty', name: 'netty-tcnative-boringssl-static', version: "${nettyTcnativeVersion}") {
         transitive = false
     }
-    enternalJars (group: 'org.wso2.transport.http', name: 'org.wso2.transport.http.netty', version: "${wso2TransportHttpNettyVersion}") {
-        transitive = false
-    }
-
-    enternalJars (group: 'io.ballerina.messaging', name: 'broker-common', version: "${ballerinaMessageBrokerVersion}") {
-        transitive = false
-    }
-    enternalJars (group: 'io.ballerina.messaging', name: 'broker-core', version: "${ballerinaMessageBrokerCoreVersion}") {
-        transitive = false
-    }
-    enternalJars (group: 'io.ballerina.messaging', name: 'broker-auth', version: "${ballerinaMessageBrokerVersion}") {
-        transitive = false
-    }
-    enternalJars (group: 'io.ballerina.messaging', name: 'broker-rest-runner', version: "${ballerinaMessageBrokerVersion}") {
-        transitive = false
-    }
-    enternalJars (group: 'io.ballerina.messaging', name: 'broker-coordination', version: "${ballerinaMessageBrokerVersion}") {
+    externalJars (group: 'org.wso2.transport.http', name: 'org.wso2.transport.http.netty', version: "${wso2TransportHttpNettyVersion}") {
         transitive = false
     }
 
-    enternalJars (group: 'commons-pool.wso2', name: 'commons-pool', version: "${wso2CommonsPoolVersion}") {
+    externalJars (group: 'io.ballerina.messaging', name: 'broker-common', version: "${ballerinaMessageBrokerVersion}") {
         transitive = false
     }
-    enternalJars (group: 'org.wso2.orbit.org.yaml', name: 'snakeyaml', version: "${wso2SnakeYamlVersion}") {
+    externalJars (group: 'io.ballerina.messaging', name: 'broker-core', version: "${ballerinaMessageBrokerCoreVersion}") {
         transitive = false
     }
-    enternalJars (group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: "${bouncycastleVersion}") {
+    externalJars (group: 'io.ballerina.messaging', name: 'broker-auth', version: "${ballerinaMessageBrokerVersion}") {
         transitive = false
     }
-    enternalJars (group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: "${bouncycastleVersion}") {
+    externalJars (group: 'io.ballerina.messaging', name: 'broker-rest-runner', version: "${ballerinaMessageBrokerVersion}") {
         transitive = false
     }
-    enternalJars (group: 'com.google.guava', name: 'guava', version: "${guavaVersion}") {
+    externalJars (group: 'io.ballerina.messaging', name: 'broker-coordination', version: "${ballerinaMessageBrokerVersion}") {
         transitive = false
     }
 
-    enternalJars (group: 'org.wso2.carbon.metrics', name: 'org.wso2.carbon.metrics.core', version: "${wso2CarbonMetricsVersion}") {
+    externalJars (group: 'commons-pool.wso2', name: 'commons-pool', version: "${wso2CommonsPoolVersion}") {
+        transitive = false
+    }
+    externalJars (group: 'org.wso2.orbit.org.yaml', name: 'snakeyaml', version: "${wso2SnakeYamlVersion}") {
+        transitive = false
+    }
+    externalJars (group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: "${bouncycastleVersion}") {
+        transitive = false
+    }
+    externalJars (group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: "${bouncycastleVersion}") {
+        transitive = false
+    }
+    externalJars (group: 'com.google.guava', name: 'guava', version: "${guavaVersion}") {
+        transitive = false
+    }
+
+    externalJars (group: 'org.wso2.carbon.metrics', name: 'org.wso2.carbon.metrics.core', version: "${wso2CarbonMetricsVersion}") {
         transitive = false
     }
 }
@@ -165,7 +165,7 @@ task copyStdlibs(type: Copy) {
 
 task copyToLib(type: Copy) {
     into "$project.projectDir/lib"
-    from configurations.enternalJars
+    from configurations.externalJars
 }
 
 def moduleName = "websub"
