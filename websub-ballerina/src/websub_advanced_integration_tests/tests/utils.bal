@@ -14,13 +14,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-map<(any|error)> outputs = {};
+map<(anydata|error)> outputs = {};
 
 public function storeOutput(string key, any|error... s) {
     outputs[key] = s[0].toString();
 }
 
-public function fetchOutput(string key) returns (any|error) {
+public function fetchOutput(string key) returns (anydata|error) {
     return outputs[key];
 }
 
