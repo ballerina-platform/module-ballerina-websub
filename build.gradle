@@ -43,7 +43,6 @@ ext.stdlibFileVersion = project.stdlibFileVersion
 ext.stdlibCacheVersion = project.stdlibCacheVersion
 ext.stdlibCryptoVersion = project.stdlibCryptoVersion
 ext.stdlibEncodingVersion = project.stdlibEncodingVersion
-ext.stdlibEncodingVersion = project.stdlibEncodingVersion
 ext.stdlibTaskVersion = project.stdlibTaskVersion
 ext.stdlibLogVersion = project.stdlibLogVersion
 ext.stdlibTimeVersion = project.stdlibTimeVersion
@@ -219,16 +218,16 @@ subprojects {
         ballerinaStdLibs "org.ballerinalang:auth-ballerina:${stdlibAuthVersion}"
         ballerinaStdLibs "org.ballerinalang:file-ballerina:${stdlibFileVersion}"
         ballerinaStdLibs "org.ballerinalang:cache-ballerina:${stdlibCacheVersion}"
-        ballerinaStdLibs "org.ballerinalang:crypto-ballerina:${stdlibCryptoVersion}" //
+        ballerinaStdLibs "org.ballerinalang:crypto-ballerina:${stdlibCryptoVersion}"
         ballerinaStdLibs "org.ballerinalang:encoding-ballerina:${stdlibEncodingVersion}"
-        ballerinaStdLibs "org.ballerinalang:task-ballerina:1.1.0-SNAPSHOT"
-        ballerinaStdLibs "org.ballerinalang:log-ballerina:${stdlibLogVersion}" //
-        ballerinaStdLibs "org.ballerinalang:time-ballerina:${stdlibTimeVersion}" //
+        ballerinaStdLibs "org.ballerinalang:task-ballerina:${stdlibTaskVersion}"
+        ballerinaStdLibs "org.ballerinalang:log-ballerina:${stdlibLogVersion}"
+        ballerinaStdLibs "org.ballerinalang:time-ballerina:${stdlibTimeVersion}"
         ballerinaStdLibs "org.ballerinalang:reflect-ballerina:${stdlibReflectVersion}"
-        ballerinaStdLibs "org.ballerinalang:runtime-api-ballerina:${stdlibRuntimeApiVersion}" //
-        ballerinaStdLibs "org.ballerinalang:system-ballerina:${stdlibSystemApiVersion}" //
+        ballerinaStdLibs "org.ballerinalang:runtime-api-ballerina:${stdlibRuntimeApiVersion}"
+        ballerinaStdLibs "org.ballerinalang:system-ballerina:${stdlibSystemApiVersion}"
         ballerinaStdLibs "org.ballerinalang:config-ballerina:${stdlibConfigApiVersion}"
-        ballerinaStdLibs "org.ballerinalang:io-ballerina:${stdlibIoVersion}" //
+        ballerinaStdLibs "org.ballerinalang:io-ballerina:${stdlibIoVersion}"
         ballerinaStdLibs "org.ballerinalang:stringutils-ballerina:${stdlibStringutilsVersion}"
     }
 
