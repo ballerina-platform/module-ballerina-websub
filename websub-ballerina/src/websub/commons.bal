@@ -513,14 +513,14 @@ public type RemotePublishConfig record {|
 #            that the hub is already started, and including the `websub:Hub` object representing the
 #            already started up hub
 public function startHub(http:Listener hubServiceListener,
-                         public string basePath = "/",
-                         public string subscriptionResourcePath = "/",
-                         public string publishResourcePath = "/publish",
-                         public http:ServiceAuth serviceAuth = {enabled:false},
-                         public http:ResourceAuth subscriptionResourceAuth = {enabled:false},
-                         public http:ResourceAuth publisherResourceAuth = {enabled:false},
-                         public string? publicUrl = (),
-                         public HubConfiguration hubConfiguration = {})
+                         string basePath = "/",
+                         string subscriptionResourcePath = "/",
+                         string publishResourcePath = "/publish",
+                         http:ServiceAuth serviceAuth = {enabled:false},
+                         http:ResourceAuth subscriptionResourceAuth = {enabled:false},
+                         http:ResourceAuth publisherResourceAuth = {enabled:false},
+                         string? publicUrl = (),
+                         HubConfiguration hubConfiguration = {})
                             returns Hub|HubStartedUpError|HubStartupError {
 
     hubBasePath = basePath;
