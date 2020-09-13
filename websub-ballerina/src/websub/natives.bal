@@ -39,7 +39,7 @@ function startUpHubService(string basePath, string subscriptionResourcePath, str
                            boolean topicRegistrationRequired, string publicUrl, http:Listener hubListener)
                                     returns Hub|HubStartedUpError|HubStartupError = @java:Method {
     name: "startUpHubService",
-    class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
 } external;
 
 # Stops the Ballerina Hub if started.
@@ -47,14 +47,14 @@ function startUpHubService(string basePath, string subscriptionResourcePath, str
 # + hub - The `websub:Hub` object returned when starting the hub
 # + return - `()` if the Ballerina Hub had been started and was stopped now or else an `error` otherwise
 function stopHubService(Hub hub) returns error? = @java:Method {
-    class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
 } external;
 
 # Adds a new subscription for the specified topic in the Ballerina Hub.
 #
 # + subscriptionDetails - The details of the subscription including WebSub specifics
 function addSubscription(SubscriptionDetails subscriptionDetails) = @java:Method {
-    class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
 } external;
 
 # Publishes an update against the topic in the Ballerina Hub.
@@ -64,7 +64,7 @@ function addSubscription(SubscriptionDetails subscriptionDetails) = @java:Method
 # + return - An `error` if an error occurred during publishing or esle `()`
 function publishToInternalHub(string topic, WebSubContent content) returns error? = @java:Method {
     name: "publishToInternalHub",
-    class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
 } external;
 
 # Removes a subscription added for the specified topic in the Ballerina Hub.
@@ -73,7 +73,7 @@ function publishToInternalHub(string topic, WebSubContent content) returns error
 # + callback - The callback registered for this subscription
 function removeNativeSubscription(string topic, string callback) = @java:Method {
     name: "removeNativeSubscription",
-    class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
 } external;
 
 # Registers a topic in the Ballerina Hub.
@@ -82,7 +82,7 @@ function removeNativeSubscription(string topic, string callback) = @java:Method 
 # + return - An `error` if an error occurred during the registration
 function registerTopicAtNativeHub(string topic) returns error? = @java:Method {
    name: "registerTopicAtNativeHub",
-   class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
+   'class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
 } external;
 
 # Unregisters a topic in the Ballerina Hub.
@@ -91,7 +91,7 @@ function registerTopicAtNativeHub(string topic) returns error? = @java:Method {
 # + return - An `error` if an error occurred during the unregistration
 function unregisterTopicAtNativeHub(string topic) returns error? = @java:Method {
     name: "unregisterTopicAtNativeHub",
-    class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
 } external;
 
 # Retrieves whether a topic is registered with the Ballerina Hub.
@@ -100,7 +100,7 @@ function unregisterTopicAtNativeHub(string topic) returns error? = @java:Method 
 # + return - `true` if the topic has been registered by a publisher or else `false`otherwise
 function isTopicRegistered(string topic) returns boolean = @java:Method {
     name: "isTopicRegistered",
-    class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
 } external;
 
 ///////////////////////////////////////////////////////////////////
@@ -115,9 +115,9 @@ function isTopicRegistered(string topic) returns boolean = @java:Method {
 function validateAndPublishToInternalHub(string publishUrl, string topic, WebSubContent content)
                                          returns error? = @java:Method {
     name: "validateAndPublishToInternalHub",
-    class: "org.ballerinalang.net.websub.nativeimpl.PublisherNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.PublisherNativeOperationHandler"
 } external;
 
 function constructByteArray(io:ReadableByteChannel byteChannel) returns byte[] = @java:Method {
-    class: "org.ballerinalang.net.websub.nativeimpl.PublisherNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.PublisherNativeOperationHandler"
 } external;

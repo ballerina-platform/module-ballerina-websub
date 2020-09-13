@@ -17,7 +17,7 @@
 import ballerina/http;
 
 # The caller remote functions to respond to client requests.
-public type Caller client object {
+public client class Caller {
     private http:Caller httpCaller;
 
     function init(http:Caller httpCaller) {

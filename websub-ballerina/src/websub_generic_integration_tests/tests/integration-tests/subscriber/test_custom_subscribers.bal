@@ -110,7 +110,7 @@ service customSubHeaderAndPayloadWebhook on new CustomSubWebhookServerForHeaderA
 }
 
 /////////////////// Specific Webhook for dispatching by key ///////////////////
-public type CustomSubWebhookServerForPayload object {
+public class CustomSubWebhookServerForPayload {
 
     *lang:Listener;
 

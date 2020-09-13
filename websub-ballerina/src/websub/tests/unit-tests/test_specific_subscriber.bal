@@ -25,7 +25,7 @@ public type SpecificSubMockDomainEvent record {|
     string domain;
 |};
 
-public type SpecificSubWebhookServerForPayload object {
+public class SpecificSubWebhookServerForPayload {
 
     *lang:Listener;
 

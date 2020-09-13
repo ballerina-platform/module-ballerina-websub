@@ -20,7 +20,7 @@ import ballerina/log;
 import ballerina/mime;
 
 # The HTTP based client for WebSub subscription and unsubscription.
-public type SubscriptionClient client object {
+public client class SubscriptionClient {
 
     private string url;
     private http:Client httpClient;

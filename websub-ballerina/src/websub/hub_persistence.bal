@@ -15,7 +15,7 @@
 // under the License.
 
 # Represents the hub persistence configuration and functions.
-public type HubPersistenceStore abstract object {
+public type HubPersistenceStore object {
 
 # Adds or updates subscription details.
 # ```ballerina

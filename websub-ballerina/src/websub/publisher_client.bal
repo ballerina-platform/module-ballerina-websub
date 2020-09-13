@@ -19,7 +19,7 @@ import ballerina/io;
 import ballerina/mime;
 
 # The HTTP based client for WebSub topic registration and unregistration, and notifying the hub of new updates.
-public type PublisherClient client object {
+public client class PublisherClient {
 
     private string url;
     private http:Client httpClient;

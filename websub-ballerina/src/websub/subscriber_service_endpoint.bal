@@ -27,7 +27,7 @@ import ballerina/java;
 # Represents the WebSubSubscriber Service Listener.
 #
 # + config - The configurations for the `websub:Listener`
-public type Listener object {
+public class Listener {
 
     *lang:Listener;
 
@@ -194,27 +194,27 @@ public type Listener object {
 
 function externInitWebSubSubscriberServiceEndpoint(Listener subscriberListener) = @java:Method {
     name: "initWebSubSubscriberServiceEndpoint",
-    class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
 function externRegisterWebSubSubscriberService(Listener subscriberListener, service serviceType) = @java:Method {
     name: "registerWebSubSubscriberService",
-    class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
 function externStartWebSubSubscriberServiceEndpoint(Listener subscriberListener) returns error? = @java:Method {
     name: "startWebSubSubscriberServiceEndpoint",
-    class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
 function externSetTopic(Listener subscriberListener, string webSubServiceName, string topic) = @java:Method {
     name: "setTopic",
-    class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
 function externRetrieveSubscriptionParameters(Listener subscriberListener) returns map<any>[] = @java:Method {
     name: "retrieveSubscriptionParameters",
-    class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
 

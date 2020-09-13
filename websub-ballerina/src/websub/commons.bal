@@ -118,7 +118,7 @@ public const TOPIC_ID_HEADER_AND_PAYLOAD = "TOPIC_ID_HEADER_AND_PAYLOAD";
 ///////////////////////////////////////////////////////////////////
 //////////////////// WebSub Subscriber Commons ////////////////////
 ///////////////////////////////////////////////////////////////////
-# Object representing an intent verification request received.
+# Class representing an intent verification request received.
 #
 # + mode - The mode specified in the intent verification request, subscription or unsubscription
 # + topic - The topic for which intent is verified to subscribe/unsubscribe
@@ -126,7 +126,7 @@ public const TOPIC_ID_HEADER_AND_PAYLOAD = "TOPIC_ID_HEADER_AND_PAYLOAD";
 # + leaseSeconds - The lease seconds period for which a subscription will be active if intent verification
 #                  is being done for subscription
 # + request - An `http:Request` received for intent verification
-public type IntentVerificationRequest object {
+public class IntentVerificationRequest {
 
     public string mode = "";
     public string topic = "";
@@ -242,7 +242,7 @@ function validateSignature(string xHubSignature, string stringPayload, string se
 # Represents the WebSub Content Delivery Request received.
 #
 # + request - The HTTP POST request received as the notification
-public type Notification object {
+public class Notification {
 
     private http:Request request = new;
 
@@ -565,7 +565,7 @@ public function startHub(http:Listener hubServiceListener,
 #
 # + subscriptionUrl - The URL for subscription changes
 # + publishUrl - The URL for publishing and topic registration
-public type Hub object {
+public class Hub {
 
     public string subscriptionUrl;
     public string publishUrl;
@@ -718,12 +718,12 @@ public function getAvailableTopics() returns string[] {
 
 function externGetAvailableTopics(Hub hub) returns string[] = @java:Method {
     name: "getAvailableTopics",
-    class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
 } external;
 
 function externGetSubscribers(Hub hub, string topic) returns SubscriberDetails[] = @java:Method {
     name: "getSubscribers",
-    class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
 } external;
 
 ///////////////////////////////////////////////////////////////////
