@@ -55,47 +55,47 @@ public class Listener {
         externInitWebSubSubscriberServiceEndpoint(self);
     }
 
-# Binds a service to the `websub:Listener`.
-# ```ballerina
-# error? result = websubListener.__attach(helloService);
-# ```
-#
-# + s - Type descriptor of the service
-# + name - Name of the service
-# + return - `()` or else an `error` upon failure to register the listener
+    # Binds a service to the `websub:Listener`.
+    # ```ballerina
+    # error? result = websubListener.__attach(helloService);
+    # ```
+    #
+    # + s - Type descriptor of the service
+    # + name - Name of the service
+    # + return - `()` or else an `error` upon failure to register the listener
     public function __attach(service s, string? name = ()) returns error? {
         // TODO: handle data and return error on error
         externRegisterWebSubSubscriberService(self, s);
     }
 
-# Stops consuming messages and detaches the service from the `websub:Listener`.
-# ```ballerina
-# error? result = websubListener.__detach(helloService);
-# ```
-#
-# + s - Type descriptor of the service
-# + return - `()` or else an `error` upon failure to detach the service
+    # Stops consuming messages and detaches the service from the `websub:Listener`.
+    # ```ballerina
+    # error? result = websubListener.__detach(helloService);
+    # ```
+    #
+    # + s - Type descriptor of the service
+    # + return - `()` or else an `error` upon failure to detach the service
     public function __detach(service s) returns error? {
     }
 
-# Starts the `websub:Listener`.
-# ```ballerina
-# error? result = websubListener.__start();
-# ```
-#
-# + return - `()` or else an `error` upon failure to start the listener
+    # Starts the `websub:Listener`.
+    # ```ballerina
+    # error? result = websubListener.__start();
+    # ```
+    #
+    # + return - `()` or else an `error` upon failure to start the listener
     public function __start() returns error? {
         check externStartWebSubSubscriberServiceEndpoint(self);
         // TODO: handle data and return error on error
         self.sendSubscriptionRequests();
     }
 
-# Stops the `websub:Listener` gracefully.
-# ```ballerina
-# error? result = websubListener.__gracefulStop();
-# ```
-#
-# + return - `()` or else an `error` upon failure to stop the listener
+    # Stops the `websub:Listener` gracefully.
+    # ```ballerina
+    # error? result = websubListener.__gracefulStop();
+    # ```
+    #
+    # + return - `()` or else an `error` upon failure to stop the listener
     public function __gracefulStop() returns error? {
         http:Listener? sListener = self.serviceEndpoint;
         if (sListener is http:Listener) {
@@ -104,12 +104,12 @@ public class Listener {
         return ();
     }
 
-# Stops the `websub:Listener` forcefully.
-# ```ballerina
-# error? result = websubListener.__immediateStop();
-# ```
-#
-# + return - () or else an `error` upon failure to stop the listener
+    # Stops the `websub:Listener` forcefully.
+    # ```ballerina
+    # error? result = websubListener.__immediateStop();
+    # ```
+    #
+    # + return - () or else an `error` upon failure to stop the listener
     public function __immediateStop() returns error? {
     }
 
