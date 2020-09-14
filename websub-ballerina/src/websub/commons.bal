@@ -384,7 +384,7 @@ public class Notification {
     public function getFormParams() returns @tainted map<string>|error {
         return self.request.getFormParams();
     }
-};
+}
 
 # Retrieves hub and topic URLs from the `http:response` from a publisher to a discovery request.
 #
