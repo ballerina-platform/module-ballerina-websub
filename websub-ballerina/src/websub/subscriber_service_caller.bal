@@ -58,5 +58,5 @@ public client class Caller {
     public remote function accepted(http:ResponseMessage message = ()) returns error? {
         return self.httpCaller->accepted(message);
     }
-};
+}
 

@@ -152,7 +152,7 @@ public client class PublisherClient {
             return WebSubError("Update availability notification failed for topic [" + topic + "]");
         }
     }
-};
+}
 
 # Builds the topic registration change request to register or unregister a topic at the hub.
 #

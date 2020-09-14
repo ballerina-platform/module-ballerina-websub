@@ -73,7 +73,7 @@ public client class SubscriptionClient {
                                   redirectCount);
     }
 
-};
+}
 
 # Function to build the subscription request to subscribe at the hub.
 #

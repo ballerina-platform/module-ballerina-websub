@@ -597,7 +597,7 @@ class PendingSubscriptionChangeRequest {
     function 'equals(PendingSubscriptionChangeRequest pendingRequest) returns boolean {
         return pendingRequest.mode == self.mode && pendingRequest.topic == self.topic && pendingRequest.callback == self.callback;
     }
-};
+}
 
 function generateKey(string topic, string callback) returns (string) {
     return topic + "_" + callback;

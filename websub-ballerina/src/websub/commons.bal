@@ -155,7 +155,7 @@ public class IntentVerificationRequest {
     public function buildUnsubscriptionVerificationResponse(string expectedTopic) returns http:Response {
         return buildIntentVerificationResponse(self, MODE_UNSUBSCRIBE, expectedTopic);
     }
-};
+}
 
 # Function to build intent verification response for subscription/unsubscription requests sent.
 #
@@ -714,7 +714,7 @@ public function getAvailableTopics() returns string[] {
     public function getSubscribers(string topic) returns SubscriberDetails[] {
         return externGetSubscribers(self, topic);
     }
-};
+}
 
 function externGetAvailableTopics(Hub hub) returns string[] = @java:Method {
     name: "getAvailableTopics",

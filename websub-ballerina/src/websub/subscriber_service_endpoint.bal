@@ -186,7 +186,7 @@ public class Listener {
     function setTopic(string webSubServiceName, string topic) {
         externSetTopic(self, webSubServiceName, topic);
     }
-};
+}
 
 ///////////////////////////////////////////////////////////////////
 //////////////////// WebSub Subscriber Natives ////////////////////

@@ -72,7 +72,7 @@ public class SpecificSubWebhookServerForPayload {
     public function __immediateStop() returns error? {
         return self.websubListener.__immediateStop();
     }
-};
+}
 
 service keyWebhook1 =
 @SubscriberServiceConfig {
