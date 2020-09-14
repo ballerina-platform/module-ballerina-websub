@@ -155,9 +155,15 @@ function testSubscriberDetailsRetrievalFromHub() {
     var response = clientEndpoint->get("/publisher/topicInfo", req);
     HttpResponseDetails httpResponseDetails = fetchHttpResponse(response);
     test:assertEquals(httpResponseDetails.statusCode, http:STATUS_OK);
-    test:assertTrue(stringutils:contains(httpResponseDetails.responseMessage, "callback=http://localhost:23181/websub"));
-    test:assertTrue(stringutils:contains(httpResponseDetails.responseMessage, "callback=http://localhost:23181/subscriberWithNoPathInAnnot"));
-    test:assertTrue(stringutils:contains(httpResponseDetails.responseMessage, "callback=http://localhost:23181/websubThree?topic=http://one.websub.topic.com&fooVal=barVal"));
+    test:assertTrue(stringutils:contains(httpResponseDetails.responseMessage, "\"callback\":\"http://localhost:23181/websub\""));
+    test:assertTrue(
+        stringutils:contains(httpResponseDetails.responseMessage,
+        "\"callback\":\"http://localhost:23181/subscriberWithNoPathInAnnot\"")
+    );
+    test:assertTrue(
+        stringutils:contains(httpResponseDetails.responseMessage,
+        "\"callback\":\"http://localhost:23181/websubThree?topic=http://one.websub.topic.com&fooVal=barVal\"")
+    );
 }
 
 @test:Config {
