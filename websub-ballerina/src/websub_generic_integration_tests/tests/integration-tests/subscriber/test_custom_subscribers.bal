@@ -110,7 +110,7 @@ service customSubHeaderAndPayloadWebhook on new CustomSubWebhookServerForHeaderA
 }
 
 /////////////////// Specific Webhook for dispatching by key ///////////////////
-public type CustomSubWebhookServerForPayload object {
+public class CustomSubWebhookServerForPayload {
 
     *lang:Listener;
 
@@ -158,10 +158,10 @@ public type CustomSubWebhookServerForPayload object {
     public function __immediateStop() returns error? {
         return self.websubListener.__immediateStop();
     }
-};
+}
 
 /////////////////// Specific Webhook for dispatching by header ///////////////////
-public type CustomSubWebhookServerForHeader object {
+public class CustomSubWebhookServerForHeader {
 
     *lang:Listener;
 
@@ -204,10 +204,10 @@ public type CustomSubWebhookServerForHeader object {
     public function __immediateStop() returns error? {
         return self.websubListener.__immediateStop();
     }
-};
+}
 
 /////////////////// Specific Webhook for dispatching by header and payload ///////////////////
-public type CustomSubWebhookServerForHeaderAndPayload object {
+public class CustomSubWebhookServerForHeaderAndPayload {
 
     *lang:Listener;
 
@@ -271,7 +271,7 @@ public type CustomSubWebhookServerForHeaderAndPayload object {
     public function __immediateStop() returns error? {
         return self.websubListener.__immediateStop();
     }
-};
+}
 
 @test:Config {}
 function testOnIntentVerificationInvocation() {

@@ -578,7 +578,7 @@ type TopicRegistration record {|
 # + mode - Whether a pending subscription or unsubscription
 # + topic - The topic for which the subscription or unsubscription is pending
 # + callback - The callback specified for the pending subscription or unsubscription
-type PendingSubscriptionChangeRequest object {
+class PendingSubscriptionChangeRequest {
 
     public string mode;
     public string topic;
@@ -597,7 +597,7 @@ type PendingSubscriptionChangeRequest object {
     function 'equals(PendingSubscriptionChangeRequest pendingRequest) returns boolean {
         return pendingRequest.mode == self.mode && pendingRequest.topic == self.topic && pendingRequest.callback == self.callback;
     }
-};
+}
 
 function generateKey(string topic, string callback) returns (string) {
     return topic + "_" + callback;

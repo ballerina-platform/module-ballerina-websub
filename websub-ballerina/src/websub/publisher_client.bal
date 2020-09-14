@@ -19,31 +19,31 @@ import ballerina/io;
 import ballerina/mime;
 
 # The HTTP based client for WebSub topic registration and unregistration, and notifying the hub of new updates.
-public type PublisherClient client object {
+public client class PublisherClient {
 
     private string url;
     private http:Client httpClient;
 
-# Initializes the `websub:PublisherClient`.
-# ```ballerina
-# websub:PublisherClient websubHubClientEP = new("http://localhost:9191/websub/publish");
-# ```
-#
-# + url    - The URL to publish/notify updates
-# + config - The `http:ClientConfiguration` for the underlying client or else `()`
+    # Initializes the `websub:PublisherClient`.
+    # ```ballerina
+    # websub:PublisherClient websubHubClientEP = new("http://localhost:9191/websub/publish");
+    # ```
+    #
+    # + url    - The URL to publish/notify updates
+    # + config - The `http:ClientConfiguration` for the underlying client or else `()`
     public function init(string url, http:ClientConfiguration? config = ()) {
         self.url = url;
         self.httpClient = new (self.url, config);
     }
 
-# Registers a topic in a Ballerina WebSub Hub against which subscribers can subscribe and the publisher will
-# publish updates.
-# ```ballerina
-# error? registerTopic = websubHubClientEP->registerTopic("http://websubpubtopic.com");
-# ```
-#
-# + topic - The topic to register
-# + return - An `error` if an error occurred registering the topic or esle `()`
+    # Registers a topic in a Ballerina WebSub Hub against which subscribers can subscribe and the publisher will
+    # publish updates.
+    # ```ballerina
+    # error? registerTopic = websubHubClientEP->registerTopic("http://websubpubtopic.com");
+    # ```
+    #
+    # + topic - The topic to register
+    # + return - An `error` if an error occurred registering the topic or esle `()`
     public remote function registerTopic(string topic) returns @tainted error? {
         http:Client httpClient = self.httpClient;
         http:Request request = buildTopicRegistrationChangeRequest(MODE_REGISTER, topic);
@@ -59,13 +59,13 @@ public type PublisherClient client object {
         }
     }
 
-# Unregisters a topic in a Ballerina WebSub Hub.
-# ```ballerina
-# error? unregisterTopic = websubHubClientEP->unregisterTopic("http://websubpubtopic.com");
-#  ```
-#
-# + topic - The topic to unregister
-# + return -  An `error`if an error occurred unregistering the topic or else `()`
+    # Unregisters a topic in a Ballerina WebSub Hub.
+    # ```ballerina
+    # error? unregisterTopic = websubHubClientEP->unregisterTopic("http://websubpubtopic.com");
+    #  ```
+    #
+    # + topic - The topic to unregister
+    # + return -  An `error`if an error occurred unregistering the topic or else `()`
     public remote function unregisterTopic(string topic) returns @tainted error? {
         http:Client httpClient = self.httpClient;
         http:Request request = buildTopicRegistrationChangeRequest(MODE_UNREGISTER, topic);
@@ -81,17 +81,17 @@ public type PublisherClient client object {
         }
     }
 
-# Publishes an update to a remote Ballerina WebSub Hub.
-# ```ballerina
-# error? publishUpdate = websubHubClientEP->publishUpdate("http://websubpubtopic.com",{"action": "publish",
-# "mode": "remote-hub"});
-#  ```
-#
-# + topic - The topic for which the update occurred
-# + payload - The update payload
-# + contentType - The type of the update content to set as the `ContentType` header
-# + headers - The headers that need to be set (if any)
-# + return -  An `error`if an error occurred with the update or else `()`
+    # Publishes an update to a remote Ballerina WebSub Hub.
+    # ```ballerina
+    # error? publishUpdate = websubHubClientEP->publishUpdate("http://websubpubtopic.com",{"action": "publish",
+    # "mode": "remote-hub"});
+    #  ```
+    #
+    # + topic - The topic for which the update occurred
+    # + payload - The update payload
+    # + contentType - The type of the update content to set as the `ContentType` header
+    # + headers - The headers that need to be set (if any)
+    # + return -  An `error`if an error occurred with the update or else `()`
     public remote function publishUpdate(string topic, string|xml|json|byte[]|io:ReadableByteChannel payload,
                                          string? contentType = (), map<string>? headers = ()) returns @tainted error? {
         http:Client httpClient = self.httpClient;
@@ -121,15 +121,15 @@ public type PublisherClient client object {
         }
     }
 
-# Notifies a remote WebSub Hub from which an update is available to fetch for hubs that require publishing to
-# happen as such.
-# ```ballerina
-#  error? notifyUpdate = websubHubClientEP->notifyUpdate("http://websubpubtopic.com");
-#   ```
-#
-# + topic - The topic for which the update occurred
-# + headers - The headers that need to be set (if any)
-# + return -  An `error`if an error occurred with the notification or else `()`
+    # Notifies a remote WebSub Hub from which an update is available to fetch for hubs that require publishing to
+    # happen as such.
+    # ```ballerina
+    #  error? notifyUpdate = websubHubClientEP->notifyUpdate("http://websubpubtopic.com");
+    #   ```
+    #
+    # + topic - The topic for which the update occurred
+    # + headers - The headers that need to be set (if any)
+    # + return -  An `error`if an error occurred with the notification or else `()`
     public remote function notifyUpdate(string topic, map<string>? headers = ()) returns @tainted error? {
         http:Client httpClient = self.httpClient;
         http:Request request = new;
@@ -152,7 +152,7 @@ public type PublisherClient client object {
             return WebSubError("Update availability notification failed for topic [" + topic + "]");
         }
     }
-};
+}
 
 # Builds the topic registration change request to register or unregister a topic at the hub.
 #

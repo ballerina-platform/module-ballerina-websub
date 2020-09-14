@@ -77,7 +77,7 @@ const string INTERNAL_HUB_NOTIFICATION_LOG = "WebSub Notification Received: {\"a
 const string REMOTE_HUB_NOTIFICATION_LOG = "WebSub Notification Received: {\"action\":\"publish\", \"mode\":\"remote-hub\"}";
 const string INTERNAL_HUB_NOTIFICATION_LOG_TWO = "WebSub Notification Received by Two: {\"action\":\"publish\", \"mode\":\"internal-hub\"}";
 const string REMOTE_HUB_NOTIFICATION_LOG_TWO = "WebSub Notification Received by Two: {\"action\":\"publish\", \"mode\":\"remote-hub\"}";
-const string QUERY_PARAM_LOG = "Query Params: fooVal=barVal topic=http://one.websub.topic.com";
+const string QUERY_PARAM_LOG = "Query Params: {\"fooVal\":[\"barVal\"],\"topic\":[\"http://one.websub.topic.com\"]}";
 
 const string XML_INTERNAL_HUB_NOTIFICATION_SUBSCRIBER_ONE_LOG = "XML WebSub Notification Received by websubSubscriber: <websub><request>Notification</request><type>Internal</type></websub>";
 const string TEXT_INTERNAL_HUB_NOTIFICATION_SUBSCRIBER_ONE_LOG = "Text WebSub Notification Received by websubSubscriber: Text update for internal Hub";

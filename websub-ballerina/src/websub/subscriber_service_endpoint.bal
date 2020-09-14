@@ -27,7 +27,7 @@ import ballerina/java;
 # Represents the WebSubSubscriber Service Listener.
 #
 # + config - The configurations for the `websub:Listener`
-public type Listener object {
+public class Listener {
 
     *lang:Listener;
 
@@ -55,47 +55,47 @@ public type Listener object {
         externInitWebSubSubscriberServiceEndpoint(self);
     }
 
-# Binds a service to the `websub:Listener`.
-# ```ballerina
-# error? result = websubListener.__attach(helloService);
-# ```
-#
-# + s - Type descriptor of the service
-# + name - Name of the service
-# + return - `()` or else an `error` upon failure to register the listener
+    # Binds a service to the `websub:Listener`.
+    # ```ballerina
+    # error? result = websubListener.__attach(helloService);
+    # ```
+    #
+    # + s - Type descriptor of the service
+    # + name - Name of the service
+    # + return - `()` or else an `error` upon failure to register the listener
     public function __attach(service s, string? name = ()) returns error? {
         // TODO: handle data and return error on error
         externRegisterWebSubSubscriberService(self, s);
     }
 
-# Stops consuming messages and detaches the service from the `websub:Listener`.
-# ```ballerina
-# error? result = websubListener.__detach(helloService);
-# ```
-#
-# + s - Type descriptor of the service
-# + return - `()` or else an `error` upon failure to detach the service
+    # Stops consuming messages and detaches the service from the `websub:Listener`.
+    # ```ballerina
+    # error? result = websubListener.__detach(helloService);
+    # ```
+    #
+    # + s - Type descriptor of the service
+    # + return - `()` or else an `error` upon failure to detach the service
     public function __detach(service s) returns error? {
     }
 
-# Starts the `websub:Listener`.
-# ```ballerina
-# error? result = websubListener.__start();
-# ```
-#
-# + return - `()` or else an `error` upon failure to start the listener
+    # Starts the `websub:Listener`.
+    # ```ballerina
+    # error? result = websubListener.__start();
+    # ```
+    #
+    # + return - `()` or else an `error` upon failure to start the listener
     public function __start() returns error? {
         check externStartWebSubSubscriberServiceEndpoint(self);
         // TODO: handle data and return error on error
         self.sendSubscriptionRequests();
     }
 
-# Stops the `websub:Listener` gracefully.
-# ```ballerina
-# error? result = websubListener.__gracefulStop();
-# ```
-#
-# + return - `()` or else an `error` upon failure to stop the listener
+    # Stops the `websub:Listener` gracefully.
+    # ```ballerina
+    # error? result = websubListener.__gracefulStop();
+    # ```
+    #
+    # + return - `()` or else an `error` upon failure to stop the listener
     public function __gracefulStop() returns error? {
         http:Listener? sListener = self.serviceEndpoint;
         if (sListener is http:Listener) {
@@ -104,12 +104,12 @@ public type Listener object {
         return ();
     }
 
-# Stops the `websub:Listener` forcefully.
-# ```ballerina
-# error? result = websubListener.__immediateStop();
-# ```
-#
-# + return - () or else an `error` upon failure to stop the listener
+    # Stops the `websub:Listener` forcefully.
+    # ```ballerina
+    # error? result = websubListener.__immediateStop();
+    # ```
+    #
+    # + return - () or else an `error` upon failure to stop the listener
     public function __immediateStop() returns error? {
     }
 
@@ -186,7 +186,7 @@ public type Listener object {
     function setTopic(string webSubServiceName, string topic) {
         externSetTopic(self, webSubServiceName, topic);
     }
-};
+}
 
 ///////////////////////////////////////////////////////////////////
 //////////////////// WebSub Subscriber Natives ////////////////////
@@ -194,27 +194,27 @@ public type Listener object {
 
 function externInitWebSubSubscriberServiceEndpoint(Listener subscriberListener) = @java:Method {
     name: "initWebSubSubscriberServiceEndpoint",
-    class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
 function externRegisterWebSubSubscriberService(Listener subscriberListener, service serviceType) = @java:Method {
     name: "registerWebSubSubscriberService",
-    class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
 function externStartWebSubSubscriberServiceEndpoint(Listener subscriberListener) returns error? = @java:Method {
     name: "startWebSubSubscriberServiceEndpoint",
-    class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
 function externSetTopic(Listener subscriberListener, string webSubServiceName, string topic) = @java:Method {
     name: "setTopic",
-    class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
 function externRetrieveSubscriptionParameters(Listener subscriberListener) returns map<any>[] = @java:Method {
     name: "retrieveSubscriptionParameters",
-    class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
+    'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
 

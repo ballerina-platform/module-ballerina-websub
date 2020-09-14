@@ -25,7 +25,7 @@ public type SpecificSubMockDomainEvent record {|
     string domain;
 |};
 
-public type SpecificSubWebhookServerForPayload object {
+public class SpecificSubWebhookServerForPayload {
 
     *lang:Listener;
 
@@ -72,7 +72,7 @@ public type SpecificSubWebhookServerForPayload object {
     public function __immediateStop() returns error? {
         return self.websubListener.__immediateStop();
     }
-};
+}
 
 service keyWebhook1 =
 @SubscriberServiceConfig {

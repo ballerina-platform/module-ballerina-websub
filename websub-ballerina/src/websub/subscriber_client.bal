@@ -20,7 +20,7 @@ import ballerina/log;
 import ballerina/mime;
 
 # The HTTP based client for WebSub subscription and unsubscription.
-public type SubscriptionClient client object {
+public client class SubscriptionClient {
 
     private string url;
     private http:Client httpClient;
@@ -36,14 +36,14 @@ public type SubscriptionClient client object {
         self.followRedirects = config?.followRedirects;
     }
 
-# Sends a subscription request to a WebSub Hub.
-# ```ballerina
-# websub:SubscriptionChangeResponse|error response = websubHubClientEP->subscribe(subscriptionRequest);
-# ```
-#
-# + subscriptionRequest - The `SubscriptionChangeRequest` containing the subscription details
-# + return - The `SubscriptionChangeResponse` indicating subscription details if the request was successful
-#           or else an `error` if an error occurred with the subscription request
+    # Sends a subscription request to a WebSub Hub.
+    # ```ballerina
+    # websub:SubscriptionChangeResponse|error response = websubHubClientEP->subscribe(subscriptionRequest);
+    # ```
+    #
+    # + subscriptionRequest - The `SubscriptionChangeRequest` containing the subscription details
+    # + return - The `SubscriptionChangeResponse` indicating subscription details if the request was successful
+    #           or else an `error` if an error occurred with the subscription request
     public remote function subscribe(SubscriptionChangeRequest subscriptionRequest)
         returns @tainted SubscriptionChangeResponse|error {
 
@@ -55,13 +55,13 @@ public type SubscriptionClient client object {
                                   redirectCount);
     }
 
-# Sends an unsubscription request to a WebSub Hub.
-# ```ballerina
-# websub:SubscriptionChangeResponse|error response = websubHubClientEP->unsubscribe(subscriptionRequest);
-# ```
-# + unsubscriptionRequest - The `SubscriptionChangeRequest` containing unsubscription details
-# + return - An unsubscription details if the request was successful or else an `error` if an error occurred
-#            with the unsubscription request
+    # Sends an unsubscription request to a WebSub Hub.
+    # ```ballerina
+    # websub:SubscriptionChangeResponse|error response = websubHubClientEP->unsubscribe(subscriptionRequest);
+    # ```
+    # + unsubscriptionRequest - The `SubscriptionChangeRequest` containing unsubscription details
+    # + return - An unsubscription details if the request was successful or else an `error` if an error occurred
+    #            with the unsubscription request
     public remote function unsubscribe(SubscriptionChangeRequest unsubscriptionRequest)
         returns @tainted SubscriptionChangeResponse|error {
 
@@ -73,7 +73,7 @@ public type SubscriptionClient client object {
                                   redirectCount);
     }
 
-};
+}
 
 # Function to build the subscription request to subscribe at the hub.
 #
