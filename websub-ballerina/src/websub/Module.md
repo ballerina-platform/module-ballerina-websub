@@ -314,7 +314,7 @@ public type IssueAssignedEvent record {
 }; 
 
 // Introduce a new `listener` wrapping the generic `ballerina/websub:Listener` 
-public type WebhookListener object {
+public class WebhookListener {
 
     *objects:Listener;
 
