@@ -18,15 +18,16 @@
 
 package org.ballerinalang.net.websub;
 
-import org.ballerinalang.jvm.BallerinaErrors;
-import org.ballerinalang.jvm.BallerinaValues;
 import org.ballerinalang.jvm.JSONParser;
+import org.ballerinalang.jvm.api.BErrorCreator;
+import org.ballerinalang.jvm.api.BStringUtils;
+import org.ballerinalang.jvm.api.BValueCreator;
+import org.ballerinalang.jvm.api.values.BError;
+import org.ballerinalang.jvm.api.values.BMap;
+import org.ballerinalang.jvm.api.values.BObject;
+import org.ballerinalang.jvm.api.values.BString;
 import org.ballerinalang.jvm.types.AttachedFunction;
 import org.ballerinalang.jvm.util.exceptions.BallerinaConnectorException;
-import org.ballerinalang.jvm.values.ErrorValue;
-import org.ballerinalang.jvm.values.MapValue;
-import org.ballerinalang.jvm.values.ObjectValue;
-import org.ballerinalang.jvm.values.api.BString;
 import org.ballerinalang.mime.util.EntityBodyHandler;
 import org.ballerinalang.mime.util.MimeConstants;
 import org.ballerinalang.mime.util.MimeUtil;
@@ -41,10 +42,10 @@ public class WebSubUtils {
 
     public static final String WEBSUB_ERROR = "WebSubError";
 
-    static ObjectValue getHttpRequest(HttpCarbonMessage httpCarbonMessage) {
-        ObjectValue httpRequest = BallerinaValues.createObjectValue(HttpConstants.PROTOCOL_HTTP_PKG_ID,
+    static BObject getHttpRequest(HttpCarbonMessage httpCarbonMessage) {
+        BObject httpRequest = BValueCreator.createObjectValue(HttpConstants.PROTOCOL_HTTP_PKG_ID,
                                                                     HttpConstants.REQUEST);
-        ObjectValue inRequestEntity = BallerinaValues.createObjectValue(MimeConstants.PROTOCOL_MIME_PKG_ID,
+        BObject inRequestEntity = BValueCreator.createObjectValue(MimeConstants.PROTOCOL_MIME_PKG_ID,
                                                                         MimeConstants.ENTITY);
 
         HttpUtil.populateInboundRequest(httpRequest, inRequestEntity, httpCarbonMessage);
@@ -54,8 +55,8 @@ public class WebSubUtils {
 
     // TODO: 8/1/18 Handle duplicate code
     @SuppressWarnings("unchecked")
-    static MapValue<BString, ?> getJsonBody(ObjectValue httpRequest) {
-        ObjectValue entityObj = HttpUtil.extractEntity(httpRequest);
+    static BMap<BString, ?> getJsonBody(BObject httpRequest) {
+        BObject entityObj = HttpUtil.extractEntity(httpRequest);
         if (entityObj != null) {
             Object dataSource = EntityBodyHandler.getMessageDataSource(entityObj);
             String stringPayload;
@@ -69,8 +70,8 @@ public class WebSubUtils {
             }
 
             Object result = JSONParser.parse(stringPayload);
-            if (result instanceof MapValue) {
-                return (MapValue<BString, ?>) result;
+            if (result instanceof BMap) {
+                return (BMap<BString, ?>) result;
             }
             throw new BallerinaConnectorException("Non-compatible payload received for payload key based dispatching");
         } else {
@@ -78,7 +79,7 @@ public class WebSubUtils {
         }
     }
 
-    public static AttachedFunction getAttachedFunction(ObjectValue service, String functionName) {
+    public static AttachedFunction getAttachedFunction(BObject service, String functionName) {
         AttachedFunction attachedFunction = null;
         String functionFullName = service.getType().getName() + "." + functionName;
         for (AttachedFunction function : service.getType().getAttachedFunctions()) {
@@ -96,9 +97,9 @@ public class WebSubUtils {
      * @param errMsg  Actual error message
      * @return Ballerina error value
      */
-    public static ErrorValue createError(String errMsg) {
-        return BallerinaErrors.createDistinctError(WEBSUB_ERROR, WebSubSubscriberConstants.WEBSUB_PACKAGE_ID,
-                errMsg);
+    public static BError createError(String errMsg) {
+        return BErrorCreator.createDistinctError(WEBSUB_ERROR, WebSubSubscriberConstants.WEBSUB_PACKAGE_ID,
+                                                 BStringUtils.fromString(errMsg));
     }
 
     /**
@@ -108,7 +109,8 @@ public class WebSubUtils {
      * @param message  The Actual error cause
      * @return Ballerina error value
      */
-    public static ErrorValue createError(String typeIdName, String message) {
-        return BallerinaErrors.createDistinctError(typeIdName, WebSubSubscriberConstants.WEBSUB_PACKAGE_ID, message);
+    public static BError createError(String typeIdName, String message) {
+        return BErrorCreator.createDistinctError(typeIdName, WebSubSubscriberConstants.WEBSUB_PACKAGE_ID,
+                                                 BStringUtils.fromString(message));
     }
 }

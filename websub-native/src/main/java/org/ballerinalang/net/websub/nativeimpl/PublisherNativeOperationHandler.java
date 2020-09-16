@@ -18,11 +18,11 @@
 
 package org.ballerinalang.net.websub.nativeimpl;
 
+import org.ballerinalang.jvm.api.values.BMap;
+import org.ballerinalang.jvm.api.values.BObject;
+import org.ballerinalang.jvm.api.values.BString;
 import org.ballerinalang.jvm.values.ArrayValue;
 import org.ballerinalang.jvm.values.ArrayValueImpl;
-import org.ballerinalang.jvm.values.MapValue;
-import org.ballerinalang.jvm.values.ObjectValue;
-import org.ballerinalang.jvm.values.api.BString;
 import org.ballerinalang.mime.util.MimeUtil;
 import org.ballerinalang.net.websub.BallerinaWebSubException;
 import org.ballerinalang.net.websub.WebSubUtils;
@@ -49,7 +49,7 @@ public class PublisherNativeOperationHandler {
      * @return `error` if an error occurred during publishing
      */
     public static Object validateAndPublishToInternalHub(BString hubUrl, BString topic,
-                                                         MapValue<BString, Object> content) {
+                                                         BMap<BString, Object> content) {
         Hub hubInstance = Hub.getInstance();
         if (hubInstance.isStarted() && hubInstance.getPublishUrl().equals(hubUrl.getValue())) {
             try {
@@ -69,7 +69,7 @@ public class PublisherNativeOperationHandler {
      * @param byteChannel the specified byte channel
      * @return the constructed byte array
      */
-    public static ArrayValue constructByteArray(ObjectValue byteChannel) {
+    public static ArrayValue constructByteArray(BObject byteChannel) {
         Channel channel = (Channel) byteChannel.getNativeData(IOConstants.BYTE_CHANNEL_NAME);
         if (channel == null) {
             return new ArrayValueImpl(new byte[0]);
