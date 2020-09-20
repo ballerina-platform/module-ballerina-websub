@@ -32,7 +32,7 @@ cache:CacheConfig config = {
 };
 cache:Cache subscriberCallbackClientCache = new(config);
 
-function getHubService() returns service {
+isolated function getHubService() returns service {
     return @http:ServiceConfig {
         basePath: hubBasePath,
         auth: hubServiceAuth
@@ -434,7 +434,7 @@ function addTopicRegistrationsOnStartup(HubPersistenceStore persistenceStore) re
     }
 }
 
-function addSubscriptionsOnStartup(HubPersistenceStore persistenceStore) returns error? {
+isolated function addSubscriptionsOnStartup(HubPersistenceStore persistenceStore) returns error? {
     SubscriptionDetails[]|error subscriptions = persistenceStore.retrieveAllSubscribers();
 
     if (subscriptions is SubscriptionDetails[]) {
@@ -584,7 +584,7 @@ class PendingSubscriptionChangeRequest {
     public string topic;
     public string callback;
 
-    public function init(string mode, string topic, string callback) {
+    public isolated function init(string mode, string topic, string callback) {
         self.mode = mode;
         self.topic = topic;
         self.callback = callback;
@@ -594,12 +594,12 @@ class PendingSubscriptionChangeRequest {
     #
     # + pendingRequest - The pending subscription change request to be checked against pending subscription or unsubscription
     # + return - A `boolean` indicating whether the requests are equal or not
-    function 'equals(PendingSubscriptionChangeRequest pendingRequest) returns boolean {
+    isolated function 'equals(PendingSubscriptionChangeRequest pendingRequest) returns boolean {
         return pendingRequest.mode == self.mode && pendingRequest.topic == self.topic && pendingRequest.callback == self.callback;
     }
 }
 
-function generateKey(string topic, string callback) returns (string) {
+isolated function generateKey(string topic, string callback) returns (string) {
     return topic + "_" + callback;
 }
 
@@ -608,7 +608,7 @@ function generateKey(string topic, string callback) returns (string) {
 # + hub - The hub publishing the update
 # + topic - The canonical URL of the topic for which the update occurred
 # + return - The link header content
-function buildWebSubLinkHeader(string hub, string topic) returns (string) {
+isolated function buildWebSubLinkHeader(string hub, string topic) returns (string) {
     string linkHeader = "<" + hub + ">; rel=\"hub\", <" + topic + ">; rel=\"self\"";
     return linkHeader;
 }
@@ -617,7 +617,7 @@ function buildWebSubLinkHeader(string hub, string topic) returns (string) {
 #
 # + groupString - Comma-separated string of groups
 # + return - An array of groups
-function getArray(string groupString) returns string[] {
+isolated function getArray(string groupString) returns string[] {
     string[] groupsArr = [];
     if (groupString.length() == 0) {
         return groupsArr;

@@ -20,7 +20,7 @@ import ballerina/http;
 public client class Caller {
     private http:Caller httpCaller;
 
-    function init(http:Caller httpCaller) {
+    isolated function init(http:Caller httpCaller) {
         self.httpCaller = httpCaller;
     }
 
@@ -32,7 +32,7 @@ public client class Caller {
     # + message - The response or any payload of type `string`, `xml`, `json`, `byte[]`, `io:ReadableByteChannel`,
     #             or `mime:Entity[]`
     # + return - An `error` on failure or else `()`
-    public remote function respond(http:ResponseMessage message = ()) returns error? {
+    public isolated remote function respond(http:ResponseMessage message = ()) returns error? {
         return self.httpCaller->respond(message);
     }
 
@@ -44,7 +44,7 @@ public client class Caller {
     # + message - The response or any payload of type `string`, `xml`, `json`, `byte[]`, `io:ReadableByteChannel`,
     #             or `mime:Entity[]`
     # + return - An `error` on failure or else `()`
-    public remote function ok(http:ResponseMessage message = ()) returns error? {
+    public isolated remote function ok(http:ResponseMessage message = ()) returns error? {
         return self.httpCaller->ok(message);
     }
 
@@ -55,7 +55,7 @@ public client class Caller {
     #
     # + message - The response or any payload of the `http:ResponseMessage` type
     # + return - An `error` on failure or else `()`
-    public remote function accepted(http:ResponseMessage message = ()) returns error? {
+    public isolated remote function accepted(http:ResponseMessage message = ()) returns error? {
         return self.httpCaller->accepted(message);
     }
 }

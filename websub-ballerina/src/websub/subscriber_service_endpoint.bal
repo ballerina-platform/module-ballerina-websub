@@ -39,7 +39,7 @@ public class Listener {
     #
     # + port - The port number of the remote service
     # + config - The configurations related to the `websub:Listener`
-    public function init(int port, SubscriberListenerConfiguration? config = ()) {
+    public isolated function init(int port, SubscriberListenerConfiguration? config = ()) {
         self.config = config;
         http:ListenerConfiguration? serviceConfig = ();
         if (config is SubscriberListenerConfiguration) {
@@ -63,7 +63,7 @@ public class Listener {
     # + s - Type descriptor of the service
     # + name - Name of the service
     # + return - `()` or else an `error` upon failure to register the listener
-    public function __attach(service s, string? name = ()) returns error? {
+    public isolated function __attach(service s, string? name = ()) returns error? {
         // TODO: handle data and return error on error
         externRegisterWebSubSubscriberService(self, s);
     }
@@ -75,7 +75,7 @@ public class Listener {
     #
     # + s - Type descriptor of the service
     # + return - `()` or else an `error` upon failure to detach the service
-    public function __detach(service s) returns error? {
+    public isolated function __detach(service s) returns error? {
     }
 
     # Starts the `websub:Listener`.
@@ -96,7 +96,7 @@ public class Listener {
     # ```
     #
     # + return - `()` or else an `error` upon failure to stop the listener
-    public function __gracefulStop() returns error? {
+    public isolated function __gracefulStop() returns error? {
         http:Listener? sListener = self.serviceEndpoint;
         if (sListener is http:Listener) {
             return sListener.__gracefulStop();
@@ -110,7 +110,7 @@ public class Listener {
     # ```
     #
     # + return - () or else an `error` upon failure to stop the listener
-    public function __immediateStop() returns error? {
+    public isolated function __immediateStop() returns error? {
     }
 
     # Sends subscription requests to the specified/discovered hubs if specified to subscribe on startup.
@@ -183,7 +183,7 @@ public class Listener {
     #
     # + webSubServiceName - The name of the service for which subscription happened for a topic
     # + topic - The topic the subscription happened for
-    function setTopic(string webSubServiceName, string topic) {
+    isolated function setTopic(string webSubServiceName, string topic) {
         externSetTopic(self, webSubServiceName, topic);
     }
 }
@@ -192,27 +192,27 @@ public class Listener {
 //////////////////// WebSub Subscriber Natives ////////////////////
 ///////////////////////////////////////////////////////////////////
 
-function externInitWebSubSubscriberServiceEndpoint(Listener subscriberListener) = @java:Method {
+isolated function externInitWebSubSubscriberServiceEndpoint(Listener subscriberListener) = @java:Method {
     name: "initWebSubSubscriberServiceEndpoint",
     'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
-function externRegisterWebSubSubscriberService(Listener subscriberListener, service serviceType) = @java:Method {
+isolated function externRegisterWebSubSubscriberService(Listener subscriberListener, service serviceType) = @java:Method {
     name: "registerWebSubSubscriberService",
     'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
-function externStartWebSubSubscriberServiceEndpoint(Listener subscriberListener) returns error? = @java:Method {
+isolated function externStartWebSubSubscriberServiceEndpoint(Listener subscriberListener) returns error? = @java:Method {
     name: "startWebSubSubscriberServiceEndpoint",
     'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
-function externSetTopic(Listener subscriberListener, string webSubServiceName, string topic) = @java:Method {
+isolated function externSetTopic(Listener subscriberListener, string webSubServiceName, string topic) = @java:Method {
     name: "setTopic",
     'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
-function externRetrieveSubscriptionParameters(Listener subscriberListener) returns map<any>[] = @java:Method {
+isolated function externRetrieveSubscriptionParameters(Listener subscriberListener) returns map<any>[] = @java:Method {
     name: "retrieveSubscriptionParameters",
     'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;

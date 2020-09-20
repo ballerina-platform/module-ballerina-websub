@@ -42,7 +42,7 @@ boolean hubPersistenceEnabled = false;
 # Attaches and starts the Ballerina WebSub Hub service.
 #
 # + hubServiceListener - The `http:Listener` to which the service is attached
-function startHubService(http:Listener hubServiceListener) {
+isolated function startHubService(http:Listener hubServiceListener) {
     // TODO : handle errors
     checkpanic hubServiceListener.__attach(getHubService());
     checkpanic hubServiceListener.__start();
@@ -62,7 +62,7 @@ function isHubTopicRegistrationRequired() returns boolean {
     return hubTopicRegistrationRequired;
 }
 
-function getSignatureMethod(SignatureMethod? signatureMethod) returns string {
+isolated function getSignatureMethod(SignatureMethod? signatureMethod) returns string {
     match signatureMethod {
         "SHA256" => {
             return "SHA256";
@@ -74,6 +74,6 @@ function getSignatureMethod(SignatureMethod? signatureMethod) returns string {
     return DEFAULT_SIGNATURE_METHOD;
 }
 
-function getRemotePublishConfig(RemotePublishConfig? remotePublish) returns RemotePublishConfig {
+isolated function getRemotePublishConfig(RemotePublishConfig? remotePublish) returns RemotePublishConfig {
     return remotePublish is RemotePublishConfig ? remotePublish : {};
 }
