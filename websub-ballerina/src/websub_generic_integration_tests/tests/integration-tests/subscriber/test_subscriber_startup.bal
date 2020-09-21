@@ -18,6 +18,7 @@ import ballerina/http;
 import ballerina/log;
 import ballerina/test;
 import ballerina/io;
+import ballerina/stringutils;
 import websub;
 
 listener http:Listener testSubscriber = new(23386);
@@ -121,6 +122,6 @@ function testMultipleSubscribersStartUpInSamePort() {
 
     string expectedResponseMsg = "failed to start server connector '0.0.0.0:23387': Address already in use";
     test:assertEquals(responseDetails.statusCode, http:STATUS_OK, msg = "Response code mismatched");
-    test:assertEquals(responseDetails.responseMessage, expectedResponseMsg, msg = "Mismatched");
+    test:assertTrue(stringutils:contains(responseDetails.responseMessage, expectedResponseMsg));
 
 }
