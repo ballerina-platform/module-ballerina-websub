@@ -261,8 +261,10 @@ task ballerinaTest {
             workingDir project.projectDir
             environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                environment "OS_TYPE", "windows"
                 commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat test --offline --all -- --b7a.config.file=src/websub_advanced_integration_tests/tests/advanced_services/sample-users.toml --test.hub.url=https://localhost:23191/websub/hub && exit %%ERRORLEVEL%%"
             } else {
+                environment "OS_TYPE", "linux"
                 commandLine 'sh', '-c', "$distributionBinPath/ballerina test --offline --all -- --b7a.config.file=src/websub_advanced_integration_tests/tests/advanced_services/sample-users.toml --test.hub.url=https://localhost:23191/websub/hub"
             }
         }
