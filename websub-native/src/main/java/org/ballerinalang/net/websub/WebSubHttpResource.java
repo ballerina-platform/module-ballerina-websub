@@ -1,8 +1,8 @@
 package org.ballerinalang.net.websub;
 
-import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.types.AttachedFunction;
 import org.ballerinalang.jvm.util.exceptions.BallerinaException;
+import org.ballerinalang.jvm.values.MapValue;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
 
@@ -26,7 +26,7 @@ class WebSubHttpResource extends HttpResource {
      */
     static HttpResource buildWebSubHttpResource(AttachedFunction resource, HttpService httpService) {
         WebSubHttpResource httpResource = new WebSubHttpResource(resource, httpService);
-        BMap resourceConfigAnnotation = getResourceConfigAnnotation(resource);
+        MapValue resourceConfigAnnotation = getResourceConfigAnnotation(resource);
 
         if (resourceConfigAnnotation != null) {
             throw new BallerinaException("resourceConfig annotation not allowed for WebSubSubscriber resource");

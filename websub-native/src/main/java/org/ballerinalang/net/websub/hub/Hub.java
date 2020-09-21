@@ -18,14 +18,14 @@
 
 package org.ballerinalang.net.websub.hub;
 
+import org.ballerinalang.jvm.BallerinaValues;
+import org.ballerinalang.jvm.StringUtils;
 import org.ballerinalang.jvm.TypeChecker;
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.BValueCreator;
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.api.values.BObject;
-import org.ballerinalang.jvm.api.values.BString;
 import org.ballerinalang.jvm.scheduling.Strand;
 import org.ballerinalang.jvm.util.exceptions.BallerinaException;
+import org.ballerinalang.jvm.values.MapValue;
+import org.ballerinalang.jvm.values.ObjectValue;
+import org.ballerinalang.jvm.values.api.BString;
 import org.ballerinalang.net.websub.BallerinaWebSubException;
 import org.ballerinalang.net.websub.broker.BallerinaBroker;
 import org.ballerinalang.net.websub.broker.BallerinaBrokerByteBuf;
@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.ballerinalang.jvm.api.BExecutor.executeFunction;
+import static org.ballerinalang.jvm.values.connector.Executor.executeFunction;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.BALLERINA;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.GENERATED_PACKAGE_VERSION;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.STRUCT_WEBSUB_BALLERINA_HUB;
@@ -55,7 +55,7 @@ public class Hub {
 
     private static Hub instance = new Hub();
     private BallerinaBroker brokerInstance = null;
-    private BObject hubObject = null;
+    private ObjectValue hubObject = null;
     private String publishUrl;
     private String subscribeUrl;
     private boolean hubTopicRegistrationRequired;
@@ -84,7 +84,7 @@ public class Hub {
         return publishUrl;
     }
 
-    public BObject getHubObject() {
+    public ObjectValue getHubObject() {
         return hubObject;
     }
 
@@ -116,7 +116,7 @@ public class Hub {
      * @param subscriptionDetails the subscription details
      */
     public void registerSubscription(Strand strand, String topic, String callback,
-                                     BMap<BString, Object> subscriptionDetails) {
+                                     MapValue<BString, Object> subscriptionDetails) {
         if (!started) {
             //TODO: Revisit to check if this needs to be returned as an error, currently not required since this check
             // is performed at Ballerina level
@@ -174,7 +174,7 @@ public class Hub {
      * @throws BallerinaWebSubException if the hub service is not started or topic registration is required, but the
      *                                  topic is not registered
      */
-    public void publish(String topic, BMap<BString, Object> content) throws BallerinaWebSubException {
+    public void publish(String topic, MapValue<BString, Object> content) throws BallerinaWebSubException {
         if (!started) {
             throw new BallerinaWebSubException("Hub Service not started: publish failed");
         } else if (!topics.contains(topic) && hubTopicRegistrationRequired) {
@@ -204,7 +204,7 @@ public class Hub {
     @SuppressWarnings("unchecked")
     public Object startUpHubService(Strand strand, String basePath, String subscriptionResourcePath,
                                   String publishResourcePath, boolean topicRegistrationRequired, String publicUrl,
-                                  BObject hubListener) {
+                                  ObjectValue hubListener) {
         synchronized (this) {
             if (!isStarted()) {
                 try {
@@ -235,9 +235,9 @@ public class Hub {
                 setPublishUrl(publishUrl);
                 setSubscribeUrl(subscribeUrl);
 
-                BObject hubObject = BValueCreator.createObjectValue(
-                        WEBSUB_PACKAGE_ID, STRUCT_WEBSUB_BALLERINA_HUB, BStringUtils.fromString(subscribeUrl),
-                        BStringUtils.fromString(publishUrl), hubListener);
+                ObjectValue hubObject = BallerinaValues.createObjectValue(
+                        WEBSUB_PACKAGE_ID, STRUCT_WEBSUB_BALLERINA_HUB, StringUtils.fromString(subscribeUrl),
+                        StringUtils.fromString(publishUrl), hubListener);
                 setHubObject(hubObject);
                 return hubObject;
             } else {
@@ -247,11 +247,11 @@ public class Hub {
     }
 
     @SuppressWarnings("unchecked")
-    private String populatePublishUrl(String publicUrl, BObject hubListener) {
+    private String populatePublishUrl(String publicUrl, ObjectValue hubListener) {
         if (publicUrl.isEmpty()) {
-            String hubPort = String.valueOf(hubListener.get(BStringUtils.fromString("port")));
-            Object secureSocket = ((BMap<BString, Object>) hubListener.get(
-                    BStringUtils.fromString("config"))).get(BStringUtils.fromString("secureSocket"));
+            String hubPort = String.valueOf(hubListener.get(StringUtils.fromString("port")));
+            Object secureSocket = ((MapValue<BString, Object>) hubListener.get(
+                    StringUtils.fromString("config"))).get(StringUtils.fromString("secureSocket"));
 
             String path = basePath.equals(SLASH) ? publishResourcePath : basePath.concat(publishResourcePath);
             return secureSocket != null ? ("https://localhost:" + hubPort + path)
@@ -261,11 +261,11 @@ public class Hub {
     }
 
     @SuppressWarnings("unchecked")
-    private String populateSubscribeUrl(String publicUrl, BObject hubListener) {
+    private String populateSubscribeUrl(String publicUrl, ObjectValue hubListener) {
         if (publicUrl.isEmpty()) {
-            String hubPort = String.valueOf(hubListener.get(BStringUtils.fromString("port")));
-            Object secureSocket = ((BMap<BString, Object>) hubListener.get(
-                    BStringUtils.fromString("config"))).get(BStringUtils.fromString("secureSocket"));
+            String hubPort = String.valueOf(hubListener.get(StringUtils.fromString("port")));
+            Object secureSocket = ((MapValue<BString, Object>) hubListener.get(
+                    StringUtils.fromString("config"))).get(StringUtils.fromString("secureSocket"));
 
             String path = basePath.equals(SLASH) ? subscribeResourcePath : basePath.concat(subscribeResourcePath);
             return secureSocket != null ? ("https://localhost:" + hubPort + path)
@@ -306,7 +306,7 @@ public class Hub {
         this.publishUrl = publishUrl;
     }
 
-    private void setHubObject(BObject hubObject) {
+    private void setHubObject(ObjectValue hubObject) {
         this.hubObject = hubObject;
     }
 

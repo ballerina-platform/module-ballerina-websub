@@ -18,9 +18,9 @@
 
 package org.ballerinalang.net.websub;
 
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.types.AttachedFunction;
+import org.ballerinalang.jvm.values.MapValue;
+import org.ballerinalang.jvm.values.ObjectValue;
 import org.ballerinalang.net.http.HttpConstants;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
@@ -46,11 +46,11 @@ public class WebSubHttpService extends HttpService {
     private static final Logger logger = LoggerFactory.getLogger(WebSubHttpService.class);
     private String topic;
 
-    private WebSubHttpService(BObject service) {
+    private WebSubHttpService(ObjectValue service) {
         super(service);
     }
 
-    private static BMap getWebSubSubscriberServiceConfigAnnotation(BObject service) {
+    private static MapValue getWebSubSubscriberServiceConfigAnnotation(ObjectValue service) {
         return getServiceConfigAnnotation(service, WEBSUB_PACKAGE_FULL_QUALIFIED_NAME,
                                           ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG);
     }
@@ -61,9 +61,9 @@ public class WebSubHttpService extends HttpService {
      * @param service   the service for which the HTTP representation is built
      * @return  the built HttpService representation
      */
-    static WebSubHttpService buildWebSubSubscriberHttpService(BObject service) {
+    static WebSubHttpService buildWebSubSubscriberHttpService(ObjectValue service) {
         WebSubHttpService websubHttpService = new WebSubHttpService(service);
-        BMap serviceConfigAnnotation = getWebSubSubscriberServiceConfigAnnotation(service);
+        MapValue serviceConfigAnnotation = getWebSubSubscriberServiceConfigAnnotation(service);
 
         if (!serviceConfigAnnotation.containsKey(PATH_FIELD)) {
             logger.debug("'path' not specified in the service config annotation, using the default base path");

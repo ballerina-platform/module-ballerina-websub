@@ -18,16 +18,16 @@
 
 package org.ballerinalang.net.websub;
 
+import org.ballerinalang.jvm.BallerinaErrors;
+import org.ballerinalang.jvm.StringUtils;
 import org.ballerinalang.jvm.TypeChecker;
-import org.ballerinalang.jvm.api.BErrorCreator;
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.api.values.BObject;
-import org.ballerinalang.jvm.api.values.BString;
 import org.ballerinalang.jvm.types.BObjectType;
 import org.ballerinalang.jvm.types.BRecordType;
 import org.ballerinalang.jvm.types.BType;
 import org.ballerinalang.jvm.types.TypeTags;
+import org.ballerinalang.jvm.values.MapValue;
+import org.ballerinalang.jvm.values.ObjectValue;
+import org.ballerinalang.jvm.values.api.BString;
 import org.ballerinalang.net.http.HTTPServicesRegistry;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
@@ -63,9 +63,9 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
     private String topicIdentifier;
     private String topicHeader;
 
-    private BMap<BString, Object> headerResourceMap;
-    private BMap<BString, BMap<BString, Object>> payloadKeyResourceMap;
-    private BMap<BString, BMap<BString, BMap<BString, Object>>> headerAndPayloadKeyResourceMap;
+    private MapValue<BString, Object> headerResourceMap;
+    private MapValue<BString, MapValue<BString, Object>> payloadKeyResourceMap;
+    private MapValue<BString, MapValue<BString, MapValue<BString, Object>>> headerAndPayloadKeyResourceMap;
     private HashMap<String, BRecordType> resourceDetails;
 
     private static final int CUSTOM_RESOURCE_PARAM_COUNT = 2;
@@ -76,9 +76,9 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
 
     public WebSubServicesRegistry(WebSocketServicesRegistry webSocketServicesRegistry,
                                   String topicIdentifier, String topicHeader,
-                                  BMap<BString, Object> headerResourceMap,
-                                  BMap<BString, BMap<BString, Object>> payloadKeyResourceMap,
-                                  BMap<BString, BMap<BString, BMap<BString, Object>>>
+                                  MapValue<BString, Object> headerResourceMap,
+                                  MapValue<BString, MapValue<BString, Object>> payloadKeyResourceMap,
+                                  MapValue<BString, MapValue<BString, MapValue<BString, Object>>>
                                           headerAndPayloadKeyResourceMap,
                                   HashMap<String, BRecordType> resourceDetails) {
         super(webSocketServicesRegistry);
@@ -109,11 +109,11 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
         return topicHeader;
     }
 
-    BMap<BString, Object> getHeaderResourceMap() {
+    MapValue<BString, Object> getHeaderResourceMap() {
         return headerResourceMap;
     }
 
-    BMap<BString, BMap<BString, Object>> getPayloadKeyResourceMap() {
+    MapValue<BString, MapValue<BString, Object>> getPayloadKeyResourceMap() {
         return payloadKeyResourceMap;
     }
 
@@ -122,7 +122,7 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
      *
      * @return the topic-resource map specified for the service
      */
-    BMap<BString, BMap<BString, BMap<BString, Object>>> getHeaderAndPayloadKeyResourceMap() {
+    MapValue<BString, MapValue<BString, MapValue<BString, Object>>> getHeaderAndPayloadKeyResourceMap() {
         return headerAndPayloadKeyResourceMap;
     }
 
@@ -135,7 +135,7 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
      *
      * @param service to be registered
      */
-    public void registerWebSubSubscriberService(BObject service) {
+    public void registerWebSubSubscriberService(ObjectValue service) {
         HttpService httpService = WebSubHttpService.buildWebSubSubscriberHttpService(service);
         String hostName = httpService.getHostName();
         if (servicesMapByHost.get(hostName) == null) {
@@ -164,7 +164,7 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
                                                                          serviceRegistry.getResourceDetails());
 
         if (!invalidResourceNames.isEmpty()) {
-            throw BErrorCreator.createError(BStringUtils.fromString("Resource name(s) not included in " +
+            throw BallerinaErrors.createError(StringUtils.fromString("Resource name(s) not included in " +
                     "the topic-resource mapping found: " + invalidResourceNames));
         }
     }
@@ -207,7 +207,7 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
     private static void validateParamCount(List<BType> paramTypes, int expectedCount, String resourceName) {
         int paramCount = paramTypes.size();
         if (paramCount < expectedCount) {
-            throw BErrorCreator.createError(BStringUtils.fromString(String.format(
+            throw BallerinaErrors.createError(StringUtils.fromString(String.format(
                     "Invalid param count for WebSub Resource '%s': expected '%d', found '%d'",
                                                             resourceName, expectedCount, paramCount)));
         }
@@ -215,7 +215,7 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
 
     private static void validateCallerParam(BType paramVarType) {
         if (!isExpectedObjectParam(paramVarType, WEBSUB_SERVICE_CALLER)) {
-            throw BErrorCreator.createError(BStringUtils.fromString(String.format(message,
+            throw BallerinaErrors.createError(StringUtils.fromString(String.format(message,
                     paramVarType.getQualifiedName(), RESOURCE_NAME_ON_INTENT_VERIFICATION, WEBSUB_PACKAGE,
                     WEBSUB_SERVICE_CALLER)));
         }
@@ -223,7 +223,7 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
 
     private static void validateIntentVerificationParam(BType paramVarType) {
         if (!isExpectedObjectParam(paramVarType, WEBSUB_INTENT_VERIFICATION_REQUEST)) {
-            throw BErrorCreator.createError(BStringUtils.fromString(String.format(message,
+            throw BallerinaErrors.createError(StringUtils.fromString(String.format(message,
                     paramVarType.getQualifiedName(), RESOURCE_NAME_ON_INTENT_VERIFICATION,
                     WEBSUB_PACKAGE, WEBSUB_INTENT_VERIFICATION_REQUEST)));
         }
@@ -231,14 +231,14 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
 
     private static void validateNotificationParam(String resourceName, BType paramVarType) {
         if (!isExpectedObjectParam(paramVarType, WEBSUB_NOTIFICATION_REQUEST)) {
-            throw BErrorCreator.createError(BStringUtils.fromString(String.format(message,
+            throw BallerinaErrors.createError(StringUtils.fromString(String.format(message,
                     paramVarType.getQualifiedName(), resourceName, WEBSUB_PACKAGE, WEBSUB_NOTIFICATION_REQUEST)));
         }
     }
 
     private static void validateRecordType(String resourceName, BType paramVarType, BRecordType recordType) {
         if (!TypeChecker.isSameType(paramVarType, recordType)) {
-            throw BErrorCreator.createError(BStringUtils.fromString(String.format("Invalid parameter type '%s' in " +
+            throw BallerinaErrors.createError(StringUtils.fromString(String.format("Invalid parameter type '%s' in " +
                             "resource '%s'. Requires '%s'", paramVarType.getQualifiedName(), resourceName,
                             recordType.getQualifiedName())));
         }
