@@ -81,7 +81,7 @@ public client class SubscriptionClient {
 # + subscriptionChangeRequest - The SubscriptionChangeRequest specifying the topic to subscribe and the
 #                               parameters to use
 # + return - An `http:Request` to be sent to the hub to subscribe/unsubscribe
-function buildSubscriptionChangeRequest(@untainted string mode,
+isolated function buildSubscriptionChangeRequest(@untainted string mode,
                                         SubscriptionChangeRequest subscriptionChangeRequest) returns (http:Request) {
     http:Request request = new;
 
@@ -198,7 +198,7 @@ function unsubscribeWithRetries(string url, SubscriptionChangeRequest unsubscrip
                               remainingRedirects);
 }
 
-function getRedirectionMaxCount(http:FollowRedirects? followRedirects) returns int {
+isolated function getRedirectionMaxCount(http:FollowRedirects? followRedirects) returns int {
     if (followRedirects is http:FollowRedirects) {
         if (followRedirects.enabled) {
             return followRedirects.maxCount;

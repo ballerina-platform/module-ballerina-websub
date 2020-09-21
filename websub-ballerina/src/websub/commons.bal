@@ -141,7 +141,7 @@ public class IntentVerificationRequest {
     #
     # + expectedTopic - The topic for which subscription should be accepted
     # + return - An `http:Response`, which to the hub verifying/denying intent to subscribe
-    public function buildSubscriptionVerificationResponse(string expectedTopic) returns http:Response {
+    public isolated function buildSubscriptionVerificationResponse(string expectedTopic) returns http:Response {
         return buildIntentVerificationResponse(self, MODE_SUBSCRIBE, expectedTopic);
     }
 
@@ -152,7 +152,7 @@ public class IntentVerificationRequest {
     #
     # + expectedTopic - The topic for which unsubscription should be accepted
     # + return - An `http:Response`, which to for the hub verifying/denying intent to unsubscribe
-    public function buildUnsubscriptionVerificationResponse(string expectedTopic) returns http:Response {
+    public isolated function buildUnsubscriptionVerificationResponse(string expectedTopic) returns http:Response {
         return buildIntentVerificationResponse(self, MODE_UNSUBSCRIBE, expectedTopic);
     }
 }
@@ -163,7 +163,7 @@ public class IntentVerificationRequest {
 # + mode - The mode (subscription/unsubscription) for which a request was sent
 # + topic - The intended topic for which subscription change should be verified
 # + return - An `http:Response`, which to the hub verifying/denying intent to subscripe/unsubscribe
-function buildIntentVerificationResponse(IntentVerificationRequest intentVerificationRequest, string mode,
+isolated function buildIntentVerificationResponse(IntentVerificationRequest intentVerificationRequest, string mode,
                                          string topic) returns http:Response {
     http:Response response = new;
     var decodedTopic = encoding:decodeUriComponent(intentVerificationRequest.topic, "UTF-8");
@@ -186,7 +186,7 @@ function buildIntentVerificationResponse(IntentVerificationRequest intentVerific
 # + request - The request received
 # + serviceType - The service for which the request was rceived
 # + return - An `error`, if an error occurred in extraction or signature validation failed or else `()`
-function processWebSubNotification(http:Request request, service serviceType) returns @tainted error? {
+isolated function processWebSubNotification(http:Request request, service serviceType) returns @tainted error? {
     SubscriberServiceConfiguration? subscriberConfig = retrieveSubscriberServiceAnnotations(serviceType);
     string secret = subscriberConfig?.secret ?: "";
     // Build the data source before responding to the content delivery requests automatically
@@ -219,7 +219,7 @@ function processWebSubNotification(http:Request request, service serviceType) re
 # + stringPayload - The string representation of the notification payload received
 # + secret - The secret used when subscribing
 # + return - An `error`, if an error occurred in extraction or signature validation failed or else `()`
-function validateSignature(string xHubSignature, string stringPayload, string secret) returns error? {
+isolated function validateSignature(string xHubSignature, string stringPayload, string secret) returns error? {
     string[] splitSignature = stringutils:split(xHubSignature, "=");
     string method = splitSignature[0];
     string signature = stringutils:replace(xHubSignature, method + "=", "");
@@ -252,7 +252,7 @@ public class Notification {
     # ```
     #
     # + return - String-constrained array map of the query params
-    public function getQueryParams() returns map<string[]> {
+    public isolated function getQueryParams() returns map<string[]> {
         return self.request.getQueryParams();
     }
 
@@ -262,7 +262,7 @@ public class Notification {
     # ```
     #
     # + return - The `mime:Entity` of the request or else an `error` if entity construction fails
-    public function getEntity() returns mime:Entity|error {
+    public isolated function getEntity() returns mime:Entity|error {
         return self.request.getEntity();
     }
 
@@ -273,7 +273,7 @@ public class Notification {
     #
     # + headerName - The header name
     # + return - `true` if the specified header key exists or else `false`
-    public function hasHeader(string headerName) returns boolean {
+    public isolated function hasHeader(string headerName) returns boolean {
         return self.request.hasHeader(headerName);
     }
 
@@ -286,7 +286,7 @@ public class Notification {
     # + headerName - The header name
     # + return - The first header value for the specified header name or else panic if no header is found. Ideally, the
     #            `Notification.hasHeader()` needs to be used to check the existence of a header initially.
-    public function getHeader(string headerName) returns @tainted string {
+    public isolated function getHeader(string headerName) returns @tainted string {
         return self.request.getHeader(headerName);
     }
 
@@ -298,7 +298,7 @@ public class Notification {
     # + headerName - The header name
     # + return - The header values the specified header key maps to or else panic if no header is found. Ideally, the
     #            `Notification.hasHeader()` needs to be used to check the existence of a header initially.
-    public function getHeaders(string headerName) returns @tainted string[] {
+    public isolated function getHeaders(string headerName) returns @tainted string[] {
         return self.request.getHeaders(headerName);
     }
 
@@ -308,7 +308,7 @@ public class Notification {
     # ```
     #
     # + return - An array of all the header names
-    public function getHeaderNames() returns @tainted string[] {
+    public isolated function getHeaderNames() returns @tainted string[] {
         return self.request.getHeaderNames();
     }
 
@@ -318,7 +318,7 @@ public class Notification {
     # ```
     #
     # + return - The `content-type` header value as a `string`
-    public function getContentType() returns @tainted string {
+    public isolated function getContentType() returns @tainted string {
         return self.request.getContentType();
     }
 
@@ -329,7 +329,7 @@ public class Notification {
     #
     # + return - The `json` payload or else an `error` in case of errors.
     #            If the content; type is not JSON, an `error` is returned.
-    public function getJsonPayload() returns @tainted json|error {
+    public isolated function getJsonPayload() returns @tainted json|error {
         return self.request.getJsonPayload();
     }
 
@@ -340,7 +340,7 @@ public class Notification {
     #
     # + return - The `xml` payload or else an `error` in case of errors.
     #            If the content; type is not XML, an `error` is returned.
-    public function getXmlPayload() returns @tainted xml|error {
+    public isolated function getXmlPayload() returns @tainted xml|error {
         return self.request.getXmlPayload();
     }
 
@@ -351,7 +351,7 @@ public class Notification {
     #
     # + return - The payload as a `text` or else  an `error` in case of errors.
     #            If the content type is not of type text, an `error` is returned.
-    public function getTextPayload() returns @tainted string|error {
+    public isolated function getTextPayload() returns @tainted string|error {
         return self.request.getTextPayload();
     }
 
@@ -361,7 +361,7 @@ public class Notification {
     # ```
     #
     # + return - A byte channel from which the message payload can be read or esle an `error` in case of errors
-    public function getByteChannel() returns @tainted io:ReadableByteChannel|error {
+    public isolated function getByteChannel() returns @tainted io:ReadableByteChannel|error {
         return self.request.getByteChannel();
     }
 
@@ -371,7 +371,7 @@ public class Notification {
     # ```
     #
     # + return - The message payload as a `byte[]` or else an `error` in case of errors
-    public function getBinaryPayload() returns @tainted byte[]|error {
+    public isolated function getBinaryPayload() returns @tainted byte[]|error {
         return self.request.getBinaryPayload();
     }
 
@@ -381,7 +381,7 @@ public class Notification {
     # ```
     #
     # + return - The form params as a `map` or else an `error` in case of errors
-    public function getFormParams() returns @tainted map<string>|error {
+    public isolated function getFormParams() returns @tainted map<string>|error {
         return self.request.getFormParams();
     }
 }
@@ -582,7 +582,7 @@ public class Hub {
     # Users of the `ballerina/websub` module must use the function `startHub()` to initialize a `websub:Hub`
     # object instead of directly calling the initializer method.
     @deprecated
-    public function init(string subscriptionUrl, string publishUrl, http:Listener hubHttpListener) {
+    public isolated function init(string subscriptionUrl, string publishUrl, http:Listener hubHttpListener) {
          self.subscriptionUrl = subscriptionUrl;
          self.publishUrl = publishUrl;
          self.hubHttpListener = hubHttpListener;
@@ -594,7 +594,7 @@ public class Hub {
     # ```
     #
     # + return - An `error` if hub can't be stoped or else `()`
-    public function stop() returns error? {
+    public isolated function stop() returns error? {
         var stopResult = self.hubHttpListener.__gracefulStop();
         var stopHubServiceResult = stopHubService(self);
 
@@ -621,7 +621,7 @@ public class Hub {
     # + payload - The update payload
     # + contentType - The content type header to set for the request delivering the payload
     # + return - An `error` if the hub is not initialized or does not represent the internal hub or else `()`
-    public function publishUpdate(string topic, string|xml|json|byte[]|io:ReadableByteChannel payload,
+    public isolated function publishUpdate(string topic, string|xml|json|byte[]|io:ReadableByteChannel payload,
                                   string? contentType = ()) returns error? {
         if (self.publishUrl == "") {
             return WebSubError("Internal Ballerina Hub not initialized or incorrectly referenced");
@@ -700,7 +700,7 @@ public class Hub {
     # ```
     #
     # + return - An array of available topics
-    public function getAvailableTopics() returns string[] {
+    public isolated function getAvailableTopics() returns string[] {
             return externGetAvailableTopics(self);
     }
 
@@ -711,17 +711,17 @@ public class Hub {
     #
     # + topic - The topic for which details need to be retrieved
     # + return - An array of subscriber details
-    public function getSubscribers(string topic) returns SubscriberDetails[] {
+    public isolated function getSubscribers(string topic) returns SubscriberDetails[] {
         return externGetSubscribers(self, topic);
     }
 }
 
-function externGetAvailableTopics(Hub hub) returns string[] = @java:Method {
+isolated function externGetAvailableTopics(Hub hub) returns string[] = @java:Method {
     name: "getAvailableTopics",
     'class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
 } external;
 
-function externGetSubscribers(Hub hub, string topic) returns SubscriberDetails[] = @java:Method {
+isolated function externGetSubscribers(Hub hub, string topic) returns SubscriberDetails[] = @java:Method {
     name: "getSubscribers",
     'class: "org.ballerinalang.net.websub.nativeimpl.HubNativeOperationHandler"
 } external;
@@ -734,7 +734,7 @@ function externGetSubscribers(Hub hub, string topic) returns SubscriberDetails[]
 # + response - The response being sent
 # + hubs - The hubs the publisher advertises as the hubs that it publishes updates to
 # + topic - The topic to which subscribers need to subscribe to, to receive updates for the resource
-public function addWebSubLinkHeader(http:Response response, string[] hubs, string topic) {
+public isolated function addWebSubLinkHeader(http:Response response, string[] hubs, string topic) {
     string hubLinkHeader = "";
     foreach var hub in hubs {
         hubLinkHeader = hubLinkHeader + "<" + hub + ">; rel=\"hub\", ";
@@ -757,7 +757,7 @@ public type SubscriptionDetails record {|
     int createdAt = 0;
 |};
 
-function retrieveSubscriberServiceAnnotations(service serviceType) returns SubscriberServiceConfiguration? {
+isolated function retrieveSubscriberServiceAnnotations(service serviceType) returns SubscriberServiceConfiguration? {
     typedesc<any> serviceTypedesc = typeof serviceType;
     return serviceTypedesc.@SubscriberServiceConfig;
 }
@@ -785,7 +785,7 @@ type WebSubContent record {|
     string contentType = "";
 |};
 
-function isSuccessStatusCode(int statusCode) returns boolean {
+isolated function isSuccessStatusCode(int statusCode) returns boolean {
     return (200 <= statusCode && statusCode < 300);
 }
 

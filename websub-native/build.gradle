@@ -24,9 +24,9 @@ description = 'Ballerina - Websub Java Utils'
 dependencies {
     compile group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
     compile group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
-    compile group: 'org.ballerinalang', name: 'ballerina-http', version: "${ballerinaLangVersion}"
-    compile group: 'org.ballerinalang', name: 'ballerina-mime', version: "${ballerinaLangVersion}"
-    compile group: 'org.ballerinalang', name: 'ballerina-io', version: "${ballerinaLangVersion}"
+    compile group: 'org.ballerinalang', name: 'http-native', version: "${stdlibHttpVersion}"
+    compile group: 'org.ballerinalang', name: 'mime-native', version: "${stdlibMimeVersion}"
+    compile group: 'org.ballerinalang', name: 'io-native', version: "${stdlibIoVersion}"
     compile group: 'org.ballerinalang', name: 'value', version: "${ballerinaLangVersion}"
     compile group: 'org.ballerinalang', name: 'typedesc', version: "${ballerinaLangVersion}"
     compile group: 'org.ballerinalang', name: 'toml-parser', version: "${ballerinaTomlParserVersion}"
