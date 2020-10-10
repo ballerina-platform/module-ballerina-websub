@@ -48,7 +48,7 @@ import org.ballerinalang.net.http.HttpUtil;
 import org.ballerinalang.net.uri.URIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.transport.http.netty.message.HttpCarbonMessage;
+import org.ballerinalang.net.transport.message.HttpCarbonMessage;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;

@@ -26,8 +26,8 @@ import org.ballerinalang.jvm.util.exceptions.BallerinaConnectorException;
 import org.ballerinalang.jvm.values.ArrayValue;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
-import org.wso2.transport.http.netty.contract.exceptions.ServerConnectorException;
-import org.wso2.transport.http.netty.message.HttpCarbonMessage;
+import org.ballerinalang.net.transport.contract.exceptions.ServerConnectorException;
+import org.ballerinalang.net.transport.message.HttpCarbonMessage;
 
 import static org.ballerinalang.net.http.HttpConstants.HTTP_METHOD_GET;
 import static org.ballerinalang.net.http.HttpConstants.HTTP_METHOD_POST;
@@ -43,7 +43,7 @@ import static org.ballerinalang.net.websub.WebSubSubscriberConstants.TOPIC_ID_PA
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB_PACKAGE_FULL_QUALIFIED_NAME;
 import static org.ballerinalang.net.websub.WebSubUtils.getHttpRequest;
 import static org.ballerinalang.net.websub.WebSubUtils.getJsonBody;
-import static org.wso2.transport.http.netty.contract.Constants.HTTP_RESOURCE;
+import static org.ballerinalang.net.transport.contract.Constants.HTTP_RESOURCE;
 
 /**
  * Resource dispatcher specific for WebSub subscriber services.
@@ -64,7 +64,7 @@ class WebSubResourceDispatcher {
         String topicIdentifier = servicesRegistry.getTopicIdentifier();
         if (TOPIC_ID_HEADER.equals(topicIdentifier) && HTTP_METHOD_POST.equals(method)) {
             String topic = inboundRequest.getHeader(servicesRegistry.getTopicHeader());
-            resourceName = retrieveResourceName(BStringUtils.fromString(topic), servicesRegistry.getHeaderResourceMap());
+            resourceName = retrieveResourceNameFromTopic(BStringUtils.fromString(topic), servicesRegistry.getHeaderResourceMap());
         } else if (topicIdentifier != null && HTTP_METHOD_POST.equals(method)) {
             if (inboundRequest.getProperty(HTTP_RESOURCE) == null) {
                 inboundRequest.setProperty(HTTP_RESOURCE, DEFERRED_FOR_PAYLOAD_BASED_DISPATCHING);
@@ -158,7 +158,7 @@ class WebSubResourceDispatcher {
                     BMap<BString, Object> topicResourceMapForValue = topicResourceMapForHeader.get(key);
                     BString valueForKey = (BString) jsonBody.get(key);
                     if (topicResourceMapForValue.containsKey(valueForKey)) {
-                        return retrieveResourceName(valueForKey, topicResourceMapForValue);
+                        return retrieveResourceNameFromTopic(valueForKey, topicResourceMapForValue);
                     }
                 }
             }
@@ -167,7 +167,7 @@ class WebSubResourceDispatcher {
         if (servicesRegistry.getHeaderResourceMap() != null) {
             BMap<BString, Object> headerResourceMap = servicesRegistry.getHeaderResourceMap();
             if (headerResourceMap.containsKey(topic)) {
-                return retrieveResourceName(topic, headerResourceMap);
+                return retrieveResourceNameFromTopic(topic, headerResourceMap);
             }
         }
 
@@ -212,7 +212,7 @@ class WebSubResourceDispatcher {
                 BMap<BString, Object> topicResourceMapForValue = payloadKeyResourceMap.get(key);
                 BString valueForKey = (BString) jsonBody.get(key);
                 if (topicResourceMapForValue.containsKey(valueForKey)) {
-                    return retrieveResourceName(valueForKey, topicResourceMapForValue);
+                    return retrieveResourceNameFromTopic(valueForKey, topicResourceMapForValue);
                 }
             }
         }
@@ -228,7 +228,7 @@ class WebSubResourceDispatcher {
      * @return                  the name of the resource as identified based on the topic
      * @throws BallerinaConnectorException if a resource could not be mapped to the topic
      */
-    private static String retrieveResourceName(BString topic, BMap<BString, Object> topicResourceMap) {
+    private static String retrieveResourceNameFromTopic(BString topic, BMap<BString, Object> topicResourceMap) {
         if (topicResourceMap.containsKey(topic)) {
             return ((ArrayValue) topicResourceMap.get(topic)).getRefValue(0).toString();
         } else {
