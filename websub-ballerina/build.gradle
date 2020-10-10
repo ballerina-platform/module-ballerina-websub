@@ -60,9 +60,6 @@ dependencies {
     externalJars (group: 'io.netty', name: 'netty-tcnative-boringssl-static', version: "${nettyTcnativeVersion}") {
         transitive = false
     }
-    externalJars (group: 'org.wso2.transport.http', name: 'org.wso2.transport.http.netty', version: "${wso2TransportHttpNettyVersion}") {
-        transitive = false
-    }
 
     externalJars (group: 'io.ballerina.messaging', name: 'broker-common', version: "${ballerinaMessageBrokerVersion}") {
         transitive = false

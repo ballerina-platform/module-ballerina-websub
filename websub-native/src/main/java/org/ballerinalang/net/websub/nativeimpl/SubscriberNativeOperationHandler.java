@@ -40,8 +40,8 @@ import org.ballerinalang.net.websub.WebSubHttpService;
 import org.ballerinalang.net.websub.WebSubServicesRegistry;
 import org.ballerinalang.net.websub.WebSubSubscriberConstants;
 import org.ballerinalang.net.websub.WebSubUtils;
-import org.wso2.transport.http.netty.contract.ServerConnector;
-import org.wso2.transport.http.netty.contract.ServerConnectorFuture;
+import org.ballerinalang.net.transport.contract.ServerConnector;
+import org.ballerinalang.net.transport.contract.ServerConnectorFuture;
 
 import java.util.HashMap;
 import java.util.Optional;
