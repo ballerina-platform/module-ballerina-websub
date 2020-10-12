@@ -31,6 +31,13 @@ target = "java11"
     modules = ["websub"]
 
     [[platform.libraries]]
+    artifactId = "http-native"
+    version = "@http.native.version@"
+    path = "./lib/http-native-@http.native.version@.jar"
+    groupId = "org.ballerinalang"
+    modules = ["websub"]
+
+    [[platform.libraries]]
     artifactId = "netty-common"
     version = "@netty.version@"
     path = "./lib/netty-common-@netty.version@.jar"
