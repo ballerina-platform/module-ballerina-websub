@@ -96,6 +96,9 @@ dependencies {
     externalJars (group: 'org.wso2.carbon.metrics', name: 'org.wso2.carbon.metrics.core', version: "${wso2CarbonMetricsVersion}") {
         transitive = false
     }
+    externalJars (group: 'org.ballerinalang', name: 'http-native', version: "${stdlibHttpVersion}") {
+        transitive = false
+    }
 }
 
 clean {
@@ -228,6 +231,7 @@ task updateTomlFile {
         newConfig = newConfig.replace("@ballerinamb.version@", project.ballerinaMessageBrokerVersion)
         newConfig = newConfig.replace("@wso2carbonmetrics.version@", project.wso2CarbonMetricsVersion)
         newConfig = newConfig.replace("@guava.version@", project.guavaVersion)
+        newConfig = newConfig.replace("@http.native.version@", project.stdlibHttpVersion)
 
         ballerinaConfigFile.text = newConfig
     }
