@@ -30,6 +30,7 @@ dependencies {
     }
     compile project(':websub-native')
     compile group: 'org.ballerinalang', name: 'toml-parser', version: "${ballerinaTomlParserVersion}"
+    
     externalJars (group: 'io.netty', name: 'netty-common', version: "${nettyVersion}") {
         transitive = false
     }
@@ -60,7 +61,7 @@ dependencies {
     externalJars (group: 'io.netty', name: 'netty-tcnative-boringssl-static', version: "${nettyTcnativeVersion}") {
         transitive = false
     }
-
+    
     externalJars (group: 'io.ballerina.messaging', name: 'broker-common', version: "${ballerinaMessageBrokerVersion}") {
         transitive = false
     }
@@ -92,7 +93,6 @@ dependencies {
     externalJars (group: 'com.google.guava', name: 'guava', version: "${guavaVersion}") {
         transitive = false
     }
-
     externalJars (group: 'org.wso2.carbon.metrics', name: 'org.wso2.carbon.metrics.core', version: "${wso2CarbonMetricsVersion}") {
         transitive = false
     }
