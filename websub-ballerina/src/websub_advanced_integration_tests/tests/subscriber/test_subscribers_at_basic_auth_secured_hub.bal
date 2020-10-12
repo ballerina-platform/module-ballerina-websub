@@ -21,7 +21,7 @@ import ballerina/runtime;
 import ballerina/test;
 import websub;
 
-listener websub:Listener websubEP = new websub:Listener(23484);
+listener websub:Listener websubEP = new websub:Listener(23485);
 auth:OutboundBasicAuthProvider basicAuthProvider1 = new({
     username: "peter",
     password: "pqr"
@@ -147,7 +147,7 @@ function testDiscoveryAndIntentVerification() {
     http:Request req = new;
     req.addHeader(http:CONTENT_TYPE, "application/json");
     req.setJsonPayload(jsonPayload);
-    var response = clientEndpoint->post("/publisher/notify/23484", req);
+    var response = clientEndpoint->post("/publisher/notify/23485", req);
     runtime:sleep(10000);
     test:assertEquals(fetchOutput(ID_NOTIFICATION_ONE), NOTIFICATION_ONE, msg = "Response code mismatched");
 }
