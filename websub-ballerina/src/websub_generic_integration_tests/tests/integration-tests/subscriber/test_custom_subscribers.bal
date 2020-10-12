@@ -281,7 +281,8 @@ function testOnIntentVerificationInvocation() {
 }
 
 @test:Config {
-    dependsOn: ["testOnIntentVerificationInvocation"]
+    dependsOn: ["testOnIntentVerificationInvocation"],
+    enable: false
 }
 function testDispatchingByKey() {
     http:Client clientEndpoint = new ("http://localhost:23585");
@@ -306,7 +307,8 @@ function testDispatchingByKey() {
 }
 
 @test:Config {
-    dependsOn: ["testDispatchingByKey"]
+    dependsOn: ["testDispatchingByKey"],
+    enable: false
 }
 function testDispatchingByHeader() {
     http:Client clientEndpoint = new ("http://localhost:23686");
@@ -333,7 +335,8 @@ function testDispatchingByHeader() {
 }
 
 @test:Config {
-    dependsOn: ["testDispatchingByHeader"]
+    dependsOn: ["testDispatchingByHeader"],
+    enable:false
 }
 function testDispatchingByHeaderAndPayloadKey() {
     http:Client clientEndpoint = new ("http://localhost:23787");
@@ -360,7 +363,8 @@ function testDispatchingByHeaderAndPayloadKey() {
 }
 
 @test:Config {
-    dependsOn: ["testDispatchingByHeaderAndPayloadKey"]
+    dependsOn: ["testDispatchingByHeaderAndPayloadKey"],
+    enable: false
 }
 function testDispatchingByHeaderAndPayloadKeyForOnlyHeader() {
     http:Client clientEndpoint = new ("http://localhost:23787");
@@ -377,7 +381,8 @@ function testDispatchingByHeaderAndPayloadKeyForOnlyHeader() {
 }
 
 @test:Config {
-    dependsOn: ["testDispatchingByHeaderAndPayloadKeyForOnlyHeader"]
+    dependsOn: ["testDispatchingByHeaderAndPayloadKeyForOnlyHeader"],
+    enable: false
 }
 function testDispatchingByHeaderAndPayloadKeyForOnlyKey() {
     http:Client clientEndpoint = new ("http://localhost:23787");
