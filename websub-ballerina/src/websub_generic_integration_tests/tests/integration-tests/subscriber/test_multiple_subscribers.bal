@@ -17,6 +17,7 @@
 import ballerina/http;
 import ballerina/test;
 import ballerina/runtime;
+import ballerina/io;
 import websub;
 
 listener websub:Listener multipleSubTestWebsubEP = new websub:Listener(23383);
@@ -62,6 +63,7 @@ service multipleSubTestWebsubSubscriberTwo on multipleSubTestWebsubEP {
     dependsOn: ["testJsonContentReceiptForRemoteHub"]
 }
 function testContentReceipt() {
+    io:println("-----testContentReceipt----");
     http:Client clientEndpoint = new ("http://localhost:23080");
     json jsonPayload = {mode: "internal", content_type: "json"};
     http:Request req = new;

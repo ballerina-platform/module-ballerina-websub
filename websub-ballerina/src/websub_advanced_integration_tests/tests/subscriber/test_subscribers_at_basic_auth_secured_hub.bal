@@ -142,6 +142,7 @@ service websubSubscriberFour on websubEP {
 
 @test:Config{}
 function testDiscoveryAndIntentVerification() {
+    io:println("-----testDiscoveryAndIntentVerification----");
     http:Client clientEndpoint = new ("http://localhost:23080");
     json jsonPayload = {mode: "internal", content_type: "json"};
     http:Request req = new;
@@ -156,6 +157,7 @@ function testDiscoveryAndIntentVerification() {
     dependsOn: ["testDiscoveryAndIntentVerification"]
 }
 function testContentReceipt() {
+    io:println("-----testContentReceipt----");
     http:Client clientEndpoint = new ("http://localhost:23080");
     json jsonPayload = {mode: "remote", content_type: "xml"};
     http:Request req = new;

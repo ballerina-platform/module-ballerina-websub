@@ -85,6 +85,7 @@ service websubSubscriberWithQueryParams on websubEP {
     dependsOn: ["testDispatchingByHeaderAndPayloadKeyForOnlyKey"]
 }
 function testSubscriptionAndAutomaticIntentVerification() {
+    io:println("-----testSubscriptionAndAutomaticIntentVerification----");
     test:assertEquals(fetchOutput(ID_EXPLICIT_INTENT_VERIFICATION_LOG), EXPLICIT_INTENT_VERIFICATION_LOG);
 }
 
@@ -92,6 +93,7 @@ function testSubscriptionAndAutomaticIntentVerification() {
     dependsOn: ["testSubscriptionAndAutomaticIntentVerification"]
 }
 function testContentInternalHubNotification() {
+    io:println("-----testContentInternalHubNotification----");
     http:Client clientEndpoint = new ("http://localhost:23080");
     json jsonPayload = {mode: "internal", content_type: "json"};
     http:Request req = new;
@@ -108,6 +110,7 @@ function testContentInternalHubNotification() {
     dependsOn: ["testContentInternalHubNotification"]
 }
 function testContentRemoteHubNotification() {
+    io:println("-----testContentRemoteHubNotification----");
     http:Client clientEndpoint = new ("http://localhost:23080");
     json jsonPayload = {mode: "remote", content_type: "json"};
     http:Request req = new;
@@ -124,6 +127,7 @@ function testContentRemoteHubNotification() {
     dependsOn: ["testContentRemoteHubNotification"]
 }
 function testContentReceiptForCallbackWithQueryParams() {
+    io:println("-----testContentReceiptForCallbackWithQueryParams----");
     test:assertEquals(fetchOutput(ID_QUERY_PARAM_LOG), QUERY_PARAM_LOG);
 }
 
@@ -131,6 +135,7 @@ function testContentReceiptForCallbackWithQueryParams() {
     dependsOn: ["testContentReceiptForCallbackWithQueryParams"]
 }
 function testRemoteTopicRegistration() {
+    io:println("-----testRemoteTopicRegistration----");
     http:Client clientEndpoint = new ("http://localhost:23191");
     http:Request req = new;
     req.setPayload("hub.mode=subscribe&hub.topic=http%3A//two.websub.topic.com&hub.callback=http%3A//localhost%3A23181/websub");
@@ -148,6 +153,7 @@ function testRemoteTopicRegistration() {
     dependsOn: ["testRemoteTopicRegistration"]
 }
 function testSubscriberDetailsRetrievalFromHub() {
+    io:println("-----testSubscriberDetailsRetrievalFromHub----");
     http:Client clientEndpoint = new ("http://localhost:23080");
     http:Request req = new;
     req.setHeader("x-topic", "http://one.websub.topic.com");
@@ -170,6 +176,7 @@ function testSubscriberDetailsRetrievalFromHub() {
     dependsOn: ["testSubscriberDetailsRetrievalFromHub"]
 }
 function testAvailableTopicsRetrievalFromHub() {
+    io:println("-----testAvailableTopicsRetrievalFromHub----");
     http:Client clientEndpoint = new ("http://localhost:23080");
     http:Request req = new;
     var response = clientEndpoint->get("/publisher/topicInfo", req);
@@ -190,6 +197,7 @@ function testAvailableTopicsRetrievalFromHub() {
     dependsOn: ["testAvailableTopicsRetrievalFromHub"]
 }
 function testUnsubscription() {
+    io:println("-----testUnsubscription----");
     http:Client clientEndpoint = new ("http://localhost:23080");
     var response = clientEndpoint->get("/publisher/unsubscribe");
     HttpResponseDetails responseDetails = fetchHttpResponse(response);

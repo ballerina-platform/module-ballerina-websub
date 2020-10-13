@@ -18,6 +18,7 @@
 import ballerina/lang.'object as lang;
 import ballerina/test;
 import ballerina/http;
+import ballerina/io;
 import websub;
 
 public type CustomSubWebhookListenerConf record {
@@ -284,6 +285,7 @@ function testOnIntentVerificationInvocation() {
     dependsOn: ["testOnIntentVerificationInvocation"]
 }
 function testDispatchingByKey() {
+    io:println("-----testDispatchingByKey----");
     http:Client clientEndpoint = new ("http://localhost:23585");
     json jsonPayload1 = {action: "created"};
     json jsonPayload2 = {domain: "feature"};
@@ -309,6 +311,7 @@ function testDispatchingByKey() {
     dependsOn: ["testDispatchingByKey"]
 }
 function testDispatchingByHeader() {
+    io:println("-----testDispatchingByHeader----");
     http:Client clientEndpoint = new ("http://localhost:23686");
     json jsonPayload1 = {action: "deleted"};
     json jsonPayload2 = {action: "created"};
@@ -336,6 +339,7 @@ function testDispatchingByHeader() {
     dependsOn: ["testDispatchingByHeader"]
 }
 function testDispatchingByHeaderAndPayloadKey() {
+    io:println("-----testDispatchingByHeaderAndPayloadKey----");
     http:Client clientEndpoint = new ("http://localhost:23787");
     json jsonPayload1 = {action: "created"};
     json jsonPayload2 = {domain: "feature"};
@@ -363,6 +367,7 @@ function testDispatchingByHeaderAndPayloadKey() {
     dependsOn: ["testDispatchingByHeaderAndPayloadKey"]
 }
 function testDispatchingByHeaderAndPayloadKeyForOnlyHeader() {
+    io:println("-----testDispatchingByHeaderAndPayloadKeyForOnlyHeader----");
     http:Client clientEndpoint = new ("http://localhost:23787");
     json jsonPayload = {action: "header_only"};
     http:Request req = new;
@@ -380,6 +385,7 @@ function testDispatchingByHeaderAndPayloadKeyForOnlyHeader() {
     dependsOn: ["testDispatchingByHeaderAndPayloadKeyForOnlyHeader"]
 }
 function testDispatchingByHeaderAndPayloadKeyForOnlyKey() {
+    io:println("-----testDispatchingByHeaderAndPayloadKeyForOnlyKey----");
     http:Client clientEndpoint = new ("http://localhost:23787");
     json jsonPayload = {action: "keyonly"};
     http:Request req = new;

@@ -18,6 +18,7 @@ import ballerina/mime;
 import ballerina/test;
 import ballerina/runtime;
 import ballerina/http;
+import ballerina/io;
 import websub;
 
 listener websub:Listener websubDifContentTypeEP = new websub:Listener(23282);
@@ -92,6 +93,7 @@ service websubDifContentTypeSubscriberTwo on websubDifContentTypeEP {
     dependsOn: ["testUnsubscription"]
 }
 function testTextContentReceiptForInternalHub() {
+    io:println("-----testTextContentReceiptForInternalHub----");
     sendSubscriptionAndIntentVerificationRequest(COMMON_PATH + "23282", HUB_MODE_INTERNAL, TYPE_STRING);
     runtime:sleep(5000);
     test:assertEquals(fetchOutput(ID_TEXT_SUBSCRIBER_ONE), TEXT_INTERNAL_HUB_NOTIFICATION_SUBSCRIBER_ONE_LOG);
@@ -102,6 +104,7 @@ function testTextContentReceiptForInternalHub() {
     dependsOn: ["testTextContentReceiptForInternalHub"]
 }
 function testTextContentReceiptForRemoteHub() {
+    io:println("-----testTextContentReceiptForRemoteHub----");
     sendSubscriptionAndIntentVerificationRequest(COMMON_PATH + SKIP_SUBSCRIBER_CHECK, HUB_MODE_REMOTE, TYPE_STRING);
     runtime:sleep(5000);
     test:assertEquals(fetchOutput(ID_TEXT_SUBSCRIBER_ONE), TEXT_REMOTE_HUB_NOTIFICATION_SUBSCRIBER_ONE_LOG);
@@ -112,6 +115,7 @@ function testTextContentReceiptForRemoteHub() {
     dependsOn: ["testTextContentReceiptForRemoteHub"]
 }
 function testXmlContentReceiptForInternalHub() {
+    io:println("-----testXmlContentReceiptForInternalHub----");
     sendSubscriptionAndIntentVerificationRequest(COMMON_PATH + SKIP_SUBSCRIBER_CHECK, HUB_MODE_INTERNAL, TYPE_XML);
     runtime:sleep(5000);
     test:assertEquals(fetchOutput(ID_XML_SUBSCRIBER_ONE), XML_INTERNAL_HUB_NOTIFICATION_SUBSCRIBER_ONE_LOG);
@@ -122,6 +126,7 @@ function testXmlContentReceiptForInternalHub() {
     dependsOn: ["testXmlContentReceiptForInternalHub"]
 }
 function testXmlContentReceiptForRemoteHub() {
+    io:println("-----testXmlContentReceiptForRemoteHub----");
     sendSubscriptionAndIntentVerificationRequest(COMMON_PATH + SKIP_SUBSCRIBER_CHECK, HUB_MODE_REMOTE, TYPE_XML);
     runtime:sleep(5000);
     test:assertEquals(fetchOutput(ID_XML_SUBSCRIBER_ONE), XML_REMOTE_HUB_NOTIFICATION_SUBSCRIBER_ONE_LOG);
@@ -142,6 +147,7 @@ function testJsonContentReceiptForInternalHub() {
     dependsOn: ["testJsonContentReceiptForInternalHub"]
 }
 function testJsonContentReceiptForRemoteHub() {
+    io:println("-----testJsonContentReceiptForRemoteHub----");
     sendSubscriptionAndIntentVerificationRequest(COMMON_PATH + SKIP_SUBSCRIBER_CHECK, HUB_MODE_REMOTE, TYPE_JSON);
     runtime:sleep(10000);
     test:assertEquals(fetchOutput(ID_JSON_SUBSCRIBER_ONE), JSON_REMOTE_HUB_NOTIFICATION_SUBSCRIBER_ONE_LOG);

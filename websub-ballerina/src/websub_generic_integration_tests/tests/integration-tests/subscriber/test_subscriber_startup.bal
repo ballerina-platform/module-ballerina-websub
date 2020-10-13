@@ -116,6 +116,7 @@ service startupHub on testHub {
     dependsOn: ["testTopicRedirectFoundAndHubPermanentRedirect"]
 }
 function testMultipleSubscribersStartUpInSamePort() {
+    io:println("-----testMultipleSubscribersStartUpInSamePort----");
     http:Client clientEndpoint = new ("http://0.0.0.0:23386");
     var response = clientEndpoint->get("/subscriber/start");
     HttpResponseDetails responseDetails = fetchHttpResponse(response);

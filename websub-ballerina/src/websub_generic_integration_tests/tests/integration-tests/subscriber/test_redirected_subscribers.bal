@@ -75,6 +75,7 @@ service redirectWebsubSubscriberTwo on redirectWebsubEP {
     dependsOn: ["testContentReceipt"]
 }
 function testTopicMovedPermanentlyAndHubTemporaryRedirect() {
+    io:println("-----testTopicMovedPermanentlyAndHubTemporaryRedirect----");
     test:assertEquals(fetchOutput(ID_REDIRECT_SUBSCRIBER_ONE_LOG), REDIRECT_SUBSCRIBER_ONE_LOG);
 }
 
@@ -82,5 +83,6 @@ function testTopicMovedPermanentlyAndHubTemporaryRedirect() {
     dependsOn: ["testTopicMovedPermanentlyAndHubTemporaryRedirect"]
 }
 function testTopicRedirectFoundAndHubPermanentRedirect() {
+    io:println("-----testTopicRedirectFoundAndHubPermanentRedirect----");
     test:assertEquals(fetchOutput(ID_REDIRECT_SUBSCRIBER_TWO_LOG), REDIRECT_SUBSCRIBER_TWO_LOG);
 }
