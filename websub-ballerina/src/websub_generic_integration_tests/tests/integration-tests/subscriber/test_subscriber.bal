@@ -81,9 +81,7 @@ service websubSubscriberWithQueryParams on websubEP {
     }
 }
 
-@test:Config {
-    dependsOn: ["testDispatchingByHeaderAndPayloadKeyForOnlyKey"]
-}
+@test:Config {}
 function testSubscriptionAndAutomaticIntentVerification() {
     test:assertEquals(fetchOutput(ID_EXPLICIT_INTENT_VERIFICATION_LOG), EXPLICIT_INTENT_VERIFICATION_LOG);
 }
