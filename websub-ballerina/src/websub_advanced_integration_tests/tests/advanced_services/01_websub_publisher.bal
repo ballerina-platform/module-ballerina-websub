@@ -175,7 +175,7 @@ service publisherThree on publisherServiceEP {
         if (payload is error) {
             panic <error> payload;
         }
-        checkSubscriberAvailability(WEBSUB_TOPIC_ONE, "http://localhost:23485/websubFour");
+        checkSubscriberAvailability(WEBSUB_TOPIC_ONE, "http://localhost:23484/websubFour");
 
         string publishErrorMessagesConcatenated = "";
 
