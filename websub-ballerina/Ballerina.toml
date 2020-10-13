@@ -1,186 +1,186 @@
 [project]
 org-name = "ballerina"
-version = "@toml.version@"
+version = "1.0.3"
 
 [dependencies]
-"ballerina/http" = "@stdlib.http.version@"
-"ballerina/mime" = "@stdlib.mime.version@"
-"ballerina/auth" = "@stdlib.auth.version@"
-"ballerina/file" = "@stdlib.file.version@"
-"ballerina/cache" = "@stdlib.cache.version@"
-"ballerina/crypto" = "@stdlib.crypto.version@"
-"ballerina/encoding" = "@stdlib.encoding.version@"
-"ballerina/task" = "@stdlib.task.version@"
-"ballerina/log" = "@stdlib.log.version@"
-"ballerina/time" = "@stdlib.time.version@"
-"ballerina/reflect" = "@stdlib.reflect.version@"
-"ballerina/runtime" = "@stdlib.runtime.version@"
-"ballerina/system" = "@stdlib.system.version@"
-"ballerina/config" = "@stdlib.configapi.version@"
-"ballerina/io" = "@stdlib.io.version@"
-"ballerina/stringutils" = "@stdlib.stringutils.version@"
+"ballerina/http" = "1.0.1"
+"ballerina/mime" = "1.0.1"
+"ballerina/auth" = "1.0.1"
+"ballerina/file" = "0.5.2"
+"ballerina/cache" = "2.0.1"
+"ballerina/crypto" = "1.0.1"
+"ballerina/encoding" = "1.0.3"
+"ballerina/task" = "1.1.1"
+"ballerina/log" = "1.0.1"
+"ballerina/time" = "1.0.2"
+"ballerina/reflect" = "0.5.1"
+"ballerina/runtime" = "0.5.1"
+"ballerina/system" = "0.6.1"
+"ballerina/config" = "1.0.1"
+"ballerina/io" = "0.5.1"
+"ballerina/stringutils" = "0.5.1"
 
 [platform]
 target = "java11"
 
     [[platform.libraries]]
     artifactId = "web-sub"
-    version = "@project.version@"
-    path = "../websub-native/build/libs/websub-native-@project.version@.jar"
+    version = "1.0.3-SNAPSHOT"
+    path = "../websub-native/build/libs/websub-native-1.0.3-SNAPSHOT.jar"
     groupId = "ballerina"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "http-native"
-    version = "@http.native.version@"
-    path = "./lib/http-native-@http.native.version@.jar"
+    version = "1.0.1-SNAPSHOT"
+    path = "./lib/http-native-1.0.1-SNAPSHOT.jar"
     groupId = "org.ballerinalang"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "netty-common"
-    version = "@netty.version@"
-    path = "./lib/netty-common-@netty.version@.jar"
+    version = "4.1.39.Final"
+    path = "./lib/netty-common-4.1.39.Final.jar"
     groupId = "io.netty"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "netty-buffer"
-    version = "@netty.version@"
-    path = "./lib/netty-buffer-@netty.version@.jar"
+    version = "4.1.39.Final"
+    path = "./lib/netty-buffer-4.1.39.Final.jar"
     groupId = "io.netty"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "netty-transport"
-    version = "@netty.version@"
-    path = "./lib/netty-transport-@netty.version@.jar"
+    version = "4.1.39.Final"
+    path = "./lib/netty-transport-4.1.39.Final.jar"
     groupId = "io.netty"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "netty-resolver"
-    version = "@netty.version@"
-    path = "./lib/netty-resolver-@netty.version@.jar"
+    version = "4.1.39.Final"
+    path = "./lib/netty-resolver-4.1.39.Final.jar"
     groupId = "io.netty"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "netty-handler"
-    version = "@netty.version@"
-    path = "./lib/netty-handler-@netty.version@.jar"
+    version = "4.1.39.Final"
+    path = "./lib/netty-handler-4.1.39.Final.jar"
     groupId = "io.netty"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "netty-codec-http"
-    version = "@netty.version@"
-    path = "./lib/netty-codec-http-@netty.version@.jar"
+    version = "4.1.39.Final"
+    path = "./lib/netty-codec-http-4.1.39.Final.jar"
     groupId = "io.netty"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "netty-codec"
-    version = "@netty.version@"
-    path = "./lib/netty-codec-@netty.version@.jar"
+    version = "4.1.39.Final"
+    path = "./lib/netty-codec-4.1.39.Final.jar"
     groupId = "io.netty"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "netty-handler-proxy"
-    version = "@netty.version@"
-    path = "./lib/netty-handler-proxy-@netty.version@.jar"
+    version = "4.1.39.Final"
+    path = "./lib/netty-handler-proxy-4.1.39.Final.jar"
     groupId = "io.netty"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "netty-codec-http2"
-    version = "@netty.version@"
-    path = "./lib/netty-codec-http2-@netty.version@.jar"
+    version = "4.1.39.Final"
+    path = "./lib/netty-codec-http2-4.1.39.Final.jar"
     groupId = "io.netty"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "commons-pool"
-    version = "@wso2commonspool.version@"
-    path = "./lib/commons-pool-@wso2commonspool.version@.jar"
+    version = "1.5.6.wso2v1"
+    path = "./lib/commons-pool-1.5.6.wso2v1.jar"
     groupId = "commons-pool.wso2"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "snakeyaml"
-    version = "@wso2snakeyaml.version@"
-    path = "./lib/snakeyaml-@wso2snakeyaml.version@.jar"
+    version = "1.16.0.wso2v1"
+    path = "./lib/snakeyaml-1.16.0.wso2v1.jar"
     groupId = "org.wso2.orbit.org.yaml"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "bcprov-jdk15on"
-    version = "@bouncycastle.version@"
-    path = "./lib/bcprov-jdk15on-@bouncycastle.version@.jar"
+    version = "1.61"
+    path = "./lib/bcprov-jdk15on-1.61.jar"
     groupId = "org.bouncycastle"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "bcpkix-jdk15on"
-    version = "@bouncycastle.version@"
-    path = "./lib/bcpkix-jdk15on-@bouncycastle.version@.jar"
+    version = "1.61"
+    path = "./lib/bcpkix-jdk15on-1.61.jar"
     groupId = "org.bouncycastle"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "netty-tcnative-boringssl-static"
-    version = "@nettytcnative.version@"
-    path = "./lib/netty-tcnative-boringssl-static-@nettytcnative.version@.jar"
+    version = "2.0.25.Final"
+    path = "./lib/netty-tcnative-boringssl-static-2.0.25.Final.jar"
     groupId = "io.netty"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "broker-core"
-    version = "@ballerinambcore.version@"
-    path = "./lib/broker-core-@ballerinambcore.version@.jar"
+    version = "0.970.5"
+    path = "./lib/broker-core-0.970.5.jar"
     groupId = "io.ballerina.messaging"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "broker-common"
-    version = "@ballerinamb.version@"
-    path = "./lib/broker-common-@ballerinamb.version@.jar"
+    version = "0.970.0"
+    path = "./lib/broker-common-0.970.0.jar"
     groupId = "io.ballerina.messaging"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "broker-auth"
-    version = "@ballerinamb.version@"
-    path = "./lib/broker-auth-@ballerinamb.version@.jar"
+    version = "0.970.0"
+    path = "./lib/broker-auth-0.970.0.jar"
     groupId = "io.ballerina.messaging"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "broker-rest-runner"
-    version = "@ballerinamb.version@"
-    path = "./lib/broker-rest-runner-@ballerinamb.version@.jar"
+    version = "0.970.0"
+    path = "./lib/broker-rest-runner-0.970.0.jar"
     groupId = "io.ballerina.messaging"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "broker-coordination"
-    version = "@ballerinamb.version@"
-    path = "./lib/broker-coordination-@ballerinamb.version@.jar"
+    version = "0.970.0"
+    path = "./lib/broker-coordination-0.970.0.jar"
     groupId = "io.ballerina.messaging"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "org.wso2.carbon.metrics.core"
-    version = "@wso2carbonmetrics.version@"
-    path = "./lib/org.wso2.carbon.metrics.core-@wso2carbonmetrics.version@.jar"
+    version = "2.3.7"
+    path = "./lib/org.wso2.carbon.metrics.core-2.3.7.jar"
     groupId = "org.wso2.carbon.metrics"
     modules = ["websub"]
 
     [[platform.libraries]]
     artifactId = "guava"
-    version = "@guava.version@"
-    path = "./lib/guava-@guava.version@.jar"
+    version = "19.0"
+    path = "./lib/guava-19.0.jar"
     groupId = "com.google.guava"
     modules = ["websub"]
 
