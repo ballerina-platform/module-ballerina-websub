@@ -16,6 +16,7 @@
 
 import ballerina/lang.'object as lang;
 import ballerina/test;
+import ballerina/websub;
 
 public type SpecificSubMockActionEvent record {|
     string action;
@@ -29,11 +30,11 @@ public class SpecificSubWebhookServerForPayload {
 
     *lang:Listener;
 
-    private Listener websubListener;
+    private websub:Listener websubListener;
 
     public function init(int port, string? host = ()) {
-        ExtensionConfig extensionConfig = {
-            topicIdentifier: TOPIC_ID_PAYLOAD_KEY,
+        websub:ExtensionConfig extensionConfig = {
+            topicIdentifier: websub:TOPIC_ID_PAYLOAD_KEY,
             payloadKeyResourceMap: {
                 "action" : {
                     "created" : ["onCreated", SpecificSubMockActionEvent],
@@ -46,7 +47,7 @@ public class SpecificSubWebhookServerForPayload {
                 }
             }
         };
-        SubscriberListenerConfiguration sseConfig = {
+        websub:SubscriberListenerConfiguration sseConfig = {
             host: host ?: "",
             extensionConfig: extensionConfig
         };
@@ -75,37 +76,37 @@ public class SpecificSubWebhookServerForPayload {
 }
 
 service keyWebhook1 =
-@SubscriberServiceConfig {
+@websub:SubscriberServiceConfig {
     path:"/key"
 }
-@SpecificSubscriber
+@websub:SpecificSubscriber
 service {
-    resource function onOpened(Notification notification, SpecificSubMockActionEvent event) {
+    resource function onOpened(websub:Notification notification, SpecificSubMockActionEvent event) {
     }
 
-    resource function onFeature(Notification notification, SpecificSubMockDomainEvent event) {
+    resource function onFeature(websub:Notification notification, SpecificSubMockDomainEvent event) {
     }
 
-    resource function onStatus(Notification notification, SpecificSubMockActionEvent event) {
+    resource function onStatus(websub:Notification notification, SpecificSubMockActionEvent event) {
     }
 
-    resource function onReopened(Notification notification, SpecificSubMockActionEvent event) {
+    resource function onReopened(websub:Notification notification, SpecificSubMockActionEvent event) {
     }
 };
 
 service keyWebhook2 =
-@SubscriberServiceConfig {
+@websub:SubscriberServiceConfig {
     path:"/key"
 }
-@SpecificSubscriber
+@websub:SpecificSubscriber
 service {
-    resource function onCreated(Notification notification, SpecificSubMockActionEvent event) {
+    resource function onCreated(websub:Notification notification, SpecificSubMockActionEvent event) {
     }
 
-    resource function onFeature(Notification notification, SpecificSubMockDomainEvent event) {
+    resource function onFeature(websub:Notification notification, SpecificSubMockDomainEvent event) {
     }
 
-    resource function onStatus(Notification notification, SpecificSubMockDomainEvent event) {
+    resource function onStatus(websub:Notification notification, SpecificSubMockDomainEvent event) {
     }
 };
 

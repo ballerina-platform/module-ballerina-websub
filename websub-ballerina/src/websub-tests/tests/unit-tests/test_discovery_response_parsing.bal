@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/http;
+import ballerina/websub;
 import ballerina/test;
 
 final string HUB_ONE = "https://hub.ballerina.com";
@@ -27,7 +28,7 @@ final string TOPIC_ONE = "https://topic.ballerina.com";
 function testTopicAndSingleHubAsSingleLinkHeader() {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\", <" + TOPIC_ONE + ">; rel=\"self\"");
-    var results = extractTopicAndHubUrls(response);
+    var results = websub:extractTopicAndHubUrls(response);
     if (results is [string, string[]]) {
         string topic = results[0];
         string[] hubs = results[1];
@@ -46,7 +47,7 @@ function testTopicAndSingleHubAsMultipleLinkHeaders() {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"self\"");
-    var results = extractTopicAndHubUrls(response);
+    var results = websub:extractTopicAndHubUrls(response);
     if (results is [string, string[]]) {
         string topic = results[0];
         string[] hubs = results[1];
@@ -66,7 +67,7 @@ function testTopicAndMultipleHubsAsSingleLinkHeader() {
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\", <" + HUB_TWO + ">; rel=\"hub\", <" + HUB_THREE +
             ">; rel=\"hub\", <" + TOPIC_ONE + ">; rel=\"self\"");
 
-    var results = extractTopicAndHubUrls(response);
+    var results = websub:extractTopicAndHubUrls(response);
     if (results is [string, string[]]) {
         string topic = results[0];
         string[] hubs = results[1];
@@ -90,7 +91,7 @@ function testTopicAndMultipleHubsAsMultipleLinkHeaders() {
     response.addHeader("Link", "<" + HUB_TWO + ">; rel=\"hub\"");
     response.addHeader("Link", "<" + HUB_THREE + ">; rel=\"hub\"");
 
-    var results = extractTopicAndHubUrls(response);
+    var results = websub:extractTopicAndHubUrls(response);
     if (results is [string, string[]]) {
         string topic = results[0];
         string[] hubs = results[1];
@@ -110,7 +111,7 @@ function testTopicAndMultipleHubsAsMultipleLinkHeaders() {
 function testMissingTopicWithSingleLinkHeader() {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\", <" + TOPIC_ONE + ">; rel=\"not_self\"");
-    var results = extractTopicAndHubUrls(response);
+    var results = websub:extractTopicAndHubUrls(response);
     if (results is error) {
         string expectedErrMsg = "Hub and/or Topic URL(s) not identified in link header of discovery response";
         test:assertEquals(results.message(), expectedErrMsg, msg = "invalid error message on unavailable topic");
@@ -126,7 +127,7 @@ function testMissingTopicWithMultipleLinkHeaders() {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"not_self\"");
-    var results = extractTopicAndHubUrls(response);
+    var results = websub:extractTopicAndHubUrls(response);
     if (results is error) {
         string expectedErrMsg = "Hub and/or Topic URL(s) not identified in link header of discovery response";
         test:assertEquals(results.message(), expectedErrMsg, msg = "invalid error message on unavailable topic");
@@ -141,7 +142,7 @@ function testMissingTopicWithMultipleLinkHeaders() {
 function testMissingHubWithSingleLinkHeader() {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\", <" + TOPIC_ONE + ">; rel=\"self\"");
-    var results = extractTopicAndHubUrls(response);
+    var results = websub:extractTopicAndHubUrls(response);
     if (results is error) {
         string expectedErrMsg = "Hub and/or Topic URL(s) not identified in link header of discovery response";
         test:assertEquals(results.message(), expectedErrMsg, msg = "invalid error message on unavailable topic");
@@ -157,7 +158,7 @@ function testMissingHubWithMultipleLinkHeaders() {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"self\"");
-    var results = extractTopicAndHubUrls(response);
+    var results = websub:extractTopicAndHubUrls(response);
     if (results is error) {
         string expectedErrMsg = "Hub and/or Topic URL(s) not identified in link header of discovery response";
         test:assertEquals(results.message(), expectedErrMsg, msg = "invalid error message on unavailable topic");
@@ -171,7 +172,7 @@ function testMissingHubWithMultipleLinkHeaders() {
 }
 function testMissingLinkHeader() {
     http:Response response = new;
-    var results = extractTopicAndHubUrls(response);
+    var results = websub:extractTopicAndHubUrls(response);
     if (results is error) {
         string expectedErrMsg = "Link header unavailable in discovery response";
         test:assertEquals(results.message(), expectedErrMsg, msg = "invalid error message on unavailable link headers(s)");
@@ -187,7 +188,7 @@ function testSingleLinkHeaderWithMultipleTopics() {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\", <" + TOPIC_ONE + ">; rel=\"self\", <" +
             HUB_TWO + ">; rel=\"self\"");
-    var results = extractTopicAndHubUrls(response);
+    var results = websub:extractTopicAndHubUrls(response);
     if (results is error) {
         string expectedErrMsg = "Link Header contains > 1 self URLs";
         test:assertEquals(results.message(), expectedErrMsg, msg = "invalid error message on > 1 topics");
@@ -204,7 +205,7 @@ function testMultipleLinkHeadersWithMultipleTopics() {
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"self\"");
     response.addHeader("Link", "<" + HUB_TWO + ">; rel=\"self\"");
-    var results = extractTopicAndHubUrls(response);
+    var results = websub:extractTopicAndHubUrls(response);
     if (results is error) {
         string expectedErrMsg = "Link Header contains > 1 self URLs";
         test:assertEquals(results.message(), expectedErrMsg, msg = "invalid error message on > 1 topics");

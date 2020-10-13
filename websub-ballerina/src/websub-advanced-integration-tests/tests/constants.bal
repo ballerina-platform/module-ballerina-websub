@@ -15,14 +15,14 @@
 // under the License.
 
 // Integration tests constants
-const string WEBSUB_PERSISTENCE_TOPIC_ONE = "http://one.persistence.topic.com";
-const string WEBSUB_PERSISTENCE_TOPIC_TWO = "http://two.persistence.topic.com";
-const string WEBSUB_TOPIC_ONE = "http://one.websub.topic.com";
-
-const string ID_NOTIFICATION_ONE = "NotificationOne";
-const string ID_NOTIFICATION_FOUR = "NotificationFour";
-
-const string NOTIFICATION_ONE = "WebSub Notification Received by One: {\"mode\":\"internal\", \"content_type\":\"json\"}";
-const string NOTIFICATION_FOUR = "WebSub Notification Received by Four: {\"mode\":\"remote\", \"content_type\":\"xml\"}";
+//const string WEBSUB_PERSISTENCE_TOPIC_ONE = "http://one.persistence.topic.com";
+//const string WEBSUB_PERSISTENCE_TOPIC_TWO = "http://two.persistence.topic.com";
+//const string WEBSUB_TOPIC_ONE = "http://one.websub.topic.com";
+//
+//const string ID_NOTIFICATION_ONE = "NotificationOne";
+//const string ID_NOTIFICATION_FOUR = "NotificationFour";
+//
+//const string NOTIFICATION_ONE = "WebSub Notification Received by One: {\"mode\":\"internal\", \"content_type\":\"json\"}";
+//const string NOTIFICATION_FOUR = "WebSub Notification Received by Four: {\"mode\":\"remote\", \"content_type\":\"xml\"}";
 
 

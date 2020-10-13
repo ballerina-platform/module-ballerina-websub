@@ -51,3 +51,13 @@ function fetchHttpResponse(http:Response|error response) returns HttpResponseDet
     };
     return httpResponseDetails;
 }
+
+//map<(anydata|error)> outputs = {};
+//
+//public function storeOutput(string key, any|error... s) {
+//    outputs[key] = s[0].toString();
+//}
+//
+//public function fetchOutput(string key) returns (anydata|error) {
+//    return outputs[key];
+//}
