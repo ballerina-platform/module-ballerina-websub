@@ -21,21 +21,19 @@ package org.ballerinalang.net.websub.hub;
 import io.ballerina.messaging.broker.core.BrokerException;
 import io.ballerina.messaging.broker.core.Consumer;
 import io.ballerina.messaging.broker.core.Message;
+import org.ballerinalang.jvm.api.BRuntime;
 import org.ballerinalang.jvm.api.BStringUtils;
+import org.ballerinalang.jvm.api.connector.CallableUnitCallback;
+import org.ballerinalang.jvm.api.values.BError;
 import org.ballerinalang.jvm.api.values.BMap;
+import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.scheduling.Scheduler;
-import org.ballerinalang.jvm.scheduling.Strand;
 import org.ballerinalang.jvm.util.exceptions.BallerinaException;
-import org.ballerinalang.jvm.api.BExecutor;
 import org.ballerinalang.net.websub.broker.BallerinaBrokerByteBuf;
 
 import java.util.Objects;
 import java.util.Properties;
-
-import static org.ballerinalang.net.websub.WebSubSubscriberConstants.BALLERINA;
-import static org.ballerinalang.net.websub.WebSubSubscriberConstants.GENERATED_PACKAGE_VERSION;
-import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * WebSub Subscriber representation for the Broker.
@@ -48,15 +46,17 @@ public class HubSubscriber extends Consumer {
     private final String topic;
     private final String callback;
     private final BMap<BString, Object> subscriptionDetails;
-    private final Scheduler scheduler;
+    private final BObject bridge;
+    private final BRuntime runtime;
 
-    HubSubscriber(Strand strand, String queue, String topic, String callback,
-                  BMap<BString, Object> subscriptionDetails) {
-        this.scheduler = strand.scheduler;
+    HubSubscriber(BRuntime runtime, String queue, String topic, String callback,
+                  BMap<BString, Object> subscriptionDetails, BObject bridge) {
+        this.runtime = runtime;
         this.queue = queue;
         this.topic = topic;
         this.callback = callback;
         this.subscriptionDetails = subscriptionDetails;
+        this.bridge = bridge;
     }
 
     @Override
@@ -65,11 +65,23 @@ public class HubSubscriber extends Consumer {
         BMap<BString, Object> content =
                 (BMap<BString, Object>) ((BallerinaBrokerByteBuf) (message.getContentChunks().get(0).getByteBuf())
                         .unwrap()).getValue();
-        Object[] args = {BStringUtils.fromString(getCallback()), getSubscriptionDetails(), content};
+        Object[] args = {BStringUtils.fromString(getCallback()), true, getSubscriptionDetails(), true, content, true};
+        CountDownLatch completeFunction = new CountDownLatch(1);
+        runtime.invokeMethodAsync(bridge, "distributeContent", null, null,
+                                  new CallableUnitCallback() {
+                                      @Override
+                                      public void notifySuccess() {
+                                          completeFunction.countDown();
+                                      }
+
+                                      @Override
+                                      public void notifyFailure(BError error) {
+                                          completeFunction.countDown();
+                                      }
+                                  }, args);
         try {
-            BExecutor.executeFunction(scheduler, null, null, this.getClass().getClassLoader(), BALLERINA, WEBSUB,
-                                     GENERATED_PACKAGE_VERSION, "hub_service", "distributeContent", args);
-        } catch (BallerinaException e) {
+            completeFunction.await();
+        } catch (BallerinaException | InterruptedException e) {
             throw new BallerinaException("send failed: " + e.getMessage());
         }
     }

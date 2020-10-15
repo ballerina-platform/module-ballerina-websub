@@ -23,14 +23,40 @@ description = 'Ballerina - Websub Java Utils'
 
 dependencies {
     compile group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
-    compile group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
+    compile (group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}") {
+        transitive = false
+    }
     compile group: 'org.ballerinalang', name: 'http-native', version: "${stdlibHttpVersion}"
     compile group: 'org.ballerinalang', name: 'mime-native', version: "${stdlibMimeVersion}"
-    compile group: 'org.ballerinalang', name: 'io-native', version: "${stdlibIoVersion}"
-    compile group: 'org.ballerinalang', name: 'value', version: "${ballerinaLangVersion}"
-    compile group: 'org.ballerinalang', name: 'typedesc', version: "${ballerinaLangVersion}"
-    compile group: 'org.ballerinalang', name: 'toml-parser', version: "${ballerinaTomlParserVersion}"
-    compile group: 'io.ballerina.messaging', name: 'broker-core', version: "${ballerinaMessageBrokerCoreVersion}"
-    compile group: 'org.wso2.transport.http', name: 'org.wso2.transport.http.netty', version: "${wso2TransportHttpNettyVersion}"
+    compile (group: 'org.ballerinalang', name: 'io-native', version: "${stdlibIoVersion}") {
+        transitive = false
+    }
+    compile (group: 'org.ballerinalang', name: 'value', version: "${ballerinaLangVersion}") {
+        transitive = false
+    }
+    compile (group: 'org.ballerinalang', name: 'typedesc', version: "${ballerinaLangVersion}") {
+        transitive = false
+    }
+    compile (group: 'org.ballerinalang', name: 'toml-parser', version: "${ballerinaTomlParserVersion}") {
+        transitive = false
+    }
+    compile (group: 'io.ballerina.messaging', name: 'broker-core', version: "${ballerinaMessageBrokerCoreVersion}") {
+        transitive = false
+    }
+    compile (group: 'io.ballerina.messaging', name: 'broker-common', version: "${ballerinaMessageBrokerCoreVersion}") {
+        transitive = false
+    }
+    compile group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}"
+    compile group: 'io.netty', name: 'netty-codec', version: "${nettyVersion}"
+    compile group: 'io.netty', name: 'netty-codec-http', version: "${nettyVersion}"
     compile group: 'org.slf4j', name: 'slf4j-jdk14', version: "${slf4jVersion}"
+}
+
+compileJava {
+    doFirst {
+        options.compilerArgs = [
+                '--module-path', classpath.asPath,
+        ]
+        classpath = files()
+    }
 }

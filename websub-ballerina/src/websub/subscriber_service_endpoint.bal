@@ -90,6 +90,10 @@ public class Listener {
         self.sendSubscriptionRequests();
     }
 
+    isolated function processWebSubNotification(http:Request request, service serviceType) returns @tainted error? {
+        return processWebSubNotification(request, serviceType);
+    }
+
     # Stops the `websub:Listener` gracefully.
     # ```ballerina
     # error? result = websubListener.__gracefulStop();

@@ -23,7 +23,7 @@ import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.ballerinalang.jvm.TypeChecker;
-import org.ballerinalang.jvm.api.BExecutor;
+import org.ballerinalang.jvm.api.BRuntime;
 import org.ballerinalang.jvm.api.BStringUtils;
 import org.ballerinalang.jvm.api.BValueCreator;
 import org.ballerinalang.jvm.api.connector.CallableUnitCallback;
@@ -31,8 +31,6 @@ import org.ballerinalang.jvm.api.values.BError;
 import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.scheduling.Scheduler;
-import org.ballerinalang.jvm.scheduling.Strand;
 import org.ballerinalang.jvm.types.AttachedFunction;
 import org.ballerinalang.jvm.types.BRecordType;
 import org.ballerinalang.jvm.types.BType;
@@ -45,24 +43,23 @@ import org.ballerinalang.net.http.BallerinaHTTPConnectorListener;
 import org.ballerinalang.net.http.HttpConstants;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpUtil;
+import org.ballerinalang.net.transport.message.HttpCarbonMessage;
 import org.ballerinalang.net.uri.URIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.transport.http.netty.message.HttpCarbonMessage;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import static org.ballerinalang.mime.util.MimeConstants.TEXT_PLAIN;
 import static org.ballerinalang.net.http.HttpConstants.CALLER;
 import static org.ballerinalang.net.http.HttpConstants.HTTP_LISTENER_ENDPOINT;
 import static org.ballerinalang.net.http.HttpConstants.PROTOCOL_HTTP_PKG_ID;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANNOTATED_TOPIC;
-import static org.ballerinalang.net.websub.WebSubSubscriberConstants.BALLERINA;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ENTITY_ACCESSED_REQUEST;
-import static org.ballerinalang.net.websub.WebSubSubscriberConstants.GENERATED_PACKAGE_VERSION;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.PARAM_HUB_CHALLENGE;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.PARAM_HUB_LEASE_SECONDS;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.PARAM_HUB_MODE;
@@ -76,7 +73,6 @@ import static org.ballerinalang.net.websub.WebSubSubscriberConstants.VERIFICATIO
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.VERIFICATION_REQUEST_LEASE_SECONDS;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.VERIFICATION_REQUEST_MODE;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.VERIFICATION_REQUEST_TOPIC;
-import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB_INTENT_VERIFICATION_REQUEST;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB_NOTIFICATION_REQUEST;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB_PACKAGE_ID;
@@ -90,15 +86,17 @@ import static org.ballerinalang.net.websub.WebSubUtils.getJsonBody;
 public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorListener {
 
     private static final Logger log = LoggerFactory.getLogger(BallerinaWebSubConnectorListener.class);
+    private final BRuntime runtime;
     private WebSubServicesRegistry webSubServicesRegistry;
+    private BObject subscriberServiceListener;
     private PrintStream console = System.out;
-    private Scheduler scheduler;
 
-    public BallerinaWebSubConnectorListener(Strand strand, WebSubServicesRegistry webSubServicesRegistry,
-                                            BMap endpointConfig) {
+    public BallerinaWebSubConnectorListener(BRuntime runtime, WebSubServicesRegistry webSubServicesRegistry,
+                                            BMap endpointConfig, BObject subscriberServiceListener) {
         super(webSubServicesRegistry, endpointConfig);
-        this.scheduler = strand.scheduler;
+        this.runtime = runtime;
         this.webSubServicesRegistry = webSubServicesRegistry;
+        this.subscriberServiceListener = subscriberServiceListener;
     }
 
     @Override
@@ -214,26 +212,38 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
         CallableUnitCallback callback = new WebSubEmptyCallableUnitCallback();
         //TODO handle BallerinaConnectorException
         BObject service = httpResource.getParentService().getBalService();
-        BExecutor.submit(scheduler, service, balResource.getName(), null, null,
-                callback, null, signatureParams);
+        runtime.invokeMethodAsync(service, balResource.getName(), null, null, callback, signatureParams);
     }
 
     @SuppressWarnings("unchecked")
     private void validateSignature(HttpCarbonMessage httpCarbonMessage, HttpResource httpResource,
                                    BObject request) {
+
         //invoke processWebSubNotification function
-        Object returnValue;
+        final BError[] returnValue = new BError[1];
+        Object[] args = {request, true, httpResource.getParentService().getBalService(), true};
+        CountDownLatch completeFunction = new CountDownLatch(1);
+        runtime.invokeMethodAsync(subscriberServiceListener, "processWebSubNotification", null, null,
+                                  new CallableUnitCallback() {
+                                      @Override
+                                      public void notifySuccess() {
+                                          completeFunction.countDown();
+                                      }
+
+                                      @Override
+                                      public void notifyFailure(BError error) {
+                                          returnValue[0] = error;
+                                          completeFunction.countDown();
+                                      }
+                                  }, args);
         try {
-            Object[] args = {request, httpResource.getParentService().getBalService()};
-            returnValue = BExecutor.executeFunction(scheduler, null, null, this.getClass().getClassLoader(), BALLERINA,
-                                                   WEBSUB, GENERATED_PACKAGE_VERSION, "commons",
-                                                   "processWebSubNotification", args);
-        } catch (BallerinaException ex) {
+            completeFunction.await();
+        } catch (InterruptedException ex) {
             log.debug("Signature Validation failed: " + ex.getMessage());
             httpCarbonMessage.setHttpStatusCode(404);
-            throw ex;
+            throw new BallerinaException(ex);
         }
-        BError error = (BError) returnValue;
+        BError error = returnValue[0];
         if (error != null) {
             log.debug("Signature Validation failed for Notification: " + error.getMessage());
             httpCarbonMessage.setHttpStatusCode(404);

@@ -33,7 +33,7 @@ import org.ballerinalang.mime.util.MimeConstants;
 import org.ballerinalang.mime.util.MimeUtil;
 import org.ballerinalang.net.http.HttpConstants;
 import org.ballerinalang.net.http.HttpUtil;
-import org.wso2.transport.http.netty.message.HttpCarbonMessage;
+import org.ballerinalang.net.transport.message.HttpCarbonMessage;
 
 /**
  * Util class for WebSub.

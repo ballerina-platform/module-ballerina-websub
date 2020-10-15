@@ -21,7 +21,7 @@ version = "@toml.version@"
 "ballerina/stringutils" = "@stdlib.stringutils.version@"
 
 [platform]
-target = "java8"
+target = "java11"
 
     [[platform.libraries]]
     artifactId = "web-sub"
@@ -31,10 +31,10 @@ target = "java8"
     modules = ["websub"]
 
     [[platform.libraries]]
-    artifactId = "org.wso2.transport.http.netty"
-    version = "@wso2httpnetty.version@"
-    path = "./lib/org.wso2.transport.http.netty-@wso2httpnetty.version@.jar"
-    groupId = "org.wso2.transport.http"
+    artifactId = "http-native"
+    version = "@http.native.version@"
+    path = "./lib/http-native-@http.native.version@.jar"
+    groupId = "org.ballerinalang"
     modules = ["websub"]
 
     [[platform.libraries]]

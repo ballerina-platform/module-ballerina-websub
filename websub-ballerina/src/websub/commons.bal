@@ -491,6 +491,18 @@ public type RemotePublishConfig record {|
     RemotePublishMode mode = PUBLISH_MODE_DIRECT;
 |};
 
+
+public class Bridge {
+
+    function setupOnStartup() returns error? {
+        return setupOnStartup();
+    }
+
+    function distributeContent(string callback, SubscriptionDetails subscriptionDetails, WebSubContent webSubContent) {
+        distributeContent(callback,subscriptionDetails,webSubContent);
+    }
+}
+
 # Starts up the Ballerina Hub.
 # ```ballerina
 #  websub:Hub|websub:HubStartedUpError|websub:HubStartupError webSubHub = websub:startHub(new http:Listener(9191),
@@ -553,7 +565,7 @@ public function startHub(http:Listener hubServiceListener,
     Hub|HubStartedUpError|HubStartupError res = startUpHubService(hubBasePath, hubSubscriptionResourcePath,
                                                                         hubPublishResourcePath,
                                                                         hubTopicRegistrationRequired, hubPublicUrl,
-                                                                        hubServiceListener);
+                                                                        hubServiceListener, new Bridge() );
     if (res is Hub) {
         startHubService(hubServiceListener);
     }

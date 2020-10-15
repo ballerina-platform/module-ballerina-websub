@@ -20,6 +20,7 @@ package org.ballerinalang.net.websub.nativeimpl;
 
 import org.ballerinalang.jvm.api.BStringUtils;
 import org.ballerinalang.jvm.api.BValueCreator;
+import org.ballerinalang.jvm.api.BalEnv;
 import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.api.values.BString;
@@ -107,9 +108,9 @@ public class HubNativeOperationHandler {
      * @return `Hub` the WebSub Hub object representing the newly started up hub, or `HubStartedUpError` indicating that
      * the hub is already started, and including the WebSub Hub object representing the already started up hub
      */
-    public static Object startUpHubService(BString basePath, BString subscriptionResourcePath,
+    public static Object startUpHubService(BalEnv env, BString basePath, BString subscriptionResourcePath,
                                            BString publishResourcePath, boolean topicRegistrationRequired,
-                                           BString publicUrl, BObject hubListener) {
+                                           BString publicUrl, BObject hubListener, BObject callback) {
         Hub hubInstance = Hub.getInstance();
         if (hubInstance.isStarted()) {
             BMap<BString, Object> hubStartedUpError =
@@ -117,9 +118,9 @@ public class HubNativeOperationHandler {
             return BValueCreator.createRecordValue(hubStartedUpError, "Ballerina Hub already started up", null,
                                                 hubInstance.getHubObject());
         }
-        return hubInstance.startUpHubService(Scheduler.getStrand(), basePath.getValue(),
+        return hubInstance.startUpHubService(env.getRuntime(), Scheduler.getStrand(), basePath.getValue(),
                                              subscriptionResourcePath.getValue(), publishResourcePath.getValue(),
-                                             topicRegistrationRequired, publicUrl.getValue(), hubListener);
+                                             topicRegistrationRequired, publicUrl.getValue(), hubListener, callback);
     }
 
     /**
@@ -155,7 +156,7 @@ public class HubNativeOperationHandler {
                 BStringUtils.fromString(SUBSCRIPTION_DETAILS_TOPIC)).getValue();
         String callback = subscriptionDetails.getStringValue(
                 BStringUtils.fromString(SUBSCRIPTION_DETAILS_CALLBACK)).getValue();
-        Hub.getInstance().registerSubscription(Scheduler.getStrand(), topic, callback, subscriptionDetails);
+        Hub.getInstance().registerSubscription(topic, callback, subscriptionDetails);
     }
 
     /**
@@ -181,7 +182,7 @@ public class HubNativeOperationHandler {
      * @param callback the callback registered for this subscription
      */
     public static void removeNativeSubscription(BString topic, BString callback) {
-        Hub.getInstance().unregisterSubscription(Scheduler.getStrand(), topic.getValue(), callback.getValue());
+        Hub.getInstance().unregisterSubscription(topic.getValue(), callback.getValue());
     }
 
     /**
