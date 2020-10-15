@@ -20,10 +20,10 @@ package org.ballerinalang.net.websub.nativeimpl;
 
 import org.ballerinalang.jvm.api.BStringUtils;
 import org.ballerinalang.jvm.api.BValueCreator;
+import org.ballerinalang.jvm.api.BalEnv;
 import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.scheduling.Scheduler;
 import org.ballerinalang.jvm.types.BArrayType;
 import org.ballerinalang.jvm.types.BMapType;
 import org.ballerinalang.jvm.types.BRecordType;
@@ -35,13 +35,13 @@ import org.ballerinalang.net.http.HttpConnectorPortBindingListener;
 import org.ballerinalang.net.http.HttpConstants;
 import org.ballerinalang.net.http.HttpService;
 import org.ballerinalang.net.http.websocket.server.WebSocketServicesRegistry;
+import org.ballerinalang.net.transport.contract.ServerConnector;
+import org.ballerinalang.net.transport.contract.ServerConnectorFuture;
 import org.ballerinalang.net.websub.BallerinaWebSubConnectorListener;
 import org.ballerinalang.net.websub.WebSubHttpService;
 import org.ballerinalang.net.websub.WebSubServicesRegistry;
 import org.ballerinalang.net.websub.WebSubSubscriberConstants;
 import org.ballerinalang.net.websub.WebSubUtils;
-import org.ballerinalang.net.transport.contract.ServerConnector;
-import org.ballerinalang.net.transport.contract.ServerConnectorFuture;
 
 import java.util.HashMap;
 import java.util.Optional;
@@ -238,7 +238,7 @@ public class SubscriberNativeOperationHandler {
      * @param subscriberServiceListener the subscriber listener
      * @return an `error` if there is any error occurred during the listener start process
      */
-    public static Object startWebSubSubscriberServiceEndpoint(BObject subscriberServiceListener) {
+    public static Object startWebSubSubscriberServiceEndpoint(BalEnv env, BObject subscriberServiceListener) {
         BObject serviceEndpoint = (BObject) subscriberServiceListener.get(
                 BStringUtils.fromString(WEBSUB_HTTP_ENDPOINT));
         ServerConnector serverConnector = (ServerConnector) serviceEndpoint.getNativeData(
@@ -248,8 +248,8 @@ public class SubscriberNativeOperationHandler {
         WebSubServicesRegistry webSubServicesRegistry = (WebSubServicesRegistry) serviceEndpoint.getNativeData(
                 WebSubSubscriberConstants.WEBSUB_SERVICE_REGISTRY);
         serverConnectorFuture.setHttpConnectorListener(
-                new BallerinaWebSubConnectorListener(Scheduler.getStrand(), webSubServicesRegistry, serviceEndpoint
-                        .getMapValue(HttpConstants.SERVICE_ENDPOINT_CONFIG)));
+                new BallerinaWebSubConnectorListener(env.getRuntime(), webSubServicesRegistry, serviceEndpoint
+                        .getMapValue(HttpConstants.SERVICE_ENDPOINT_CONFIG), subscriberServiceListener));
         serverConnectorFuture.setPortBindingEventListener(new HttpConnectorPortBindingListener());
         try {
             serverConnectorFuture.sync();

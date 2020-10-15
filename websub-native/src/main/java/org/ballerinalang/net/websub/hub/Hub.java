@@ -18,31 +18,33 @@
 
 package org.ballerinalang.net.websub.hub;
 
-import org.ballerinalang.jvm.TypeChecker;
+import org.ballerinalang.jvm.api.BErrorCreator;
+import org.ballerinalang.jvm.api.BRuntime;
 import org.ballerinalang.jvm.api.BStringUtils;
 import org.ballerinalang.jvm.api.BValueCreator;
+import org.ballerinalang.jvm.api.connector.CallableUnitCallback;
+import org.ballerinalang.jvm.api.values.BError;
 import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.api.values.BString;
 import org.ballerinalang.jvm.scheduling.Strand;
 import org.ballerinalang.jvm.util.exceptions.BallerinaException;
+import org.ballerinalang.jvm.values.ErrorValue;
 import org.ballerinalang.net.websub.BallerinaWebSubException;
 import org.ballerinalang.net.websub.broker.BallerinaBroker;
 import org.ballerinalang.net.websub.broker.BallerinaBrokerByteBuf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.ballerinalang.compiler.util.TypeTags;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
-import static org.ballerinalang.jvm.api.BExecutor.executeFunction;
-import static org.ballerinalang.net.websub.WebSubSubscriberConstants.BALLERINA;
-import static org.ballerinalang.net.websub.WebSubSubscriberConstants.GENERATED_PACKAGE_VERSION;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.STRUCT_WEBSUB_BALLERINA_HUB;
-import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB_PACKAGE_ID;
 
 /**
@@ -72,6 +74,8 @@ public class Hub {
     private static final String HUB_SERVICE = "hub_service";
 
     private static final String SLASH = "/";
+    private BRuntime runtime;
+    private BObject bridge;
 
     public static Hub getInstance() {
         return instance;
@@ -110,12 +114,11 @@ public class Hub {
 
     /**
      * Method to add a subscription to the topic on MB.
-     * @param strand    the current strand
      * @param topic     the topic to which the subscription should be added
      * @param callback  the callback registered for the particular subscription
      * @param subscriptionDetails the subscription details
      */
-    public void registerSubscription(Strand strand, String topic, String callback,
+    public void registerSubscription(String topic, String callback,
                                      BMap<BString, Object> subscriptionDetails) {
         if (!started) {
             //TODO: Revisit to check if this needs to be returned as an error, currently not required since this check
@@ -124,12 +127,13 @@ public class Hub {
         } else if (!topics.contains(topic) && hubTopicRegistrationRequired) {
             logger.warn("Subscription request ignored for unregistered topic[" + topic + "]");
         } else {
-            if (getSubscribers().contains(new HubSubscriber(strand, "", topic, callback, null))) {
-                unregisterSubscription(strand, topic, callback);
+            HubSubscriber subscriberToAdd = new HubSubscriber(null, null, topic, callback, null, null);
+            if (getSubscribers().contains(subscriberToAdd)) {
+                unregisterSubscription(topic, callback);
             }
             String queue = UUID.randomUUID().toString();
 
-            HubSubscriber subscriberToAdd = new HubSubscriber(strand, queue, topic, callback, subscriptionDetails);
+            subscriberToAdd = new HubSubscriber(runtime, queue, topic, callback, subscriptionDetails, bridge);
             brokerInstance.addSubscription(topic, subscriberToAdd);
             getSubscribers().add(subscriberToAdd);
         }
@@ -138,19 +142,18 @@ public class Hub {
     /**
      * Method to remove a subscription to the topic on MB.
      *
-     * @param strand    the current strand
      * @param topic     the topic to which the subscription should was added
      * @param callback  the callback registered for the particular subscription
      */
-    public void unregisterSubscription(Strand strand, String topic, String callback) {
+    public void unregisterSubscription(String topic, String callback) {
         if (!started) {
             logger.error("Hub Service not started: unsubscription failed.");
             return;
         }
-        HubSubscriber subscriberToUnregister = new HubSubscriber(strand, "", topic, callback, null);
+        HubSubscriber subscriberToUnregister = new HubSubscriber(null, "", topic, callback, null, null);
         if (!getSubscribers().contains(subscriberToUnregister)) {
             if (callback.endsWith("/")) {
-                unregisterSubscription(strand, topic, callback.substring(0, callback.length() - 1));
+                unregisterSubscription(topic, callback.substring(0, callback.length() - 1));
             }
             return;
         } else {
@@ -202,9 +205,9 @@ public class Hub {
      * @return the hub object if the hub was started up successfully, error if not
      */
     @SuppressWarnings("unchecked")
-    public Object startUpHubService(Strand strand, String basePath, String subscriptionResourcePath,
-                                  String publishResourcePath, boolean topicRegistrationRequired, String publicUrl,
-                                  BObject hubListener) {
+    public Object startUpHubService(BRuntime runtime, Strand strand, String basePath, String subscriptionResourcePath,
+                                    String publishResourcePath, boolean topicRegistrationRequired, String publicUrl,
+                                    BObject hubListener, BObject bridge) {
         synchronized (this) {
             if (!isStarted()) {
                 try {
@@ -222,11 +225,32 @@ public class Hub {
                 String subscribeUrl = populateSubscribeUrl(publicUrl, hubListener);
 
                 started = true;
-                Object setupResult = executeFunction(strand.scheduler, null, null, classLoader, BALLERINA, WEBSUB,
-                                                     GENERATED_PACKAGE_VERSION, HUB_SERVICE, "setupOnStartup");
-                if (TypeChecker.getType(setupResult).getTag() == TypeTags.ERROR) {
+                //TODO: this has to be re-written in a non-blocking way for better performance
+                CountDownLatch completeFunction = new CountDownLatch(1);
+                final BError[] errorValue = new ErrorValue[1];
+                runtime.invokeMethodAsync(bridge, "setupOnStartup",
+                                          null, null, new CallableUnitCallback() {
+                            @Override
+                            public void notifySuccess() {
+                                completeFunction.countDown();
+                            }
+
+                            @Override
+                            public void notifyFailure(BError error) {
+                                started = false;
+                                errorValue[0] = error;
+                                completeFunction.countDown();
+                            }
+                        });
+                try {
+                    completeFunction.await();
+                } catch (InterruptedException e) {
                     started = false;
-                    return setupResult;
+                    return BErrorCreator.createError(BStringUtils.fromString("Hub start timeout"), e);
+                }
+
+                if (errorValue[0] != null) {
+                    return errorValue[0];
                 }
 
                 PrintStream console = System.err;
@@ -239,6 +263,8 @@ public class Hub {
                         WEBSUB_PACKAGE_ID, STRUCT_WEBSUB_BALLERINA_HUB, BStringUtils.fromString(subscribeUrl),
                         BStringUtils.fromString(publishUrl), hubListener);
                 setHubObject(hubObject);
+                this.runtime = runtime;
+                this.bridge = bridge;
                 return hubObject;
             } else {
                 throw new BallerinaWebSubException("Hub Service already started up");
