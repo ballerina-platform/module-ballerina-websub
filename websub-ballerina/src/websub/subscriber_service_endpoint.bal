@@ -296,9 +296,11 @@ function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? pu
         } else {
             return topicAndHubs;
         }
-    } else {
+    } else if (discoveryResponse is error) {
         return WebSubError("Error occurred with WebSub discovery for Resource URL [" +resourceUrl + "]: " +
-                            discoveryResponse.message() );
+                            discoveryResponse.message());
+    } else {
+        return WebSubError("Expected an HTTP response, but found http:Payload");
     }
 }
 

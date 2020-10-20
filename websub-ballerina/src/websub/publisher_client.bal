@@ -54,7 +54,7 @@ public client class PublisherClient {
                 string payload = result is string ? result : "";
                 return WebSubError("Error occurred during topic registration: " + payload);
             }
-        } else {
+        } else if (registrationResponse is error) {
             return WebSubError("Error sending topic registration request: " + registrationResponse.message());
         }
     }
@@ -76,7 +76,7 @@ public client class PublisherClient {
                 string payload = result is string ? result : "";
                 return WebSubError("Error occurred during topic unregistration: " + payload);
             }
-        } else {
+        } else if (unregistrationResponse is error) {
             return WebSubError("Error sending topic unregistration request: " + unregistrationResponse.message());
         }
     }

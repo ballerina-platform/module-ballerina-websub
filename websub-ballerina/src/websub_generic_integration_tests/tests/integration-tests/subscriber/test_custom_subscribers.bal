@@ -281,8 +281,7 @@ function testOnIntentVerificationInvocation() {
 }
 
 @test:Config {
-    dependsOn: ["testOnIntentVerificationInvocation"],
-    enable: false
+    dependsOn: ["testOnIntentVerificationInvocation"]
 }
 function testDispatchingByKey() {
     http:Client clientEndpoint = new ("http://localhost:23585");
@@ -308,7 +307,7 @@ function testDispatchingByKey() {
 
 @test:Config {
     dependsOn: ["testDispatchingByKey"],
-    enable:false
+    enable: false
 }
 function testDispatchingByHeader() {
     http:Client clientEndpoint = new ("http://localhost:23686");
@@ -334,7 +333,7 @@ function testDispatchingByHeader() {
     test:assertEquals(fetchOutput(ID_BY_HEADER_COMMIT_LOG), BY_HEADER_COMMIT_LOG);
 }
 
-@test:Config {enable: false}
+@test:Config {}
 function testDispatchingByHeaderAndPayloadKey() {
     http:Client clientEndpoint = new ("http://localhost:23787");
     json jsonPayload1 = {action: "created"};
@@ -359,7 +358,7 @@ function testDispatchingByHeaderAndPayloadKey() {
     test:assertEquals(fetchOutput(ID_BY_HEADER_AND_PAYLOAD_FEATURE_PULL_LOG), BY_HEADER_AND_PAYLOAD_FEATURE_PULL_LOG);
 }
 
-@test:Config {enable: false}
+@test:Config {}
 function testDispatchingByHeaderAndPayloadKeyForOnlyHeader() {
     http:Client clientEndpoint = new ("http://localhost:23787");
     json jsonPayload = {action: "header_only"};
@@ -375,8 +374,7 @@ function testDispatchingByHeaderAndPayloadKeyForOnlyHeader() {
 }
 
 @test:Config {
-    dependsOn: ["testDispatchingByHeaderAndPayloadKeyForOnlyHeader"],
-    enable:false
+    dependsOn: ["testDispatchingByHeaderAndPayloadKeyForOnlyHeader"]
 }
 function testDispatchingByHeaderAndPayloadKeyForOnlyKey() {
     http:Client clientEndpoint = new ("http://localhost:23787");

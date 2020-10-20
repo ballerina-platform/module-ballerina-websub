@@ -118,13 +118,11 @@ isolated function buildSubscriptionChangeRequest(@untainted string mode,
 #            if an error occurred
 function processHubResponse(@untainted string hub, @untainted string mode,
                             SubscriptionChangeRequest subscriptionChangeRequest,
-                            http:Response|error response, http:Client httpClient,
+                            http:Response|http:Payload|error response, http:Client httpClient,
                             int remainingRedirects) returns @tainted SubscriptionChangeResponse|error {
 
     string topic = subscriptionChangeRequest.topic;
-    if (response is error) {
-        return WebSubError("Error occurred for request: Mode[" + mode+ "] at Hub[" + hub + "] - " + response.message());
-    } else {
+    if (response is http:Response) {
         int responseStatusCode = response.statusCode;
         if (responseStatusCode == http:STATUS_TEMPORARY_REDIRECT
                 || responseStatusCode == http:STATUS_PERMANENT_REDIRECT) {
@@ -153,6 +151,11 @@ function processHubResponse(@untainted string hub, @untainted string mode,
             SubscriptionChangeResponse subscriptionChangeResponse = {hub:hub, topic:topic, response:response};
             return subscriptionChangeResponse;
         }
+    } else if (response is error) {
+       return WebSubError("Error occurred for request: Mode[" + mode+ "] at Hub[" + hub + "] - "
+                             + response.message());
+    } else {
+        return WebSubError("Expected an HTTP response. But found http:Payload");
     }
 }
 

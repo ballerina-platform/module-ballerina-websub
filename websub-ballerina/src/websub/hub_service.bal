@@ -364,7 +364,7 @@ function verifyIntentAndAddSubscription(string callback, string topic, map<strin
             log:printInfo("Intent verification failed for mode: [" + mode + "], for callback URL: [" + callback
                     + "]: Error retrieving response payload: " + errCause);
         }
-    } else {
+    } else if (subscriberResponse is error) {
         log:printError("Error sending intent verification request for callback URL: [" + callback + "]: " +
                         subscriberResponse.message());
     }
@@ -459,11 +459,11 @@ isolated function addSubscriptionsOnStartup(HubPersistenceStore persistenceStore
 # + topic - The topic URL to be fetched to retrieve updates
 # + return - An `http:Response` indicating the response received on fetching the topic URL if successful or else an
 #            `error` if an HTTP error occurred
-function fetchTopicUpdate(string topic) returns http:Response|error {
+function fetchTopicUpdate(string topic) returns @untainted http:Response|error {
     http:Client topicEp = new http:Client(topic, hubClientConfig);
     http:Request request = new;
 
-    return topicEp->get("", request);
+    return <http:Response> check topicEp->get("", request);
 }
 
 # Distributes content to a subscriber on the notification from the publishers.
@@ -531,7 +531,7 @@ function distributeContent(string callback, SubscriptionDetails subscriptionDeta
                 log:printError("Error delivering content to callback[" + callback + "] for topic["
                             + subscriptionDetails.topic + "]: received response code " + respStatusCode.toString());
             }
-        } else {
+        } else if (contentDistributionResponse is error) {
             log:printError("Error delivering content to callback[" + callback + "] for topic["
                             + subscriptionDetails.topic + "]: " + contentDistributionResponse.message());
         }
