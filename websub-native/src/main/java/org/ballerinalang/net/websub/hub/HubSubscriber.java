@@ -21,14 +21,14 @@ package org.ballerinalang.net.websub.hub;
 import io.ballerina.messaging.broker.core.BrokerException;
 import io.ballerina.messaging.broker.core.Consumer;
 import io.ballerina.messaging.broker.core.Message;
-import org.ballerinalang.jvm.api.BRuntime;
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.connector.CallableUnitCallback;
-import org.ballerinalang.jvm.api.values.BError;
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.api.values.BObject;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.util.exceptions.BallerinaException;
+import io.ballerina.runtime.api.Runtime;
+import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.async.Callback;
+import io.ballerina.runtime.api.values.BError;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.util.exceptions.BallerinaException;
 import org.ballerinalang.net.websub.broker.BallerinaBrokerByteBuf;
 
 import java.util.Objects;
@@ -47,9 +47,9 @@ public class HubSubscriber extends Consumer {
     private final String callback;
     private final BMap<BString, Object> subscriptionDetails;
     private final BObject bridge;
-    private final BRuntime runtime;
+    private final Runtime runtime;
 
-    HubSubscriber(BRuntime runtime, String queue, String topic, String callback,
+    HubSubscriber(Runtime runtime, String queue, String topic, String callback,
                   BMap<BString, Object> subscriptionDetails, BObject bridge) {
         this.runtime = runtime;
         this.queue = queue;
@@ -65,10 +65,10 @@ public class HubSubscriber extends Consumer {
         BMap<BString, Object> content =
                 (BMap<BString, Object>) ((BallerinaBrokerByteBuf) (message.getContentChunks().get(0).getByteBuf())
                         .unwrap()).getValue();
-        Object[] args = {BStringUtils.fromString(getCallback()), true, getSubscriptionDetails(), true, content, true};
+        Object[] args = {StringUtils.fromString(getCallback()), true, getSubscriptionDetails(), true, content, true};
         CountDownLatch completeFunction = new CountDownLatch(1);
         runtime.invokeMethodAsync(bridge, "distributeContent", null, null,
-                                  new CallableUnitCallback() {
+                                  new Callback() {
                                       @Override
                                       public void notifySuccess() {
                                           completeFunction.countDown();

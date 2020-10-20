@@ -18,16 +18,17 @@
 
 package org.ballerinalang.net.websub;
 
-import org.ballerinalang.jvm.JSONParser;
-import org.ballerinalang.jvm.api.BErrorCreator;
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.BValueCreator;
-import org.ballerinalang.jvm.api.values.BError;
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.api.values.BObject;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.types.AttachedFunction;
-import org.ballerinalang.jvm.util.exceptions.BallerinaConnectorException;
+import io.ballerina.runtime.JSONParser;
+import io.ballerina.runtime.api.ErrorCreator;
+import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.values.BError;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.types.AttachedFunction;
+import io.ballerina.runtime.api.types.AttachedFunctionType;
+import io.ballerina.runtime.util.exceptions.BallerinaConnectorException;
 import org.ballerinalang.mime.util.EntityBodyHandler;
 import org.ballerinalang.mime.util.MimeConstants;
 import org.ballerinalang.mime.util.MimeUtil;
@@ -43,9 +44,9 @@ public class WebSubUtils {
     public static final String WEBSUB_ERROR = "WebSubError";
 
     static BObject getHttpRequest(HttpCarbonMessage httpCarbonMessage) {
-        BObject httpRequest = BValueCreator.createObjectValue(HttpConstants.PROTOCOL_HTTP_PKG_ID,
+        BObject httpRequest = ValueCreator.createObjectValue(HttpConstants.PROTOCOL_HTTP_PKG_ID,
                                                                     HttpConstants.REQUEST);
-        BObject inRequestEntity = BValueCreator.createObjectValue(MimeConstants.PROTOCOL_MIME_PKG_ID,
+        BObject inRequestEntity = ValueCreator.createObjectValue(MimeConstants.PROTOCOL_MIME_PKG_ID,
                                                                         MimeConstants.ENTITY);
 
         HttpUtil.populateInboundRequest(httpRequest, inRequestEntity, httpCarbonMessage);
@@ -79,10 +80,10 @@ public class WebSubUtils {
         }
     }
 
-    public static AttachedFunction getAttachedFunction(BObject service, String functionName) {
-        AttachedFunction attachedFunction = null;
+    public static AttachedFunctionType getAttachedFunction(BObject service, String functionName) {
+        AttachedFunctionType attachedFunction = null;
         String functionFullName = service.getType().getName() + "." + functionName;
-        for (AttachedFunction function : service.getType().getAttachedFunctions()) {
+        for (AttachedFunctionType function : service.getType().getAttachedFunctions()) {
             //TODO test the name of resource
             if (functionFullName.contains(function.getName())) {
                 attachedFunction = function;
@@ -98,8 +99,8 @@ public class WebSubUtils {
      * @return Ballerina error value
      */
     public static BError createError(String errMsg) {
-        return BErrorCreator.createDistinctError(WEBSUB_ERROR, WebSubSubscriberConstants.WEBSUB_PACKAGE_ID,
-                                                 BStringUtils.fromString(errMsg));
+        return ErrorCreator.createDistinctError(WEBSUB_ERROR, WebSubSubscriberConstants.WEBSUB_PACKAGE_ID,
+                                                 StringUtils.fromString(errMsg));
     }
 
     /**
@@ -110,7 +111,7 @@ public class WebSubUtils {
      * @return Ballerina error value
      */
     public static BError createError(String typeIdName, String message) {
-        return BErrorCreator.createDistinctError(typeIdName, WebSubSubscriberConstants.WEBSUB_PACKAGE_ID,
-                                                 BStringUtils.fromString(message));
+        return ErrorCreator.createDistinctError(typeIdName, WebSubSubscriberConstants.WEBSUB_PACKAGE_ID,
+                                                 StringUtils.fromString(message));
     }
 }

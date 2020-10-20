@@ -21,7 +21,7 @@ module io.ballerina.stdlib.websub {
     requires io.netty.buffer;
     requires org.slf4j;
     requires io.ballerina.lang;
-    requires io.ballerina.jvm;
+    requires io.ballerina.runtime;
     requires io.netty.codec.http;
     requires io.netty.codec;
     requires io.ballerina.lang.value;

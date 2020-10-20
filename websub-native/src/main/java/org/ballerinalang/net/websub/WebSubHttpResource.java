@@ -1,8 +1,9 @@
 package org.ballerinalang.net.websub;
 
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.types.AttachedFunction;
-import org.ballerinalang.jvm.util.exceptions.BallerinaException;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.types.AttachedFunction;
+import io.ballerina.runtime.api.types.AttachedFunctionType;
+import io.ballerina.runtime.util.exceptions.BallerinaException;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
 
@@ -13,7 +14,7 @@ import org.ballerinalang.net.http.HttpService;
  */
 class WebSubHttpResource extends HttpResource {
 
-    private WebSubHttpResource(AttachedFunction resource, HttpService parentService) {
+    private WebSubHttpResource(AttachedFunctionType resource, HttpService parentService) {
         super(resource, parentService);
     }
 
@@ -24,7 +25,7 @@ class WebSubHttpResource extends HttpResource {
      * @param httpService   the HTTP service representation of the service
      * @return  the built HTTP resource
      */
-    static HttpResource buildWebSubHttpResource(AttachedFunction resource, HttpService httpService) {
+    static HttpResource buildWebSubHttpResource(AttachedFunctionType resource, HttpService httpService) {
         WebSubHttpResource httpResource = new WebSubHttpResource(resource, httpService);
         BMap resourceConfigAnnotation = getResourceConfigAnnotation(resource);
 
