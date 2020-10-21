@@ -55,7 +55,7 @@ public client class PublisherClient {
                 return WebSubError("Error occurred during topic registration: " + payload);
             }
         } else {
-            return WebSubError("Error sending topic registration request: " + registrationResponse.message());
+            return WebSubError("Error sending topic registration request: " + (<error>registrationResponse).message());
         }
     }
 
@@ -77,7 +77,8 @@ public client class PublisherClient {
                 return WebSubError("Error occurred during topic unregistration: " + payload);
             }
         } else {
-            return WebSubError("Error sending topic unregistration request: " + unregistrationResponse.message());
+            return WebSubError("Error sending topic unregistration request: "
+                                    + (<error>unregistrationResponse).message());
         }
     }
 

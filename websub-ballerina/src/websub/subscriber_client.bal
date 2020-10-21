@@ -118,18 +118,19 @@ isolated function buildSubscriptionChangeRequest(@untainted string mode,
 #            if an error occurred
 function processHubResponse(@untainted string hub, @untainted string mode,
                             SubscriptionChangeRequest subscriptionChangeRequest,
-                            http:Response|error response, http:Client httpClient,
+                            http:Response|http:Payload|error response, http:Client httpClient,
                             int remainingRedirects) returns @tainted SubscriptionChangeResponse|error {
 
     string topic = subscriptionChangeRequest.topic;
     if (response is error) {
         return WebSubError("Error occurred for request: Mode[" + mode+ "] at Hub[" + hub + "] - " + response.message());
     } else {
-        int responseStatusCode = response.statusCode;
+        http:Response hubResponse = <http:Response> response;
+        int responseStatusCode = hubResponse.statusCode;
         if (responseStatusCode == http:STATUS_TEMPORARY_REDIRECT
                 || responseStatusCode == http:STATUS_PERMANENT_REDIRECT) {
             if (remainingRedirects > 0) {
-                string redirected_hub = response.getHeader("Location");
+                string redirected_hub = hubResponse.getHeader("Location");
                 return invokeClientConnectorOnRedirection(redirected_hub, mode, subscriptionChangeRequest,
                                                             httpClient.config.auth, remainingRedirects - 1);
             }
@@ -137,7 +138,7 @@ function processHubResponse(@untainted string hub, @untainted string mode,
                                "followRedirects disabled or after maxCount exceeded: Hub [" + hub + "], Topic [" +
                                subscriptionChangeRequest.topic + "]");
         } else if (!isSuccessStatusCode(responseStatusCode)) {
-            var responsePayload = response.getTextPayload();
+            var responsePayload = hubResponse.getTextPayload();
             string errorMessage = "Error in request: Mode[" + mode + "] at Hub[" + hub + "]";
             if (responsePayload is string) {
                 errorMessage = errorMessage + " - " + responsePayload;
@@ -150,7 +151,7 @@ function processHubResponse(@untainted string hub, @untainted string mode,
                 log:printDebug("Subscription request considered successful for non 202 status code: "
                                 + responseStatusCode.toString());
             }
-            SubscriptionChangeResponse subscriptionChangeResponse = {hub:hub, topic:topic, response:response};
+            SubscriptionChangeResponse subscriptionChangeResponse = {hub:hub, topic:topic, response:hubResponse};
             return subscriptionChangeResponse;
         }
     }

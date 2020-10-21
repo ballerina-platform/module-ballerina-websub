@@ -18,19 +18,20 @@
 
 package org.ballerinalang.net.websub.nativeimpl;
 
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.BValueCreator;
-import org.ballerinalang.jvm.api.BalEnv;
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.api.values.BObject;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.types.BArrayType;
-import org.ballerinalang.jvm.types.BMapType;
-import org.ballerinalang.jvm.types.BRecordType;
-import org.ballerinalang.jvm.types.BTypes;
-import org.ballerinalang.jvm.util.exceptions.BallerinaConnectorException;
-import org.ballerinalang.jvm.values.ArrayValue;
-import org.ballerinalang.jvm.values.TypedescValue;
+import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.Environment;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.types.BAnnotatableType;
+import io.ballerina.runtime.types.BArrayType;
+import io.ballerina.runtime.types.BMapType;
+import io.ballerina.runtime.types.BRecordType;
+import io.ballerina.runtime.api.PredefinedTypes;
+import io.ballerina.runtime.util.exceptions.BallerinaConnectorException;
+import io.ballerina.runtime.values.ArrayValue;
+import io.ballerina.runtime.values.TypedescValue;
 import org.ballerinalang.net.http.HttpConnectorPortBindingListener;
 import org.ballerinalang.net.http.HttpConstants;
 import org.ballerinalang.net.http.HttpService;
@@ -85,7 +86,7 @@ import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB_SERV
  */
 public class SubscriberNativeOperationHandler {
 
-    private static final BArrayType mapArrayType = new BArrayType(new BMapType(BTypes.typeAny));
+    private static final BArrayType mapArrayType = new BArrayType(new BMapType(PredefinedTypes.TYPE_ANY));
 
     /**
      * Initialize the WebSub subscriber endpoint.
@@ -96,18 +97,18 @@ public class SubscriberNativeOperationHandler {
     public static void initWebSubSubscriberServiceEndpoint(BObject subscriberServiceListener) {
 
         BObject serviceEndpoint = (BObject) subscriberServiceListener.get(
-                BStringUtils.fromString(WEBSUB_HTTP_ENDPOINT));
+                StringUtils.fromString(WEBSUB_HTTP_ENDPOINT));
         BMap<BString, Object> config = (BMap<BString, Object>) subscriberServiceListener.get(
-                BStringUtils.fromString(LISTENER_SERVICE_ENDPOINT_CONFIG));
+                StringUtils.fromString(LISTENER_SERVICE_ENDPOINT_CONFIG));
         WebSubServicesRegistry webSubServicesRegistry;
 
-        if (config == null || config.get(BStringUtils.fromString(SERVICE_CONFIG_EXTENSION_CONFIG)) == null) {
+        if (config == null || config.get(StringUtils.fromString(SERVICE_CONFIG_EXTENSION_CONFIG)) == null) {
             webSubServicesRegistry = new WebSubServicesRegistry(new WebSocketServicesRegistry());
         } else {
             BMap<BString, Object> extensionConfig = (BMap<BString, Object>) config.get(
-                    BStringUtils.fromString(SERVICE_CONFIG_EXTENSION_CONFIG));
+                    StringUtils.fromString(SERVICE_CONFIG_EXTENSION_CONFIG));
             String topicIdentifier = extensionConfig.getStringValue(
-                    BStringUtils.fromString(EXTENSION_CONFIG_TOPIC_IDENTIFIER)).getValue();
+                    StringUtils.fromString(EXTENSION_CONFIG_TOPIC_IDENTIFIER)).getValue();
             String topicHeader = null;
             BMap<BString, Object> headerResourceMap = null;
             BMap<BString, BMap<BString, Object>> payloadKeyResourceMap = null;
@@ -115,7 +116,7 @@ public class SubscriberNativeOperationHandler {
 
             if (TOPIC_ID_HEADER.equals(topicIdentifier) || TOPIC_ID_HEADER_AND_PAYLOAD.equals(topicIdentifier)) {
                 topicHeader = extensionConfig.getStringValue(
-                        BStringUtils.fromString(EXTENSION_CONFIG_TOPIC_HEADER)).getValue();
+                        StringUtils.fromString(EXTENSION_CONFIG_TOPIC_HEADER)).getValue();
                 if (topicHeader == null) {
                     throw new BallerinaConnectorException("Topic Header not specified to dispatch by "
                                                                   + topicIdentifier);
@@ -226,7 +227,7 @@ public class SubscriberNativeOperationHandler {
      */
     public static void registerWebSubSubscriberService(BObject subscriberServiceListener, BObject service) {
         BObject serviceEndpoint = (BObject) subscriberServiceListener.get(
-                BStringUtils.fromString(LISTENER_SERVICE_ENDPOINT));
+                StringUtils.fromString(LISTENER_SERVICE_ENDPOINT));
         WebSubServicesRegistry webSubServicesRegistry =
                 (WebSubServicesRegistry) serviceEndpoint.getNativeData(WEBSUB_SERVICE_REGISTRY);
         webSubServicesRegistry.registerWebSubSubscriberService(service);
@@ -238,9 +239,9 @@ public class SubscriberNativeOperationHandler {
      * @param subscriberServiceListener the subscriber listener
      * @return an `error` if there is any error occurred during the listener start process
      */
-    public static Object startWebSubSubscriberServiceEndpoint(BalEnv env, BObject subscriberServiceListener) {
+    public static Object startWebSubSubscriberServiceEndpoint(Environment env, BObject subscriberServiceListener) {
         BObject serviceEndpoint = (BObject) subscriberServiceListener.get(
-                BStringUtils.fromString(WEBSUB_HTTP_ENDPOINT));
+                StringUtils.fromString(WEBSUB_HTTP_ENDPOINT));
         ServerConnector serverConnector = (ServerConnector) serviceEndpoint.getNativeData(
                 HttpConstants.HTTP_SERVER_CONNECTOR);
         //TODO: check if isStarted check is required
@@ -270,7 +271,7 @@ public class SubscriberNativeOperationHandler {
      */
     public static void setTopic(BObject subscriberServiceListener, BString webSubServiceName, BString topic) {
         BObject serviceEndpoint = (BObject) subscriberServiceListener.get(
-                BStringUtils.fromString(WEBSUB_HTTP_ENDPOINT));
+                StringUtils.fromString(WEBSUB_HTTP_ENDPOINT));
         WebSubServicesRegistry webSubServicesRegistry = ((WebSubServicesRegistry) serviceEndpoint.getNativeData(
                 WEBSUB_SERVICE_REGISTRY));
         if (webSubServicesRegistry.getServicesMapHolder(DEFAULT_HOST) == null) {
@@ -297,9 +298,9 @@ public class SubscriberNativeOperationHandler {
      */
     @SuppressWarnings("unchecked")
     public static ArrayValue retrieveSubscriptionParameters(BObject subscriberServiceListener) {
-        ArrayValue subscriptionDetailArray = (ArrayValue) BValueCreator.createArrayValue(mapArrayType);
+        ArrayValue subscriptionDetailArray = (ArrayValue) ValueCreator.createArrayValue(mapArrayType);
         BObject serviceEndpoint = (BObject) subscriberServiceListener.get(
-                BStringUtils.fromString(WEBSUB_HTTP_ENDPOINT));
+                StringUtils.fromString(WEBSUB_HTTP_ENDPOINT));
         WebSubServicesRegistry webSubServicesRegistry = ((WebSubServicesRegistry) serviceEndpoint.getNativeData(
                 WEBSUB_SERVICE_REGISTRY));
         if (webSubServicesRegistry.getServicesMapHolder(DEFAULT_HOST) == null) {
@@ -309,12 +310,12 @@ public class SubscriberNativeOperationHandler {
 
         for (int index = 0; index < webSubHttpServices.length; index++) {
             WebSubHttpService webSubHttpService = (WebSubHttpService) webSubHttpServices[index];
-            BMap<BString, Object> subscriptionDetails = BValueCreator.createMapValue();
-            BMap annotation = (BMap) webSubHttpService.getBalService().getType()
+            BMap<BString, Object> subscriptionDetails = ValueCreator.createMapValue();
+            BMap annotation = (BMap) ((BAnnotatableType)webSubHttpService.getBalService().getType())
                     .getAnnotation(WEBSUB_PACKAGE_FULL_QUALIFIED_NAME, ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG);
 
             subscriptionDetails.put(WEBSUB_SERVICE_NAME,
-                                    BStringUtils.fromString(webSubHttpService.getBalService().getType().getName()));
+                                    StringUtils.fromString(webSubHttpService.getBalService().getType().getName()));
             subscriptionDetails.put(ANN_WEBSUB_ATTR_SUBSCRIBE_ON_STARTUP,
                                     annotation.getBooleanValue(ANN_WEBSUB_ATTR_SUBSCRIBE_ON_STARTUP));
 
@@ -331,9 +332,9 @@ public class SubscriberNativeOperationHandler {
                 subscriptionDetails.put(ANN_WEBSUB_ATTR_SECRET, annotation.getStringValue(ANN_WEBSUB_ATTR_SECRET));
             }
 
-            subscriptionDetails.put(BStringUtils.fromString(ANN_WEBSUB_ATTR_EXPECT_INTENT_VERIFICATION),
+            subscriptionDetails.put(StringUtils.fromString(ANN_WEBSUB_ATTR_EXPECT_INTENT_VERIFICATION),
                                     annotation.getBooleanValue(
-                                            BStringUtils.fromString(ANN_WEBSUB_ATTR_EXPECT_INTENT_VERIFICATION)));
+                                            StringUtils.fromString(ANN_WEBSUB_ATTR_EXPECT_INTENT_VERIFICATION)));
 
             if (annotation.containsKey(ANN_WEBSUB_ATTR_SUBSCRIPTION_PUBLISHER_CLIENT_CONFIG)) {
                 BMap<BString, Object> publisherClientConfig = (BMap<BString, Object>)
@@ -355,11 +356,11 @@ public class SubscriberNativeOperationHandler {
                 //TODO: intro methods to return host+port and change instead of using connector ID
                 callback = webSubHttpService.getBasePath();
                 BMap<BString, Object> serviceEndpointConfig = (BMap<BString, Object>) serviceEndpoint.get(
-                        BStringUtils.fromString(SERVICE_ENDPOINT_CONFIG_NAME));
-                long port = serviceEndpoint.getIntValue(BStringUtils.fromString(ENDPOINT_CONFIG_PORT));
+                        StringUtils.fromString(SERVICE_ENDPOINT_CONFIG_NAME));
+                long port = serviceEndpoint.getIntValue(StringUtils.fromString(ENDPOINT_CONFIG_PORT));
                 if (!serviceEndpointConfig.getStringValue(
-                        BStringUtils.fromString(ENDPOINT_CONFIG_HOST)).getValue().isEmpty() && port != 0) {
-                    callback = serviceEndpointConfig.getStringValue(BStringUtils.fromString(ENDPOINT_CONFIG_HOST))
+                        StringUtils.fromString(ENDPOINT_CONFIG_HOST)).getValue().isEmpty() && port != 0) {
+                    callback = serviceEndpointConfig.getStringValue(StringUtils.fromString(ENDPOINT_CONFIG_HOST))
                             + ":" + port + callback;
                 } else {
                     callback = ((ServerConnector) serviceEndpoint.getNativeData(HTTP_SERVER_CONNECTOR))
@@ -378,7 +379,7 @@ public class SubscriberNativeOperationHandler {
                 }
             }
 
-            subscriptionDetails.put(ANN_WEBSUB_ATTR_CALLBACK, BStringUtils.fromString(callback));
+            subscriptionDetails.put(ANN_WEBSUB_ATTR_CALLBACK, StringUtils.fromString(callback));
             subscriptionDetailArray.add(index, subscriptionDetails);
         }
         return subscriptionDetailArray;

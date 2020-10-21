@@ -18,16 +18,16 @@
 
 package org.ballerinalang.net.websub;
 
-import org.ballerinalang.jvm.TypeChecker;
-import org.ballerinalang.jvm.api.BErrorCreator;
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.api.values.BObject;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.types.BObjectType;
-import org.ballerinalang.jvm.types.BRecordType;
-import org.ballerinalang.jvm.types.BType;
-import org.ballerinalang.jvm.types.TypeTags;
+import io.ballerina.runtime.TypeChecker;
+import io.ballerina.runtime.api.ErrorCreator;
+import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.types.BObjectType;
+import io.ballerina.runtime.types.BRecordType;
+import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.TypeTags;
 import org.ballerinalang.net.http.HTTPServicesRegistry;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
@@ -164,7 +164,7 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
                                                                          serviceRegistry.getResourceDetails());
 
         if (!invalidResourceNames.isEmpty()) {
-            throw BErrorCreator.createError(BStringUtils.fromString("Resource name(s) not included in " +
+            throw ErrorCreator.createError(StringUtils.fromString("Resource name(s) not included in " +
                     "the topic-resource mapping found: " + invalidResourceNames));
         }
     }
@@ -191,66 +191,66 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
     // Runtime Validation for Specific Subscriber Services.
 
     private static void validateOnIntentVerificationResource(HttpResource resource) {
-        List<BType> paramTypes = resource.getParamTypes();
+        List<Type> paramTypes = resource.getParamTypes();
         validateParamCount(paramTypes, 2, resource.getName());
         validateCallerParam(paramTypes.get(0));
         validateIntentVerificationParam(paramTypes.get(1));
     }
 
     private static void validateCustomNotificationResource(HttpResource resource, BRecordType recordType) {
-        List<BType> paramTypes = resource.getParamTypes();
+        List<Type> paramTypes = resource.getParamTypes();
         validateParamCount(paramTypes, CUSTOM_RESOURCE_PARAM_COUNT, resource.getName());
         validateNotificationParam(resource.getName(), paramTypes.get(0));
         validateRecordType(resource.getName(), paramTypes.get(1), recordType);
     }
 
-    private static void validateParamCount(List<BType> paramTypes, int expectedCount, String resourceName) {
+    private static void validateParamCount(List<Type> paramTypes, int expectedCount, String resourceName) {
         int paramCount = paramTypes.size();
         if (paramCount < expectedCount) {
-            throw BErrorCreator.createError(BStringUtils.fromString(String.format(
+            throw ErrorCreator.createError(StringUtils.fromString(String.format(
                     "Invalid param count for WebSub Resource '%s': expected '%d', found '%d'",
                                                             resourceName, expectedCount, paramCount)));
         }
     }
 
-    private static void validateCallerParam(BType paramVarType) {
+    private static void validateCallerParam(Type paramVarType) {
         if (!isExpectedObjectParam(paramVarType, WEBSUB_SERVICE_CALLER)) {
-            throw BErrorCreator.createError(BStringUtils.fromString(String.format(message,
+            throw ErrorCreator.createError(StringUtils.fromString(String.format(message,
                     paramVarType.getQualifiedName(), RESOURCE_NAME_ON_INTENT_VERIFICATION, WEBSUB_PACKAGE,
                     WEBSUB_SERVICE_CALLER)));
         }
     }
 
-    private static void validateIntentVerificationParam(BType paramVarType) {
+    private static void validateIntentVerificationParam(Type paramVarType) {
         if (!isExpectedObjectParam(paramVarType, WEBSUB_INTENT_VERIFICATION_REQUEST)) {
-            throw BErrorCreator.createError(BStringUtils.fromString(String.format(message,
+            throw ErrorCreator.createError(StringUtils.fromString(String.format(message,
                     paramVarType.getQualifiedName(), RESOURCE_NAME_ON_INTENT_VERIFICATION,
                     WEBSUB_PACKAGE, WEBSUB_INTENT_VERIFICATION_REQUEST)));
         }
     }
 
-    private static void validateNotificationParam(String resourceName, BType paramVarType) {
+    private static void validateNotificationParam(String resourceName, Type paramVarType) {
         if (!isExpectedObjectParam(paramVarType, WEBSUB_NOTIFICATION_REQUEST)) {
-            throw BErrorCreator.createError(BStringUtils.fromString(String.format(message,
+            throw ErrorCreator.createError(StringUtils.fromString(String.format(message,
                     paramVarType.getQualifiedName(), resourceName, WEBSUB_PACKAGE, WEBSUB_NOTIFICATION_REQUEST)));
         }
     }
 
-    private static void validateRecordType(String resourceName, BType paramVarType, BRecordType recordType) {
+    private static void validateRecordType(String resourceName, Type paramVarType, BRecordType recordType) {
         if (!TypeChecker.isSameType(paramVarType, recordType)) {
-            throw BErrorCreator.createError(BStringUtils.fromString(String.format("Invalid parameter type '%s' in " +
+            throw ErrorCreator.createError(StringUtils.fromString(String.format("Invalid parameter type '%s' in " +
                             "resource '%s'. Requires '%s'", paramVarType.getQualifiedName(), resourceName,
                             recordType.getQualifiedName())));
         }
     }
 
-    private static boolean isExpectedObjectParam(BType specifiedType, String expectedWebSubRecordName) {
+    private static boolean isExpectedObjectParam(Type specifiedType, String expectedWebSubRecordName) {
         if (specifiedType.getTag() != TypeTags.OBJECT_TYPE_TAG) {
             return false;
         }
         BObjectType objectType = (BObjectType) specifiedType;
-        return objectType.getPackage().org.equals(BALLERINA) &&
-                objectType.getPackage().name.equals(WEBSUB) &&
+        return objectType.getPackage().getOrg().equals(BALLERINA) &&
+                objectType.getPackage().getName().equals(WEBSUB) &&
                 objectType.getName().equals(expectedWebSubRecordName);
     }
 }

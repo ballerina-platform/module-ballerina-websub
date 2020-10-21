@@ -18,13 +18,13 @@
 
 package org.ballerinalang.net.websub;
 
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.types.BPackage;
+import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.api.Module;
 
-import static org.ballerinalang.jvm.util.BLangConstants.BALLERINA_BUILTIN_PKG_PREFIX;
-import static org.ballerinalang.jvm.util.BLangConstants.ORG_NAME_SEPARATOR;
-import static org.ballerinalang.jvm.util.BLangConstants.VERSION_SEPARATOR;
+import static io.ballerina.runtime.util.BLangConstants.BALLERINA_BUILTIN_PKG_PREFIX;
+import static io.ballerina.runtime.util.BLangConstants.ORG_NAME_SEPARATOR;
+import static io.ballerina.runtime.util.BLangConstants.VERSION_SEPARATOR;
 
 /**
  * Constants for WebSubSubscriber Services.
@@ -46,25 +46,25 @@ public class WebSubSubscriberConstants {
     public static final String WEBSUB_PACKAGE = BALLERINA + ORG_NAME_SEPARATOR + WEBSUB;
     public static final String WEBSUB_PACKAGE_FULL_QUALIFIED_NAME = WEBSUB_PACKAGE + VERSION_SEPARATOR + MODULE_VERSION;
 
-    public static final BPackage WEBSUB_PACKAGE_ID = new BPackage(BALLERINA_BUILTIN_PKG_PREFIX, WEBSUB, MODULE_VERSION);
+    public static final Module WEBSUB_PACKAGE_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, WEBSUB, MODULE_VERSION);
     public static final String WEBSUB_SERVICE_LISTENER = "Listener";
     public static final String WEBSUB_SERVICE_CALLER = "Caller";
     public static final String WEBSUB_HTTP_ENDPOINT = "serviceEndpoint";
-    public static final BString WEBSUB_SERVICE_NAME = BStringUtils.fromString("webSubServiceName");
+    public static final BString WEBSUB_SERVICE_NAME = StringUtils.fromString("webSubServiceName");
 
     public static final String ENDPOINT_CONFIG_HOST = "host";
     public static final String ENDPOINT_CONFIG_PORT = "port";
-    public static final BString ENDPOINT_CONFIG_SECURE_SOCKET_CONFIG = BStringUtils.fromString("secureSocket");
+    public static final BString ENDPOINT_CONFIG_SECURE_SOCKET_CONFIG = StringUtils.fromString("secureSocket");
 
-    public static final BString ANN_WEBSUB_ATTR_SUBSCRIBE_ON_STARTUP = BStringUtils.fromString("subscribeOnStartUp");
-    public static final BString ANN_WEBSUB_ATTR_TARGET = BStringUtils.fromString("target");
-    public static final BString ANN_WEBSUB_ATTR_LEASE_SECONDS = BStringUtils.fromString("leaseSeconds");
-    public static final BString ANN_WEBSUB_ATTR_SECRET = BStringUtils.fromString("secret");
-    public static final BString ANN_WEBSUB_ATTR_CALLBACK = BStringUtils.fromString("callback");
+    public static final BString ANN_WEBSUB_ATTR_SUBSCRIBE_ON_STARTUP = StringUtils.fromString("subscribeOnStartUp");
+    public static final BString ANN_WEBSUB_ATTR_TARGET = StringUtils.fromString("target");
+    public static final BString ANN_WEBSUB_ATTR_LEASE_SECONDS = StringUtils.fromString("leaseSeconds");
+    public static final BString ANN_WEBSUB_ATTR_SECRET = StringUtils.fromString("secret");
+    public static final BString ANN_WEBSUB_ATTR_CALLBACK = StringUtils.fromString("callback");
     public static final String ANN_WEBSUB_ATTR_EXPECT_INTENT_VERIFICATION = "expectIntentVerification";
-    public static final BString ANN_WEBSUB_ATTR_SUBSCRIPTION_PUBLISHER_CLIENT_CONFIG = BStringUtils.fromString(
+    public static final BString ANN_WEBSUB_ATTR_SUBSCRIPTION_PUBLISHER_CLIENT_CONFIG = StringUtils.fromString(
             "publisherClientConfig");
-    public static final BString ANN_WEBSUB_ATTR_SUBSCRIPTION_HUB_CLIENT_CONFIG = BStringUtils.fromString(
+    public static final BString ANN_WEBSUB_ATTR_SUBSCRIPTION_HUB_CLIENT_CONFIG = StringUtils.fromString(
             "hubClientConfig");
 
     public static final String TOPIC_ID_HEADER = "TOPIC_ID_HEADER";
@@ -74,13 +74,13 @@ public class WebSubSubscriberConstants {
     public static final String STRUCT_WEBSUB_BALLERINA_HUB = "Hub";
     public static final String STRUCT_WEBSUB_BALLERINA_HUB_STARTED_UP_ERROR = "HubStartedUpError";
 
-    static final BString PARAM_HUB_MODE = BStringUtils.fromString("hub.mode");
-    static final BString PARAM_HUB_TOPIC = BStringUtils.fromString("hub.topic");
-    static final BString PARAM_HUB_CHALLENGE = BStringUtils.fromString("hub.challenge");
-    static final BString PARAM_HUB_LEASE_SECONDS = BStringUtils.fromString("hub.lease_seconds");
+    static final BString PARAM_HUB_MODE = StringUtils.fromString("hub.mode");
+    static final BString PARAM_HUB_TOPIC = StringUtils.fromString("hub.topic");
+    static final BString PARAM_HUB_CHALLENGE = StringUtils.fromString("hub.challenge");
+    static final BString PARAM_HUB_LEASE_SECONDS = StringUtils.fromString("hub.lease_seconds");
 
-    static final BString SUBSCRIBE = BStringUtils.fromString("subscribe");
-    static final BString UNSUBSCRIBE = BStringUtils.fromString("unsubscribe");
+    static final BString SUBSCRIBE = StringUtils.fromString("subscribe");
+    static final BString UNSUBSCRIBE = StringUtils.fromString("unsubscribe");
 
     static final String ANNOTATED_TOPIC = "annotatedTopic";
     static final String DEFERRED_FOR_PAYLOAD_BASED_DISPATCHING = "deferredForPayloadBasedDispatching";
@@ -92,14 +92,14 @@ public class WebSubSubscriberConstants {
     public static final String RESOURCE_NAME_ON_INTENT_VERIFICATION = "onIntentVerification";
     public static final String RESOURCE_NAME_ON_NOTIFICATION = "onNotification";
 
-    static final BString PATH_FIELD = BStringUtils.fromString("path");
+    static final BString PATH_FIELD = StringUtils.fromString("path");
 
     // SubscriptionDetails struct field names
     public static final String SUBSCRIPTION_DETAILS_TOPIC = "topic";
     public static final String SUBSCRIPTION_DETAILS_CALLBACK = "callback";
     public static final String SUBSCRIPTION_DETAILS_SECRET = "secret";
-    public static final BString SUBSCRIPTION_DETAILS_LEASE_SECONDS = BStringUtils.fromString("leaseSeconds");
-    public static final BString SUBSCRIPTION_DETAILS_CREATED_AT = BStringUtils.fromString("createdAt");
+    public static final BString SUBSCRIPTION_DETAILS_LEASE_SECONDS = StringUtils.fromString("leaseSeconds");
+    public static final BString SUBSCRIPTION_DETAILS_CREATED_AT = StringUtils.fromString("createdAt");
     public static final String SUBSCRIPTION_DETAILS = "SubscriberDetails";
 
     // IntentVerificationRequest
@@ -119,10 +119,10 @@ public class WebSubSubscriberConstants {
     public static final String SERVICE_CONFIG_SECURE_SOCKET = "httpServiceSecureSocket";
     public static final String SERVICE_CONFIG_EXTENSION_CONFIG = "extensionConfig";
     public static final String EXTENSION_CONFIG_TOPIC_IDENTIFIER = "topicIdentifier";
-    public static final BString EXTENSION_CONFIG_HEADER_RESOURCE_MAP = BStringUtils.fromString("headerResourceMap");
-    public static final BString EXTENSION_CONFIG_PAYLOAD_KEY_RESOURCE_MAP = BStringUtils.fromString(
+    public static final BString EXTENSION_CONFIG_HEADER_RESOURCE_MAP = StringUtils.fromString("headerResourceMap");
+    public static final BString EXTENSION_CONFIG_PAYLOAD_KEY_RESOURCE_MAP = StringUtils.fromString(
             "payloadKeyResourceMap");
-    public static final BString EXTENSION_CONFIG_HEADER_AND_PAYLOAD_KEY_RESOURCE_MAP = BStringUtils.fromString(
+    public static final BString EXTENSION_CONFIG_HEADER_AND_PAYLOAD_KEY_RESOURCE_MAP = StringUtils.fromString(
             "headerAndPayloadKeyResourceMap");
 
     public static final String EXTENSION_CONFIG_TOPIC_HEADER = "topicHeader";

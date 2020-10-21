@@ -17,14 +17,14 @@
 */
 package org.ballerinalang.net.websub;
 
-import org.ballerinalang.jvm.api.connector.CallableUnitCallback;
-import org.ballerinalang.jvm.api.values.BError;
-import org.ballerinalang.jvm.services.ErrorHandlerUtils;
+import io.ballerina.runtime.api.async.Callback;
+import io.ballerina.runtime.api.values.BError;
+import io.ballerina.runtime.services.ErrorHandlerUtils;
 
 /**
  * Empty callback implementation for WebSub resources.
  */
-public class WebSubEmptyCallableUnitCallback implements CallableUnitCallback {
+public class WebSubEmptyCallableUnitCallback implements Callback {
 
     @Override
     public void notifySuccess() {
@@ -32,7 +32,7 @@ public class WebSubEmptyCallableUnitCallback implements CallableUnitCallback {
     }
 
     @Override
-    public void notifyFailure(org.ballerinalang.jvm.api.values.BError error) {
+    public void notifyFailure(io.ballerina.runtime.api.values.BError error) {
         ErrorHandlerUtils.printError("error: " + error.getPrintableStackTrace());
     }
 }

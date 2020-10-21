@@ -18,18 +18,18 @@
 
 package org.ballerinalang.net.websub.hub;
 
-import org.ballerinalang.jvm.api.BErrorCreator;
-import org.ballerinalang.jvm.api.BRuntime;
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.BValueCreator;
-import org.ballerinalang.jvm.api.connector.CallableUnitCallback;
-import org.ballerinalang.jvm.api.values.BError;
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.api.values.BObject;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.scheduling.Strand;
-import org.ballerinalang.jvm.util.exceptions.BallerinaException;
-import org.ballerinalang.jvm.values.ErrorValue;
+import io.ballerina.runtime.api.ErrorCreator;
+import io.ballerina.runtime.api.Runtime;
+import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.async.Callback;
+import io.ballerina.runtime.api.values.BError;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.scheduling.Strand;
+import io.ballerina.runtime.util.exceptions.BallerinaException;
+import io.ballerina.runtime.values.ErrorValue;
 import org.ballerinalang.net.websub.BallerinaWebSubException;
 import org.ballerinalang.net.websub.broker.BallerinaBroker;
 import org.ballerinalang.net.websub.broker.BallerinaBrokerByteBuf;
@@ -74,7 +74,7 @@ public class Hub {
     private static final String HUB_SERVICE = "hub_service";
 
     private static final String SLASH = "/";
-    private BRuntime runtime;
+    private Runtime runtime;
     private BObject bridge;
 
     public static Hub getInstance() {
@@ -205,7 +205,7 @@ public class Hub {
      * @return the hub object if the hub was started up successfully, error if not
      */
     @SuppressWarnings("unchecked")
-    public Object startUpHubService(BRuntime runtime, Strand strand, String basePath, String subscriptionResourcePath,
+    public Object startUpHubService(Runtime runtime, Strand strand, String basePath, String subscriptionResourcePath,
                                     String publishResourcePath, boolean topicRegistrationRequired, String publicUrl,
                                     BObject hubListener, BObject bridge) {
         synchronized (this) {
@@ -229,7 +229,7 @@ public class Hub {
                 CountDownLatch completeFunction = new CountDownLatch(1);
                 final BError[] errorValue = new ErrorValue[1];
                 runtime.invokeMethodAsync(bridge, "setupOnStartup",
-                                          null, null, new CallableUnitCallback() {
+                                          null, null, new Callback() {
                             @Override
                             public void notifySuccess() {
                                 completeFunction.countDown();
@@ -246,7 +246,7 @@ public class Hub {
                     completeFunction.await();
                 } catch (InterruptedException e) {
                     started = false;
-                    return BErrorCreator.createError(BStringUtils.fromString("Hub start timeout"), e);
+                    return ErrorCreator.createError(StringUtils.fromString("Hub start timeout"), e);
                 }
 
                 if (errorValue[0] != null) {
@@ -259,9 +259,9 @@ public class Hub {
                 setPublishUrl(publishUrl);
                 setSubscribeUrl(subscribeUrl);
 
-                BObject hubObject = BValueCreator.createObjectValue(
-                        WEBSUB_PACKAGE_ID, STRUCT_WEBSUB_BALLERINA_HUB, BStringUtils.fromString(subscribeUrl),
-                        BStringUtils.fromString(publishUrl), hubListener);
+                BObject hubObject = ValueCreator.createObjectValue(
+                        WEBSUB_PACKAGE_ID, STRUCT_WEBSUB_BALLERINA_HUB, StringUtils.fromString(subscribeUrl),
+                        StringUtils.fromString(publishUrl), hubListener);
                 setHubObject(hubObject);
                 this.runtime = runtime;
                 this.bridge = bridge;
@@ -275,9 +275,9 @@ public class Hub {
     @SuppressWarnings("unchecked")
     private String populatePublishUrl(String publicUrl, BObject hubListener) {
         if (publicUrl.isEmpty()) {
-            String hubPort = String.valueOf(hubListener.get(BStringUtils.fromString("port")));
+            String hubPort = String.valueOf(hubListener.get(StringUtils.fromString("port")));
             Object secureSocket = ((BMap<BString, Object>) hubListener.get(
-                    BStringUtils.fromString("config"))).get(BStringUtils.fromString("secureSocket"));
+                    StringUtils.fromString("config"))).get(StringUtils.fromString("secureSocket"));
 
             String path = basePath.equals(SLASH) ? publishResourcePath : basePath.concat(publishResourcePath);
             return secureSocket != null ? ("https://localhost:" + hubPort + path)
@@ -289,9 +289,9 @@ public class Hub {
     @SuppressWarnings("unchecked")
     private String populateSubscribeUrl(String publicUrl, BObject hubListener) {
         if (publicUrl.isEmpty()) {
-            String hubPort = String.valueOf(hubListener.get(BStringUtils.fromString("port")));
+            String hubPort = String.valueOf(hubListener.get(StringUtils.fromString("port")));
             Object secureSocket = ((BMap<BString, Object>) hubListener.get(
-                    BStringUtils.fromString("config"))).get(BStringUtils.fromString("secureSocket"));
+                    StringUtils.fromString("config"))).get(StringUtils.fromString("secureSocket"));
 
             String path = basePath.equals(SLASH) ? subscribeResourcePath : basePath.concat(subscribeResourcePath);
             return secureSocket != null ? ("https://localhost:" + hubPort + path)

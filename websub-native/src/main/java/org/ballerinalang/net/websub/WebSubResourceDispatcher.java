@@ -18,12 +18,13 @@
 
 package org.ballerinalang.net.websub;
 
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.api.values.BObject;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.util.exceptions.BallerinaConnectorException;
-import org.ballerinalang.jvm.values.ArrayValue;
+import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.types.BAnnotatableType;
+import io.ballerina.runtime.util.exceptions.BallerinaConnectorException;
+import io.ballerina.runtime.values.ArrayValue;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
 import org.ballerinalang.net.transport.contract.exceptions.ServerConnectorException;
@@ -64,7 +65,7 @@ class WebSubResourceDispatcher {
         String topicIdentifier = servicesRegistry.getTopicIdentifier();
         if (TOPIC_ID_HEADER.equals(topicIdentifier) && HTTP_METHOD_POST.equals(method)) {
             String topic = inboundRequest.getHeader(servicesRegistry.getTopicHeader());
-            resourceName = retrieveResourceNameFromTopic(BStringUtils.fromString(topic), servicesRegistry.getHeaderResourceMap());
+            resourceName = retrieveResourceNameFromTopic(StringUtils.fromString(topic), servicesRegistry.getHeaderResourceMap());
         } else if (topicIdentifier != null && HTTP_METHOD_POST.equals(method)) {
             if (inboundRequest.getProperty(HTTP_RESOURCE) == null) {
                 inboundRequest.setProperty(HTTP_RESOURCE, DEFERRED_FOR_PAYLOAD_BASED_DISPATCHING);
@@ -90,7 +91,7 @@ class WebSubResourceDispatcher {
             if (RESOURCE_NAME_ON_INTENT_VERIFICATION.equals(resourceName)) {
                 //if the request is a GET request indicating an intent verification request, and the user has not
                 //specified an onIntentVerification resource, assume auto intent verification
-                Object target = ((BMap) service.getBalService().getType()
+                Object target = ((BMap) ((BAnnotatableType)service.getBalService().getType())
                         .getAnnotation(WEBSUB_PACKAGE_FULL_QUALIFIED_NAME, ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG))
                         .get(ANN_WEBSUB_ATTR_TARGET);
                 String annotatedTopic = "";
@@ -145,7 +146,7 @@ class WebSubResourceDispatcher {
                                                WebSubServicesRegistry servicesRegistry) {
         BMap<BString, BMap<BString, BMap<BString, Object>>> headerAndPayloadKeyResourceMap =
                 servicesRegistry.getHeaderAndPayloadKeyResourceMap();
-        BString topic = BStringUtils.fromString(inboundRequest.getHeader(servicesRegistry.getTopicHeader()));
+        BString topic = StringUtils.fromString(inboundRequest.getHeader(servicesRegistry.getTopicHeader()));
         BObject httpRequest = getHttpRequest(inboundRequest);
         BMap<BString, ?> jsonBody = getJsonBody(httpRequest);
         inboundRequest.setProperty(ENTITY_ACCESSED_REQUEST, httpRequest);
