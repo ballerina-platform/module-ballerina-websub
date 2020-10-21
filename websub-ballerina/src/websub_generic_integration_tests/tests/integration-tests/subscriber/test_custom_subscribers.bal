@@ -333,7 +333,9 @@ function testDispatchingByHeader() {
     test:assertEquals(fetchOutput(ID_BY_HEADER_COMMIT_LOG), BY_HEADER_COMMIT_LOG);
 }
 
-@test:Config {}
+@test:Config {
+    enable: false
+}
 function testDispatchingByHeaderAndPayloadKey() {
     http:Client clientEndpoint = new ("http://localhost:23787");
     json jsonPayload1 = {action: "created"};
