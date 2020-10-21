@@ -364,9 +364,9 @@ function verifyIntentAndAddSubscription(string callback, string topic, map<strin
             log:printInfo("Intent verification failed for mode: [" + mode + "], for callback URL: [" + callback
                     + "]: Error retrieving response payload: " + errCause);
         }
-    } else if (subscriberResponse is error) {
+    } else {
         log:printError("Error sending intent verification request for callback URL: [" + callback + "]: " +
-                        subscriberResponse.message());
+                        (<error>subscriberResponse).message());
     }
     PendingSubscriptionChangeRequest pendingSubscriptionChangeRequest = new(mode, topic, callback);
     string key = generateKey(topic, callback);
@@ -531,9 +531,9 @@ function distributeContent(string callback, SubscriptionDetails subscriptionDeta
                 log:printError("Error delivering content to callback[" + callback + "] for topic["
                             + subscriptionDetails.topic + "]: received response code " + respStatusCode.toString());
             }
-        } else if (contentDistributionResponse is error) {
+        } else {
             log:printError("Error delivering content to callback[" + callback + "] for topic["
-                            + subscriptionDetails.topic + "]: " + contentDistributionResponse.message());
+                            + subscriptionDetails.topic + "]: " + (<error>contentDistributionResponse).message());
         }
     }
     return;
