@@ -3,7 +3,7 @@ Ballerina WebSub Library
 
   [![Build](https://github.com/ballerina-platform/module-ballerina-websub/workflows/Build/badge.svg)](https://github.com/ballerina-platform/module-ballerina-websub/actions?query=workflow%3ABuild)
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-websub.svg)](https://github.com/ballerina-platform/module-ballerina-websub/commits/master)
-    [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/websub.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fwebsub)
+  [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/websub.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fwebsub)
   [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 The WebSub library is one of the standard library modules of the<a target="_blank" href="https://ballerina.io/"> Ballerina</a> language.
@@ -12,9 +12,9 @@ This library provides the capability to easily introduce publishers and subscrib
 
 For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/swan-lake/learn/by-example/websub-internal-hub-sample.html).
 
-## `Issues` and `Projects`
+## Issues and Projects
 
-`Issues` and `Project` tabs are disabled for this repository as this is one of the Ballerina Standard Libraries. To report bugs, request new features, start new discussions, view project boards, etc. please visit Ballerina Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library).
+Issues and Project tabs are disabled for this repository as this is one of the Ballerina Standard Libraries. To report bugs, request new features, start new discussions, view project boards, etc. please visit Ballerina Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library).
 
 This repository only contains the source code for the module.
 
