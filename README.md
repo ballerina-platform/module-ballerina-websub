@@ -8,7 +8,7 @@ Ballerina WebSub Library
 
 The WebSub library is one of the standard library modules of the<a target="_blank" href="https://ballerina.io/"> Ballerina</a> language.
 
-This library provides the capability to easily introduce publishers and subscribers that are WebSub-compliant. The ballerina/websub library comes with an in-built WebSub Hub service, which can be brought up by publishers that need to bring up a hub.
+This library providess the capability to easily introduce publishers and subscribers that are WebSub-compliant. The ballerina/websub library comes with an in-built WebSub Hub service, which can be brought up by publishers that need to bring up a hub.
 
 For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/swan-lake/learn/by-example/websub-internal-hub-sample.html).
 
