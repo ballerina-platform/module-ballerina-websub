@@ -28,7 +28,6 @@ ext.slf4jVersion = project.slf4jVersion
 ext.ballerinaTomlParserVersion = project.ballerinaTomlParserVersion
 ext.nettyVersion = project.nettyVersion
 ext.nettyTcnativeVersion = project.nettyTcnativeVersion
-ext.wso2TransportHttpNettyVersion = project.wso2TransportHttpNettyVersion
 ext.ballerinaMessageBrokerVersion = project.ballerinaMessageBrokerVersion
 ext.ballerinaMessageBrokerCoreVersion = project.ballerinaMessageBrokerCoreVersion
 ext.wso2CommonsPoolVersion = project.wso2CommonsPoolVersion
