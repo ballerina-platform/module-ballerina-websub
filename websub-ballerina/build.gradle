@@ -221,7 +221,6 @@ task updateTomlFile {
         newConfig = newConfig.replace("@stdlib.stringutils.version@", stdlibDependentStringutilsVersion)
 
         // Dynamic version update of external dependencies
-        newConfig = newConfig.replace("@wso2httpnetty.version@", project.wso2TransportHttpNettyVersion)
         newConfig = newConfig.replace("@netty.version@", project.nettyVersion)
         newConfig = newConfig.replace("@wso2commonspool.version@", project.wso2CommonsPoolVersion)
         newConfig = newConfig.replace("@wso2snakeyaml.version@", project.wso2SnakeYamlVersion)
@@ -266,7 +265,7 @@ task ballerinaTest {
                 commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat test --all -- --b7a.config.file=src/websub_advanced_integration_tests/tests/advanced_services/sample-users.toml --test.hub.url=https://localhost:23191/websub/hub && exit %%ERRORLEVEL%%"
             } else {
                 environment "OS_TYPE", "linux"
-                commandLine 'sh', '-c', "$distributionBinPath/ballerina build -c ${moduleName}"
+                commandLine 'sh', '-c', "$distributionBinPath/ballerina test --all -- --b7a.config.file=src/websub_advanced_integration_tests/tests/advanced_services/sample-users.toml --test.hub.url=https://localhost:23191/websub/hub"
             }
         }
     }
