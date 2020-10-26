@@ -265,7 +265,7 @@ task ballerinaTest {
                 commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat test --all -- --b7a.config.file=src/websub_advanced_integration_tests/tests/advanced_services/sample-users.toml --test.hub.url=https://localhost:23191/websub/hub && exit %%ERRORLEVEL%%"
             } else {
                 environment "OS_TYPE", "linux"
-                commandLine 'sh', '-c', "$distributionBinPath/ballerina build -c ${moduleName}"
+                commandLine 'sh', '-c', "$distributionBinPath/ballerina test --all -- --b7a.config.file=src/websub_advanced_integration_tests/tests/advanced_services/sample-users.toml --test.hub.url=https://localhost:23191/websub/hub"
             }
         }
     }
