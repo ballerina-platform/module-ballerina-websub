@@ -19,7 +19,7 @@
 
 package org.ballerinalang.net.websub;
 
-import org.ballerinalang.util.diagnostic.Diagnostic;
+import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 import org.ballerinalang.util.diagnostic.DiagnosticLog;
 import org.wso2.ballerinalang.compiler.tree.BLangFunction;
 import org.wso2.ballerinalang.compiler.tree.BLangSimpleVariable;
@@ -52,7 +52,7 @@ public class WebSubSubscriberServiceValidator {
                 validateOnNotificationResource(resource, dlog);
                 break;
             default:
-                dlog.logDiagnostic(Diagnostic.Kind.ERROR, resource.getPosition(), "invalid resource name '"
+                dlog.logDiagnostic(DiagnosticSeverity.ERROR, resource.getPosition(), "invalid resource name '"
                         + resourceName + "' only two resources allowed with " + WEBSUB_PACKAGE + ":"
                         + GENERIC_SUBSCRIBER_SERVICE_TYPE + ", '" + RESOURCE_NAME_ON_INTENT_VERIFICATION + "' and '"
                         + RESOURCE_NAME_ON_NOTIFICATION + "'");
@@ -80,7 +80,7 @@ public class WebSubSubscriberServiceValidator {
     private static boolean isValidParamNumber(BLangFunction resource, List<BLangSimpleVariable> paramDetails,
                                               int expectedSize, String resourceName, DiagnosticLog dlog) {
         if (paramDetails == null || paramDetails.size() != expectedSize) {
-            dlog.logDiagnostic(Diagnostic.Kind.ERROR, resource.pos, "invalid param count for WebSub Resource '"
+            dlog.logDiagnostic(DiagnosticSeverity.ERROR, resource.pos, "invalid param count for WebSub Resource '"
                     + resourceName + "', expected: " + expectedSize + " found: "
                     + (paramDetails == null ? 0 : paramDetails.size()));
             return false;
@@ -91,7 +91,7 @@ public class WebSubSubscriberServiceValidator {
     private static void validateStructType(String resourceName, BLangSimpleVariable paramDetail, String packageName,
                                            String structuralTypeName, String paramPosition, DiagnosticLog dlog) {
         if (!(packageName.concat(":").concat(structuralTypeName)).equals((paramDetail.type).toString())) {
-            dlog.logDiagnostic(Diagnostic.Kind.ERROR, paramDetail.pos, "invalid resource signature for '" + resourceName
+            dlog.logDiagnostic(DiagnosticSeverity.ERROR, paramDetail.pos, "invalid resource signature for '" + resourceName
                     + "', expected '" + packageName.concat(":").concat(structuralTypeName) + "' as " + paramPosition
                     + " parameter");
         }
