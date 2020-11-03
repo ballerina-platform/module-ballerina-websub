@@ -16,11 +16,11 @@
  */
 package org.ballerinalang.net.websub.compiler;
 
+import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 import org.ballerinalang.compiler.plugins.AbstractCompilerPlugin;
 import org.ballerinalang.compiler.plugins.SupportedResourceParamTypes;
 import org.ballerinalang.model.tree.AnnotationAttachmentNode;
 import org.ballerinalang.model.tree.ServiceNode;
-import org.ballerinalang.util.diagnostic.Diagnostic;
 import org.ballerinalang.util.diagnostic.DiagnosticLog;
 import org.wso2.ballerinalang.compiler.semantics.model.types.BType;
 import org.wso2.ballerinalang.compiler.tree.BLangFunction;
@@ -76,7 +76,7 @@ public class WebSubServiceCompilerPlugin extends AbstractCompilerPlugin {
         }
 
         if (webSubAnnotationConfigCount == 0) {
-            dlog.logDiagnostic(Diagnostic.Kind.ERROR, serviceNode.getPosition(),
+            dlog.logDiagnostic(DiagnosticSeverity.ERROR, serviceNode.getPosition(),
                                "'" + ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG + "' annotation is compulsory");
             return;
         }
@@ -97,7 +97,7 @@ public class WebSubServiceCompilerPlugin extends AbstractCompilerPlugin {
 
         List<BLangFunction> resources = (List<BLangFunction>) serviceNode.getResources();
         if (resources.size() > 2) {
-            dlog.logDiagnostic(Diagnostic.Kind.ERROR, serviceNode.getPosition(),
+            dlog.logDiagnostic(DiagnosticSeverity.ERROR, serviceNode.getPosition(),
                                "cannot have more than two resources with " + WEBSUB_PACKAGE + ":"
                                        + GENERIC_SUBSCRIBER_SERVICE_TYPE);
             return;
@@ -106,7 +106,7 @@ public class WebSubServiceCompilerPlugin extends AbstractCompilerPlugin {
         if (resources.size() < 1
                 || (resources.size() == 1
                             && !(RESOURCE_NAME_ON_NOTIFICATION.equals(resources.get(0).getName().getValue())))) {
-            dlog.logDiagnostic(Diagnostic.Kind.ERROR, serviceNode.getPosition(),
+            dlog.logDiagnostic(DiagnosticSeverity.ERROR, serviceNode.getPosition(),
                                "required resource '" + RESOURCE_NAME_ON_NOTIFICATION + "' not "
                                        + "specified with " + WEBSUB_PACKAGE + ":" +
                                        GENERIC_SUBSCRIBER_SERVICE_TYPE);

@@ -23,6 +23,7 @@ description = 'Ballerina - Websub Java Utils'
 
 dependencies {
     compile group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
+    compile group: 'org.ballerinalang', name: 'ballerina-tools-api', version: "${ballerinaLangVersion}"
     compile (group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}") {
         transitive = false
     }
