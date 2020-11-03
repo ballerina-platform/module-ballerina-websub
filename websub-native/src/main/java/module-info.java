@@ -27,6 +27,7 @@ module io.ballerina.stdlib.websub {
     requires io.ballerina.lang.value;
     requires io.ballerina.stdlib.mime;
     requires io.ballerina.stdlib.http;
+    requires io.ballerina.tools.api;
     requires broker.common;
     requires broker.core;
 }
