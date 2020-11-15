@@ -19,7 +19,7 @@
 package org.ballerinalang.net.websub;
 
 /**
- * Exceptions that could occur in HTTP native level.
+ * Exceptions that could occur in WebSub native level.
  *
  * @since slp6
  */

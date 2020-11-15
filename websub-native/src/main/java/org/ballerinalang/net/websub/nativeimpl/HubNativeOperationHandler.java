@@ -43,8 +43,6 @@ import static org.ballerinalang.net.websub.WebSubSubscriberConstants.SUBSCRIPTIO
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.SUBSCRIPTION_DETAILS_TOPIC;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB_PACKAGE_ID;
 
-//import io.ballerina.runtime.scheduling.Scheduler;
-
 /**
  * This class contains interop external functions related to Hub.
  *
