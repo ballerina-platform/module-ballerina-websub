@@ -18,13 +18,11 @@
 
 package org.ballerinalang.net.websub;
 
-import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.types.BAnnotatableType;
-import io.ballerina.runtime.util.exceptions.BallerinaConnectorException;
-import io.ballerina.runtime.values.ArrayValue;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
 import org.ballerinalang.net.transport.contract.exceptions.ServerConnectorException;
@@ -32,6 +30,7 @@ import org.ballerinalang.net.transport.message.HttpCarbonMessage;
 
 import static org.ballerinalang.net.http.HttpConstants.HTTP_METHOD_GET;
 import static org.ballerinalang.net.http.HttpConstants.HTTP_METHOD_POST;
+import static org.ballerinalang.net.transport.contract.Constants.HTTP_RESOURCE;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANNOTATED_TOPIC;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_TARGET;
@@ -44,7 +43,6 @@ import static org.ballerinalang.net.websub.WebSubSubscriberConstants.TOPIC_ID_PA
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB_PACKAGE_FULL_QUALIFIED_NAME;
 import static org.ballerinalang.net.websub.WebSubUtils.getHttpRequest;
 import static org.ballerinalang.net.websub.WebSubUtils.getJsonBody;
-import static org.ballerinalang.net.transport.contract.Constants.HTTP_RESOURCE;
 
 /**
  * Resource dispatcher specific for WebSub subscriber services.
@@ -91,13 +89,13 @@ class WebSubResourceDispatcher {
             if (RESOURCE_NAME_ON_INTENT_VERIFICATION.equals(resourceName)) {
                 //if the request is a GET request indicating an intent verification request, and the user has not
                 //specified an onIntentVerification resource, assume auto intent verification
-                Object target = ((BMap) ((BAnnotatableType)service.getBalService().getType())
-                        .getAnnotation(WEBSUB_PACKAGE_FULL_QUALIFIED_NAME, ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG))
+                Object target = ((BMap) (service.getBalService().getType()).getAnnotation(StringUtils.fromString(
+                        WEBSUB_PACKAGE_FULL_QUALIFIED_NAME + ":" + ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG)))
                         .get(ANN_WEBSUB_ATTR_TARGET);
                 String annotatedTopic = "";
 
-                if (target instanceof ArrayValue) {
-                    annotatedTopic = ((ArrayValue) target).getString(1);
+                if (target instanceof BArray) {
+                    annotatedTopic = ((BArray) target).getString(1);
                 }
 
                 if (annotatedTopic.isEmpty() && service instanceof WebSubHttpService) {
@@ -231,7 +229,7 @@ class WebSubResourceDispatcher {
      */
     private static String retrieveResourceNameFromTopic(BString topic, BMap<BString, Object> topicResourceMap) {
         if (topicResourceMap.containsKey(topic)) {
-            return ((ArrayValue) topicResourceMap.get(topic)).getRefValue(0).toString();
+            return ((BArray) topicResourceMap.get(topic)).getRefValue(0).toString();
         } else {
             throw new BallerinaConnectorException("resource not specified for topic : " + topic);
         }

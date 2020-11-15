@@ -18,7 +18,6 @@
 
 package org.ballerinalang.net.websub;
 
-import io.ballerina.runtime.util.exceptions.BallerinaConnectorException;
 import org.ballerinalang.net.http.HttpConstants;
 import org.ballerinalang.net.http.HttpDispatcher;
 import org.ballerinalang.net.http.HttpResource;

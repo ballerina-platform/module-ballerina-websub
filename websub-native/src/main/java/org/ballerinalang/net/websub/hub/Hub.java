@@ -18,18 +18,16 @@
 
 package org.ballerinalang.net.websub.hub;
 
-import io.ballerina.runtime.api.ErrorCreator;
 import io.ballerina.runtime.api.Runtime;
-import io.ballerina.runtime.api.StringUtils;
-import io.ballerina.runtime.api.ValueCreator;
 import io.ballerina.runtime.api.async.Callback;
+import io.ballerina.runtime.api.creators.ErrorCreator;
+import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.scheduling.Strand;
-import io.ballerina.runtime.util.exceptions.BallerinaException;
-import io.ballerina.runtime.values.ErrorValue;
+import org.ballerinalang.net.websub.BallerinaConnectorException;
 import org.ballerinalang.net.websub.BallerinaWebSubException;
 import org.ballerinalang.net.websub.broker.BallerinaBroker;
 import org.ballerinalang.net.websub.broker.BallerinaBrokerByteBuf;
@@ -41,8 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.STRUCT_WEBSUB_BALLERINA_HUB;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB_PACKAGE_ID;
@@ -194,7 +190,6 @@ public class Hub {
     /**
      * Method to start up the default Ballerina WebSub Hub.
      *
-     * @param strand                    current strand
      * @param basePath                  the base path of the hub service
      * @param subscriptionResourcePath  the resource path for subscription
      * @param publishResourcePath       the resource path for publishing and topic registration
@@ -205,7 +200,7 @@ public class Hub {
      * @return the hub object if the hub was started up successfully, error if not
      */
     @SuppressWarnings("unchecked")
-    public Object startUpHubService(Runtime runtime, Strand strand, String basePath, String subscriptionResourcePath,
+    public Object startUpHubService(Runtime runtime, String basePath, String subscriptionResourcePath,
                                     String publishResourcePath, boolean topicRegistrationRequired, String publicUrl,
                                     BObject hubListener, BObject bridge) {
         synchronized (this) {
@@ -213,7 +208,7 @@ public class Hub {
                 try {
                     brokerInstance = BallerinaBroker.getBrokerInstance();
                 } catch (Exception e) {
-                    throw new BallerinaException("Error starting up internal broker for WebSub Hub");
+                    throw new BallerinaConnectorException("Error starting up internal broker for WebSub Hub");
                 }
                 this.basePath = basePath.startsWith(SLASH) ? basePath : SLASH.concat(basePath);
                 this.subscribeResourcePath = subscriptionResourcePath.startsWith(SLASH) ? subscriptionResourcePath :
@@ -227,7 +222,7 @@ public class Hub {
                 started = true;
                 //TODO: this has to be re-written in a non-blocking way for better performance
                 CountDownLatch completeFunction = new CountDownLatch(1);
-                final BError[] errorValue = new ErrorValue[1];
+                final BError[] errorValue = new BError[1];
                 runtime.invokeMethodAsync(bridge, "setupOnStartup",
                                           null, null, new Callback() {
                             @Override

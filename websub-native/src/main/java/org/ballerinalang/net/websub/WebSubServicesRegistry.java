@@ -18,16 +18,16 @@
 
 package org.ballerinalang.net.websub;
 
-import io.ballerina.runtime.TypeChecker;
-import io.ballerina.runtime.api.ErrorCreator;
-import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.TypeTags;
+import io.ballerina.runtime.api.creators.ErrorCreator;
+import io.ballerina.runtime.api.types.ObjectType;
+import io.ballerina.runtime.api.types.RecordType;
+import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.types.BObjectType;
-import io.ballerina.runtime.types.BRecordType;
-import io.ballerina.runtime.api.types.Type;
-import io.ballerina.runtime.api.TypeTags;
 import org.ballerinalang.net.http.HTTPServicesRegistry;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
@@ -66,7 +66,7 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
     private BMap<BString, Object> headerResourceMap;
     private BMap<BString, BMap<BString, Object>> payloadKeyResourceMap;
     private BMap<BString, BMap<BString, BMap<BString, Object>>> headerAndPayloadKeyResourceMap;
-    private HashMap<String, BRecordType> resourceDetails;
+    private HashMap<String, RecordType> resourceDetails;
 
     private static final int CUSTOM_RESOURCE_PARAM_COUNT = 2;
 
@@ -80,7 +80,7 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
                                   BMap<BString, BMap<BString, Object>> payloadKeyResourceMap,
                                   BMap<BString, BMap<BString, BMap<BString, Object>>>
                                           headerAndPayloadKeyResourceMap,
-                                  HashMap<String, BRecordType> resourceDetails) {
+                                  HashMap<String, RecordType> resourceDetails) {
         super(webSocketServicesRegistry);
         this.topicIdentifier = topicIdentifier;
         this.topicHeader = topicHeader;
@@ -126,7 +126,7 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
         return headerAndPayloadKeyResourceMap;
     }
 
-    HashMap<String, BRecordType> getResourceDetails() {
+    HashMap<String, RecordType> getResourceDetails() {
         return resourceDetails;
     }
 
@@ -170,7 +170,7 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
     }
 
     private static List<String> retrieveInvalidResourceNames(List<HttpResource> resources,
-                                                             HashMap<String, BRecordType> resourceDetails) {
+                                                             HashMap<String, RecordType> resourceDetails) {
         Set<String> resourceNames = resourceDetails.keySet();
         List<String> invalidResourceNames = new ArrayList<>();
 
@@ -197,7 +197,7 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
         validateIntentVerificationParam(paramTypes.get(1));
     }
 
-    private static void validateCustomNotificationResource(HttpResource resource, BRecordType recordType) {
+    private static void validateCustomNotificationResource(HttpResource resource, RecordType recordType) {
         List<Type> paramTypes = resource.getParamTypes();
         validateParamCount(paramTypes, CUSTOM_RESOURCE_PARAM_COUNT, resource.getName());
         validateNotificationParam(resource.getName(), paramTypes.get(0));
@@ -236,8 +236,8 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
         }
     }
 
-    private static void validateRecordType(String resourceName, Type paramVarType, BRecordType recordType) {
-        if (!TypeChecker.isSameType(paramVarType, recordType)) {
+    private static void validateRecordType(String resourceName, Type paramVarType, RecordType recordType) {
+        if (!TypeUtils.isSameType(paramVarType, recordType)) {
             throw ErrorCreator.createError(StringUtils.fromString(String.format("Invalid parameter type '%s' in " +
                             "resource '%s'. Requires '%s'", paramVarType.getQualifiedName(), resourceName,
                             recordType.getQualifiedName())));
@@ -248,7 +248,7 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
         if (specifiedType.getTag() != TypeTags.OBJECT_TYPE_TAG) {
             return false;
         }
-        BObjectType objectType = (BObjectType) specifiedType;
+        ObjectType objectType = (ObjectType) specifiedType;
         return objectType.getPackage().getOrg().equals(BALLERINA) &&
                 objectType.getPackage().getName().equals(WEBSUB) &&
                 objectType.getName().equals(expectedWebSubRecordName);

@@ -18,17 +18,15 @@
 
 package org.ballerinalang.net.websub;
 
-import io.ballerina.runtime.JSONParser;
-import io.ballerina.runtime.api.ErrorCreator;
-import io.ballerina.runtime.api.StringUtils;
-import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.creators.ErrorCreator;
+import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.types.AttachedFunctionType;
+import io.ballerina.runtime.api.utils.JsonUtils;
+import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.types.AttachedFunction;
-import io.ballerina.runtime.api.types.AttachedFunctionType;
-import io.ballerina.runtime.util.exceptions.BallerinaConnectorException;
 import org.ballerinalang.mime.util.EntityBodyHandler;
 import org.ballerinalang.mime.util.MimeConstants;
 import org.ballerinalang.mime.util.MimeUtil;
@@ -70,7 +68,7 @@ public class WebSubUtils {
                 entityObj.addNativeData(MimeConstants.ENTITY_BYTE_CHANNEL, null);
             }
 
-            Object result = JSONParser.parse(stringPayload);
+            Object result = JsonUtils.parse(stringPayload);
             if (result instanceof BMap) {
                 return (BMap<BString, ?>) result;
             }

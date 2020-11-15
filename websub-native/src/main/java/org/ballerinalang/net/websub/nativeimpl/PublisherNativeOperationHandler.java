@@ -18,11 +18,11 @@
 
 package org.ballerinalang.net.websub.nativeimpl;
 
+import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.values.ArrayValue;
-import io.ballerina.runtime.values.ArrayValueImpl;
 import org.ballerinalang.mime.util.MimeUtil;
 import org.ballerinalang.net.websub.BallerinaWebSubException;
 import org.ballerinalang.net.websub.WebSubUtils;
@@ -69,17 +69,17 @@ public class PublisherNativeOperationHandler {
      * @param byteChannel the specified byte channel
      * @return the constructed byte array
      */
-    public static ArrayValue constructByteArray(BObject byteChannel) {
+    public static BArray constructByteArray(BObject byteChannel) {
         Channel channel = (Channel) byteChannel.getNativeData(IOConstants.BYTE_CHANNEL_NAME);
         if (channel == null) {
-            return new ArrayValueImpl(new byte[0]);
+            return ValueCreator.createArrayValue(new byte[0]);
         }
         try {
             byte[] byteData = MimeUtil.getByteArray(channel.getInputStream());
             channel.close();
-            return new ArrayValueImpl(byteData);
+            return ValueCreator.createArrayValue(byteData);
         } catch (IOException e) {
-            return new ArrayValueImpl(new byte[0]);
+            return ValueCreator.createArrayValue(new byte[0]);
         }
     }
 }

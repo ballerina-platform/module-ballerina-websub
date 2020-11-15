@@ -22,13 +22,13 @@ import io.ballerina.messaging.broker.core.BrokerException;
 import io.ballerina.messaging.broker.core.Consumer;
 import io.ballerina.messaging.broker.core.Message;
 import io.ballerina.runtime.api.Runtime;
-import io.ballerina.runtime.api.StringUtils;
 import io.ballerina.runtime.api.async.Callback;
+import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.util.exceptions.BallerinaException;
+import org.ballerinalang.net.websub.BallerinaConnectorException;
 import org.ballerinalang.net.websub.broker.BallerinaBrokerByteBuf;
 
 import java.util.Objects;
@@ -81,8 +81,8 @@ public class HubSubscriber extends Consumer {
                                   }, args);
         try {
             completeFunction.await();
-        } catch (BallerinaException | InterruptedException e) {
-            throw new BallerinaException("send failed: " + e.getMessage());
+        } catch (BError | InterruptedException e) {
+            throw new BallerinaConnectorException("send failed: " + e.getMessage());
         }
     }
 

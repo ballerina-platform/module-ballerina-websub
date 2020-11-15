@@ -18,27 +18,24 @@
 
 package org.ballerinalang.net.websub;
 
-import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.http.DefaultLastHttpContent;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.ballerina.runtime.TypeChecker;
 import io.ballerina.runtime.api.Runtime;
-import io.ballerina.runtime.api.StringUtils;
-import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.TypeTags;
 import io.ballerina.runtime.api.async.Callback;
+import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.types.AttachedFunctionType;
+import io.ballerina.runtime.api.types.RecordType;
+import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.utils.TypeUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.types.AttachedFunction;
-import io.ballerina.runtime.api.types.AttachedFunctionType;
-import io.ballerina.runtime.types.BRecordType;
-import io.ballerina.runtime.api.types.Type;
-import io.ballerina.runtime.api.TypeTags;
-import io.ballerina.runtime.util.exceptions.BallerinaConnectorException;
-import io.ballerina.runtime.util.exceptions.BallerinaException;
-import io.ballerina.runtime.values.ArrayValue;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.http.DefaultLastHttpContent;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import org.ballerinalang.langlib.value.CloneWithType;
 import org.ballerinalang.net.http.BallerinaHTTPConnectorListener;
 import org.ballerinalang.net.http.HttpConstants;
@@ -128,9 +125,9 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
                 return;
             }
             extractPropertiesAndStartResourceExecution(inboundMessage, httpResource);
-        } catch (BallerinaException ex) {
+        } catch (BallerinaConnectorException ex) {
             try {
-                HttpUtil.handleFailure(inboundMessage, new BallerinaConnectorException(ex.getMessage(), ex.getCause()));
+                HttpUtil.handleFailure(inboundMessage, ex.getMessage());
             } catch (Exception e) {
                 log.error("Cannot handle error using the error handler for: " + e.getMessage(), e);
             }
@@ -200,7 +197,7 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
             signatureParams[paramIndex++] = true;
             if (!RESOURCE_NAME_ON_NOTIFICATION.equals(balResource.getName())) {
                 Object customRecordOrError = createCustomNotification(httpCarbonMessage, balResource, httpRequest);
-                if (TypeChecker.getType(customRecordOrError).getTag() == TypeTags.ERROR_TAG) {
+                if (TypeUtils.getType(customRecordOrError).getTag() == TypeTags.ERROR_TAG) {
                     log.error("Data binding failed: " + ((BError) customRecordOrError).getPrintableStackTrace());
                     return;
                 }
@@ -242,13 +239,13 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
         } catch (InterruptedException ex) {
             log.debug("Signature Validation failed: " + ex.getMessage());
             httpCarbonMessage.setHttpStatusCode(404);
-            throw new BallerinaException(ex);
+            throw new BallerinaConnectorException(ex);
         }
         BError error = returnValue[0];
         if (error != null) {
             log.debug("Signature Validation failed for Notification: " + error.getMessage());
             httpCarbonMessage.setHttpStatusCode(404);
-            throw new BallerinaException("validation failed for notification");
+            throw new BallerinaConnectorException("validation failed for notification");
         }
     }
 
@@ -294,7 +291,7 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
      */
     private Object createCustomNotification(HttpCarbonMessage inboundRequest, AttachedFunctionType resource,
                                               BObject httpRequest) {
-        BRecordType recordType = webSubServicesRegistry.getResourceDetails().get(resource.getName());
+        RecordType recordType = webSubServicesRegistry.getResourceDetails().get(resource.getName());
         BMap<BString, ?> jsonBody = getJsonBody(httpRequest);
         inboundRequest.setProperty(ENTITY_ACCESSED_REQUEST, httpRequest);
         return CloneWithType.convert(recordType, jsonBody);
@@ -375,9 +372,9 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
             return StringUtils.fromString("");
         }
         Object param = params.get(key);
-        if (TypeChecker.getType(param).getTag() != TypeTags.ARRAY_TAG || ((ArrayValue) param).size() < 1) {
+        if (TypeUtils.getType(param).getTag() != TypeTags.ARRAY_TAG || ((BArray) param).size() < 1) {
             return StringUtils.fromString("");
         }
-        return StringUtils.fromString(((ArrayValue) param).get(0).toString());
+        return StringUtils.fromString(((BArray) param).get(0).toString());
     }
 }
