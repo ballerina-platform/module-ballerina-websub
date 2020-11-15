@@ -556,7 +556,7 @@ function getSubcriberCallbackClient(string callback) returns http:Client {
             cache:Error? result = subscriberCallbackClientCache.put(<@untainted> callback,
                                                               <@untainted> subscriberCallbackClient);
             if (result is cache:Error) {
-                log:printDebug(function() returns string {
+                log:printDebug(isolated function() returns string {
                     return "Failed to add subscriber callback client with key: " + callback + " to the cache.";
                 });
             }
