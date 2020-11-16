@@ -132,4 +132,6 @@ public class WebSubSubscriberConstants {
 
     // WebSub error types related constants
     public static final String WEBSUB_LISTENER_STARTUP_FAILURE = "ListenerStartupError";
+
+    static final BString EMPTY = StringUtils.fromString("");
 }

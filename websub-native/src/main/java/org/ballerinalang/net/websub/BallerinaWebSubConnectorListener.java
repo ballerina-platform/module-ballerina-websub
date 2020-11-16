@@ -57,6 +57,7 @@ import static org.ballerinalang.net.http.HttpConstants.CALLER;
 import static org.ballerinalang.net.http.HttpConstants.HTTP_LISTENER_ENDPOINT;
 import static org.ballerinalang.net.http.HttpConstants.PROTOCOL_HTTP_PKG_ID;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANNOTATED_TOPIC;
+import static org.ballerinalang.net.websub.WebSubSubscriberConstants.EMPTY;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ENTITY_ACCESSED_REQUEST;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.PARAM_HUB_CHALLENGE;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.PARAM_HUB_LEASE_SECONDS;
@@ -369,11 +370,11 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
 
     private BString getParamStringValue(BMap<BString, Object> params, BString key) {
         if (!params.containsKey(key)) {
-            return StringUtils.fromString("");
+            return EMPTY;
         }
         Object param = params.get(key);
         if (TypeUtils.getType(param).getTag() != TypeTags.ARRAY_TAG || ((BArray) param).size() < 1) {
-            return StringUtils.fromString("");
+            return EMPTY;
         }
         return StringUtils.fromString(((BArray) param).get(0).toString());
     }
