@@ -60,11 +60,7 @@ public class HubNativeOperationHandler {
      */
     public static BArray getAvailableTopics(BObject webSubHub) {
         String[] topics = Hub.getInstance().getTopics();
-        BString[] topicsBStringArray = new BString[topics.length];
-        for (int i = 0; i < topics.length; i++) {
-            topicsBStringArray[i] = StringUtils.fromString(topics[i]);
-        }
-        return ValueCreator.createArrayValue(topicsBStringArray);
+        return StringUtils.fromStringArray(topics);
     }
 
     /**
