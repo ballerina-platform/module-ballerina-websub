@@ -18,8 +18,6 @@
 package org.ballerinalang.net.websub;
 
 import io.ballerina.runtime.api.async.Callback;
-import io.ballerina.runtime.api.values.BError;
-import io.ballerina.runtime.services.ErrorHandlerUtils;
 
 /**
  * Empty callback implementation for WebSub resources.
@@ -33,6 +31,6 @@ public class WebSubEmptyCallableUnitCallback implements Callback {
 
     @Override
     public void notifyFailure(io.ballerina.runtime.api.values.BError error) {
-        ErrorHandlerUtils.printError("error: " + error.getPrintableStackTrace());
+        error.printStackTrace();
     }
 }

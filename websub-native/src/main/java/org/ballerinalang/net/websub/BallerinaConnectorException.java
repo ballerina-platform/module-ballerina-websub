@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -15,16 +15,29 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.ballerinalang.net.websub;
 
 /**
- * Represents a Runtime Exception that could be thrown when performing WebSub actions.
+ * Exceptions that could occur in WebSub native level.
  *
- * @since 0.970.2
+ * @since slp6
  */
-public class BallerinaWebSubException extends RuntimeException {
+public class BallerinaConnectorException extends RuntimeException {
 
-    public BallerinaWebSubException(String message) {
+    public BallerinaConnectorException() {
+        super();
+    }
+
+    public BallerinaConnectorException(String message) {
         super(message);
+    }
+
+    public BallerinaConnectorException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
+
+    public BallerinaConnectorException(Exception ex) {
+        super(ex);
     }
 }

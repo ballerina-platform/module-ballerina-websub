@@ -18,16 +18,14 @@
 
 package org.ballerinalang.net.websub.nativeimpl;
 
-import io.ballerina.runtime.api.StringUtils;
-import io.ballerina.runtime.api.ValueCreator;
 import io.ballerina.runtime.api.Environment;
+import io.ballerina.runtime.api.creators.TypeCreator;
+import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.scheduling.Scheduler;
-import io.ballerina.runtime.types.BArrayType;
-import io.ballerina.runtime.values.ArrayValue;
-import io.ballerina.runtime.values.ArrayValueImpl;
 import org.ballerinalang.net.websub.BallerinaWebSubException;
 import org.ballerinalang.net.websub.WebSubUtils;
 import org.ballerinalang.net.websub.hub.Hub;
@@ -60,9 +58,9 @@ public class HubNativeOperationHandler {
      * @param webSubHub respective hub instance
      * @return an array of available topics
      */
-    public static ArrayValue getAvailableTopics(BObject webSubHub) {
+    public static BArray getAvailableTopics(BObject webSubHub) {
         String[] topics = Hub.getInstance().getTopics();
-        return new ArrayValueImpl(StringUtils.fromStringArray(topics));
+        return StringUtils.fromStringArray(topics);
     }
 
     /**
@@ -72,13 +70,13 @@ public class HubNativeOperationHandler {
      * @param topic     the topic for which details need to be retrieved
      * @return an array of subscriber details
      */
-    public static ArrayValue getSubscribers(BObject webSubHub, BString topic) {
-        ArrayValue subscriberDetailArray = null;
+    public static BArray getSubscribers(BObject webSubHub, BString topic) {
+        BArray subscriberDetailArray = null;
         try {
             List<HubSubscriber> subscribers = Hub.getInstance().getSubscribers();
             BMap<BString, Object> subscriberDetailsRecordValue =
                     ValueCreator.createRecordValue(WEBSUB_PACKAGE_ID, SUBSCRIPTION_DETAILS);
-            subscriberDetailArray = new ArrayValueImpl(new BArrayType(subscriberDetailsRecordValue.getType()));
+            subscriberDetailArray = ValueCreator.createArrayValue(TypeCreator.createArrayType(subscriberDetailsRecordValue.getType()));
             for (HubSubscriber subscriber : subscribers) {
                 if (topic.getValue().equals(subscriber.getTopic())) {
                     BMap<BString, Object> subscriberDetail = ValueCreator.createRecordValue(
@@ -118,7 +116,7 @@ public class HubNativeOperationHandler {
             return ValueCreator.createRecordValue(hubStartedUpError, "Ballerina Hub already started up", null,
                                                 hubInstance.getHubObject());
         }
-        return hubInstance.startUpHubService(env.getRuntime(), Scheduler.getStrand(), basePath.getValue(),
+        return hubInstance.startUpHubService(env.getRuntime(), basePath.getValue(),
                                              subscriptionResourcePath.getValue(), publishResourcePath.getValue(),
                                              topicRegistrationRequired, publicUrl.getValue(), hubListener, callback);
     }

@@ -18,26 +18,25 @@
 
 package org.ballerinalang.net.websub.nativeimpl;
 
-import io.ballerina.runtime.api.StringUtils;
-import io.ballerina.runtime.api.ValueCreator;
 import io.ballerina.runtime.api.Environment;
+import io.ballerina.runtime.api.PredefinedTypes;
+import io.ballerina.runtime.api.creators.TypeCreator;
+import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.types.ArrayType;
+import io.ballerina.runtime.api.types.RecordType;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.types.BAnnotatableType;
-import io.ballerina.runtime.types.BArrayType;
-import io.ballerina.runtime.types.BMapType;
-import io.ballerina.runtime.types.BRecordType;
-import io.ballerina.runtime.api.PredefinedTypes;
-import io.ballerina.runtime.util.exceptions.BallerinaConnectorException;
-import io.ballerina.runtime.values.ArrayValue;
-import io.ballerina.runtime.values.TypedescValue;
+import io.ballerina.runtime.api.values.BTypedesc;
 import org.ballerinalang.net.http.HttpConnectorPortBindingListener;
 import org.ballerinalang.net.http.HttpConstants;
 import org.ballerinalang.net.http.HttpService;
 import org.ballerinalang.net.http.websocket.server.WebSocketServicesRegistry;
 import org.ballerinalang.net.transport.contract.ServerConnector;
 import org.ballerinalang.net.transport.contract.ServerConnectorFuture;
+import org.ballerinalang.net.websub.BallerinaConnectorException;
 import org.ballerinalang.net.websub.BallerinaWebSubConnectorListener;
 import org.ballerinalang.net.websub.WebSubHttpService;
 import org.ballerinalang.net.websub.WebSubServicesRegistry;
@@ -86,7 +85,7 @@ import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB_SERV
  */
 public class SubscriberNativeOperationHandler {
 
-    private static final BArrayType mapArrayType = new BArrayType(new BMapType(PredefinedTypes.TYPE_ANY));
+    private static final ArrayType mapArrayType = TypeCreator.createArrayType(TypeCreator.createMapType(PredefinedTypes.TYPE_ANY));
 
     /**
      * Initialize the WebSub subscriber endpoint.
@@ -147,7 +146,7 @@ public class SubscriberNativeOperationHandler {
                     throw new BallerinaConnectorException("Resource map not specified to dispatch by payload");
                 }
             }
-            HashMap<String, BRecordType> resourceDetails = buildResourceDetailsMap(topicIdentifier, headerResourceMap,
+            HashMap<String, RecordType> resourceDetails = buildResourceDetailsMap(topicIdentifier, headerResourceMap,
                                                                                    payloadKeyResourceMap,
                                                                                    headerAndPayloadKeyResourceMap);
             webSubServicesRegistry = new WebSubServicesRegistry(new WebSocketServicesRegistry(), topicIdentifier,
@@ -158,7 +157,7 @@ public class SubscriberNativeOperationHandler {
         serviceEndpoint.addNativeData(WEBSUB_SERVICE_REGISTRY, webSubServicesRegistry);
     }
 
-    private static HashMap<String, BRecordType> buildResourceDetailsMap(String topicIdentifier,
+    private static HashMap<String, RecordType> buildResourceDetailsMap(String topicIdentifier,
                                                                         BMap<BString, Object> headerResourceMap,
                                                                         BMap<BString, BMap<BString, Object>>
                                                                                 payloadKeyResourceMap,
@@ -166,7 +165,7 @@ public class SubscriberNativeOperationHandler {
                                                                                 BMap<BString, Object>>>
                                                                                 headerAndPayloadKeyResourceMap) {
         // Map with resource details where the key is the resource name and the value is the param
-        HashMap<String, BRecordType> resourceDetails = new HashMap<>();
+        HashMap<String, RecordType> resourceDetails = new HashMap<>();
         if (topicIdentifier != null) {
             switch (topicIdentifier) {
                 case TOPIC_ID_HEADER:
@@ -190,33 +189,33 @@ public class SubscriberNativeOperationHandler {
     }
 
     private static void populateResourceDetailsByHeader(BMap<BString, Object> headerResourceMap,
-                                                        HashMap<String, BRecordType> resourceDetails) {
-        headerResourceMap.values().forEach(value -> populateResourceDetails(resourceDetails, (ArrayValue) value));
+                                                        HashMap<String, RecordType> resourceDetails) {
+        headerResourceMap.values().forEach(value -> populateResourceDetails(resourceDetails, (BArray) value));
     }
 
     private static void populateResourceDetailsByPayload(
             BMap<BString, BMap<BString, Object>> payloadKeyResourceMap,
-            HashMap<String, BRecordType> resourceDetails) {
+            HashMap<String, RecordType> resourceDetails) {
         payloadKeyResourceMap.values().forEach(mapByKey -> {
-            mapByKey.values().forEach(value -> populateResourceDetails(resourceDetails, (ArrayValue) value));
+            mapByKey.values().forEach(value -> populateResourceDetails(resourceDetails, (BArray) value));
         });
     }
 
     private static void populateResourceDetailsByHeaderAndPayload(
             BMap<BString, BMap<BString, BMap<BString, Object>>> headerAndPayloadKeyResourceMap,
-            HashMap<String, BRecordType> resourceDetails) {
+            HashMap<String, RecordType> resourceDetails) {
         headerAndPayloadKeyResourceMap.values().forEach(mapByHeader -> {
             mapByHeader.values().forEach(mapByKey -> {
-                mapByKey.values().forEach(value -> populateResourceDetails(resourceDetails, (ArrayValue) value));
+                mapByKey.values().forEach(value -> populateResourceDetails(resourceDetails, (BArray) value));
             });
         });
     }
 
-    private static void populateResourceDetails(HashMap<String, BRecordType> resourceDetails,
-                                                ArrayValue resourceDetailTuple) {
+    private static void populateResourceDetails(HashMap<String, RecordType> resourceDetails,
+                                                BArray resourceDetailTuple) {
         String resourceName = resourceDetailTuple.getRefValue(0).toString();
         resourceDetails.put(resourceName,
-                            (BRecordType) ((TypedescValue) resourceDetailTuple.getRefValue(1)).getDescribingType());
+                            (RecordType) ((BTypedesc) resourceDetailTuple.getRefValue(1)).getDescribingType());
     }
 
     /**
@@ -297,8 +296,8 @@ public class SubscriberNativeOperationHandler {
      * @return `map[]` array of maps containing subscription details for each service
      */
     @SuppressWarnings("unchecked")
-    public static ArrayValue retrieveSubscriptionParameters(BObject subscriberServiceListener) {
-        ArrayValue subscriptionDetailArray = (ArrayValue) ValueCreator.createArrayValue(mapArrayType);
+    public static BArray retrieveSubscriptionParameters(BObject subscriberServiceListener) {
+        BArray subscriptionDetailArray = (BArray) ValueCreator.createArrayValue(mapArrayType);
         BObject serviceEndpoint = (BObject) subscriberServiceListener.get(
                 StringUtils.fromString(WEBSUB_HTTP_ENDPOINT));
         WebSubServicesRegistry webSubServicesRegistry = ((WebSubServicesRegistry) serviceEndpoint.getNativeData(
@@ -311,8 +310,8 @@ public class SubscriberNativeOperationHandler {
         for (int index = 0; index < webSubHttpServices.length; index++) {
             WebSubHttpService webSubHttpService = (WebSubHttpService) webSubHttpServices[index];
             BMap<BString, Object> subscriptionDetails = ValueCreator.createMapValue();
-            BMap annotation = (BMap) ((BAnnotatableType)webSubHttpService.getBalService().getType())
-                    .getAnnotation(WEBSUB_PACKAGE_FULL_QUALIFIED_NAME, ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG);
+            BMap annotation = (BMap) (webSubHttpService.getBalService().getType()).getAnnotation(StringUtils
+                    .fromString(WEBSUB_PACKAGE_FULL_QUALIFIED_NAME + ":" + ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG));
 
             subscriptionDetails.put(WEBSUB_SERVICE_NAME,
                                     StringUtils.fromString(webSubHttpService.getBalService().getType().getName()));

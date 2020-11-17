@@ -18,10 +18,9 @@
 
 package org.ballerinalang.net.websub;
 
+import io.ballerina.runtime.api.types.AttachedFunctionType;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
-import io.ballerina.runtime.types.AttachedFunction;
-import io.ballerina.runtime.api.types.AttachedFunctionType;
 import org.ballerinalang.net.http.HttpConstants;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;

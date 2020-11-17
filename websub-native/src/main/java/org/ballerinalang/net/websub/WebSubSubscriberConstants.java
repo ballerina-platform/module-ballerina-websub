@@ -18,13 +18,13 @@
 
 package org.ballerinalang.net.websub;
 
-import io.ballerina.runtime.api.StringUtils;
-import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.Module;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BString;
 
-import static io.ballerina.runtime.util.BLangConstants.BALLERINA_BUILTIN_PKG_PREFIX;
-import static io.ballerina.runtime.util.BLangConstants.ORG_NAME_SEPARATOR;
-import static io.ballerina.runtime.util.BLangConstants.VERSION_SEPARATOR;
+import static io.ballerina.runtime.api.constants.RuntimeConstants.BALLERINA_BUILTIN_PKG_PREFIX;
+import static io.ballerina.runtime.api.constants.RuntimeConstants.ORG_NAME_SEPARATOR;
+import static io.ballerina.runtime.api.constants.RuntimeConstants.VERSION_SEPARATOR;
 
 /**
  * Constants for WebSubSubscriber Services.
@@ -132,4 +132,6 @@ public class WebSubSubscriberConstants {
 
     // WebSub error types related constants
     public static final String WEBSUB_LISTENER_STARTUP_FAILURE = "ListenerStartupError";
+
+    static final BString EMPTY = StringUtils.fromString("");
 }
