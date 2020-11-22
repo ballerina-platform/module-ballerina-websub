@@ -223,6 +223,7 @@ task ballerinaBuild {
     inputs.dir file(project.projectDir)
     finalizedBy(revertTomlFile)
     finalizedBy(':websub-generic-integration-tests:build')
+    finalizedBy(':websub-advanced-integration-tests:build')
 
     doLast {
         // Build and populate caches
