@@ -18,7 +18,7 @@ import ballerina/auth;
 import ballerina/http;
 import ballerina/log;
 import ballerina/runtime;
-import websub;
+import ballerina/websub;
 
 auth:InboundBasicAuthProvider basicAuthProvider = new;
 http:BasicAuthHandler basicAuthHandler = new(basicAuthProvider);
@@ -38,7 +38,7 @@ websub:PublisherClient websubHubClientEP = new (webSubHub.publishUrl, {
     },
     secureSocket: {
         trustStore: {
-            path: "src/websub_advanced_integration_tests/resources/security/ballerinaTruststore.p12",
+            path: "tests/resources/security/ballerinaTruststore.p12",
             password: "ballerina"
         }
     }
@@ -55,7 +55,7 @@ websub:PublisherClient authnFailingClient = new (webSubHub.publishUrl, {
     },
     secureSocket: {
         trustStore: {
-            path: "src/websub_advanced_integration_tests/resources/security/ballerinaTruststore.p12",
+            path: "tests/resources/security/ballerinaTruststore.p12",
             password: "ballerina"
         }
     }
@@ -72,7 +72,7 @@ websub:PublisherClient authzFailingClient = new (webSubHub.publishUrl, {
     },
     secureSocket: {
         trustStore: {
-            path: "src/websub_advanced_integration_tests/resources/security/ballerinaTruststore.p12",
+            path: "tests/resources/security/ballerinaTruststore.p12",
             password: "ballerina"
         }
     }
@@ -239,11 +239,11 @@ function startWebSubHub() returns websub:Hub {
                 },
                 secureSocket: {
                     keyStore: {
-                        path: "src/websub_advanced_integration_tests/resources/security/ballerinaKeystore.p12",
+                        path: "tests/resources/security/ballerinaKeystore.p12",
                         password: "ballerina"
                     },
                     trustStore: {
-                        path: "src/websub_advanced_integration_tests/resources/security/ballerinaTruststore.p12",
+                        path: "tests/resources/security/ballerinaTruststore.p12",
                         password: "ballerina"
                     }
                 }

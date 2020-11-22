@@ -16,7 +16,7 @@
 
 import ballerina/http;
 import ballerina/log;
-import websub;
+import ballerina/websub;
 
 listener http:Listener publisherServiceEPTwo = new http:Listener(23081);
 

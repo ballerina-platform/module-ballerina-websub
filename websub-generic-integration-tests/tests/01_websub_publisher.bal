@@ -20,7 +20,6 @@ import ballerina/log;
 import ballerina/runtime;
 import ballerina/websub;
 
-
 boolean remoteTopicRegistered = false;
 
 websub:Hub webSubHub = startHubAndRegisterTopic();

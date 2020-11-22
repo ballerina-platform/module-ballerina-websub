@@ -19,7 +19,7 @@ import ballerina/http;
 import ballerina/runtime;
 import ballerina/stringutils;
 import ballerina/test;
-import websub;
+import ballerina/websub;
 
 listener websub:Listener websubEP = new websub:Listener(23181, { host: "0.0.0.0" });
 
@@ -173,7 +173,6 @@ function testAvailableTopicsRetrievalFromHub() {
     var response = clientEndpoint->get("/publisher/topicInfo", req);
 
     HttpResponseDetails httpResponseDetails = fetchHttpResponse(response);
-
     io:println(httpResponseDetails);
     string expectedData = "{\"Topic_1\":\"http://one.websub.topic.com\", " +
                            "\"Topic_2\":\"http://three.websub.topic.com\", \"Topic_3\":\"http://four.websub.topic.com\", " +

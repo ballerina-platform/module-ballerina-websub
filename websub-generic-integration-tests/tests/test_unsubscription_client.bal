@@ -16,7 +16,7 @@
 
 import ballerina/io;
 import ballerina/runtime;
-import websub;
+import ballerina/websub;
 
 function sendUnsubscription() {
     // This is the client used to send subscription and unsubscription requests.

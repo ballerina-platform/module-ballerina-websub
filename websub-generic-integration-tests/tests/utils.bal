@@ -51,3 +51,4 @@ function fetchHttpResponse(http:Response|http:Payload|error response) returns Ht
     };
     return httpResponseDetails;
 }
+

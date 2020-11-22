@@ -19,7 +19,7 @@ import ballerina/http;
 import ballerina/io;
 import ballerina/runtime;
 import ballerina/test;
-import websub;
+import ballerina/websub;
 
 listener websub:Listener websubEP = new websub:Listener(23484);
 auth:OutboundBasicAuthProvider basicAuthProvider1 = new({
@@ -39,7 +39,7 @@ http:BasicAuthHandler basicAuthHandler1 = new(basicAuthProvider1);
         auth: { authHandler: basicAuthHandler1 },
         secureSocket: {
             trustStore: {
-                path: "src/websub_advanced_integration_tests/resources/security/ballerinaTruststore.p12",
+                path: "tests/resources/security/ballerinaTruststore.p12",
                 password: "ballerina"
             }
         }
@@ -69,7 +69,7 @@ http:BasicAuthHandler basicAuthHandler2 = new(basicAuthProvider2);
         auth: { authHandler: basicAuthHandler2 },
         secureSocket: {
             trustStore: {
-                path: "src/websub_advanced_integration_tests/resources/security/ballerinaTruststore.p12",
+                path: "tests/resources/security/ballerinaTruststore.p12",
                 password: "ballerina"
             }
         }
@@ -98,7 +98,7 @@ http:BasicAuthHandler basicAuthHandler3 = new(basicAuthProvider3);
         auth: { authHandler: basicAuthHandler3 },
         secureSocket: {
             trustStore: {
-                path: "src/websub_advanced_integration_tests/resources/security/ballerinaTruststore.p12",
+                path: "tests/resources/security/ballerinaTruststore.p12",
                 password: "ballerina"
             }
         }
@@ -126,7 +126,7 @@ http:BasicAuthHandler basicAuthHandler4 = new(basicAuthProvider4);
         auth: { authHandler: basicAuthHandler4 },
         secureSocket: {
             trustStore: {
-                path: "src/websub_advanced_integration_tests/resources/security/ballerinaTruststore.p12",
+                path: "tests/resources/security/ballerinaTruststore.p12",
                 password: "ballerina"
             }
         }

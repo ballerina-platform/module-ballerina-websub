@@ -18,7 +18,7 @@ import ballerina/mime;
 import ballerina/test;
 import ballerina/runtime;
 import ballerina/http;
-import websub;
+import ballerina/websub;
 
 listener websub:Listener websubDifContentTypeEP = new websub:Listener(23282);
 

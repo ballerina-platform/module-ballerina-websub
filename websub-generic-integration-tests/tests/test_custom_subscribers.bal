@@ -18,7 +18,7 @@
 import ballerina/lang.'object as lang;
 import ballerina/test;
 import ballerina/http;
-import websub;
+import ballerina/websub;
 
 public type CustomSubWebhookListenerConf record {
     string host = "";

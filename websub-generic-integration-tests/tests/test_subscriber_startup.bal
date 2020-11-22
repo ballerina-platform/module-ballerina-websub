@@ -19,7 +19,7 @@ import ballerina/log;
 import ballerina/test;
 import ballerina/io;
 import ballerina/config;
-import websub;
+import ballerina/websub;
 
 listener http:Listener testSubscriber = new(23386);
 listener http:Listener testHub = new(23190);
@@ -113,7 +113,7 @@ service startupHub on testHub {
 }
 
 @test:Config {
-    dependsOn: ["testTopicRedirectFoundAndHubPermanentRedirect"]
+    dependsOn: ["testJsonContentReceiptForRemoteHub"]
 }
 function testMultipleSubscribersStartUpInSamePort() {
     http:Client clientEndpoint = new ("http://0.0.0.0:23386");

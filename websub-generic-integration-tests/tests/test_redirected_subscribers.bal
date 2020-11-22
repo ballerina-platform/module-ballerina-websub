@@ -16,7 +16,7 @@
 
 import ballerina/io;
 import ballerina/test;
-import websub;
+import ballerina/websub;
 
 listener websub:Listener redirectWebsubEP = new websub:Listener(23484);
 
@@ -72,14 +72,16 @@ service redirectWebsubSubscriberTwo on redirectWebsubEP {
 }
 
 @test:Config {
-    dependsOn: ["testContentReceipt"]
+    dependsOn: ["testJsonContentReceiptForRemoteHub"],
+    enable: false
 }
 function testTopicMovedPermanentlyAndHubTemporaryRedirect() {
     test:assertEquals(fetchOutput(ID_REDIRECT_SUBSCRIBER_ONE_LOG), REDIRECT_SUBSCRIBER_ONE_LOG);
 }
 
 @test:Config {
-    dependsOn: ["testTopicMovedPermanentlyAndHubTemporaryRedirect"]
+    dependsOn: ["testJsonContentReceiptForRemoteHub"],
+    enable: false
 }
 function testTopicRedirectFoundAndHubPermanentRedirect() {
     test:assertEquals(fetchOutput(ID_REDIRECT_SUBSCRIBER_TWO_LOG), REDIRECT_SUBSCRIBER_TWO_LOG);
