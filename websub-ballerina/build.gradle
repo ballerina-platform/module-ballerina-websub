@@ -168,14 +168,11 @@ task updateTomlFile {
         def stdlibDependentHttpVersion = project.stdlibHttpVersion.split("-")[0]
         def stdlibDependentMimeVersion = project.stdlibMimeVersion.split("-")[0]
         def stdlibDependentAuthVersion = project.stdlibAuthVersion.split("-")[0]
-        def stdlibDependentFileVersion = project.stdlibFileVersion.split("-")[0]
         def stdlibDependentCacheVersion = project.stdlibCacheVersion.split("-")[0]
         def stdlibDependentCryptoVersion = project.stdlibCryptoVersion.split("-")[0]
         def stdlibDependentEncodingVersion = project.stdlibEncodingVersion.split("-")[0]
-        def stdlibDependentTaskVersion = project.stdlibTaskVersion.split("-")[0]
         def stdlibDependentLogVersion = project.stdlibLogVersion.split("-")[0]
         def stdlibDependentTimeVersion = project.stdlibTimeVersion.split("-")[0]
-        def stdlibDependentReflectVersion = project.stdlibReflectVersion.split("-")[0]
         def stdlibDependentRuntimeApiVersion = project.stdlibRuntimeApiVersion.split("-")[0]
         def stdlibDependentSystemVersion = project.stdlibSystemVersion.split("-")[0]
         def stdlibDependentConfigApiVersion = project.stdlibConfigApiVersion.split("-")[0]
@@ -189,14 +186,11 @@ task updateTomlFile {
         newConfig = newConfig.replace("@stdlib.http.version@", stdlibDependentHttpVersion)
         newConfig = newConfig.replace("@stdlib.mime.version@", stdlibDependentMimeVersion)
         newConfig = newConfig.replace("@stdlib.auth.version@", stdlibDependentAuthVersion)
-        newConfig = newConfig.replace("@stdlib.file.version@", stdlibDependentFileVersion)
         newConfig = newConfig.replace("@stdlib.cache.version@", stdlibDependentCacheVersion)
         newConfig = newConfig.replace("@stdlib.crypto.version@", stdlibDependentCryptoVersion)
         newConfig = newConfig.replace("@stdlib.encoding.version@", stdlibDependentEncodingVersion)
-        newConfig = newConfig.replace("@stdlib.task.version@", stdlibDependentTaskVersion)
         newConfig = newConfig.replace("@stdlib.log.version@", stdlibDependentLogVersion)
         newConfig = newConfig.replace("@stdlib.time.version@", stdlibDependentTimeVersion)
-        newConfig = newConfig.replace("@stdlib.reflect.version@", stdlibDependentReflectVersion)
         newConfig = newConfig.replace("@stdlib.runtime.version@", stdlibDependentRuntimeApiVersion)
         newConfig = newConfig.replace("@stdlib.system.version@", stdlibDependentSystemVersion)
         newConfig = newConfig.replace("@stdlib.configapi.version@", stdlibDependentConfigApiVersion)
@@ -225,42 +219,10 @@ task revertTomlFile {
     }
 }
 
-//task ballerinaTest {
-//    dependsOn(":websub-native:build")
-//    dependsOn(copyToLib)
-//    dependsOn(unpackJballerinaTools)
-//    dependsOn(unpackStdLibs)
-//    dependsOn(copyStdlibs)
-//    dependsOn(updateTomlFile)
-//    finalizedBy(revertTomlFile)
-//
-//    def debugParams = ""
-//    if (project.hasProperty("debug")) {
-//        debugParams = "--debug ${project.findProperty("debug")}"
-//    }
-//
-//    doLast {
-//        exec {
-//            workingDir project.projectDir
-//            environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
-//            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-//                environment "OS_TYPE", "windows"
-//                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat test -- --b7a.config.file=src/websub_advanced_integration_tests/tests/advanced_services/sample-users.toml --test.hub.url=https://localhost:23191/websub/hub && exit %%ERRORLEVEL%%"
-//            } else {
-//                environment "OS_TYPE", "linux"
-//                commandLine 'sh', '-c', "$distributionBinPath/ballerina test -- --b7a.config.file=src/websub_advanced_integration_tests/tests/advanced_services/sample-users.toml --test.hub.url=https://localhost:23191/websub/hub"
-//            }
-//        }
-//    }
-//}
-//
-//test {
-//    dependsOn(ballerinaTest)
-//}
-
 task ballerinaBuild {
     inputs.dir file(project.projectDir)
     finalizedBy(revertTomlFile)
+    finalizedBy(':websub-generic-integration-tests:build')
 
     doLast {
         // Build and populate caches
@@ -270,7 +232,7 @@ task ballerinaBuild {
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
                 commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat build --skip-tests -c && exit %%ERRORLEVEL%%"
             } else {
-                commandLine 'sh', '-c', "$distributionBinPath/ballerina build --skip-tests -c --debug=5005"
+                commandLine 'sh', '-c', "$distributionBinPath/ballerina build --skip-tests -c"
             }
         }
         copy {
@@ -285,19 +247,19 @@ task ballerinaBuild {
         }
 
         // Publish to central
-//        if (!project.version.endsWith('-SNAPSHOT') && ballerinaCentralAccessToken != null && project.hasProperty("publishToCentral")) {
-//            println("Publishing to the ballerina central..")
-//            exec {
-//                workingDir project.projectDir
-//                environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
-//                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-//                    commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat push && exit %%ERRORLEVEL%%"
-//                } else {
-//                    commandLine 'sh', '-c', "$distributionBinPath/ballerina push"
-//                }
-//            }
-//
-//        }
+        if (!project.version.endsWith('-SNAPSHOT') && ballerinaCentralAccessToken != null && project.hasProperty("publishToCentral")) {
+            println("Publishing to the ballerina central..")
+            exec {
+                workingDir project.projectDir
+                environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
+                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                    commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat push && exit %%ERRORLEVEL%%"
+                } else {
+                    commandLine 'sh', '-c', "$distributionBinPath/ballerina push"
+                }
+            }
+
+        }
         // Doc creation and packing
 //        exec {
 //            workingDir project.projectDir
@@ -312,7 +274,6 @@ task ballerinaBuild {
 //            from file("$project.projectDir/target/apidocs/${packageName}")
 //            into file("$project.projectDir/build/docs_parent/docs/${packageName}")
 //        }
-//        ballerinaConfigFile.text = originalConfig
     }
 
     outputs.dir artifactCacheParent
