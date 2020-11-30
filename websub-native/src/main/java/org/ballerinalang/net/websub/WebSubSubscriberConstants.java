@@ -41,7 +41,7 @@ public class WebSubSubscriberConstants {
     public static final String ANN_NAME_WEBSUB_SPECIFIC_SUBSCRIBER = "SpecificSubscriber";
     public static final String BALLERINA = "ballerina";
     public static final String WEBSUB = "websub";
-    public static final String MODULE_VERSION = "1.0.5";
+    public static final String MODULE_VERSION = "1.0.6";
     public static final String GENERATED_PACKAGE_VERSION = MODULE_VERSION.replace(".", "_");
     public static final String WEBSUB_PACKAGE = BALLERINA + ORG_NAME_SEPARATOR + WEBSUB;
     public static final String WEBSUB_PACKAGE_FULL_QUALIFIED_NAME = WEBSUB_PACKAGE + VERSION_SEPARATOR + MODULE_VERSION;
