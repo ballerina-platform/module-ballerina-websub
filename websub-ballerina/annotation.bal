@@ -35,6 +35,8 @@ public type SubscriberServiceConfiguration record {|
     string path?;
     boolean subscribeOnStartUp = true;
     string|[string, string] target?;
+    string accept?;
+    string acceptLanguage?;
     int leaseSeconds?;
     string secret?;
     string callback?;

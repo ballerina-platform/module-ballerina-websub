@@ -58,6 +58,10 @@ import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_SUBSCRIPTION_HUB_CLIENT_CONFIG;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_SUBSCRIPTION_PUBLISHER_CLIENT_CONFIG;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_TARGET;
+
+import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_ACCEPT;
+import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_ACCEPT_LANGUAGE;
+
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ENDPOINT_CONFIG_HOST;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ENDPOINT_CONFIG_PORT;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ENDPOINT_CONFIG_SECURE_SOCKET_CONFIG;
@@ -321,6 +325,18 @@ public class SubscriberNativeOperationHandler {
             if (annotation.containsKey(ANN_WEBSUB_ATTR_TARGET)) {
                 subscriptionDetails.put(ANN_WEBSUB_ATTR_TARGET, annotation.get(ANN_WEBSUB_ATTR_TARGET));
             }
+
+
+
+            if (annotation.containsKey(ANN_WEBSUB_ATTR_ACCEPT)) {
+                subscriptionDetails.put(ANN_WEBSUB_ATTR_ACCEPT, annotation.get(ANN_WEBSUB_ATTR_ACCEPT));
+            }
+
+            if (annotation.containsKey(ANN_WEBSUB_ATTR_ACCEPT_LANGUAGE)) {
+                subscriptionDetails.put(ANN_WEBSUB_ATTR_ACCEPT_LANGUAGE, annotation.get(ANN_WEBSUB_ATTR_ACCEPT_LANGUAGE));
+            }
+
+            
 
             if (annotation.containsKey(ANN_WEBSUB_ATTR_LEASE_SECONDS)) {
                 subscriptionDetails.put(ANN_WEBSUB_ATTR_LEASE_SECONDS,

@@ -70,8 +70,15 @@ const string X_HUB_TOPIC = "X-Hub-Topic";
 
 const string CONTENT_TYPE = "Content-Type";
 
+const string ACCEPT= "Accept";
+const string ACCEPT_LANGUAGE="Accept-Language";
+
 const string ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG = "SubscriberServiceConfig";
 const ANNOT_FIELD_TARGET = "target";
+
+const ANNOT_FIELD_ACCEPT="accept";
+const ANNOT_FIELD_ACCEPT_LANGUAGE="acceptLanguage";
+
 const ANNOT_FIELD_CALLBACK = "callback";
 const ANNOT_FIELD_LEASE_SECONDS = "leaseSeconds";
 const ANNOT_FIELD_SECRET = "secret";
@@ -395,9 +402,14 @@ public function extractTopicAndHubUrls(http:Response response) returns @tainted 
         linkHeaders = response.getHeaders("Link");
     }
 
-    if (linkHeaders.length() == 0) {
-        return WebSubError("Link header unavailable in discovery response");
-    }
+    if(response.statusCode== http:STATUS_NOT_ACCEPTABLE){
+            return WebSubError("Content negotiation failed.Accept headers mismatch !!!!!!!!!!!!!!!!!!!!!");
+        }else if(response.statusCode==http:STATUS_INTERNAL_SERVER_ERROR){
+            return WebSubError("Accept headers unavailable in discovery request");
+        } else if(linkHeaders.length() == 0) {
+            return WebSubError("Link header unavailable in discovery response");
+
+        }else{}
 
     int hubIndex = 0;
     string[] hubs = [];

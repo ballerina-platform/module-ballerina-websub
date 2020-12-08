@@ -41,7 +41,7 @@ public class WebSubSubscriberConstants {
     public static final String ANN_NAME_WEBSUB_SPECIFIC_SUBSCRIBER = "SpecificSubscriber";
     public static final String BALLERINA = "ballerina";
     public static final String WEBSUB = "websub";
-    public static final String MODULE_VERSION = "1.0.7";
+    public static final String MODULE_VERSION = "1.0.8";
     public static final String GENERATED_PACKAGE_VERSION = MODULE_VERSION.replace(".", "_");
     public static final String WEBSUB_PACKAGE = BALLERINA + ORG_NAME_SEPARATOR + WEBSUB;
     public static final String WEBSUB_PACKAGE_FULL_QUALIFIED_NAME = WEBSUB_PACKAGE + VERSION_SEPARATOR + MODULE_VERSION;
@@ -58,6 +58,10 @@ public class WebSubSubscriberConstants {
 
     public static final BString ANN_WEBSUB_ATTR_SUBSCRIBE_ON_STARTUP = StringUtils.fromString("subscribeOnStartUp");
     public static final BString ANN_WEBSUB_ATTR_TARGET = StringUtils.fromString("target");
+
+    public static final BString ANN_WEBSUB_ATTR_ACCEPT=StringUtils.fromString("accept");
+    public static final BString ANN_WEBSUB_ATTR_ACCEPT_LANGUAGE=StringUtils.fromString("acceptLanguage");
+
     public static final BString ANN_WEBSUB_ATTR_LEASE_SECONDS = StringUtils.fromString("leaseSeconds");
     public static final BString ANN_WEBSUB_ATTR_SECRET = StringUtils.fromString("secret");
     public static final BString ANN_WEBSUB_ATTR_CALLBACK = StringUtils.fromString("callback");
