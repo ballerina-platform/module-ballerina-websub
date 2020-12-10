@@ -20,7 +20,7 @@ package org.ballerinalang.net.websub;
 
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
-import io.ballerina.runtime.api.types.AttachedFunctionType;
+import io.ballerina.runtime.api.types.MemberFunctionType;
 import io.ballerina.runtime.api.utils.JsonUtils;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
@@ -78,10 +78,10 @@ public class WebSubUtils {
         }
     }
 
-    public static AttachedFunctionType getAttachedFunction(BObject service, String functionName) {
-        AttachedFunctionType attachedFunction = null;
+    public static MemberFunctionType getAttachedFunction(BObject service, String functionName) {
+        MemberFunctionType attachedFunction = null;
         String functionFullName = service.getType().getName() + "." + functionName;
-        for (AttachedFunctionType function : service.getType().getAttachedFunctions()) {
+        for (MemberFunctionType function : service.getType().getAttachedFunctions()) {
             //TODO test the name of resource
             if (functionFullName.contains(function.getName())) {
                 attachedFunction = function;
