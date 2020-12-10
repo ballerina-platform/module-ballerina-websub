@@ -185,7 +185,7 @@ isolated function buildIntentVerificationResponse(IntentVerificationRequest inte
 # + request - The request received
 # + serviceType - The service for which the request was rceived
 # + return - An `error`, if an error occurred in extraction or signature validation failed or else `()`
-isolated function processWebSubNotification(http:Request request, service serviceType) returns @tainted error? {
+isolated function processWebSubNotification(http:Request request, SubscriberService serviceType) returns @tainted error? {
     SubscriberServiceConfiguration? subscriberConfig = retrieveSubscriberServiceAnnotations(serviceType);
     string secret = subscriberConfig?.secret ?: "";
     // Build the data source before responding to the content delivery requests automatically
@@ -566,7 +566,7 @@ public function startHub(http:Listener hubServiceListener,
                                                                         hubTopicRegistrationRequired, hubPublicUrl,
                                                                         hubServiceListener, new Bridge() );
     if (res is Hub) {
-        startHubService(hubServiceListener);
+        startHubService(hubServiceListener, basePath);
     }
 
     return res;
@@ -606,7 +606,7 @@ public class Hub {
     #
     # + return - An `error` if hub can't be stoped or else `()`
     public isolated function stop() returns error? {
-        var stopResult = self.hubHttpListener.__gracefulStop();
+        var stopResult = self.hubHttpListener.gracefulStop();
         var stopHubServiceResult = stopHubService(self);
 
         if (stopResult is () && stopHubServiceResult is ()) {
@@ -768,7 +768,7 @@ public type SubscriptionDetails record {|
     int createdAt = 0;
 |};
 
-isolated function retrieveSubscriberServiceAnnotations(service serviceType) returns SubscriberServiceConfiguration? {
+isolated function retrieveSubscriberServiceAnnotations(SubscriberService serviceType) returns SubscriberServiceConfiguration? {
     typedesc<any> serviceTypedesc = typeof serviceType;
     return serviceTypedesc.@SubscriberServiceConfig;
 }

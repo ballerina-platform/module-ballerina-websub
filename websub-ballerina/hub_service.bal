@@ -32,19 +32,20 @@ cache:CacheConfig config = {
 };
 cache:Cache subscriberCallbackClientCache = new(config);
 
-isolated function getHubService() returns service {
-    return @http:ServiceConfig {
-        basePath: hubBasePath,
-        auth: hubServiceAuth
+isolated function getHubService() returns http:Service {
+    return
+    @http:ServiceConfig {
+        //basePath: hubBasePath,
+        //auth: hubServiceAuth
     }
-    service {
+    service object  {
 
-        @http:ResourceConfig {
-            methods: ["POST"],
-            path: hubPublishResourcePath,
-            auth: hubPublisherResourceAuth
-        }
-        resource function publish(http:Caller httpCaller, http:Request request) {
+        //@http:ResourceConfig {
+            //methods: ["POST"],
+            //path: hubPublishResourcePath,
+            //auth: hubPublisherResourceAuth
+        //}
+        resource function post [string hubPublishResourcePath] (http:Caller httpCaller, http:Request request) {
             http:Response response = new;
             string topic = "";
 
@@ -209,11 +210,11 @@ isolated function getHubService() returns service {
         }
 
         @http:ResourceConfig {
-            methods: ["POST"],
-            path: hubSubscriptionResourcePath,
+            //methods: ["POST"],
+            //path: hubSubscriptionResourcePath,
             auth: hubSubscriptionResourceAuth
         }
-        resource function subscribe(http:Caller httpCaller, http:Request request) {
+        resource function post hubSubscriptionResourcePath(http:Caller httpCaller, http:Request request) {
             http:Response response = new;
             string topic = "";
 

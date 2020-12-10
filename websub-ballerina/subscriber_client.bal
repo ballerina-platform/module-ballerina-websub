@@ -44,7 +44,7 @@ public client class SubscriptionClient {
     # + subscriptionRequest - The `SubscriptionChangeRequest` containing the subscription details
     # + return - The `SubscriptionChangeResponse` indicating subscription details if the request was successful
     #           or else an `error` if an error occurred with the subscription request
-    public remote function subscribe(SubscriptionChangeRequest subscriptionRequest)
+    remote function subscribe(SubscriptionChangeRequest subscriptionRequest)
         returns @tainted SubscriptionChangeResponse|error {
 
         http:Client httpClient = self.httpClient;
@@ -62,7 +62,7 @@ public client class SubscriptionClient {
     # + unsubscriptionRequest - The `SubscriptionChangeRequest` containing unsubscription details
     # + return - An unsubscription details if the request was successful or else an `error` if an error occurred
     #            with the unsubscription request
-    public remote function unsubscribe(SubscriptionChangeRequest unsubscriptionRequest)
+    remote function unsubscribe(SubscriptionChangeRequest unsubscriptionRequest)
         returns @tainted SubscriptionChangeResponse|error {
 
         http:Client httpClient = self.httpClient;
