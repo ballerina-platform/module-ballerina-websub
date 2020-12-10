@@ -18,7 +18,7 @@
 
 package org.ballerinalang.net.websub;
 
-import io.ballerina.runtime.api.types.AttachedFunctionType;
+import io.ballerina.runtime.api.types.MemberFunctionType;
 import io.ballerina.runtime.api.values.BMap;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
@@ -30,7 +30,7 @@ import org.ballerinalang.net.http.HttpService;
  */
 class WebSubHttpResource extends HttpResource {
 
-    private WebSubHttpResource(AttachedFunctionType resource, HttpService parentService) {
+    private WebSubHttpResource(MemberFunctionType resource, HttpService parentService) {
         super(resource, parentService);
     }
 
@@ -41,7 +41,7 @@ class WebSubHttpResource extends HttpResource {
      * @param httpService   the HTTP service representation of the service
      * @return  the built HTTP resource
      */
-    static HttpResource buildWebSubHttpResource(AttachedFunctionType resource, HttpService httpService) {
+    static HttpResource buildWebSubHttpResource(MemberFunctionType resource, HttpService httpService) {
         WebSubHttpResource httpResource = new WebSubHttpResource(resource, httpService);
         BMap resourceConfigAnnotation = getResourceConfigAnnotation(resource);
 

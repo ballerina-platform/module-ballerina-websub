@@ -22,7 +22,7 @@ import io.ballerina.runtime.api.Runtime;
 import io.ballerina.runtime.api.TypeTags;
 import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.creators.ValueCreator;
-import io.ballerina.runtime.api.types.AttachedFunctionType;
+import io.ballerina.runtime.api.types.MemberFunctionType;
 import io.ballerina.runtime.api.types.RecordType;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.StringUtils;
@@ -146,7 +146,7 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
             httpRequest = getHttpRequest(httpCarbonMessage);
         }
 
-        AttachedFunctionType balResource = httpResource.getBalResource();
+        MemberFunctionType balResource = httpResource.getRemoteFunction();
         List<Type> paramTypes = httpResource.getParamTypes();
         Object[] signatureParams = new Object[paramTypes.size() * 2];
         String resourceName = httpResource.getName();
@@ -225,7 +225,7 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
         runtime.invokeMethodAsync(subscriberServiceListener, "processWebSubNotification", null, null,
                                   new Callback() {
                                       @Override
-                                      public void notifySuccess() {
+                                      public void notifySuccess(Object result) {
                                           completeFunction.countDown();
                                       }
 
@@ -290,7 +290,7 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
     /**
      * Method to create the notification request struct representing WebSub notifications received.
      */
-    private Object createCustomNotification(HttpCarbonMessage inboundRequest, AttachedFunctionType resource,
+    private Object createCustomNotification(HttpCarbonMessage inboundRequest, MemberFunctionType resource,
                                               BObject httpRequest) {
         RecordType recordType = webSubServicesRegistry.getResourceDetails().get(resource.getName());
         BMap<BString, ?> jsonBody = getJsonBody(httpRequest);

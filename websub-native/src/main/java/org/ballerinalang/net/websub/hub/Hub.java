@@ -226,7 +226,7 @@ public class Hub {
                 runtime.invokeMethodAsync(bridge, "setupOnStartup",
                                           null, null, new Callback() {
                             @Override
-                            public void notifySuccess() {
+                            public void notifySuccess(Object result) {
                                 completeFunction.countDown();
                             }
 

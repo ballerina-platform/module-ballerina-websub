@@ -25,7 +25,7 @@ import io.ballerina.runtime.api.async.Callback;
 public class WebSubEmptyCallableUnitCallback implements Callback {
 
     @Override
-    public void notifySuccess() {
+    public void notifySuccess(Object result) {
         //do nothing
     }
 

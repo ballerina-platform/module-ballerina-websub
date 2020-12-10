@@ -70,7 +70,7 @@ public class HubSubscriber extends Consumer {
         runtime.invokeMethodAsync(bridge, "distributeContent", null, null,
                                   new Callback() {
                                       @Override
-                                      public void notifySuccess() {
+                                      public void notifySuccess(Object result) {
                                           completeFunction.countDown();
                                       }
 
