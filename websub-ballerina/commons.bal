@@ -200,7 +200,7 @@ isolated function processWebSubNotification(http:Request request, SubscriberServ
 
     string xHubSignature = request.getHeader(X_HUB_SIGNATURE);
     if (secret == "" && xHubSignature != "") {
-        log:printWarn("Ignoring " + X_HUB_SIGNATURE + " value since secret is not specified.");
+        log:print("Ignoring " + X_HUB_SIGNATURE + " value since secret is not specified.");
         return;
     }
 
