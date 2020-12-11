@@ -21,7 +21,6 @@ package org.ballerinalang.net.websub;
 import io.ballerina.runtime.api.types.MemberFunctionType;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
-import org.ballerinalang.net.http.HttpConstants;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
 import org.slf4j.Logger;
@@ -61,16 +60,9 @@ public class WebSubHttpService extends HttpService {
      */
     static WebSubHttpService buildWebSubSubscriberHttpService(BObject service, String[] basePath) {
         WebSubHttpService websubHttpService = new WebSubHttpService(service);
-        String path = String.join("/", basePath);;
-        BMap serviceConfigAnnotation = getWebSubSubscriberServiceConfigAnnotation(service);
+        String path = String.join("/", basePath);
 
-        if (path == "") {
-            logger.debug("'path' not specified in the service config annotation, using the default base path");
-            // Service name cannot start with /, hence concat.
-            websubHttpService.setBasePath(HttpConstants.DEFAULT_BASE_PATH.concat(websubHttpService.getName()));
-        } else {
-            websubHttpService.setBasePath(path);
-        }
+        websubHttpService.setBasePath(path);
 
         List<HttpResource> resources = new ArrayList<>();
         for (MemberFunctionType resource : websubHttpService.getBalService().getType().getAttachedFunctions()) {
@@ -78,26 +70,12 @@ public class WebSubHttpService extends HttpService {
             resources.add(httpResource);
         }
         websubHttpService.setResources(resources);
+        //TODO: Need to check this is needed for other features like redirect/auth
 //        websubHttpService.setAllAllowedMethods(DispatcherUtil.getAllResourceMethods(websubHttpService));
         websubHttpService.setHostName(DEFAULT_HOST);
 
         return websubHttpService;
     }
-
-//    private static String findFullBasePath(String[] basePathArr) {
-//        String path = null;
-//        if (basePathArr != null) {
-//            String basePathVal = String.join("/", basePathArr);
-//            //            String basePathVal = config.getStringValue(WebSocketConstants.ANNOTATION_ATTR_PATH).getValue();
-//            if (!basePathVal.trim().isEmpty()) {
-//                path = HttpUtil.sanitizeBasePath(basePathVal);
-//            }
-//        }
-//        if (path == null) {
-//            path = "/".concat(getName());
-//        }
-//        return path;
-//    }
 
     public String getTopic() {
         return topic;

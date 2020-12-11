@@ -36,6 +36,10 @@ function getHubPublishService() returns http:Service {
     return
     @http:ServiceConfig {}
     service object  {
+        //TODO: Uncomment when the auth support is given from http.
+        //@http:ResourceConfig {
+        //    auth: hubPublisherResourceAuth
+        //}
         resource function post .(http:Caller httpCaller, http:Request request) {
             http:Response response = new;
             string topic = "";
@@ -206,7 +210,7 @@ function getHubSubscribeService() returns http:Service {
     return
     @http:ServiceConfig {}
     service object  {
-
+        //TODO: Uncomment when the auth support is given from http.
         //@http:ResourceConfig {
             //auth: hubSubscriptionResourceAuth
         //}

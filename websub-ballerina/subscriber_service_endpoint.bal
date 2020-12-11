@@ -16,7 +16,6 @@
 
 import ballerina/encoding;
 import ballerina/http;
-//import ballerina/lang.'object as lang;
 import ballerina/log;
 import ballerina/java;
 
