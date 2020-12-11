@@ -44,7 +44,7 @@ public client class PublisherClient {
     #
     # + topic - The topic to register
     # + return - An `error` if an error occurred registering the topic or esle `()`
-    public remote function registerTopic(string topic) returns @tainted error? {
+    remote function registerTopic(string topic) returns @tainted error? {
         http:Client httpClient = self.httpClient;
         http:Request request = buildTopicRegistrationChangeRequest(MODE_REGISTER, topic);
         var registrationResponse = httpClient->post("", request);
@@ -66,7 +66,7 @@ public client class PublisherClient {
     #
     # + topic - The topic to unregister
     # + return -  An `error`if an error occurred unregistering the topic or else `()`
-    public remote function unregisterTopic(string topic) returns @tainted error? {
+    remote function unregisterTopic(string topic) returns @tainted error? {
         http:Client httpClient = self.httpClient;
         http:Request request = buildTopicRegistrationChangeRequest(MODE_UNREGISTER, topic);
         var unregistrationResponse = httpClient->post("", request);
@@ -93,7 +93,7 @@ public client class PublisherClient {
     # + contentType - The type of the update content to set as the `ContentType` header
     # + headers - The headers that need to be set (if any)
     # + return -  An `error`if an error occurred with the update or else `()`
-    public remote function publishUpdate(string topic, string|xml|json|byte[]|io:ReadableByteChannel payload,
+    remote function publishUpdate(string topic, string|xml|json|byte[]|io:ReadableByteChannel payload,
                                          string? contentType = (), map<string>? headers = ()) returns @tainted error? {
         http:Client httpClient = self.httpClient;
         http:Request request = new;
@@ -131,7 +131,7 @@ public client class PublisherClient {
     # + topic - The topic for which the update occurred
     # + headers - The headers that need to be set (if any)
     # + return -  An `error`if an error occurred with the notification or else `()`
-    public remote function notifyUpdate(string topic, map<string>? headers = ()) returns @tainted error? {
+    remote function notifyUpdate(string topic, map<string>? headers = ()) returns @tainted error? {
         http:Client httpClient = self.httpClient;
         http:Request request = new;
         string queryParams = HUB_MODE + "=" + MODE_PUBLISH + "&" + HUB_TOPIC + "=" + topic;

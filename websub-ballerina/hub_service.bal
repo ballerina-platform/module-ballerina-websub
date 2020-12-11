@@ -32,19 +32,15 @@ cache:CacheConfig config = {
 };
 cache:Cache subscriberCallbackClientCache = new(config);
 
-isolated function getHubService() returns service {
-    return @http:ServiceConfig {
-        basePath: hubBasePath,
-        auth: hubServiceAuth
-    }
-    service {
-
-        @http:ResourceConfig {
-            methods: ["POST"],
-            path: hubPublishResourcePath,
-            auth: hubPublisherResourceAuth
-        }
-        resource function publish(http:Caller httpCaller, http:Request request) {
+isolated function getHubPublishService() returns http:Service {
+    return
+    @http:ServiceConfig {}
+    service object  {
+        //TODO: Uncomment when the auth support is given from http.
+        //@http:ResourceConfig {
+        //    auth: hubPublisherResourceAuth
+        //}
+        resource function post .(http:Caller httpCaller, http:Request request) {
             http:Response response = new;
             string topic = "";
 
@@ -207,16 +203,20 @@ isolated function getHubService() returns service {
                 }
             }
         }
+    };
+}
 
-        @http:ResourceConfig {
-            methods: ["POST"],
-            path: hubSubscriptionResourcePath,
-            auth: hubSubscriptionResourceAuth
-        }
-        resource function subscribe(http:Caller httpCaller, http:Request request) {
+isolated function getHubSubscribeService() returns http:Service {
+    return
+    @http:ServiceConfig {}
+    service object  {
+        //TODO: Uncomment when the auth support is given from http.
+        //@http:ResourceConfig {
+            //auth: hubSubscriptionResourceAuth
+        //}
+        resource function post .(http:Caller httpCaller, http:Request request) {
             http:Response response = new;
             string topic = "";
-
             var reqFormParamMap = request.getFormParams();
             map<string> params = reqFormParamMap is map<string> ? reqFormParamMap : {};
 

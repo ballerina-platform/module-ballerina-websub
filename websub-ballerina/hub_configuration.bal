@@ -42,10 +42,11 @@ boolean hubPersistenceEnabled = false;
 # Attaches and starts the Ballerina WebSub Hub service.
 #
 # + hubServiceListener - The `http:Listener` to which the service is attached
-isolated function startHubService(http:Listener hubServiceListener) {
+function startHubService(http:Listener hubServiceListener, string basePath) {
     // TODO : handle errors
-    checkpanic hubServiceListener.__attach(getHubService());
-    checkpanic hubServiceListener.__start();
+    checkpanic hubServiceListener.attach(getHubPublishService(), basePath + hubPublishResourcePath);
+    checkpanic hubServiceListener.attach(getHubSubscribeService(), basePath + hubSubscriptionResourcePath);
+    checkpanic hubServiceListener.'start();
 }
 
 # Retrieves if persistence is enabled for the Hub.
