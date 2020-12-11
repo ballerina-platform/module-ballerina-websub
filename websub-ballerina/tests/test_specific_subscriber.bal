@@ -54,7 +54,7 @@
 //         self.websubListener = new(port, sseConfig);
 //     }
 
-//     public function attach(SpecificSubsriber s, string? name = ()) returns error? {
+//     public function attach(SpecificSubsriber s, string[]|string? name = ()) returns error? {
 //         return self.websubListener.attach(s, name);
 //     }
 
@@ -79,7 +79,7 @@
 // @SubscriberServiceConfig {
 //     //path:"/key"
 // }
-// @SpecificSubscriber
+// //@SpecificSubscriber
 // service SpecificSubscriber /key {
 //     remote function onOpened(Notification notification, SpecificSubMockActionEvent event) {
 //     }
@@ -98,7 +98,7 @@
 // @SubscriberServiceConfig {
 //     //path:"/key"
 // }
-// @SpecificSubscriber
+// //@SpecificSubscriber
 // service SpecificSubscriber /key {
 //     remote function onCreated(Notification notification, SpecificSubMockActionEvent event) {
 //     }
