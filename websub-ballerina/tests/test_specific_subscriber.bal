@@ -25,6 +25,9 @@
 //     string domain;
 // |};
 
+// public type SpecificSubscriber service object {
+// };
+
 // public class SpecificSubWebhookServerForPayload {
 
 //     private Listener websubListener;
@@ -72,15 +75,12 @@
 //     }
 // }
 
-// public type SubscriberService service object {
-// };
-
 // service object keyWebhook1 =
 // @SubscriberServiceConfig {
 //     //path:"/key"
 // }
 // @SpecificSubscriber
-// service SpecificSubsriber /key {
+// service SpecificSubscriber /key {
 //     remote function onOpened(Notification notification, SpecificSubMockActionEvent event) {
 //     }
 
@@ -96,10 +96,10 @@
 
 // service keyWebhook2 =
 // @SubscriberServiceConfig {
-//     path:"/key"
+//     //path:"/key"
 // }
 // @SpecificSubscriber
-// service {
+// service SpecificSubscriber /key {
 //     remote function onCreated(Notification notification, SpecificSubMockActionEvent event) {
 //     }
 
