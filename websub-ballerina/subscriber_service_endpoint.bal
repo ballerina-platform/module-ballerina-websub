@@ -326,10 +326,10 @@ function invokeClientConnectorForSubscription(string hub, http:ClientConfigurati
 
         boolean expectIntentVerification = <boolean> subscriptionDetails[ANNOT_FIELD_EXPECT_INTENT_VERIFICATION];
         if (expectIntentVerification) {
-            log:printInfo(subscriptionSuccessMsg + ". Awaiting intent verification.");
+            log:print(subscriptionSuccessMsg + ". Awaiting intent verification.");
             return;
         }
-        log:printInfo(subscriptionSuccessMsg);
+        log:print(subscriptionSuccessMsg);
     } else {
         log:printError("Subscription Request failed at Hub[" + hub + "], for Topic[" + topic + "]: " +
                        subscriptionResponse.message());

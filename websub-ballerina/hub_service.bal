@@ -59,10 +59,10 @@ isolated function getHubPublishService() returns http:Service {
                 if (!remotePublishConfig.enabled || !hubTopicRegistrationRequired) {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                     response.setTextPayload("Remote topic registration not allowed/not required at the Hub");
-                    log:printWarn("Remote topic registration denied at Hub");
+                    log:print("Remote topic registration denied at Hub");
                     var responseError = httpCaller->respond(response);
                     if (responseError is error) {
-                        log:printError("Error responding on remote topic registration failure", responseError);
+                        log:printError("Error responding on remote topic registration failure", err = responseError);
                     }
                     return;
                 }
@@ -72,23 +72,23 @@ isolated function getHubPublishService() returns http:Service {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                     string errorMessage = registerStatus.message();
                     response.setTextPayload(errorMessage);
-                    log:printWarn("Topic registration unsuccessful at Hub for Topic[" + topic + "]: " + errorMessage);
+                    log:print("Topic registration unsuccessful at Hub for Topic[" + topic + "]: " + errorMessage);
                 } else {
                     response.statusCode = http:STATUS_ACCEPTED;
-                    log:printInfo("Topic registration successful at Hub, for topic[" + topic + "]");
+                    log:print("Topic registration successful at Hub, for topic[" + topic + "]");
                 }
                 var responseError = httpCaller->respond(response);
                 if (responseError is error) {
-                    log:printError("Error responding remote topic registration status", responseError);
+                    log:printError("Error responding remote topic registration status", err = responseError);
                 }
             } else if (mode == MODE_UNREGISTER) {
                 if (!remotePublishConfig.enabled || !hubTopicRegistrationRequired) {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                     response.setTextPayload("Remote unregistration not allowed/not required at the Hub");
-                    log:printWarn("Remote topic unregistration denied at Hub");
+                    log:print("Remote topic unregistration denied at Hub");
                     var responseError = httpCaller->respond(response);
                     if (responseError is error) {
-                        log:printError("Error responding on remote topic unregistration failure", responseError);
+                        log:printError("Error responding on remote topic unregistration failure", err = responseError);
                     }
                     return;
                 }
@@ -98,14 +98,14 @@ isolated function getHubPublishService() returns http:Service {
                     string errorMessage = <string>unregisterStatus.message();
                     response.statusCode = http:STATUS_BAD_REQUEST;
                     response.setTextPayload(errorMessage);
-                    log:printWarn("Topic unregistration unsuccessful at Hub for Topic[" + topic + "]: " + errorMessage);
+                    log:print("Topic unregistration unsuccessful at Hub for Topic[" + topic + "]: " + errorMessage);
                 } else {
                     response.statusCode = http:STATUS_ACCEPTED;
-                    log:printInfo("Topic unregistration successful at Hub, for topic[" + topic + "]");
+                    log:print("Topic unregistration successful at Hub, for topic[" + topic + "]");
                 }
                 var responseError = httpCaller->respond(response);
                 if (responseError is error) {
-                    log:printError("Error responding remote topic unregistration status", responseError);
+                    log:printError("Error responding remote topic unregistration status", err = responseError);
                 }
             } else {
                 if (mode != MODE_PUBLISH) {
@@ -138,7 +138,7 @@ isolated function getHubPublishService() returns http:Service {
                                 response.statusCode = http:STATUS_BAD_REQUEST;
                                 var responseError = httpCaller->respond(response);
                                 if (responseError is error) {
-                                    log:printError("Error responding on update fetch failure", responseError);
+                                    log:printError("Error responding on update fetch failure", err = responseError);
                                 }
                                 return;
                             }
@@ -164,7 +164,7 @@ isolated function getHubPublishService() returns http:Service {
                             var responseError = httpCaller->respond(response);
                             if (responseError is error) {
                                 log:printError("Error responding on payload extraction failure for"
-                                                + " publish request", responseError);
+                                                + " publish request", err = responseError);
                             }
                             return;
                         }
@@ -175,30 +175,30 @@ isolated function getHubPublishService() returns http:Service {
                             response.setTextPayload(<@untainted string>errorMessage);
                             log:printError(errorMessage);
                         } else {
-                            log:printInfo("Update notification done for Topic [" + topic + "]");
+                            log:print("Update notification done for Topic [" + topic + "]");
                             response.statusCode = http:STATUS_ACCEPTED;
                             var responseError = httpCaller->respond(response);
                             if (responseError is error) {
                                 log:printError("Error responding on update notification for topic[" + topic
-                                + "]", responseError);
+                                + "]", err = responseError);
                             }
                             return;
                         }
                     } else {
                         string errorMessage = "Publish request denied for unregistered topic[" + topic + "]";
-                        log:printDebug(errorMessage);
+                        log:print(errorMessage);
                         response.setTextPayload(<@untainted string>errorMessage);
                     }
                     response.statusCode = http:STATUS_BAD_REQUEST;
                     var responseError = httpCaller->respond(response);
                     if (responseError is error) {
-                        log:printError("Error responding to publish request", responseError);
+                        log:printError("Error responding to publish request", err = responseError);
                     }
                 } else {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                     var responseError = httpCaller->respond(response);
                     if (responseError is error) {
-                        log:printError("Error responding to request", responseError);
+                        log:printError("Error responding to request", err = responseError);
                     }
                 }
             }
@@ -232,7 +232,7 @@ isolated function getHubSubscribeService() returns http:Service {
                 response.statusCode = http:STATUS_BAD_REQUEST;
                 var responseError = httpCaller->respond(response);
                 if (responseError is error) {
-                    log:printError("Error responding to request", responseError);
+                    log:printError("Error responding to request", err = responseError);
                 }
             }
 
@@ -243,7 +243,7 @@ isolated function getHubSubscribeService() returns http:Service {
             var decodedCallbackFromParams = encoding:decodeUriComponent(callbackFromParams, "UTF-8");
             string callback = decodedCallbackFromParams is string ? decodedCallbackFromParams : callbackFromParams;
 
-            log:printInfo("Subscription request received for topic[" + topic + "] with callback[" + callback + "]");
+            log:print("Subscription request received for topic[" + topic + "] with callback[" + callback + "]");
 
             var validationStatus = validateSubscriptionChangeRequest(mode, topic, callback);
             if (validationStatus is error) {
@@ -258,7 +258,7 @@ isolated function getHubSubscribeService() returns http:Service {
 
             var responseError = httpCaller->respond(response);
             if (responseError is error) {
-                log:printError("Error responding to subscription change request", responseError);
+                log:printError("Error responding to subscription change request", err = responseError);
             } else if (validSubscriptionChangeRequest) {
                 verifyIntentAndAddSubscription(callback, topic, params);
             }
@@ -322,7 +322,7 @@ function verifyIntentAndAddSubscription(string callback, string topic, map<strin
         queryParams = queryParams + "&" + HUB_LEASE_SECONDS + "=" + leaseSeconds.toString();
     }
 
-    log:printInfo("Sending intent verification request to callback[" + callback + "] for topic[" + topic + "]");
+    log:print("Sending intent verification request to callback[" + callback + "] for topic[" + topic + "]");
 
     var subscriberResponse = callbackEp->get(<@untainted string> queryParams, request);
 
@@ -330,7 +330,7 @@ function verifyIntentAndAddSubscription(string callback, string topic, map<strin
         var respStringPayload = subscriberResponse.getTextPayload();
         if (respStringPayload is string) {
             if (respStringPayload != challenge) {
-                log:printInfo("Intent verification failed for mode: [" + mode + "], for callback URL: ["
+                log:print("Intent verification failed for mode: [" + mode + "], for callback URL: ["
                         + callback + "]: Challenge not echoed correctly.");
             } else {
                 SubscriptionDetails subscriptionDetails = {topic:topic, callback:callback};
@@ -349,19 +349,19 @@ function verifyIntentAndAddSubscription(string callback, string topic, map<strin
                     removeNativeSubscription(topic, callback);
                 }
 
-                log:printInfo("Intent verification successful for mode: [" + mode + "], for callback URL: ["
+                log:print("Intent verification successful for mode: [" + mode + "], for callback URL: ["
                         + callback + "]");
                 if (hubPersistenceEnabled) {
                     error? res = persistSubscriptionChange(mode, subscriptionDetails);
                     if (res is error) {
-                        log:printError("Error persisting subscription change", res);
+                        log:printError("Error persisting subscription change", err = res);
                     }
                 }
             }
         } else {
             error err = respStringPayload;
             string errCause = <string> err.message();
-            log:printInfo("Intent verification failed for mode: [" + mode + "], for callback URL: [" + callback
+            log:print("Intent verification failed for mode: [" + mode + "], for callback URL: [" + callback
                     + "]: Error retrieving response payload: " + errCause);
         }
     } else {
@@ -443,7 +443,7 @@ isolated function addSubscriptionsOnStartup(HubPersistenceStore persistenceStore
             if (time - subscription.leaseSeconds > subscription.createdAt) {
                 error? remResult = persistenceStore.removeSubscription(subscription);
                 if (remResult is error) {
-                    log:printError("Error removing expired subscription", remResult);
+                    log:printError("Error removing expired subscription", err = remResult);
                 }
                 continue;
             }
@@ -487,7 +487,7 @@ function distributeContent(string callback, SubscriptionDetails subscriptionDeta
         if (hubPersistenceEnabled) {
             error? remResult = persistSubscriptionChange(MODE_UNSUBSCRIBE, subscriptionDetails);
             if (remResult is error) {
-                log:printError("Error removing expired subscription", remResult);
+                log:printError("Error removing expired subscription", err = remResult);
             }
         }
     } else {
@@ -515,17 +515,17 @@ function distributeContent(string callback, SubscriptionDetails subscriptionDeta
         if (contentDistributionResponse is http:Response) {
             int respStatusCode = contentDistributionResponse.statusCode;
             if (isSuccessStatusCode(respStatusCode)) {
-                log:printDebug("Content delivery to callback[" + callback + "] successful for topic["
+                log:print("Content delivery to callback[" + callback + "] successful for topic["
                                     + subscriptionDetails.topic + "]");
             } else if (respStatusCode == http:STATUS_GONE) {
                 removeNativeSubscription(subscriptionDetails.topic, callback);
                 if (hubPersistenceEnabled) {
                     error? remResult = persistSubscriptionChange(MODE_UNSUBSCRIBE, subscriptionDetails);
                     if (remResult is error) {
-                        log:printError("Error removing gone subscription", remResult);
+                        log:printError("Error removing gone subscription", err = remResult);
                     }
                 }
-                log:printInfo("HTTP 410 response code received: Subscription deleted for callback[" + callback
+                log:print("HTTP 410 response code received: Subscription deleted for callback[" + callback
                                 + "], topic[" + subscriptionDetails.topic + "]");
             } else {
                 log:printError("Error delivering content to callback[" + callback + "] for topic["
@@ -556,7 +556,7 @@ function getSubcriberCallbackClient(string callback) returns http:Client {
             cache:Error? result = subscriberCallbackClientCache.put(<@untainted> callback,
                                                               <@untainted> subscriberCallbackClient);
             if (result is cache:Error) {
-                log:printDebug("Failed to add subscriber callback client with key: " + callback + " to the cache.");
+                log:print("Failed to add subscriber callback client with key: " + callback + " to the cache.");
             }
             return subscriberCallbackClient;
         }
