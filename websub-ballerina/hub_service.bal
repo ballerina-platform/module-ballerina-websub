@@ -32,7 +32,7 @@ cache:CacheConfig config = {
 };
 cache:Cache subscriberCallbackClientCache = new(config);
 
-function getHubPublishService() returns http:Service {
+isolated function getHubPublishService() returns http:Service {
     return
     @http:ServiceConfig {}
     service object  {
@@ -206,7 +206,7 @@ function getHubPublishService() returns http:Service {
     };
 }
 
-function getHubSubscribeService() returns http:Service {
+isolated function getHubSubscribeService() returns http:Service {
     return
     @http:ServiceConfig {}
     service object  {

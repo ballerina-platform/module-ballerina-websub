@@ -58,11 +58,10 @@ public class WebSubHttpService extends HttpService {
      * @param service   the service for which the HTTP representation is built
      * @return  the built HttpService representation
      */
-    static WebSubHttpService buildWebSubSubscriberHttpService(BObject service, String[] basePath) {
+    static WebSubHttpService buildWebSubSubscriberHttpService(BObject service, String basePath) {
         WebSubHttpService websubHttpService = new WebSubHttpService(service);
-        String path = String.join("/", basePath);
 
-        websubHttpService.setBasePath(path);
+        websubHttpService.setBasePath(basePath);
 
         List<HttpResource> resources = new ArrayList<>();
         for (MemberFunctionType resource : websubHttpService.getBalService().getType().getAttachedFunctions()) {

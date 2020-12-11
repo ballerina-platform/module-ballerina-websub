@@ -33,6 +33,7 @@ import io.ballerina.runtime.api.values.BTypedesc;
 import org.ballerinalang.net.http.HttpConnectorPortBindingListener;
 import org.ballerinalang.net.http.HttpConstants;
 import org.ballerinalang.net.http.HttpService;
+import org.ballerinalang.net.http.HttpUtil;
 import org.ballerinalang.net.http.websocket.server.WebSocketServicesRegistry;
 import org.ballerinalang.net.transport.contract.ServerConnector;
 import org.ballerinalang.net.transport.contract.ServerConnectorFuture;
@@ -230,8 +231,20 @@ public class SubscriberNativeOperationHandler {
                 StringUtils.fromString(LISTENER_SERVICE_ENDPOINT));
         WebSubServicesRegistry webSubServicesRegistry =
                 (WebSubServicesRegistry) serviceEndpoint.getNativeData(WEBSUB_SERVICE_REGISTRY);
-        String[] basePathArr = ((BArray) serviceName).getStringArray();
+        String basePathArr = getBasePath(serviceName);
         webSubServicesRegistry.registerWebSubSubscriberService(service, basePathArr);
+    }
+
+    private static String getBasePath(Object serviceName) {
+        if (serviceName instanceof BArray) {
+            String basePath = String.join("/", ((BArray) serviceName).getStringArray());
+            return HttpUtil.sanitizeBasePath(basePath);
+        } else if (serviceName instanceof BString) {
+            String basePath = ((BString) serviceName).getValue();
+            return HttpUtil.sanitizeBasePath(basePath);
+        } else {
+            return HttpConstants.DEFAULT_BASE_PATH;
+        }
     }
 
     /**
