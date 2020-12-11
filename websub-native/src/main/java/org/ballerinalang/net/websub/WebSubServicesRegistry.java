@@ -135,8 +135,8 @@ public class WebSubServicesRegistry extends HTTPServicesRegistry {
      *
      * @param service to be registered
      */
-    public void registerWebSubSubscriberService(BObject service) {
-        HttpService httpService = WebSubHttpService.buildWebSubSubscriberHttpService(service);
+    public void registerWebSubSubscriberService(BObject service, String[] basePath) {
+        HttpService httpService = WebSubHttpService.buildWebSubSubscriberHttpService(service, basePath);
         String hostName = httpService.getHostName();
         if (servicesMapByHost.get(hostName) == null) {
             servicesByBasePath = new ConcurrentHashMap<>();

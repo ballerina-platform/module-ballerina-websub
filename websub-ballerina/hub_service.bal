@@ -23,6 +23,7 @@ import ballerina/log;
 import ballerina/stringutils;
 import ballerina/system;
 import ballerina/time;
+import ballerina/io;
 
 @tainted map<PendingSubscriptionChangeRequest> pendingRequests = {};
 
@@ -32,25 +33,29 @@ cache:CacheConfig config = {
 };
 cache:Cache subscriberCallbackClientCache = new(config);
 
-isolated function getHubService() returns http:Service {
+function getHubService() returns http:Service {
+    io:println("----------------##############----------------------------------");
+    io:println(hubPublishResourcePath);
+    io:println("-------------------#############-------------------------------");
     return
-    @http:ServiceConfig {
-        //basePath: hubBasePath,
-        //auth: hubServiceAuth
-    }
+    @http:ServiceConfig {}
     service object  {
-
-        //@http:ResourceConfig {
-            //methods: ["POST"],
-            //path: hubPublishResourcePath,
-            //auth: hubPublisherResourceAuth
-        //}
-        resource function post [string hubPublishResourcePath] (http:Caller httpCaller, http:Request request) {
+        resource function post publish (http:Caller httpCaller, http:Request request) {
+        //resource function post [string hubPublishResourcePath] (http:Caller httpCaller, http:Request request) {
+            io:println("-----------getHubService hubPublishResourcePath------");
+            io:println(hubPublishResourcePath);
+            io:println("-----------getHubService hubPublishResourcePath------");
+            log:printInfo("Dispatched to hubPublishResourcePath");
             http:Response response = new;
             string topic = "";
+            io:println("request");
+            io:println(request.rawPath);
+            io:println(request.method);
 
             var reqFormParamMap = request.getFormParams();
             map<string> params = reqFormParamMap is map<string> ? reqFormParamMap : {};
+            io:println("params");
+            io:println(params);
 
             string mode = params[HUB_MODE] ?: "";
 
@@ -58,9 +63,12 @@ isolated function getHubService() returns http:Service {
             if topicFromParams is string {
                 var decodedValue = encoding:decodeUriComponent(topicFromParams, "UTF-8");
                 topic = decodedValue is string ? decodedValue : topicFromParams;
+                io:println("Topic");
+                io:println(topic);
             }
 
             if (mode == MODE_REGISTER) {
+                io:println("MODE_REGISTER");
                 if (!remotePublishConfig.enabled || !hubTopicRegistrationRequired) {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                     response.setTextPayload("Remote topic registration not allowed/not required at the Hub");
@@ -73,6 +81,7 @@ isolated function getHubService() returns http:Service {
                 }
 
                 var registerStatus = registerTopic(topic);
+                io:println("registerTopic");
                 if (registerStatus is error) {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                     string errorMessage = registerStatus.message();
@@ -209,27 +218,33 @@ isolated function getHubService() returns http:Service {
             }
         }
 
-        @http:ResourceConfig {
+        //@http:ResourceConfig {
             //methods: ["POST"],
             //path: hubSubscriptionResourcePath,
-            auth: hubSubscriptionResourceAuth
-        }
-        resource function post hubSubscriptionResourcePath(http:Caller httpCaller, http:Request request) {
+            //auth: hubSubscriptionResourceAuth
+        //}
+        resource function post hub(http:Caller httpCaller, http:Request request) {
+        //resource function post [string hubSubscriptionResourcePath](http:Caller httpCaller, http:Request request) {
+            io:println(hubSubscriptionResourcePath);
+            io:println("Dispatched to hubSubscriptionResourcePath");
             http:Response response = new;
             string topic = "";
-
             var reqFormParamMap = request.getFormParams();
             map<string> params = reqFormParamMap is map<string> ? reqFormParamMap : {};
+            io:println(params);
 
             string mode = params[HUB_MODE] ?: "";
 
             var topicFromParams = params[HUB_TOPIC];
+            io:println("topicFromParams");
             if topicFromParams is string {
                 var decodedValue = encoding:decodeUriComponent(topicFromParams, "UTF-8");
                 topic = decodedValue is string ? decodedValue : topicFromParams;
+                io:println(topic);
             }
 
             if (mode != MODE_SUBSCRIBE && mode != MODE_UNSUBSCRIBE) {
+                io:println("STATUS_BAD_REQUEST");
                 response.statusCode = http:STATUS_BAD_REQUEST;
                 var responseError = httpCaller->respond(response);
                 if (responseError is error) {

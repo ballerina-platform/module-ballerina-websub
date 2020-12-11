@@ -24,7 +24,6 @@ import io.ballerina.runtime.api.values.BObject;
 import org.ballerinalang.net.http.HttpConstants;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
-import org.ballerinalang.net.uri.DispatcherUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +32,6 @@ import java.util.List;
 
 import static org.ballerinalang.net.http.HttpConstants.DEFAULT_HOST;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG;
-import static org.ballerinalang.net.websub.WebSubSubscriberConstants.PATH_FIELD;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB_PACKAGE_FULL_QUALIFIED_NAME;
 
 /**
@@ -61,16 +59,17 @@ public class WebSubHttpService extends HttpService {
      * @param service   the service for which the HTTP representation is built
      * @return  the built HttpService representation
      */
-    static WebSubHttpService buildWebSubSubscriberHttpService(BObject service) {
+    static WebSubHttpService buildWebSubSubscriberHttpService(BObject service, String[] basePath) {
         WebSubHttpService websubHttpService = new WebSubHttpService(service);
+        String path = String.join("/", basePath);;
         BMap serviceConfigAnnotation = getWebSubSubscriberServiceConfigAnnotation(service);
 
-        if (!serviceConfigAnnotation.containsKey(PATH_FIELD)) {
+        if (path == "") {
             logger.debug("'path' not specified in the service config annotation, using the default base path");
             // Service name cannot start with /, hence concat.
             websubHttpService.setBasePath(HttpConstants.DEFAULT_BASE_PATH.concat(websubHttpService.getName()));
         } else {
-            websubHttpService.setBasePath(serviceConfigAnnotation.getStringValue(PATH_FIELD).getValue());
+            websubHttpService.setBasePath(path);
         }
 
         List<HttpResource> resources = new ArrayList<>();
@@ -79,11 +78,26 @@ public class WebSubHttpService extends HttpService {
             resources.add(httpResource);
         }
         websubHttpService.setResources(resources);
-        websubHttpService.setAllAllowedMethods(DispatcherUtil.getAllResourceMethods(websubHttpService));
+//        websubHttpService.setAllAllowedMethods(DispatcherUtil.getAllResourceMethods(websubHttpService));
         websubHttpService.setHostName(DEFAULT_HOST);
 
         return websubHttpService;
     }
+
+//    private static String findFullBasePath(String[] basePathArr) {
+//        String path = null;
+//        if (basePathArr != null) {
+//            String basePathVal = String.join("/", basePathArr);
+//            //            String basePathVal = config.getStringValue(WebSocketConstants.ANNOTATION_ATTR_PATH).getValue();
+//            if (!basePathVal.trim().isEmpty()) {
+//                path = HttpUtil.sanitizeBasePath(basePathVal);
+//            }
+//        }
+//        if (path == null) {
+//            path = "/".concat(getName());
+//        }
+//        return path;
+//    }
 
     public String getTopic() {
         return topic;

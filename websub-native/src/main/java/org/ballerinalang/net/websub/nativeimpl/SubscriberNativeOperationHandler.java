@@ -224,12 +224,14 @@ public class SubscriberNativeOperationHandler {
      * @param subscriberServiceListener the listener that the service has to be attached with
      * @param service                   the service to be registered
      */
-    public static void registerWebSubSubscriberService(BObject subscriberServiceListener, BObject service) {
+    public static void registerWebSubSubscriberService(BObject subscriberServiceListener, BObject service,
+            Object serviceName) {
         BObject serviceEndpoint = (BObject) subscriberServiceListener.get(
                 StringUtils.fromString(LISTENER_SERVICE_ENDPOINT));
         WebSubServicesRegistry webSubServicesRegistry =
                 (WebSubServicesRegistry) serviceEndpoint.getNativeData(WEBSUB_SERVICE_REGISTRY);
-        webSubServicesRegistry.registerWebSubSubscriberService(service);
+        String[] basePathArr = ((BArray) serviceName).getStringArray();
+        webSubServicesRegistry.registerWebSubSubscriberService(service, basePathArr);
     }
 
     /**

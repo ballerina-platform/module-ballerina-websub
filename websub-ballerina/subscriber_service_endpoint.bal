@@ -60,9 +60,9 @@ public class Listener {
     # + s - Type descriptor of the service
     # + name - Name of the service
     # + return - `()` or else an `error` upon failure to register the listener
-    public isolated function attach(SubscriberService s, string? name = ()) returns error? {
+    public isolated function attach(SubscriberService s, string[]|string? name = ()) returns error? {
         // TODO: handle data and return error on error
-        externRegisterWebSubSubscriberService(self, s);
+        externRegisterWebSubSubscriberService(self, s, name);
     }
 
     # Stops consuming messages and detaches the service from the `websub:Listener`.
@@ -198,7 +198,7 @@ isolated function externInitWebSubSubscriberServiceEndpoint(Listener subscriberL
     'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
-isolated function externRegisterWebSubSubscriberService(Listener subscriberListener, SubscriberService serviceType) = @java:Method {
+isolated function externRegisterWebSubSubscriberService(Listener subscriberListener, SubscriberService serviceType, string[]|string? name) = @java:Method {
     name: "registerWebSubSubscriberService",
     'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;

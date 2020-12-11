@@ -17,6 +17,3 @@
 # The WebSub service type
 public type SubscriberService service object {
 };
-
-//public type HubService service object {
-//};
