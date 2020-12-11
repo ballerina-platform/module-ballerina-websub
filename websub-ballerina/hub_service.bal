@@ -186,7 +186,7 @@ isolated function getHubPublishService() returns http:Service {
                         }
                     } else {
                         string errorMessage = "Publish request denied for unregistered topic[" + topic + "]";
-                        log:print(errorMessage);
+                        //log:print(errorMessage);
                         response.setTextPayload(<@untainted string>errorMessage);
                     }
                     response.statusCode = http:STATUS_BAD_REQUEST;
