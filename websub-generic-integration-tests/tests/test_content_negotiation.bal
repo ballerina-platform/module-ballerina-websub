@@ -11,6 +11,10 @@ service publisherService on httpListener {
     @http:ResourceConfig {
            methods: ["GET", "HEAD"]
     }
+
+    //Publisher need accept and accept language headers and agree with application/json as Accept header
+    //and de-DE as Accept-Language header
+
     resource function discoveryWithAcceptAndAcceptLanguage(http:Caller caller, http:Request req) {
         http:Response response = new;
         string media_type=req.getHeader("Accept");
@@ -30,6 +34,8 @@ service publisherService on httpListener {
 
     }
 
+    //Publisher need accept header only and agree with application/json as Accept header
+
     resource function discoveryAcceptHeaderOnly(http:Caller caller, http:Request req) {
         http:Response response = new;
         string media_type=req.getHeader("Accept");
@@ -47,8 +53,7 @@ service publisherService on httpListener {
         }
     }
 
-    //SubscriberServiceConfig consists of acceptLanguage field only.Publisher also need accept language header only
-    //and agree with de-DE as Accept-Language header
+    //Publisher need accept language header only and agree with de-DE as Accept-Language header
 
     resource function discoveryAcceptLanguageOnly(http:Caller caller, http:Request req) {
         http:Response response = new;
@@ -70,7 +75,7 @@ service publisherService on httpListener {
 
 @test:Config{}
 
-//subscriberServiceConfig accept and acceptLanguage field values match with publisher's acceptable Accept and Accept-Language header values.
+//SubscriberServiceConfig's accept and acceptLanguage field values match with publisher's acceptable Accept and Accept-Language header values.
 
 function testMatchAcceptAndAcceptLanguage(){
     http:Client clientEndpoint=new("http://localhost:24080");
@@ -86,7 +91,7 @@ function testMatchAcceptAndAcceptLanguage(){
      dependsOn:["testMatchAcceptAndAcceptLanguage"]
 }
 
-//subscriberServiceConfig accept and acceptLanguage field values mismatch with publisher's acceptable Accept and Accept-Language header values.
+//SubscriberServiceConfig's accept and acceptLanguage field values mismatch with publisher's acceptable Accept and Accept-Language header values.
 
 function testMisMatchAcceptAndAcceptLanguage(){
     http:Client clientEndpoint=new("http://localhost:24080");
@@ -103,7 +108,7 @@ function testMisMatchAcceptAndAcceptLanguage(){
      dependsOn:["testMisMatchAcceptAndAcceptLanguage"]
 }
 
-//subscriberServiceConfig accept field value match with publisher's acceptable accept header value.
+//SubscriberServiceConfig's accept field value match with publisher's acceptable Accept header values.
 
 function testMatchAcceptOnly(){
     http:Client clientEndpoint=new("http://localhost:24080");
@@ -118,7 +123,7 @@ function testMatchAcceptOnly(){
      dependsOn:["testMatchAcceptOnly"]
 }
 
-//subscriberServiceConfig accept field value mismatch with publisher's acceptable accept header value.
+//SubscriberServiceConfig accept field value mismatch with publisher's acceptable Accept header value.
 
 function testMisMatchAcceptOnly(){
     http:Client clientEndpoint=new("http://localhost:24080");
@@ -133,7 +138,7 @@ function testMisMatchAcceptOnly(){
      dependsOn:["testMisMatchAcceptOnly"]
 }
 
-//subscriberServiceConfig acceptLanguage field value match with publisher's acceptable Accept-Language header value.
+//SubscriberServiceConfig acceptLanguage field value match with publisher's acceptable Accept-Language header value.
 
 function testMatchAcceptLanguageOnly(){
     http:Client clientEndpoint=new("http://localhost:24080");
@@ -148,7 +153,7 @@ function testMatchAcceptLanguageOnly(){
      dependsOn:["testMatchAcceptLanguageOnly"]
 }
 
-//subscriberServiceConfig acceptLanguage field value mismatch with publisher's acceptable Accept-Language header value.
+//SubscriberServiceConfig acceptLanguage field value mismatch with publisher's acceptable Accept-Language header value.
 
 function testMisMatchAcceptLanguageOnly(){
     http:Client clientEndpoint=new("http://localhost:24080");
@@ -164,13 +169,11 @@ function testMisMatchAcceptLanguageOnly(){
     dependsOn:["testMisMatchAcceptLanguageOnly"]
 }
 
-//SubscriberServiceConfig provide application/json as the accept field value and it agree with publisher's acceptable Accept header value.
-//But publisher require both Accept and Accept-Language headers.
+//SubscriberServiceConfig doesn't contain accept and acceptLanguage fields.Publisher need Accept and Accept-Language headers from discovery request.
 
-function testMissingOneHeader(){
+function testMissingHeaders(){
     http:Client clientEndpoint=new("http://localhost:24080");
     http:Request req=new;
-    req.setHeader("Accept","application/json");
     var result=clientEndpoint->get("/publisherService/discoveryWithAcceptAndAcceptLanguage",req);
     HttpResponseDetails responseDetails = fetchHttpResponse(result);
     test:assertEquals(responseDetails.statusCode,http:STATUS_INTERNAL_SERVER_ERROR,msg="Both Accept and Accept-Language headers available");
