@@ -25,6 +25,8 @@ import ballerina/http;
 # + subscribeOnStartUp - A `boolean` indicating whether a subscription request is expected to be sent on start up
 # + target - The `string` resource URL for which discovery will be initiated to identify the hub and topic,
 #               or a tuple `[hub, topic]` representing a discovered hub and a topic
+# + accept - The acceptable media type of subscriber
+# + acceptLanguage - The acceptable language type of subscriber
 # + leaseSeconds - The period for which the subscription is expected to be active
 # + secret - The secret to be used for authenticated content distribution
 # + callback - The callback to use when registering, if unspecified host:port/path will be used

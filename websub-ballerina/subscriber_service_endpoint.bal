@@ -152,10 +152,9 @@ public class Listener {
                     http:ClientConfiguration? publisherClientConfig =
                                 <http:ClientConfiguration?> subscriptionDetails[ANNOT_FIELD_PUBLISHER_CLIENT_CONFIG];
 
-                     string? accept=<string?>subscriptionDetails[ANNOT_FIELD_ACCEPT];
-                     string? acceptLanguage =<string?>subscriptionDetails[ANNOT_FIELD_ACCEPT_LANGUAGE];
+                    map<string?> acceptAndAcceptLanguageHeaders={"Accept":<string?>subscriptionDetails[ANNOT_FIELD_ACCEPT],"Accept-Language":<string?>subscriptionDetails[ANNOT_FIELD_ACCEPT_LANGUAGE]};
 
-                    var discoveredDetails = retrieveHubAndTopicUrl(resourceUrl, publisherClientConfig,accept,acceptLanguage);
+                    var discoveredDetails = retrieveHubAndTopicUrl(resourceUrl, publisherClientConfig,acceptAndAcceptLanguageHeaders);
                     if (discoveredDetails is [string, string]) {
                         var [retHub, retTopic] = discoveredDetails;
                         var hubDecodeResponse = encoding:decodeUriComponent(retHub, "UTF-8");
@@ -284,25 +283,17 @@ public type ExtensionConfig record {|
 # + resourceUrl - The resource URL advertising the hub and topic URLs
 # + publisherClientConfig - The configuration for the publisher client
 # + return - A `(hub, topic)` as a `(string, string)` if successful or else an `error` if not
-function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? publisherClientConfig , string? accept , string? acceptLanguage)
+function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? publisherClientConfig,map<string?> acceptAndAcceptLanguageHeaders)
         returns @tainted [string, string]|error {
+
     http:Client resourceEP = new http:Client(resourceUrl, publisherClientConfig);
     http:Request request = new;
 
-    if(accept is string || acceptLanguage is string){
-
-
-              if(acceptLanguage is string && accept is string){
-                   request.setHeader(ACCEPT,accept);
-                   request.setHeader(ACCEPT_LANGUAGE,acceptLanguage);
-              }else if(accept is string){
-                  request.setHeader(ACCEPT,accept);
-              }
-              else if(acceptLanguage is string){
-                 request.addHeader(ACCEPT_LANGUAGE,acceptLanguage);
-
-              }else{}
-
+    foreach var [headerType,value] in acceptAndAcceptLanguageHeaders.entries(){
+        if(!(value is ())){
+            request.setHeader(headerType,value);
+        }
+    }
     var discoveryResponse = resourceEP->get("", request);
     if (discoveryResponse is http:Response) {
         var topicAndHubs = extractTopicAndHubUrls(discoveryResponse);
@@ -314,16 +305,11 @@ function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? pu
         } else {
             return topicAndHubs;
         }
+
     } else {
         return WebSubError("Error occurred with WebSub discovery for Resource URL [" +resourceUrl + "]: " +
-                            (<error>discoveryResponse).message());
+        (<error>discoveryResponse).message());
     }
-
-    }  else{
-
-               return WebSubError("Error occurred with WebSub discovery, Accept and Accept-Language header unavailable. ");
-
-           }
 }
 
 # Invokes the `WebSubSubscriberConnector`'s remote functions for the subscription.
