@@ -20,49 +20,49 @@ import ballerina/websub;
 
 listener http:Listener publisherServiceEPTwo = new http:Listener(23081);
 
-service original on publisherServiceEPTwo {
-    resource function one(http:Caller caller, http:Request req) {
+service /original on publisherServiceEPTwo {
+    resource function get one(http:Caller caller, http:Request req) {
         http:Response res = new;
         checkpanic caller->redirect(res, http:REDIRECT_MOVED_PERMANENTLY_301, ["http://localhost:23081/redirected/one"]);
     }
 
-    resource function two(http:Caller caller, http:Request req) {
+    resource function get two(http:Caller caller, http:Request req) {
         http:Response res = new;
         checkpanic caller->redirect(res, http:REDIRECT_FOUND_302, ["http://localhost:23081/redirected/two"]);
     }
 }
 
-service redirected on publisherServiceEPTwo {
-    resource function one(http:Caller caller, http:Request req) {
+service /redirected on publisherServiceEPTwo {
+    resource function get one(http:Caller caller, http:Request req) {
         http:Response res = new;
         websub:addWebSubLinkHeader(res, ["http://localhost:23081/hub/one"], WEBSUB_TOPIC_FIVE);
         var err = caller->respond(res);
         if (err is error) {
-            log:printError("Error sending response", err);
+            log:printError("Error sending response", err = err);
         } else {
             storeOutput(ID_REDIRECT_SUBSCRIBER_ONE_LOG, REDIRECT_SUBSCRIBER_ONE_LOG);
         }
     }
 
-    resource function two(http:Caller caller, http:Request req) {
+    resource function get two(http:Caller caller, http:Request req) {
         http:Response res = new;
         websub:addWebSubLinkHeader(res, ["http://localhost:23081/hub/two"], WEBSUB_TOPIC_SIX);
         var err = caller->respond(res);
         if (err is error) {
-            log:printError("Error sending response", err);
+            log:printError("Error sending response", err = err);
         } else {
             storeOutput(ID_REDIRECT_SUBSCRIBER_TWO_LOG, REDIRECT_SUBSCRIBER_TWO_LOG);
         }
     }
 }
 
-service hub on publisherServiceEPTwo {
-    resource function one(http:Caller caller, http:Request req) {
+service /hub on publisherServiceEPTwo {
+    resource function get one(http:Caller caller, http:Request req) {
         http:Response res = new;
         checkpanic caller->redirect(res, http:REDIRECT_TEMPORARY_REDIRECT_307, ["http://localhost:23191/websub/hub"]);
     }
 
-    resource function two(http:Caller caller, http:Request req) {
+    resource function get two(http:Caller caller, http:Request req) {
         http:Response res = new;
         checkpanic caller->redirect(res, http:REDIRECT_PERMANENT_REDIRECT_308, ["http://localhost:23191/websub/hub"]);
     }

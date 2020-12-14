@@ -16,7 +16,6 @@
 
 import ballerina/encoding;
 import ballerina/http;
-import ballerina/lang.'object as lang;
 import ballerina/log;
 import ballerina/java;
 
@@ -27,8 +26,6 @@ import ballerina/java;
 #
 # + config - The configurations for the `websub:Listener`
 public class Listener {
-
-    *lang:Listener;
 
     public SubscriberListenerConfiguration? config = ();
 
@@ -56,64 +53,64 @@ public class Listener {
 
     # Binds a service to the `websub:Listener`.
     # ```ballerina
-    # error? result = websubListener.__attach(helloService);
+    # error? result = websubListener.attach(helloService);
     # ```
     #
     # + s - Type descriptor of the service
     # + name - Name of the service
     # + return - `()` or else an `error` upon failure to register the listener
-    public isolated function __attach(service s, string? name = ()) returns error? {
+    public isolated function attach(SubscriberService s, string[]|string? name = ()) returns error? {
         // TODO: handle data and return error on error
-        externRegisterWebSubSubscriberService(self, s);
+        externRegisterWebSubSubscriberService(self, s, name);
     }
 
     # Stops consuming messages and detaches the service from the `websub:Listener`.
     # ```ballerina
-    # error? result = websubListener.__detach(helloService);
+    # error? result = websubListener.detach(helloService);
     # ```
     #
     # + s - Type descriptor of the service
     # + return - `()` or else an `error` upon failure to detach the service
-    public isolated function __detach(service s) returns error? {
+    public isolated function detach(SubscriberService s) returns error? {
     }
 
     # Starts the `websub:Listener`.
     # ```ballerina
-    # error? result = websubListener.__start();
+    # error? result = websubListener.'start();
     # ```
     #
     # + return - `()` or else an `error` upon failure to start the listener
-    public function __start() returns error? {
+    public function 'start() returns error? {
         check externStartWebSubSubscriberServiceEndpoint(self);
         // TODO: handle data and return error on error
         self.sendSubscriptionRequests();
     }
 
-    isolated function processWebSubNotification(http:Request request, service serviceType) returns @tainted error? {
+    isolated function processWebSubNotification(http:Request request, SubscriberService serviceType) returns @tainted error? {
         return processWebSubNotification(request, serviceType);
     }
 
     # Stops the `websub:Listener` gracefully.
     # ```ballerina
-    # error? result = websubListener.__gracefulStop();
+    # error? result = websubListener.gracefulStop();
     # ```
     #
     # + return - `()` or else an `error` upon failure to stop the listener
-    public isolated function __gracefulStop() returns error? {
+    public isolated function gracefulStop() returns error? {
         http:Listener? sListener = self.serviceEndpoint;
         if (sListener is http:Listener) {
-            return sListener.__gracefulStop();
+            return sListener.gracefulStop();
         }
         return ();
     }
 
     # Stops the `websub:Listener` forcefully.
     # ```ballerina
-    # error? result = websubListener.__immediateStop();
+    # error? result = websubListener.immediateStop();
     # ```
     #
     # + return - () or else an `error` upon failure to stop the listener
-    public isolated function __immediateStop() returns error? {
+    public isolated function immediateStop() returns error? {
     }
 
     # Sends subscription requests to the specified/discovered hubs if specified to subscribe on startup.
@@ -204,7 +201,7 @@ isolated function externInitWebSubSubscriberServiceEndpoint(Listener subscriberL
     'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
 
-isolated function externRegisterWebSubSubscriberService(Listener subscriberListener, service serviceType) = @java:Method {
+isolated function externRegisterWebSubSubscriberService(Listener subscriberListener, SubscriberService serviceType, string[]|string? name) = @java:Method {
     name: "registerWebSubSubscriberService",
     'class: "org.ballerinalang.net.websub.nativeimpl.SubscriberNativeOperationHandler"
 } external;
@@ -341,10 +338,10 @@ function invokeClientConnectorForSubscription(string hub, http:ClientConfigurati
 
         boolean expectIntentVerification = <boolean> subscriptionDetails[ANNOT_FIELD_EXPECT_INTENT_VERIFICATION];
         if (expectIntentVerification) {
-            log:printInfo(subscriptionSuccessMsg + ". Awaiting intent verification.");
+            log:print(subscriptionSuccessMsg + ". Awaiting intent verification.");
             return;
         }
-        log:printInfo(subscriptionSuccessMsg);
+        log:print(subscriptionSuccessMsg);
     } else {
         log:printError("Subscription Request failed at Hub[" + hub + "], for Topic[" + topic + "]: " +
                        subscriptionResponse.message());
