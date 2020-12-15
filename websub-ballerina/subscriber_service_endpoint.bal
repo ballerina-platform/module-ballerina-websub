@@ -305,7 +305,7 @@ function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? pu
         }
      } else {
         return WebSubError("Error occurred with WebSub discovery for Resource URL [" +resourceUrl + "]: " +
-        (<error>discoveryResponse).message());
+                            (<error>discoveryResponse).message());
     }
 }
 
