@@ -118,7 +118,7 @@ isolated function buildSubscriptionChangeRequest(@untainted string mode,
 #            if an error occurred
 function processHubResponse(@untainted string hub, @untainted string mode,
                             SubscriptionChangeRequest subscriptionChangeRequest,
-                            http:Response|http:Payload|error response, http:Client httpClient,
+                            http:Response|http:PayloadType|error response, http:Client httpClient,
                             int remainingRedirects) returns @tainted SubscriptionChangeResponse|error {
 
     string topic = subscriptionChangeRequest.topic;
