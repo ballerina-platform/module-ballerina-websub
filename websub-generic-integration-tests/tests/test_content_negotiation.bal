@@ -7,8 +7,6 @@ websub:Hub WebSubHub = startHubAndRegisterTopic();
 listener http:Listener httpListener = new (24080);
 
 service /publisherService on httpListener {
-    //Publisher need both accept and accept language headers. Publisher agree with application/json as Accept header
-    //and de-DE as Accept-Language header.
     resource function get discoveryWithAcceptAndAcceptLanguage(http:Caller caller, http:Request req) {
         http:Response response = new;
         string media_type = req.getHeader("Accept");
