@@ -300,11 +300,10 @@ function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? pu
             string[] hubs = [];
             [topic, hubs] = topicAndHubs;
             return [hubs[0], topic]; // guaranteed by `extractTopicAndHubUrls` for hubs to have length > 0
-        }else {
+        } else {
             return topicAndHubs;
         }
-
-    }else {
+     } else {
         return WebSubError("Error occurred with WebSub discovery for Resource URL [" +resourceUrl + "]: " +
         (<error>discoveryResponse).message());
     }
