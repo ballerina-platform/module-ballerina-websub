@@ -88,8 +88,7 @@ import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB_SERV
  */
 public class SubscriberNativeOperationHandler {
 
-    private static final ArrayType mapArrayType = TypeCreator.createArrayType(
-            TypeCreator.createMapType(PredefinedTypes.TYPE_ANY));
+    private static final ArrayType mapArrayType = TypeCreator.createArrayType(TypeCreator.createMapType(PredefinedTypes.TYPE_ANY));
 
     /**
      * Initialize the WebSub subscriber endpoint.
@@ -151,8 +150,8 @@ public class SubscriberNativeOperationHandler {
                 }
             }
             HashMap<String, RecordType> resourceDetails = buildResourceDetailsMap(topicIdentifier, headerResourceMap,
-                                                                                  payloadKeyResourceMap,
-                                                                                  headerAndPayloadKeyResourceMap);
+                                                                                   payloadKeyResourceMap,
+                                                                                   headerAndPayloadKeyResourceMap);
             webSubServicesRegistry = new WebSubServicesRegistry(new WebSocketServicesRegistry(), topicIdentifier,
                                                                 topicHeader, headerResourceMap, payloadKeyResourceMap,
                                                                 headerAndPayloadKeyResourceMap, resourceDetails);
@@ -162,12 +161,12 @@ public class SubscriberNativeOperationHandler {
     }
 
     private static HashMap<String, RecordType> buildResourceDetailsMap(String topicIdentifier,
-                                                                       BMap<BString, Object> headerResourceMap,
-                                                                       BMap<BString, BMap<BString, Object>>
-                                                                               payloadKeyResourceMap,
-                                                                       BMap<BString, BMap<BString,
-                                                                               BMap<BString, Object>>>
-                                                                               headerAndPayloadKeyResourceMap) {
+                                                                        BMap<BString, Object> headerResourceMap,
+                                                                        BMap<BString, BMap<BString, Object>>
+                                                                                payloadKeyResourceMap,
+                                                                        BMap<BString, BMap<BString,
+                                                                                BMap<BString, Object>>>
+                                                                                headerAndPayloadKeyResourceMap) {
         // Map with resource details where the key is the resource name and the value is the param
         HashMap<String, RecordType> resourceDetails = new HashMap<>();
         if (topicIdentifier != null) {
@@ -229,7 +228,7 @@ public class SubscriberNativeOperationHandler {
      * @param service                   the service to be registered
      */
     public static void registerWebSubSubscriberService(BObject subscriberServiceListener, BObject service,
-                                                       Object serviceName) {
+            Object serviceName) {
         BObject serviceEndpoint = (BObject) subscriberServiceListener.get(
                 StringUtils.fromString(LISTENER_SERVICE_ENDPOINT));
         WebSubServicesRegistry webSubServicesRegistry =
@@ -329,10 +328,7 @@ public class SubscriberNativeOperationHandler {
             WebSubHttpService webSubHttpService = (WebSubHttpService) webSubHttpServices[index];
             BMap<BString, Object> subscriptionDetails = ValueCreator.createMapValue();
             BMap annotation = (BMap) (webSubHttpService.getBalService().getType()).getAnnotation(StringUtils
-                                                                                                         .fromString(
-                                                                                                                 WEBSUB_PACKAGE_FULL_QUALIFIED_NAME +
-                                                                                                                         ":" +
-                                                                                                                         ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG));
+                    .fromString(WEBSUB_PACKAGE_FULL_QUALIFIED_NAME + ":" + ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG));
 
             subscriptionDetails.put(WEBSUB_SERVICE_NAME,
                                     StringUtils.fromString(webSubHttpService.getBalService().getType().getName()));
@@ -348,13 +344,11 @@ public class SubscriberNativeOperationHandler {
             }
 
             if (annotation.containsKey(ANN_WEBSUB_ATTR_ACCEPT_LANGUAGE)) {
-                subscriptionDetails.put(ANN_WEBSUB_ATTR_ACCEPT_LANGUAGE,
-                                        annotation.get(ANN_WEBSUB_ATTR_ACCEPT_LANGUAGE));
+                subscriptionDetails.put(ANN_WEBSUB_ATTR_ACCEPT_LANGUAGE, annotation.get(ANN_WEBSUB_ATTR_ACCEPT_LANGUAGE));
             }
 
             if (annotation.containsKey(ANN_WEBSUB_ATTR_LEASE_SECONDS)) {
-                subscriptionDetails.put(ANN_WEBSUB_ATTR_LEASE_SECONDS,
-                                        annotation.getIntValue(ANN_WEBSUB_ATTR_LEASE_SECONDS));
+                subscriptionDetails.put(ANN_WEBSUB_ATTR_LEASE_SECONDS, annotation.getIntValue(ANN_WEBSUB_ATTR_LEASE_SECONDS));
             }
 
             if (annotation.containsKey(ANN_WEBSUB_ATTR_SECRET)) {
@@ -367,7 +361,7 @@ public class SubscriberNativeOperationHandler {
 
             if (annotation.containsKey(ANN_WEBSUB_ATTR_SUBSCRIPTION_PUBLISHER_CLIENT_CONFIG)) {
                 BMap<BString, Object> publisherClientConfig = (BMap<BString, Object>)
-                        annotation.get(ANN_WEBSUB_ATTR_SUBSCRIPTION_PUBLISHER_CLIENT_CONFIG);
+                                annotation.get(ANN_WEBSUB_ATTR_SUBSCRIPTION_PUBLISHER_CLIENT_CONFIG);
                 subscriptionDetails.put(ANN_WEBSUB_ATTR_SUBSCRIPTION_PUBLISHER_CLIENT_CONFIG, publisherClientConfig);
             }
 
