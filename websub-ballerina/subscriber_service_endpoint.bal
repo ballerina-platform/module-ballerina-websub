@@ -149,10 +149,10 @@ public class Listener {
                     http:ClientConfiguration? publisherClientConfig =
                                 <http:ClientConfiguration?> subscriptionDetails[ANNOT_FIELD_PUBLISHER_CLIENT_CONFIG];
 
-                    map<string?> acceptAndAcceptLanguageHeaders=
-                                {"Accept":<string?>subscriptionDetails[ANNOT_FIELD_ACCEPT],"Accept-Language":<string?>subscriptionDetails[ANNOT_FIELD_ACCEPT_LANGUAGE]};
+                    map<string?> acceptAndAcceptLanguageHeaders =
+                                {"Accept":<string?>subscriptionDetails[ANNOT_FIELD_ACCEPT], "Accept-Language":<string?>subscriptionDetails[ANNOT_FIELD_ACCEPT_LANGUAGE]};
 
-                    var discoveredDetails = retrieveHubAndTopicUrl(resourceUrl, publisherClientConfig,acceptAndAcceptLanguageHeaders);
+                    var discoveredDetails = retrieveHubAndTopicUrl(resourceUrl, publisherClientConfig, acceptAndAcceptLanguageHeaders);
                     if (discoveredDetails is [string, string]) {
                         var [retHub, retTopic] = discoveredDetails;
                         var hubDecodeResponse = encoding:decodeUriComponent(retHub, "UTF-8");
@@ -281,15 +281,15 @@ public type ExtensionConfig record {|
 # + resourceUrl - The resource URL advertising the hub and topic URLs
 # + publisherClientConfig - The configuration for the publisher client
 # + return - A `(hub, topic)` as a `(string, string)` if successful or else an `error` if not
-function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? publisherClientConfig,map<string?> acceptAndAcceptLanguageHeaders)
+function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? publisherClientConfig, map<string?> acceptAndAcceptLanguageHeaders)
         returns @tainted [string, string]|error {
 
     http:Client resourceEP = new http:Client(resourceUrl, publisherClientConfig);
     http:Request request = new;
 
-    foreach var [headerType,value] in acceptAndAcceptLanguageHeaders.entries(){
-        if(!(value is ())){
-            request.setHeader(headerType,value);
+    foreach var [headerType, value] in acceptAndAcceptLanguageHeaders.entries(){
+        if (!(value is ())) {
+            request.setHeader(headerType, value);
         }
     }
     var discoveryResponse = resourceEP->get("", request);

@@ -348,7 +348,7 @@ public class SubscriberNativeOperationHandler {
             }
 
             if (annotation.containsKey(ANN_WEBSUB_ATTR_LEASE_SECONDS)) {
-                subscriptionDetails.put(ANN_WEBSUB_ATTR_LEASE_SECONDS,annotation.getIntValue(ANN_WEBSUB_ATTR_LEASE_SECONDS));
+                subscriptionDetails.put(ANN_WEBSUB_ATTR_LEASE_SECONDS, annotation.getIntValue(ANN_WEBSUB_ATTR_LEASE_SECONDS));
             }
 
             if (annotation.containsKey(ANN_WEBSUB_ATTR_SECRET)) {

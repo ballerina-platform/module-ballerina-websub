@@ -72,8 +72,8 @@ const string CONTENT_TYPE = "Content-Type";
 
 const string ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG = "SubscriberServiceConfig";
 const ANNOT_FIELD_TARGET = "target";
-const ANNOT_FIELD_ACCEPT="accept";
-const ANNOT_FIELD_ACCEPT_LANGUAGE="acceptLanguage";
+const ANNOT_FIELD_ACCEPT = "accept";
+const ANNOT_FIELD_ACCEPT_LANGUAGE = "acceptLanguage";
 const ANNOT_FIELD_CALLBACK = "callback";
 const ANNOT_FIELD_LEASE_SECONDS = "leaseSeconds";
 const ANNOT_FIELD_SECRET = "secret";
@@ -396,12 +396,11 @@ public function extractTopicAndHubUrls(http:Response response) returns @tainted 
     if (response.hasHeader("Link")) {
         linkHeaders = response.getHeaders("Link");
     }
-
-    if(response.statusCode== http:STATUS_NOT_ACCEPTABLE) {
-        return WebSubError("Content negotiation failed.Accept and/or Accept-Language headers mismatch");
-    } else if (response.statusCode==http:STATUS_INTERNAL_SERVER_ERROR) {
-        return WebSubError("Accept and/or Accept-Language headers unavailable in discovery request");
-    }else if (linkHeaders.length() == 0) {
+    if (response.statusCode == http:STATUS_NOT_ACCEPTABLE) {
+        return WebSubError("Content negotiation failed. Accept and/or Accept-Language headers mismatch");
+    } else if (response.statusCode == http:STATUS_INTERNAL_SERVER_ERROR) {
+        return WebSubError("Content negotiation failed. Accept and/or Accept-Language headers unavailable in discovery request");
+    } else if (linkHeaders.length() == 0) {
         return WebSubError("Link header unavailable in discovery response");
     } else {}
 

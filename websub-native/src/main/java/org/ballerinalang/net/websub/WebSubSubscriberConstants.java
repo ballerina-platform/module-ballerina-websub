@@ -58,8 +58,8 @@ public class WebSubSubscriberConstants {
 
     public static final BString ANN_WEBSUB_ATTR_SUBSCRIBE_ON_STARTUP = StringUtils.fromString("subscribeOnStartUp");
     public static final BString ANN_WEBSUB_ATTR_TARGET = StringUtils.fromString("target");
-    public static final BString ANN_WEBSUB_ATTR_ACCEPT=StringUtils.fromString("accept");
-    public static final BString ANN_WEBSUB_ATTR_ACCEPT_LANGUAGE=StringUtils.fromString("acceptLanguage");
+    public static final BString ANN_WEBSUB_ATTR_ACCEPT = StringUtils.fromString("accept");
+    public static final BString ANN_WEBSUB_ATTR_ACCEPT_LANGUAGE = StringUtils.fromString("acceptLanguage");
     public static final BString ANN_WEBSUB_ATTR_LEASE_SECONDS = StringUtils.fromString("leaseSeconds");
     public static final BString ANN_WEBSUB_ATTR_SECRET = StringUtils.fromString("secret");
     public static final BString ANN_WEBSUB_ATTR_CALLBACK = StringUtils.fromString("callback");
