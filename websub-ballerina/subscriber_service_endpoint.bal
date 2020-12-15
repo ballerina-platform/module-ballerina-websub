@@ -286,7 +286,6 @@ function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? pu
 
     http:Client resourceEP = new http:Client(resourceUrl, publisherClientConfig);
     http:Request request = new;
-
     foreach var [headerType, value] in acceptAndAcceptLanguageHeaders.entries(){
         if (!(value is ())) {
             request.setHeader(headerType, value);
