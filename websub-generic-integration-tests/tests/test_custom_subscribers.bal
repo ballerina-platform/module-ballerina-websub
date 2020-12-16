@@ -260,6 +260,7 @@ public class CustomSubWebhookServerForHeaderAndPayload {
 }
 
 @test:Config {}
+
 function testOnIntentVerificationInvocation() {
     http:Client clientEndpoint = new ("http://localhost:23585");
     var response = clientEndpoint->get("/key");
