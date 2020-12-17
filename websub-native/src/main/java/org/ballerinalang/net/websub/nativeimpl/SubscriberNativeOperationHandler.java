@@ -150,8 +150,8 @@ public class SubscriberNativeOperationHandler {
                 }
             }
             HashMap<String, RecordType> resourceDetails = buildResourceDetailsMap(topicIdentifier, headerResourceMap,
-                                                                                   payloadKeyResourceMap,
-                                                                                   headerAndPayloadKeyResourceMap);
+                                                                                  payloadKeyResourceMap,
+                                                                                  headerAndPayloadKeyResourceMap);
             webSubServicesRegistry = new WebSubServicesRegistry(new WebSocketServicesRegistry(), topicIdentifier,
                                                                 topicHeader, headerResourceMap, payloadKeyResourceMap,
                                                                 headerAndPayloadKeyResourceMap, resourceDetails);
@@ -161,12 +161,12 @@ public class SubscriberNativeOperationHandler {
     }
 
     private static HashMap<String, RecordType> buildResourceDetailsMap(String topicIdentifier,
-                                                                        BMap<BString, Object> headerResourceMap,
-                                                                        BMap<BString, BMap<BString, Object>>
-                                                                                payloadKeyResourceMap,
-                                                                        BMap<BString, BMap<BString,
-                                                                                BMap<BString, Object>>>
-                                                                                headerAndPayloadKeyResourceMap) {
+                                                                       BMap<BString, Object> headerResourceMap,
+                                                                       BMap<BString, BMap<BString, Object>>
+                                                                               payloadKeyResourceMap,
+                                                                       BMap<BString, BMap<BString,
+                                                                               BMap<BString, Object>>>
+                                                                               headerAndPayloadKeyResourceMap) {
         // Map with resource details where the key is the resource name and the value is the param
         HashMap<String, RecordType> resourceDetails = new HashMap<>();
         if (topicIdentifier != null) {
@@ -228,7 +228,7 @@ public class SubscriberNativeOperationHandler {
      * @param service                   the service to be registered
      */
     public static void registerWebSubSubscriberService(BObject subscriberServiceListener, BObject service,
-            Object serviceName) {
+           Object serviceName) {
         BObject serviceEndpoint = (BObject) subscriberServiceListener.get(
                 StringUtils.fromString(LISTENER_SERVICE_ENDPOINT));
         WebSubServicesRegistry webSubServicesRegistry =
