@@ -395,14 +395,16 @@ public function extractTopicAndHubUrls(http:Response response) returns @tainted 
     string[] linkHeaders = [];
     if (response.hasHeader("Link")) {
         linkHeaders = response.getHeaders("Link");
-    }
+    } 
     if (response.statusCode == http:STATUS_NOT_ACCEPTABLE) {
         return WebSubError("Content negotiation failed. Accept and/or Accept-Language headers mismatch");
-    } else if (response.statusCode == http:STATUS_INTERNAL_SERVER_ERROR) {
+    }
+    if (response.statusCode == http:STATUS_INTERNAL_SERVER_ERROR) { 
         return WebSubError("Content negotiation failed. Accept and/or Accept-Language headers unavailable in discovery request");
-    } else if (linkHeaders.length() == 0) {
+    }
+    if (linkHeaders.length() == 0) {
         return WebSubError("Link header unavailable in discovery response");
-    } else {}
+    }
 
     int hubIndex = 0;
     string[] hubs = [];

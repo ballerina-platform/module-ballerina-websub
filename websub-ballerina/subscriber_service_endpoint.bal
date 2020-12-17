@@ -286,7 +286,6 @@ function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? pu
 
     http:Client resourceEP = new http:Client(resourceUrl, publisherClientConfig);
     http:Request request = new;
-
     foreach var [headerType, value] in acceptAndAcceptLanguageHeaders.entries(){
         if (!(value is ())) {
             request.setHeader(headerType, value);
@@ -300,13 +299,12 @@ function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? pu
             string[] hubs = [];
             [topic, hubs] = topicAndHubs;
             return [hubs[0], topic]; // guaranteed by `extractTopicAndHubUrls` for hubs to have length > 0
-        }else {
+        } else {
             return topicAndHubs;
         }
-
-    }else {
+     } else {
         return WebSubError("Error occurred with WebSub discovery for Resource URL [" +resourceUrl + "]: " +
-        (<error>discoveryResponse).message());
+                            (<error>discoveryResponse).message());
     }
 }
 
