@@ -51,6 +51,7 @@ ext.stdlibSystemApiVersion = project.stdlibSystemVersion
 ext.stdlibConfigApiVersion = project.stdlibConfigApiVersion
 ext.stdlibIoVersion = project.stdlibIoVersion
 ext.stdlibStringutilsVersion = project.stdlibStringutilsVersion
+ext.stdlibUuidVersion = project.stdlibUuidVersion
 
 allprojects {
     group = project.group
@@ -201,6 +202,13 @@ allprojects {
                 password System.getenv("packagePAT")
             }
         }
+        maven {
+            url "https://maven.pkg.github.com/ballerina-platform/module-ballerina-uuid"
+            credentials {
+                username System.getenv("packageUser")
+                password System.getenv("packagePAT")
+            }
+        }
     }
 }
 
@@ -228,6 +236,7 @@ subprojects {
         ballerinaStdLibs "org.ballerinalang:config-ballerina:${stdlibConfigApiVersion}"
         ballerinaStdLibs "org.ballerinalang:io-ballerina:${stdlibIoVersion}"
         ballerinaStdLibs "org.ballerinalang:stringutils-ballerina:${stdlibStringutilsVersion}"
+        ballerinaStdLibs "org.ballerinalang:uuid-ballerina:${stdlibUuidVersion}"
     }
 }
 
