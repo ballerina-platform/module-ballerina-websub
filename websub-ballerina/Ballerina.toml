@@ -68,6 +68,11 @@ org = "ballerina"
 name = "stringutils"
 version = "@stdlib.stringutils.version@"
 
+[[dependency]]
+org = "ballerina"
+name = "uuid"
+version = "@stdlib.uuid.version@"
+
 [[platform.java11.dependency]]
 path = "../websub-native/build/libs/websub-native-@project.version@.jar"
 groupId = "ballerina"

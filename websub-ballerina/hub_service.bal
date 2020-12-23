@@ -21,7 +21,7 @@ import ballerina/http;
 import ballerina/lang.'int as langint;
 import ballerina/log;
 import ballerina/stringutils;
-import ballerina/system;
+import ballerina/uuid;
 import ballerina/time;
 
 @tainted map<PendingSubscriptionChangeRequest> pendingRequests = {};
@@ -306,7 +306,7 @@ function verifyIntentAndAddSubscription(string callback, string topic, map<strin
     if (!(leaseSeconds > 0)) {
         leaseSeconds = hubLeaseSeconds;
     }
-    string challenge = system:uuid();
+    string challenge = uuid:createType4AsString();
 
     http:Request request = new;
 
@@ -508,7 +508,7 @@ function distributeContent(string callback, SubscriptionDetails subscriptionDeta
             request.setHeader(X_HUB_SIGNATURE, xHubSignature);
         }
 
-        request.setHeader(X_HUB_UUID, system:uuid());
+        request.setHeader(X_HUB_UUID, uuid:createType4AsString());
         request.setHeader(X_HUB_TOPIC, subscriptionDetails.topic);
         request.setHeader("Link", buildWebSubLinkHeader(hubPublicUrl, subscriptionDetails.topic));
         var contentDistributionResponse = callbackEp->post("", request);
