@@ -25,9 +25,9 @@ string hubBasePath = "/";
 string hubSubscriptionResourcePath = "/";
 string hubPublishResourcePath = "/publish";
 
-http:ServiceAuth hubServiceAuth = {enabled: false};
-http:ResourceAuth hubSubscriptionResourceAuth = {enabled: false};
-http:ResourceAuth hubPublisherResourceAuth = {enabled: false};
+//http:ServiceAuth hubServiceAuth = {enabled: false};
+//http:ResourceAuth hubSubscriptionResourceAuth = {enabled: false};
+//http:ResourceAuth hubPublisherResourceAuth = {enabled: false};
 
 int hubLeaseSeconds = DEFAULT_LEASE_SECONDS_VALUE;
 string hubSignatureMethod = DEFAULT_SIGNATURE_METHOD;

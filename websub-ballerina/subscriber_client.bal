@@ -168,7 +168,7 @@ function processHubResponse(@untainted string hub, @untainted string mode,
 #            if an error occurred
 function invokeClientConnectorOnRedirection(@untainted string hub, @untainted string mode,
                                             SubscriptionChangeRequest subscriptionChangeRequest,
-                                            http:OutboundAuthConfig? auth, int remainingRedirects)
+                                            http:ClientAuthConfig? auth, int remainingRedirects)
     returns @tainted SubscriptionChangeResponse|error {
 
     if (mode == MODE_SUBSCRIBE) {
@@ -178,7 +178,7 @@ function invokeClientConnectorOnRedirection(@untainted string hub, @untainted st
 }
 
 function subscribeWithRetries(string url, SubscriptionChangeRequest subscriptionRequest,
-                              http:OutboundAuthConfig? auth, int remainingRedirects = 0)
+                              http:ClientAuthConfig? auth, int remainingRedirects = 0)
              returns @tainted SubscriptionChangeResponse| error {
     http:Client clientEndpoint = new http:Client(url, { auth: auth });
     http:Request builtSubscriptionRequest = buildSubscriptionChangeRequest(MODE_SUBSCRIBE, subscriptionRequest);
@@ -188,7 +188,7 @@ function subscribeWithRetries(string url, SubscriptionChangeRequest subscription
 }
 
 function unsubscribeWithRetries(string url, SubscriptionChangeRequest unsubscriptionRequest,
-                                http:OutboundAuthConfig? auth, int remainingRedirects = 0)
+                                http:ClientAuthConfig? auth, int remainingRedirects = 0)
              returns @tainted SubscriptionChangeResponse|error {
     http:Client clientEndpoint = new http:Client(url, {
         auth: auth
