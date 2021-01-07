@@ -509,9 +509,9 @@ public class Bridge {
 # ```
 # + hubServiceListener - The `http:Listener` to which the hub service is attached
 # + basePath - The base path of the hub service
-# + subscriptionResourcePath - The resource path for subscription changes
-# + publishResourcePath - The resource path for publishing and topic registration
-# + serviceAuth - The auth configuration for the hub service
+//# + subscriptionResourcePath - The resource path for subscription changes
+//# + publishResourcePath - The resource path for publishing and topic registration
+//# + serviceAuth - The auth configuration for the hub service
 # + subscriptionResourceAuth - The auth configuration for the subscription resource of the hub service
 # + publisherResourceAuth - The auth configuration for the publisher resource of the hub service
 # + publicUrl - The URL for the hub for remote interaction; used in defining the subscription and publish URLs.
@@ -527,9 +527,9 @@ public function startHub(http:Listener hubServiceListener,
                          string basePath = "/",
                          string subscriptionResourcePath = "/",
                          string publishResourcePath = "/publish",
-                         http:ServiceAuth serviceAuth = {enabled:false},
-                         http:ResourceAuth subscriptionResourceAuth = {enabled:false},
-                         http:ResourceAuth publisherResourceAuth = {enabled:false},
+                         //http:ServiceAuth serviceAuth = {enabled:false},
+                         //http:ResourceAuth subscriptionResourceAuth = {enabled:false},
+                         //http:ResourceAuth publisherResourceAuth = {enabled:false},
                          string? publicUrl = (),
                          HubConfiguration hubConfiguration = {})
                             returns Hub|HubStartedUpError|HubStartupError {
@@ -542,9 +542,9 @@ public function startHub(http:Listener hubServiceListener,
         return HubStartupError("publisher and subscription resource paths cannot be the same");
     }
 
-    hubServiceAuth = serviceAuth;
-    hubSubscriptionResourceAuth = subscriptionResourceAuth;
-    hubPublisherResourceAuth = publisherResourceAuth;
+    //hubServiceAuth = serviceAuth;
+    //hubSubscriptionResourceAuth = subscriptionResourceAuth;
+    //hubPublisherResourceAuth = publisherResourceAuth;
 
     hubLeaseSeconds = hubConfiguration.leaseSeconds;
     hubSignatureMethod = getSignatureMethod(hubConfiguration.signatureMethod);
