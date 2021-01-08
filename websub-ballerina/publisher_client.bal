@@ -52,10 +52,10 @@ public client class PublisherClient {
             if (registrationResponse.statusCode != http:STATUS_ACCEPTED) {
                 var result = registrationResponse.getTextPayload();
                 string payload = result is string ? result : "";
-                return WebSubError("Error occurred during topic registration: " + payload);
+                return error WebSubError("Error occurred during topic registration: " + payload);
             }
         } else {
-            return WebSubError("Error sending topic registration request: " + (<error>registrationResponse).message());
+            return error WebSubError("Error sending topic registration request: " + (<error>registrationResponse).message());
         }
     }
 
@@ -74,10 +74,10 @@ public client class PublisherClient {
             if (unregistrationResponse.statusCode != http:STATUS_ACCEPTED) {
                 var result = unregistrationResponse.getTextPayload();
                 string payload = result is string ? result : "";
-                return WebSubError("Error occurred during topic unregistration: " + payload);
+                return error WebSubError("Error occurred during topic unregistration: " + payload);
             }
         } else {
-            return WebSubError("Error sending topic unregistration request: "
+            return error WebSubError("Error sending topic unregistration request: "
                                     + (<error>unregistrationResponse).message());
         }
     }
@@ -115,10 +115,10 @@ public client class PublisherClient {
             if (!isSuccessStatusCode(response.statusCode)) {
                 var result = response.getTextPayload();
                 string textPayload = result is string ? result : "";
-                return WebSubError("Error occurred publishing update: " + textPayload);
+                return error WebSubError("Error occurred publishing update: " + textPayload);
             }
         } else {
-            return WebSubError("Publish failed for topic [" + topic + "]");
+            return error WebSubError("Publish failed for topic [" + topic + "]");
         }
     }
 
@@ -147,10 +147,10 @@ public client class PublisherClient {
             if (!isSuccessStatusCode(response.statusCode)) {
                 var result = response.getTextPayload();
                 string textPayload = result is string ? result : "";
-                return WebSubError("Error occurred notifying update availability: " + textPayload);
+                return error WebSubError("Error occurred notifying update availability: " + textPayload);
             }
         } else {
-            return WebSubError("Update availability notification failed for topic [" + topic + "]");
+            return error WebSubError("Update availability notification failed for topic [" + topic + "]");
         }
     }
 }

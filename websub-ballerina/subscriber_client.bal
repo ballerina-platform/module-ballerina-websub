@@ -123,7 +123,7 @@ function processHubResponse(@untainted string hub, @untainted string mode,
 
     string topic = subscriptionChangeRequest.topic;
     if (response is error) {
-        return WebSubError("Error occurred for request: Mode[" + mode+ "] at Hub[" + hub + "] - " + response.message());
+        return error WebSubError("Error occurred for request: Mode[" + mode+ "] at Hub[" + hub + "] - " + response.message());
     } else {
         http:Response hubResponse = <http:Response> response;
         int responseStatusCode = hubResponse.statusCode;
@@ -134,7 +134,7 @@ function processHubResponse(@untainted string hub, @untainted string mode,
                 return invokeClientConnectorOnRedirection(redirected_hub, mode, subscriptionChangeRequest,
                                                             httpClient.config.auth, remainingRedirects - 1);
             }
-            return WebSubError("Redirection response received for subscription change request made with " +
+            return error WebSubError("Redirection response received for subscription change request made with " +
                                "followRedirects disabled or after maxCount exceeded: Hub [" + hub + "], Topic [" +
                                subscriptionChangeRequest.topic + "]");
         } else if (!isSuccessStatusCode(responseStatusCode)) {
@@ -145,7 +145,7 @@ function processHubResponse(@untainted string hub, @untainted string mode,
             } else {
                 errorMessage = errorMessage + " - Error occurred identifying cause: " + responsePayload.message();
             }
-            return WebSubError(errorMessage);
+            return error WebSubError(errorMessage);
         } else {
             if (responseStatusCode != http:STATUS_ACCEPTED) {
                 log:print("Subscription request considered successful for non 202 status code: "

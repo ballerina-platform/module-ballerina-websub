@@ -18,7 +18,7 @@
 
 package org.ballerinalang.net.websub;
 
-import io.ballerina.runtime.api.types.MemberFunctionType;
+import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import org.ballerinalang.net.http.HttpResource;
@@ -64,7 +64,7 @@ public class WebSubHttpService extends HttpService {
         websubHttpService.setBasePath(basePath);
 
         List<HttpResource> resources = new ArrayList<>();
-        for (MemberFunctionType resource : websubHttpService.getBalService().getType().getAttachedFunctions()) {
+        for (MethodType resource : websubHttpService.getBalService().getType().getMethods()) {
             HttpResource httpResource = WebSubHttpResource.buildWebSubHttpResource(resource, websubHttpService);
             resources.add(httpResource);
         }
