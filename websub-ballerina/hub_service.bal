@@ -278,14 +278,14 @@ function validateSubscriptionChangeRequest(string mode, string topic, string cal
         PendingSubscriptionChangeRequest pendingRequest = new(mode, topic, callback);
         pendingRequests[generateKey(topic, callback)] = pendingRequest;
         if (!callback.startsWith("http://") && !callback.startsWith("https://")) {
-            return WebSubError("Malformed URL specified as callback");
+            return error WebSubError("Malformed URL specified as callback");
         }
         if (hubTopicRegistrationRequired && !isTopicRegistered(topic)) {
-            return WebSubError("Subscription request denied for unregistered topic");
+            return error WebSubError("Subscription request denied for unregistered topic");
         }
         return;
     }
-    return WebSubError("Topic/Callback cannot be null for subscription/unsubscription request");
+    return error WebSubError("Topic/Callback cannot be null for subscription/unsubscription request");
 }
 
 # Initiates intent verification for a valid subscription/unsubscription request received.
@@ -430,7 +430,7 @@ function addTopicRegistrationsOnStartup(HubPersistenceStore persistenceStore) re
             }
         }
     } else {
-        return HubStartupError("Error retrieving persisted topics", topics);
+        return error HubStartupError("Error retrieving persisted topics", topics);
     }
 }
 
@@ -450,7 +450,7 @@ isolated function addSubscriptionsOnStartup(HubPersistenceStore persistenceStore
             addSubscription(subscription);
         }
     } else {
-        return HubStartupError("Error retrieving persisted subscriptions", subscriptions);
+        return error HubStartupError("Error retrieving persisted subscriptions", subscriptions);
     }
 }
 
@@ -546,11 +546,11 @@ function distributeContent(string callback, SubscriptionDetails subscriptionDeta
 function getSubcriberCallbackClient(string callback) returns http:Client {
     http:Client subscriberCallbackClient;
     if (subscriberCallbackClientCache.hasKey(callback)) {
-        return <http:Client>subscriberCallbackClientCache.get(<@untainted> callback);
+        return <http:Client> checkpanic subscriberCallbackClientCache.get(<@untainted> callback);
     } else {
         lock {
             if (subscriberCallbackClientCache.hasKey(callback)) {
-                return <http:Client>subscriberCallbackClientCache.get(<@untainted> callback);
+                return <http:Client> checkpanic subscriberCallbackClientCache.get(<@untainted> callback);
             }
             subscriberCallbackClient = new http:Client(callback, hubClientConfig);
             cache:Error? result = subscriberCallbackClientCache.put(<@untainted> callback,
