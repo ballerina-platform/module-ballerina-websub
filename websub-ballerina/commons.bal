@@ -68,10 +68,14 @@ const string REMOTE_PUBLISHING_MODE_FETCH = "fetch";
 const string X_HUB_UUID = "X-Hub-Uuid";
 const string X_HUB_TOPIC = "X-Hub-Topic";
 
+const string ACCEPT_HEADER = "Accept";
+const string ACCEPT_LANGUAGE_HEADER = "Accept-Language";
 const string CONTENT_TYPE = "Content-Type";
 
 const string ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG = "SubscriberServiceConfig";
 const ANNOT_FIELD_TARGET = "target";
+const ANNOT_FIELD_ACCEPT = "accept";
+const ANNOT_FIELD_ACCEPT_LANGUAGE = "acceptLanguage";
 const ANNOT_FIELD_CALLBACK = "callback";
 const ANNOT_FIELD_LEASE_SECONDS = "leaseSeconds";
 const ANNOT_FIELD_SECRET = "secret";
@@ -394,7 +398,11 @@ public function extractTopicAndHubUrls(http:Response response) returns @tainted 
     if (response.hasHeader("Link")) {
         linkHeaders = response.getHeaders("Link");
     }
-
+    
+    if (response.statusCode == http:STATUS_NOT_ACCEPTABLE) {
+        return error WebSubError("Content negotiation failed.Accept and/or Accept-Language headers mismatch");
+    }
+    
     if (linkHeaders.length() == 0) {
         return error WebSubError("Link header unavailable in discovery response");
     }
