@@ -148,7 +148,9 @@ public class Listener {
                 if (resourceUrl is string) {
                     http:ClientConfiguration? publisherClientConfig =
                                 <http:ClientConfiguration?> subscriptionDetails[ANNOT_FIELD_PUBLISHER_CLIENT_CONFIG];
-                    var discoveredDetails = retrieveHubAndTopicUrl(resourceUrl, publisherClientConfig);
+                    string?|string[] expectedMediaTypes = <string?|string[]> subscriptionDetails[ANNOT_FIELD_ACCEPT];
+                    string?|string[] expectedLanguageTypes = <string?|string[]> subscriptionDetails[ANNOT_FIELD_ACCEPT_LANGUAGE];
+                    var discoveredDetails = retrieveHubAndTopicUrl(resourceUrl, publisherClientConfig, expectedMediaTypes, expectedLanguageTypes);
                     if (discoveredDetails is [string, string]) {
                         var [retHub, retTopic] = discoveredDetails;
                         var hubDecodeResponse = encoding:decodeUriComponent(retHub, "UTF-8");
@@ -276,11 +278,37 @@ public type ExtensionConfig record {|
 #
 # + resourceUrl - The resource URL advertising the hub and topic URLs
 # + publisherClientConfig - The configuration for the publisher client
+# + expectedMediaTypes - The expected media types for the subscriber client
+# + expectedLanguageTypes - The expected language types for the subscriber client
 # + return - A `(hub, topic)` as a `(string, string)` if successful or else an `error` if not
-function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? publisherClientConfig)
+function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? publisherClientConfig, string?|string[] expectedMediaTypes, string?|string[] expectedLanguageTypes)
         returns @tainted [string, string]|error {
     http:Client resourceEP = new http:Client(resourceUrl, publisherClientConfig);
     http:Request request = new;
+    if (expectedMediaTypes is string) {
+        request.addHeader(ACCEPT_HEADER, expectedMediaTypes);
+    }
+    
+    if (expectedMediaTypes is string[]) {
+        string acceptMeadiaTypesString = expectedMediaTypes[0];
+        foreach int expectedMediaTypeIndex in 1 ... (expectedMediaTypes.length() - 1) {
+            acceptMeadiaTypesString = acceptMeadiaTypesString.concat(", ", expectedMediaTypes[expectedMediaTypeIndex]);
+        }
+        request.addHeader(ACCEPT_HEADER, acceptMeadiaTypesString);
+    }
+    
+    if (expectedLanguageTypes is string) {
+        request.addHeader(ACCEPT_LANGUAGE_HEADER, expectedLanguageTypes);
+    }
+    
+    if (expectedLanguageTypes is string[]) {
+        string acceptLanguageTypesString = expectedLanguageTypes[0];
+        foreach int expectedLanguageTypeIndex in 1 ... (expectedLanguageTypes.length() - 1) {
+            acceptLanguageTypesString = acceptLanguageTypesString.concat(", ", expectedLanguageTypes[expectedLanguageTypeIndex]);
+        }
+        request.addHeader(ACCEPT_LANGUAGE_HEADER, acceptLanguageTypesString);
+    }
+    
     var discoveryResponse = resourceEP->get("", request);
     if (discoveryResponse is http:Response) {
         var topicAndHubs = extractTopicAndHubUrls(discoveryResponse);
