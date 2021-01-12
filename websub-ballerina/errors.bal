@@ -17,8 +17,5 @@
 # Represents a listener startup error.
 public type ListenerStartupError distinct error;
 
-# Represents a hub startup error.
-public type HubStartupError distinct error;
-
 # Represents a webSub distinct error.
 public type WebSubError distinct error;
