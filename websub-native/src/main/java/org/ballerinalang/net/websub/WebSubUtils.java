@@ -78,29 +78,6 @@ public class WebSubUtils {
         }
     }
 
-    public static MethodType getAttachedFunction(BObject service, String functionName) {
-        MethodType attachedFunction = null;
-        String functionFullName = service.getType().getName() + "." + functionName;
-        for (MethodType function : service.getType().getMethods()) {
-            //TODO test the name of resource
-            if (functionFullName.contains(function.getName())) {
-                attachedFunction = function;
-            }
-        }
-        return attachedFunction;
-    }
-
-    /**
-     * Create WebSub specific error record with 'WebSubError' as error type ID name.
-     *
-     * @param errMsg  Actual error message
-     * @return Ballerina error value
-     */
-    public static BError createError(String errMsg) {
-        return ErrorCreator.createDistinctError(WEBSUB_ERROR, WebSubSubscriberConstants.WEBSUB_PACKAGE_ID,
-                                                 StringUtils.fromString(errMsg));
-    }
-
     /**
      * Create WebSub specific error for a given error message.
      *
