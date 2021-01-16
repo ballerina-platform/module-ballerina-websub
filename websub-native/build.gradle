@@ -41,12 +41,7 @@ dependencies {
     compile (group: 'org.ballerinalang', name: 'toml-parser', version: "${ballerinaTomlParserVersion}") {
         transitive = false
     }
-    compile (group: 'io.ballerina.messaging', name: 'broker-core', version: "${ballerinaMessageBrokerCoreVersion}") {
-        transitive = false
-    }
-    compile (group: 'io.ballerina.messaging', name: 'broker-common', version: "${ballerinaMessageBrokerCoreVersion}") {
-        transitive = false
-    }
+
     compile group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}"
     compile group: 'io.netty', name: 'netty-codec', version: "${nettyVersion}"
     compile group: 'io.netty', name: 'netty-codec-http', version: "${nettyVersion}"
