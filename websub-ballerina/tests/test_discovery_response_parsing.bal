@@ -40,7 +40,7 @@ function testTopicAndSingleHubAsSingleLinkHeader() {
 }
 
 @test:Config {
-    dependsOn: ["testTopicAndSingleHubAsSingleLinkHeader"]
+    dependsOn: [testTopicAndSingleHubAsSingleLinkHeader]
 }
 function testTopicAndSingleHubAsMultipleLinkHeaders() {
     http:Response response = new;
@@ -59,7 +59,7 @@ function testTopicAndSingleHubAsMultipleLinkHeaders() {
 }
 
 @test:Config {
-    dependsOn: ["testTopicAndSingleHubAsMultipleLinkHeaders"]
+    dependsOn: [testTopicAndSingleHubAsMultipleLinkHeaders]
 }
 function testTopicAndMultipleHubsAsSingleLinkHeader() {
     http:Response response = new;
@@ -81,7 +81,7 @@ function testTopicAndMultipleHubsAsSingleLinkHeader() {
 }
 
 @test:Config {
-    dependsOn: ["testTopicAndMultipleHubsAsSingleLinkHeader"]
+    dependsOn: [testTopicAndMultipleHubsAsSingleLinkHeader]
 }
 function testTopicAndMultipleHubsAsMultipleLinkHeaders() {
     http:Response response = new;
@@ -105,7 +105,7 @@ function testTopicAndMultipleHubsAsMultipleLinkHeaders() {
 }
 
 @test:Config {
-    dependsOn: ["testTopicAndMultipleHubsAsMultipleLinkHeaders"]
+    dependsOn: [testTopicAndMultipleHubsAsMultipleLinkHeaders]
 }
 function testMissingTopicWithSingleLinkHeader() {
     http:Response response = new;
@@ -120,7 +120,7 @@ function testMissingTopicWithSingleLinkHeader() {
 }
 
 @test:Config {
-    dependsOn: ["testMissingTopicWithSingleLinkHeader"]
+    dependsOn: [testMissingTopicWithSingleLinkHeader]
 }
 function testMissingTopicWithMultipleLinkHeaders() {
     http:Response response = new;
@@ -136,7 +136,7 @@ function testMissingTopicWithMultipleLinkHeaders() {
 }
 
 @test:Config {
-    dependsOn: ["testMissingTopicWithMultipleLinkHeaders"]
+    dependsOn: [testMissingTopicWithMultipleLinkHeaders]
 }
 function testMissingHubWithSingleLinkHeader() {
     http:Response response = new;
@@ -151,7 +151,7 @@ function testMissingHubWithSingleLinkHeader() {
 }
 
 @test:Config {
-    dependsOn: ["testMissingHubWithSingleLinkHeader"]
+    dependsOn: [testMissingHubWithSingleLinkHeader]
 }
 function testMissingHubWithMultipleLinkHeaders() {
     http:Response response = new;
@@ -167,7 +167,7 @@ function testMissingHubWithMultipleLinkHeaders() {
 }
 
 @test:Config {
-    dependsOn: ["testMissingHubWithMultipleLinkHeaders"]
+    dependsOn: [testMissingHubWithMultipleLinkHeaders]
 }
 function testMissingLinkHeader() {
     http:Response response = new;
@@ -181,7 +181,7 @@ function testMissingLinkHeader() {
 }
 
 @test:Config {
-    dependsOn: ["testMissingLinkHeader"]
+    dependsOn: [testMissingLinkHeader]
 }
 function testSingleLinkHeaderWithMultipleTopics() {
     http:Response response = new;
@@ -197,7 +197,7 @@ function testSingleLinkHeaderWithMultipleTopics() {
 }
 
 @test:Config {
-    dependsOn: ["testSingleLinkHeaderWithMultipleTopics"]
+    dependsOn: [testSingleLinkHeaderWithMultipleTopics]
 }
 function testMultipleLinkHeadersWithMultipleTopics() {
     http:Response response = new;
