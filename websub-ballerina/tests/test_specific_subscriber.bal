@@ -120,7 +120,7 @@
 // }
 
 // @test:Config {
-//     dependsOn: ["testInvalidResourceFunctions"]
+//     dependsOn: [testInvalidResourceFunctions]
 // }
 // public function testInvalidParam() {
 //     SpecificSubWebhookServerForPayload l = new(8081);
