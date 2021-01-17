@@ -174,42 +174,6 @@ groupId = "io.netty"
 artifactId = "netty-tcnative-boringssl-static"
 version = "@nettytcnative.version@"
 
-
-[[platform.java11.dependency]]
-path = "./lib/broker-core-@ballerinambcore.version@.jar"
-groupId = "io.ballerina.messaging"
-artifactId = "broker-core"
-version = "@ballerinambcore.version@"
-
-
-[[platform.java11.dependency]]
-path = "./lib/broker-common-@ballerinamb.version@.jar"
-groupId = "io.ballerina.messaging"
-artifactId = "broker-common"
-version = "@ballerinamb.version@"
-
-
-[[platform.java11.dependency]]
-path = "./lib/broker-auth-@ballerinamb.version@.jar"
-groupId = "io.ballerina.messaging"
-artifactId = "broker-auth"
-version = "@ballerinamb.version@"
-
-
-[[platform.java11.dependency]]
-path = "./lib/broker-rest-runner-@ballerinamb.version@.jar"
-groupId = "io.ballerina.messaging"
-artifactId = "broker-rest-runner"
-version = "@ballerinamb.version@"
-
-
-[[platform.java11.dependency]]
-path = "./lib/broker-coordination-@ballerinamb.version@.jar"
-groupId = "io.ballerina.messaging"
-artifactId = "broker-coordination"
-version = "@ballerinamb.version@"
-
-
 [[platform.java11.dependency]]
 path = "./lib/org.wso2.carbon.metrics.core-@wso2carbonmetrics.version@.jar"
 groupId = "org.wso2.carbon.metrics"

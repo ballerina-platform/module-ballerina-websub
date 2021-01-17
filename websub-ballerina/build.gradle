@@ -61,22 +61,6 @@ dependencies {
     externalJars (group: 'io.netty', name: 'netty-tcnative-boringssl-static', version: "${nettyTcnativeVersion}") {
         transitive = false
     }
-    
-    externalJars (group: 'io.ballerina.messaging', name: 'broker-common', version: "${ballerinaMessageBrokerVersion}") {
-        transitive = false
-    }
-    externalJars (group: 'io.ballerina.messaging', name: 'broker-core', version: "${ballerinaMessageBrokerCoreVersion}") {
-        transitive = false
-    }
-    externalJars (group: 'io.ballerina.messaging', name: 'broker-auth', version: "${ballerinaMessageBrokerVersion}") {
-        transitive = false
-    }
-    externalJars (group: 'io.ballerina.messaging', name: 'broker-rest-runner', version: "${ballerinaMessageBrokerVersion}") {
-        transitive = false
-    }
-    externalJars (group: 'io.ballerina.messaging', name: 'broker-coordination', version: "${ballerinaMessageBrokerVersion}") {
-        transitive = false
-    }
 
     externalJars (group: 'commons-pool.wso2', name: 'commons-pool', version: "${wso2CommonsPoolVersion}") {
         transitive = false
@@ -203,8 +187,6 @@ task updateTomlFile {
         newConfig = newConfig.replace("@wso2snakeyaml.version@", project.wso2SnakeYamlVersion)
         newConfig = newConfig.replace("@bouncycastle.version@", project.bouncycastleVersion)
         newConfig = newConfig.replace("@nettytcnative.version@", project.nettyTcnativeVersion)
-        newConfig = newConfig.replace("@ballerinambcore.version@", project.ballerinaMessageBrokerCoreVersion)
-        newConfig = newConfig.replace("@ballerinamb.version@", project.ballerinaMessageBrokerVersion)
         newConfig = newConfig.replace("@wso2carbonmetrics.version@", project.wso2CarbonMetricsVersion)
         newConfig = newConfig.replace("@guava.version@", project.guavaVersion)
         newConfig = newConfig.replace("@http.native.version@", project.stdlibHttpVersion)
