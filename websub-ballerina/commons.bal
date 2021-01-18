@@ -18,9 +18,10 @@ import ballerina/crypto;
 import ballerina/encoding;
 import ballerina/http;
 import ballerina/io;
+import ballerina/lang.'string as strings;
 import ballerina/log;
 import ballerina/mime;
-import ballerina/stringutils;
+import ballerina/regex;
 
 # Intent verification request parameter 'hub.challenge' representing the challenge that needs to be echoed by
 # susbscribers to verify intent.
@@ -201,7 +202,7 @@ isolated function processWebSubNotification(http:Request request, SubscriberServ
         return;
     }
 
-    string xHubSignature = request.getHeader(X_HUB_SIGNATURE);
+    string xHubSignature = check request.getHeader(X_HUB_SIGNATURE);
     if (secret == "" && xHubSignature != "") {
         log:print("Ignoring " + X_HUB_SIGNATURE + " value since secret is not specified.");
         return;
@@ -222,20 +223,20 @@ isolated function processWebSubNotification(http:Request request, SubscriberServ
 # + secret - The secret used when subscribing
 # + return - An `error`, if an error occurred in extraction or signature validation failed or else `()`
 isolated function validateSignature(string xHubSignature, string stringPayload, string secret) returns error? {
-    string[] splitSignature = stringutils:split(xHubSignature, "=");
+    string[] splitSignature = regex:split(xHubSignature, "=");
     string method = splitSignature[0];
-    string signature = stringutils:replace(xHubSignature, method + "=", "");
+    string signature = regex:replaceAll(xHubSignature, method + "=", "");
     string generatedSignature = "";
 
-    if (stringutils:equalsIgnoreCase(method, SHA1)) {
+    if (strings:equalsIgnoreCaseAscii(method, SHA1)) {
         generatedSignature = crypto:hmacSha1(stringPayload.toBytes(), secret.toBytes()).toBase16();
-    } else if (stringutils:equalsIgnoreCase(method, SHA256)) {
+    } else if (strings:equalsIgnoreCaseAscii(method, SHA256)) {
         generatedSignature = crypto:hmacSha256(stringPayload.toBytes(), secret.toBytes()).toBase16();
     } else {
         return error WebSubError("Unsupported signature method: " + method);
     }
 
-    if (!stringutils:equalsIgnoreCase(signature, generatedSignature)) {
+    if (!strings:equalsIgnoreCaseAscii(signature, generatedSignature)) {
         return error WebSubError("Signature validation failed: Invalid Signature!");
     }
     return;
@@ -288,7 +289,7 @@ public class Notification {
     # + headerName - The header name
     # + return - The first header value for the specified header name or else panic if no header is found. Ideally, the
     #            `Notification.hasHeader()` needs to be used to check the existence of a header initially.
-    public isolated function getHeader(string headerName) returns @tainted string {
+    public isolated function getHeader(string headerName) returns @tainted string|error {
         return self.request.getHeader(headerName);
     }
 
@@ -300,7 +301,7 @@ public class Notification {
     # + headerName - The header name
     # + return - The header values the specified header key maps to or else panic if no header is found. Ideally, the
     #            `Notification.hasHeader()` needs to be used to check the existence of a header initially.
-    public isolated function getHeaders(string headerName) returns @tainted string[] {
+    public isolated function getHeaders(string headerName) returns @tainted string[]|error {
         return self.request.getHeaders(headerName);
     }
 
@@ -395,7 +396,7 @@ public class Notification {
 public function extractTopicAndHubUrls(http:Response response) returns @tainted [string, string[]]|error {
     string[] linkHeaders = [];
     if (response.hasHeader("Link")) {
-        linkHeaders = response.getHeaders("Link");
+        linkHeaders = check response.getHeaders("Link");
     }
     
     if (response.statusCode == http:STATUS_NOT_ACCEPTABLE) {
@@ -411,21 +412,21 @@ public function extractTopicAndHubUrls(http:Response response) returns @tainted 
     string topic = "";
     string[] linkHeaderConstituents = [];
     if (linkHeaders.length() == 1) {
-        linkHeaderConstituents = stringutils:split(linkHeaders[0], ",");
+        linkHeaderConstituents = regex:split(linkHeaders[0], ",");
     } else {
         linkHeaderConstituents = linkHeaders;
     }
 
     foreach var link in linkHeaderConstituents {
-        string[] linkConstituents = stringutils:split(link, ";");
+        string[] linkConstituents = regex:split(link, ";");
         if (linkConstituents[1] != "") {
             string url = linkConstituents[0].trim();
-            url = stringutils:replace(url, "<", "");
-            url = stringutils:replace(url, ">", "");
-            if (stringutils:contains(linkConstituents[1], "rel=\"hub\"")) {
+            url = regex:replaceAll(url, "<", "");
+            url = regex:replaceAll(url, ">", "");
+            if (strings:includes(linkConstituents[1], "rel=\"hub\"")) {
                 hubs[hubIndex] = url;
                 hubIndex += 1;
-            } else if (stringutils:contains(linkConstituents[1], "rel=\"self\"")) {
+            } else if (strings:includes(linkConstituents[1], "rel=\"self\"")) {
                 if (topic != "") {
                     return error WebSubError("Link Header contains > 1 self URLs");
                 } else {
