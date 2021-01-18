@@ -130,7 +130,7 @@ function processHubResponse(@untainted string hub, @untainted string mode,
         if (responseStatusCode == http:STATUS_TEMPORARY_REDIRECT
                 || responseStatusCode == http:STATUS_PERMANENT_REDIRECT) {
             if (remainingRedirects > 0) {
-                string redirected_hub = hubResponse.getHeader("Location");
+                string redirected_hub = check hubResponse.getHeader("Location");
                 return invokeClientConnectorOnRedirection(redirected_hub, mode, subscriptionChangeRequest,
                                                             httpClient.config.auth, remainingRedirects - 1);
             }
