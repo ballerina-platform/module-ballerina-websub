@@ -35,7 +35,7 @@ public class Listener {
     #
     # + port - The port number of the remote service
     # + config - The configurations related to the `websub:Listener`
-    public isolated function init(int port, SubscriberListenerConfiguration? config = ()) {
+    public isolated function init(int port, SubscriberListenerConfiguration? config = ()) returns error? {
         self.config = config;
         http:ListenerConfiguration? serviceConfig = ();
         if (config is SubscriberListenerConfiguration) {
@@ -45,7 +45,7 @@ public class Listener {
             };
             serviceConfig = httpServiceConfig;
         }
-        http:Listener httpEndpoint = new(port, serviceConfig);
+        http:Listener httpEndpoint = check new(port, serviceConfig);
         self.serviceEndpoint = httpEndpoint;
 
         externInitWebSubSubscriberServiceEndpoint(self);
@@ -80,10 +80,10 @@ public class Listener {
     # ```
     #
     # + return - `()` or else an `error` upon failure to start the listener
-    public function 'start() returns error? {
+    public function 'start() returns @tainted error? {
         check externStartWebSubSubscriberServiceEndpoint(self);
         // TODO: handle data and return error on error
-        self.sendSubscriptionRequests();
+        check self.sendSubscriptionRequests();
     }
 
     isolated function processWebSubNotification(http:Request request, SubscriberService serviceType) returns @tainted error? {
@@ -114,7 +114,7 @@ public class Listener {
     }
 
     # Sends subscription requests to the specified/discovered hubs if specified to subscribe on startup.
-    function sendSubscriptionRequests() {
+    function sendSubscriptionRequests() returns @tainted error? {
         map<any>[] subscriptionDetailsArray = externRetrieveSubscriptionParameters(self);
 
         foreach map<any> subscriptionDetails in subscriptionDetailsArray {
@@ -176,7 +176,7 @@ public class Listener {
                         continue;
                     }
                 }
-                invokeClientConnectorForSubscription(<string> hub, hubClientConfig, <@untainted> subscriptionDetails);
+                check invokeClientConnectorForSubscription(<string> hub, hubClientConfig, <@untainted> subscriptionDetails);
             }
         }
     }
@@ -283,7 +283,7 @@ public type ExtensionConfig record {|
 # + return - A `(hub, topic)` as a `(string, string)` if successful or else an `error` if not
 function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? publisherClientConfig, string?|string[] expectedMediaType, string?|string[] expectedLanguageType)
         returns @tainted [string, string]|error {
-    http:Client resourceEP = new http:Client(resourceUrl, publisherClientConfig);
+    http:Client resourceEP = check new http:Client(resourceUrl, publisherClientConfig);
     http:Request request = new;
     if (expectedMediaType is string) {
         request.addHeader(ACCEPT_HEADER, expectedMediaType);
@@ -332,8 +332,8 @@ function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? pu
 # + hubClientConfig - The configuration for the hub client
 # + subscriptionDetails - The subscription details as a `map`
 function invokeClientConnectorForSubscription(string hub, http:ClientConfiguration? hubClientConfig,
-                                              map<any> subscriptionDetails) {
-    SubscriptionClient websubHubClientEP = new (hub, hubClientConfig);
+                                              map<any> subscriptionDetails) returns error? {
+    SubscriptionClient websubHubClientEP = check new (hub, hubClientConfig);
     [string, string][_, topic] = <[string, string]> subscriptionDetails[ANNOT_FIELD_TARGET];
     string callback = <string> subscriptionDetails[ANNOT_FIELD_CALLBACK];
 
