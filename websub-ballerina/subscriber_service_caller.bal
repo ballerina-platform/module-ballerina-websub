@@ -35,28 +35,5 @@ public client class Caller {
     isolated remote function respond(http:ResponseMessage message = ()) returns error? {
         return self.httpCaller->respond(message);
     }
-
-    # Sends the response to the caller with the "200 OK" status.
-    # ```ballerina
-    # error? response = caller->ok();
-    # ```
-    #
-    # + message - The response or any payload of type `string`, `xml`, `json`, `byte[]`, `io:ReadableByteChannel`,
-    #             or `mime:Entity[]`
-    # + return - An `error` on failure or else `()`
-    isolated remote function ok(http:ResponseMessage message = ()) returns error? {
-        return self.httpCaller->ok(message);
-    }
-
-    # Sends the response to the caller with the "202 Accepted" status.
-    # ```ballerina
-    # error? response = caller->accepted();
-    # ```
-    #
-    # + message - The response or any payload of the `http:ResponseMessage` type
-    # + return - An `error` on failure or else `()`
-    isolated remote function accepted(http:ResponseMessage message = ()) returns error? {
-        return self.httpCaller->accepted(message);
-    }
 }
 
