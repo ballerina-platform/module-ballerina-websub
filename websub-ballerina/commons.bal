@@ -17,7 +17,6 @@
 import ballerina/crypto;
 import ballerina/encoding;
 import ballerina/http;
-import ballerina/io;
 import ballerina/lang.'string as strings;
 import ballerina/log;
 import ballerina/mime;
