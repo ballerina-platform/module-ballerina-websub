@@ -40,11 +40,6 @@ version = "@stdlib.time.version@"
 
 [[dependency]]
 org = "ballerina"
-name = "config"
-version = "@stdlib.configapi.version@"
-
-[[dependency]]
-org = "ballerina"
 name = "log"
 version = "@stdlib.log.version@"
 

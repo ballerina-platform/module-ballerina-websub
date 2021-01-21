@@ -17,7 +17,6 @@
 import ballerina/crypto;
 import ballerina/encoding;
 import ballerina/http;
-import ballerina/io;
 import ballerina/lang.'string as strings;
 import ballerina/log;
 import ballerina/mime;
@@ -356,16 +355,6 @@ public class Notification {
     #            If the content type is not of type text, an `error` is returned.
     public isolated function getTextPayload() returns @tainted string|error {
         return self.request.getTextPayload();
-    }
-
-    # Retrieves the request payload as a `ByteChannel` except in the case of multiparts.
-    # ```ballerina
-    # io:ReadableByteChannel|error result = notification.getByteChannel();
-    # ```
-    #
-    # + return - A byte channel from which the message payload can be read or esle an `error` in case of errors
-    public isolated function getByteChannel() returns @tainted io:ReadableByteChannel|error {
-        return self.request.getByteChannel();
     }
 
     # Retrieves the request payload as a `byte[]`.
