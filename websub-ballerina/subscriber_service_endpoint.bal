@@ -17,7 +17,7 @@
 import ballerina/encoding;
 import ballerina/http;
 import ballerina/log;
-import ballerina/java;
+import ballerina/jballerina.java;
 
 //////////////////////////////////////////
 /// WebSub Subscriber Service Endpoint ///
