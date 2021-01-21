@@ -19,18 +19,32 @@ package org.ballerinalang.net.websub;
 
 import io.ballerina.runtime.api.async.Callback;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * Empty callback implementation for WebSub resources.
  */
 public class WebSubEmptyCallableUnitCallback implements Callback {
+    private CountDownLatch latch;
+    private Object result;
+
+    public WebSubEmptyCallableUnitCallback(CountDownLatch latch) {
+        this.latch = latch;
+    }
+
+    public Object getResult() {
+        return this.result;
+    }
 
     @Override
     public void notifySuccess(Object result) {
-        //do nothing
+        this.result = result;
+        this.latch.countDown();
     }
 
     @Override
     public void notifyFailure(io.ballerina.runtime.api.values.BError error) {
-        error.printStackTrace();
+        this.result = error;
+        this.latch.countDown();
     }
 }
