@@ -148,9 +148,9 @@ public class Listener {
                 if (resourceUrl is string) {
                     http:ClientConfiguration? publisherClientConfig =
                                 <http:ClientConfiguration?> subscriptionDetails[ANNOT_FIELD_PUBLISHER_CLIENT_CONFIG];
-                    string?|string[] expectedMediaType = <string?|string[]> subscriptionDetails[ANNOT_FIELD_ACCEPT];
-                    string?|string[] expectedLanguageType = <string?|string[]> subscriptionDetails[ANNOT_FIELD_ACCEPT_LANGUAGE];
-                    var discoveredDetails = retrieveHubAndTopicUrl(resourceUrl, publisherClientConfig, expectedMediaType, expectedLanguageType);
+                    string?|string[] expectedMediaTypes = <string?|string[]> subscriptionDetails[ANNOT_FIELD_ACCEPT];
+                    string?|string[] expectedLanguageTypes = <string?|string[]> subscriptionDetails[ANNOT_FIELD_ACCEPT_LANGUAGE];
+                    var discoveredDetails = retrieveHubAndTopicUrl(resourceUrl, publisherClientConfig, expectedMediaTypes, expectedLanguageTypes);
                     if (discoveredDetails is [string, string]) {
                         var [retHub, retTopic] = discoveredDetails;
                         var hubDecodeResponse = encoding:decodeUriComponent(retHub, "UTF-8");
@@ -278,33 +278,33 @@ public type ExtensionConfig record {|
 #
 # + resourceUrl - The resource URL advertising the hub and topic URLs
 # + publisherClientConfig - The configuration for the publisher client
-# + expectedMediaType - The expected media type for the subscriber client
-# + expectedLanguageType - The expected language type for the subscriber client
+# + expectedMediaTypes - The expected media types for the subscriber client
+# + expectedLanguageTypes - The expected language types for the subscriber client
 # + return - A `(hub, topic)` as a `(string, string)` if successful or else an `error` if not
-function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? publisherClientConfig, string?|string[] expectedMediaType, string?|string[] expectedLanguageType)
+function retrieveHubAndTopicUrl(string resourceUrl, http:ClientConfiguration? publisherClientConfig, string?|string[] expectedMediaTypes, string?|string[] expectedLanguageTypes)
         returns @tainted [string, string]|error {
     http:Client resourceEP = check new http:Client(resourceUrl, publisherClientConfig);
     http:Request request = new;
-    if (expectedMediaType is string) {
-        request.addHeader(ACCEPT_HEADER, expectedMediaType);
+    if (expectedMediaTypes is string) {
+        request.addHeader(ACCEPT_HEADER, expectedMediaTypes);
     }
     
-    if (expectedMediaType is string[]) {
-        string acceptMeadiaTypesString = expectedMediaType[0];
-        foreach string mediaType in expectedMediaType {
-            acceptMeadiaTypesString = acceptMeadiaTypesString.concat(", ", mediaType);
+    if (expectedMediaTypes is string[]) {
+        string acceptMeadiaTypesString = expectedMediaTypes[0];
+        foreach int expectedMediaTypeIndex in 1 ... (expectedMediaTypes.length() - 1) {
+            acceptMeadiaTypesString = acceptMeadiaTypesString.concat(", ", expectedMediaTypes[expectedMediaTypeIndex]);
         }
         request.addHeader(ACCEPT_HEADER, acceptMeadiaTypesString);
     }
     
-    if (expectedLanguageType is string) {
-        request.addHeader(ACCEPT_LANGUAGE_HEADER, expectedLanguageType);
+    if (expectedLanguageTypes is string) {
+        request.addHeader(ACCEPT_LANGUAGE_HEADER, expectedLanguageTypes);
     }
     
-    if (expectedLanguageType is string[]) {
-        string acceptLanguageTypesString = expectedLanguageType[0];
-        foreach string languageType in expectedLanguageType {
-            acceptLanguageTypesString = acceptLanguageTypesString.concat(", ", languageType);
+    if (expectedLanguageTypes is string[]) {
+        string acceptLanguageTypesString = expectedLanguageTypes[0];
+        foreach int expectedLanguageTypeIndex in 1 ... (expectedLanguageTypes.length() - 1) {
+            acceptLanguageTypesString = acceptLanguageTypesString.concat(", ", expectedLanguageTypes[expectedLanguageTypeIndex]);
         }
         request.addHeader(ACCEPT_LANGUAGE_HEADER, acceptLanguageTypesString);
     }
