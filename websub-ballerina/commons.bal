@@ -15,7 +15,6 @@
 // under the License.
 
 import ballerina/crypto;
-import ballerina/encoding;
 import ballerina/http;
 import ballerina/lang.'string as strings;
 import ballerina/log;
@@ -120,68 +119,31 @@ public const TOPIC_ID_HEADER_AND_PAYLOAD = "TOPIC_ID_HEADER_AND_PAYLOAD";
 ///////////////////////////////////////////////////////////////////
 //////////////////// WebSub Subscriber Commons ////////////////////
 ///////////////////////////////////////////////////////////////////
-#  representing an intent verification request received.
-#
-# + mode - The mode specified in the intent verification request, subscription or unsubscription
-# + topic - The topic for which intent is verified to subscribe/unsubscribe
-# + challenge - The challenge to be echoed to verify intent to subscribe/unsubscribe
-# + leaseSeconds - The lease seconds period for which a subscription will be active if intent verification
-#                  is being done for subscription
-# + request - An `http:Request` received for intent verification
-public class IntentVerificationRequest {
+public type SubscriptionVerification record {
+    string hubMode;
+    string hubTopic;
+    string hubChallenge;
+    string? hubLeaseSeconds;
+};
 
-    public string mode = "";
-    public string topic = "";
-    public string challenge = "";
-    public int leaseSeconds = 0;
-    public http:Request request = new;
+public type ContentDistributionMessage record {
+    map<string|string[]>? headers = ();
+    string? contentType = ();
+    json|xml|string|byte[] content;
+};
 
-    # Builds the response for the request, verifying intention to subscribe, if the topic matches that expected.
-    # ```ballerina
-    #  http:Response response = request.buildSubscriptionVerificationResponse("<TOPIC_TO_VERIFY_FOR>");
-    # ```
-    #
-    # + expectedTopic - The topic for which subscription should be accepted
-    # + return - An `http:Response`, which to the hub verifying/denying intent to subscribe
-    public isolated function buildSubscriptionVerificationResponse(string expectedTopic) returns http:Response {
-        return buildIntentVerificationResponse(self, MODE_SUBSCRIBE, expectedTopic);
-    }
+type CommonResponse record {|
+    map<string|string[]>? headers = ();
+    map<string>? body = ();
+|};
 
-    # Builds the response for the request, verifying intention to unsubscribe, if the topic matches that expected.
-    # ```ballerina
-    # http:Response response = request.buildUnsubscriptionVerificationResponse("<TOPIC_TO_VERIFY_FOR>");
-    # ```
-    #
-    # + expectedTopic - The topic for which unsubscription should be accepted
-    # + return - An `http:Response`, which to for the hub verifying/denying intent to unsubscribe
-    public isolated function buildUnsubscriptionVerificationResponse(string expectedTopic) returns http:Response {
-        return buildIntentVerificationResponse(self, MODE_UNSUBSCRIBE, expectedTopic);
-    }
-}
+public type SubscriptionVerificationSuccess record {
+    *CommonResponse;
+};
 
-# Function to build intent verification response for subscription/unsubscription requests sent.
-#
-# + intentVerificationRequest - The intent verification request from the hub
-# + mode - The mode (subscription/unsubscription) for which a request was sent
-# + topic - The intended topic for which subscription change should be verified
-# + return - An `http:Response`, which to the hub verifying/denying intent to subscripe/unsubscribe
-isolated function buildIntentVerificationResponse(IntentVerificationRequest intentVerificationRequest, string mode,
-                                         string topic) returns http:Response {
-    http:Response response = new;
-    var decodedTopic = encoding:decodeUriComponent(intentVerificationRequest.topic, "UTF-8");
-    string reqTopic = decodedTopic is string ? decodedTopic : topic;
-
-    string reqMode = intentVerificationRequest.mode;
-    string challenge = <@untainted>intentVerificationRequest.challenge;
-
-    if (reqMode == mode && reqTopic == topic) {
-        response.statusCode = http:STATUS_ACCEPTED;
-        response.setTextPayload(challenge);
-    } else {
-        response.statusCode = http:STATUS_NOT_FOUND;
-    }
-    return response;
-}
+public type Acknowledgement record {
+    *CommonResponse;
+};
 
 # Function to build the data source and validate the signature for requests received at the callback.
 #

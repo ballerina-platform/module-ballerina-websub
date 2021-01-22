@@ -90,9 +90,12 @@ public class WebSubSubscriberConstants {
 
     public static final String WEBSUB_INTENT_VERIFICATION_REQUEST = "IntentVerificationRequest";
     public static final String WEBSUB_NOTIFICATION_REQUEST = "Notification";
+    public static final String WEBSUB_SUBSCRIPTION_VERIFICATION_MESSAGE = "SubscriptionVerification";
+    public static final String WEBSUB_CONTENT_DISTRIBUTION_MESSAGE = "SubscriptionVerification";
 
-    public static final String RESOURCE_NAME_ON_INTENT_VERIFICATION = "onIntentVerification";
-    public static final String RESOURCE_NAME_ON_NOTIFICATION = "onNotification";
+    public static final String RESOURCE_NAME_ON_SUBSCRIPTION_DENIED = "onSubscriptionValidationDenied";
+    public static final String RESOURCE_NAME_ON_INTENT_VERIFICATION = "onSubscriptionVerification";
+    public static final String RESOURCE_NAME_ON_NOTIFICATION = "onEventNotification";
 
     static final BString PATH_FIELD = StringUtils.fromString("path");
 
@@ -104,11 +107,11 @@ public class WebSubSubscriberConstants {
     public static final BString SUBSCRIPTION_DETAILS_CREATED_AT = StringUtils.fromString("createdAt");
     public static final String SUBSCRIPTION_DETAILS = "SubscriberDetails";
 
-    // IntentVerificationRequest
-    public static final String VERIFICATION_REQUEST_MODE = "mode";
-    public static final String VERIFICATION_REQUEST_TOPIC = "topic";
-    public static final String VERIFICATION_REQUEST_CHALLENGE = "challenge";
-    public static final String VERIFICATION_REQUEST_LEASE_SECONDS = "leaseSeconds";
+    // subscriptionVerificationMessage
+    public static final String SUBSCRIPTION_VERIFICATION_HUB_MODE = "hubMode";
+    public static final String SUBSCRIPTION_VERIFICATION_HUB_TOPIC = "hubTopic";
+    public static final String SUBSCRIPTION_VERIFICATION_HUB_CHALLENGE = "hubChallenge";
+    public static final String SUBSCRIPTION_VERIFICATION_LEASE_SECONDS = "hubLeaseSeconds";
     public static final String REQUEST = "request";
 
     // websub Listener struct

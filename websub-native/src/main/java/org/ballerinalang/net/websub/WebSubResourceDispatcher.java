@@ -18,15 +18,20 @@
 
 package org.ballerinalang.net.websub;
 
+import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
+import org.ballerinalang.net.http.HttpConstants;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
 import org.ballerinalang.net.transport.contract.exceptions.ServerConnectorException;
 import org.ballerinalang.net.transport.message.HttpCarbonMessage;
+import org.ballerinalang.net.uri.URIUtil;
+
+import java.io.UnsupportedEncodingException;
 
 import static org.ballerinalang.net.http.HttpConstants.HTTP_METHOD_GET;
 import static org.ballerinalang.net.http.HttpConstants.HTTP_METHOD_POST;
@@ -38,6 +43,7 @@ import static org.ballerinalang.net.websub.WebSubSubscriberConstants.DEFERRED_FO
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ENTITY_ACCESSED_REQUEST;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.RESOURCE_NAME_ON_INTENT_VERIFICATION;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.RESOURCE_NAME_ON_NOTIFICATION;
+import static org.ballerinalang.net.websub.WebSubSubscriberConstants.RESOURCE_NAME_ON_SUBSCRIPTION_DENIED;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.TOPIC_ID_HEADER;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.TOPIC_ID_PAYLOAD_KEY;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB_PACKAGE_FULL_QUALIFIED_NAME;
@@ -75,7 +81,7 @@ class WebSubResourceDispatcher {
                 resourceName = retrieveResourceName(inboundRequest, servicesRegistry);
             }
         } else {
-            resourceName = retrieveResourceName(method);
+            resourceName = retrieveResourceName(method, inboundRequest);
         }
 
         for (HttpResource resource : service.getResources()) {
@@ -103,6 +109,9 @@ class WebSubResourceDispatcher {
                 }
                 inboundRequest.setProperty(ANNOTATED_TOPIC, annotatedTopic);
                 inboundRequest.setProperty(HTTP_RESOURCE, ANNOTATED_TOPIC);
+            } else if (RESOURCE_NAME_ON_SUBSCRIPTION_DENIED.equals(resourceName)) {
+                inboundRequest.setHttpStatusCode(200);
+                throw new BallerinaConnectorException("On subscription denied request is not handled in the service");
             } else {
                 inboundRequest.setHttpStatusCode(404);
                 throw new BallerinaConnectorException("no matching WebSub Subscriber service  resource " + resourceName
@@ -120,12 +129,26 @@ class WebSubResourceDispatcher {
      *                  {@link WebSubSubscriberConstants#RESOURCE_NAME_ON_NOTIFICATION} if the method is POST
      * @throws BallerinaConnectorException for any method other than GET or POST
      */
-    private static String retrieveResourceName(String method) {
+    private static String retrieveResourceName(String method, HttpCarbonMessage inboundRequest) {
         switch (method) {
             case HTTP_METHOD_POST:
                 return RESOURCE_NAME_ON_NOTIFICATION;
             case HTTP_METHOD_GET:
-                return RESOURCE_NAME_ON_INTENT_VERIFICATION;
+                String queryString = (String) inboundRequest.getProperty(HttpConstants.QUERY_STR);
+                BMap<BString, Object> params = ValueCreator.createMapValue();
+                String hubMode = "";
+                try {
+                    URIUtil.populateQueryParamMap(queryString, params);
+                    hubMode = params.getArrayValue(StringUtils.fromString("hub.mode")).getBString(0).getValue();
+                } catch (UnsupportedEncodingException e) {
+                    inboundRequest.setHttpStatusCode(404);
+                    throw new BallerinaConnectorException("Bad Request. No query params found");
+                }
+                if (hubMode.equalsIgnoreCase("denied")) {
+                    return RESOURCE_NAME_ON_SUBSCRIPTION_DENIED;
+                } else if (hubMode.equalsIgnoreCase("accepted")) {
+                    return RESOURCE_NAME_ON_INTENT_VERIFICATION;
+                }
             default:
                 throw new BallerinaConnectorException("method not allowed for WebSub Subscriber Services : " + method);
         }

@@ -19,3 +19,7 @@ public type ListenerStartupError distinct error;
 
 # Represents a webSub distinct error.
 public type WebSubError distinct error;
+
+public type SubscriptionVerificationError distinct error;
+
+public type SubscriptionDeniedError distinct error;
