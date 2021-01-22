@@ -26,16 +26,10 @@ verification
 
 #### Subscriber
 
-This module allows introducing a WebSub Subscriber Service with `onIntentVerification`, which accepts HTTP GET requests for intent verification, and `onNotification`, which accepts HTTP POST requests for notifications. The WebSub Subscriber Service provides the following capabilities:
+This module allows introducing a WebSub Subscriber Service with `onSubscriptionVerification`, which accepts HTTP GET requests for intent verification, and `onEventNotification`, which accepts HTTP POST requests for notifications. The WebSub Subscriber Service provides the following capabilities:
  - When the service is started a subscription request is sent for a hub/topic combination, either specified as annotations or discovered based on the resource URL specified as an annotation.
- - If `onIntentVerification` is not specified, intent verification will be done automatically against the topic specified as an annotation or discovered based on the resource URL specified as an annotation.
+ - If `onSubscriptionVerification` is not specified, intent verification will be done automatically against the topic specified as an annotation or discovered based on the resource URL specified as an annotation.
  - If a secret is specified for the subscription, signature validation will be done for authenticated content distribution.
- 
-**Sends subscription request on service startup and explicit intent verification**
-  
-  > When the `subscribeOnStartUp` is set to true in the Subscriber Service, it will result in a subscription request being sent to the specified hub for the specified topic, with the specified lease seconds value and the specified secret for authenticated content distribution. 
-  
-  > Since an `onIntentVerification` resource function is not included, intent verification for subscription and unsubscription requests would happen automatically.
 
     ```ballerina
     @websub:SubscriberServiceConfig {	
@@ -46,32 +40,29 @@ This module allows introducing a WebSub Subscriber Service with `onIntentVerific
         secret: "<SECRET>"	
     }	
     service websubSubscriber on websubEP {	
-        resource function onNotification(websub:Notification notification) {	
+        remote function onEventNotification(websub:ContentDistributionMessage event) {	
             //...
         }	
     }
     ```
     
-  > Explicit intent verification can be done by introducing an `onIntentVerification` resource function.
+  > Explicit intent verification can be done by introducing an `onSubscriptionVerification` resource function.
  
     ```ballerina
-        resource function onIntentVerification(websub:Caller caller, websub:IntentVerificationRequest request) {	
-            http:Response response = new;	
-            // Insert logic to build subscription/unsubscription intent verification response.	
-            error? result = caller->respond(response);
+        remote function onSubscriptionVerification(websub:SubscriptionVerification msg)
+                                    returns websub:SubscriptionVerificationSuccess|SubscriptionVerificationError { 	
+            // Insert the logic to build subscription/unsubscription intent verification response	
+            // and return the value.
         }
      ```
  
-Functions are made available on the `websub:IntentVerificationRequest` to build a subscription or unsubscription 
+Functions are made available on the `websub:SubscriptionVerification` to build a subscription or unsubscription 
 verification response, specifying the topic to verify intent against:
 ```ballerina
-http:Response response = request.buildSubscriptionVerificationResponse("<TOPIC_TO_VERIFY_FOR>");
-```
-```ballerina
-http:Response response = request.buildUnsubscriptionVerificationResponse("<TOPIC_TO_VERIFY_FOR>");
+var result = check msg.verifySubscription("http://localtopic.com");
 ```
 
-### Introducing Specific Subscriber Services (Webhook Callback Services)
+### [Temporarily Disabled in Alpha] Introducing Specific Subscriber Services (Webhook Callback Services)
 
 Ballerina's WebSub subscriber service listener can be extended to introduce specific Webhooks.
  
@@ -162,7 +153,7 @@ The mapping can be based on one of the following indicators of a notification re
     The first parameter of this resource will be the generic `websub:Notification` record and the second parameter will 
     be a custom `IssueOpenedEvent` record, mapping the JSON payload received when an issue is created. 
      
-#### The Specific Subscriber Service
+#### [Temporarily Disabled in Alpha] The Specific Subscriber Service
 
 In order to introduce a specific subscriber service, a new Ballerina `listener` needs to be introduced. This `listener` should wrap the generic `ballerina/websub:Listener` and include the extension configuration described above.
 
@@ -260,8 +251,3 @@ service specificSubscriber on new WebhookListener(8080) {
 
 For a step-by-step guide on introducing custom subscriber services, see the ["Create Webhook Callback Services"](https://ballerina.io/learn/how-to-extend-ballerina/#create-webhook-callback-services) section of "How to Extend Ballerina". 
  
-For information on the operations, which you can perform with this module, see the below **Functions**. For examples on the usage of the operations, see the following.
- * [Internal Hub Sample Example](https://ballerina.io/learn/by-example/websub-internal-hub-sample.html)
- * [Remote Hub Sample Example](https://ballerina.io/learn/by-example/websub-remote-hub-sample.html)
- * [Hub Client Sample Example](https://ballerina.io/learn/by-example/websub-hub-client-sample.html)
- * [Service Integration Sample Example](https://ballerina.io/learn/by-example/websub-service-integration-sample.html)
