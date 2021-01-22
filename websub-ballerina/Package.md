@@ -45,8 +45,8 @@ This module allows introducing a WebSub Subscriber Service with `onSubscriptionV
         }	
     }
     ```
-    
-  > Explicit intent verification can be done by introducing an `onSubscriptionVerification` resource function.
+   
+   > Explicit intent verification can be done by introducing an `onSubscriptionVerification` resource function.
  
     ```ballerina
     remote function onSubscriptionVerification(websub:SubscriptionVerification msg)
@@ -54,7 +54,7 @@ This module allows introducing a WebSub Subscriber Service with `onSubscriptionV
         // Insert the logic to build subscription/unsubscription intent verification response	
         // and return the value.
     }
-     ```
+   ```
  
 Functions are made available on the `websub:SubscriptionVerification` to build a subscription or unsubscription 
 verification response, specifying the topic to verify intent against:
