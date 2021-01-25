@@ -24,6 +24,7 @@ import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
+
 import org.ballerinalang.net.http.HttpConstants;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
@@ -32,6 +33,7 @@ import org.ballerinalang.net.transport.message.HttpCarbonMessage;
 import org.ballerinalang.net.uri.URIUtil;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 
 import static org.ballerinalang.net.http.HttpConstants.HTTP_METHOD_GET;
 import static org.ballerinalang.net.http.HttpConstants.HTTP_METHOD_POST;
@@ -56,101 +58,95 @@ import static org.ballerinalang.net.websub.WebSubUtils.getJsonBody;
  * @since 0.965.0
  */
 class WebSubResourceDispatcher {
+    private static final String HUB_MODE_DENIED = "denied";
+    private static final String HUB_MODE_SUBSCRIBE = "subscribe";
+    private static final String HUB_MODE_UNSUBSCRIBE = "unsubscribe";
 
-    static HttpResource findResource(HttpService service, HttpCarbonMessage inboundRequest,
+    static HttpResource findResource(HttpService service, 
+                                     HttpCarbonMessage inboundRequest, 
                                      WebSubServicesRegistry servicesRegistry)
-            throws BallerinaConnectorException, ServerConnectorException {
+                                     throws BallerinaConnectorException, ServerConnectorException {
 
         String method = inboundRequest.getHttpMethod();
-        HttpResource httpResource = null;
-        String resourceName;
 
-        // TODO: 8/1/18 refactor this block to reduce checks
-        String topicIdentifier = servicesRegistry.getTopicIdentifier();
-        if (TOPIC_ID_HEADER.equals(topicIdentifier) && HTTP_METHOD_POST.equals(method)) {
-            String topic = inboundRequest.getHeader(servicesRegistry.getTopicHeader());
-            resourceName = retrieveResourceNameFromTopic(StringUtils.fromString(topic), servicesRegistry.getHeaderResourceMap());
-        } else if (topicIdentifier != null && HTTP_METHOD_POST.equals(method)) {
-            if (inboundRequest.getProperty(HTTP_RESOURCE) == null) {
-                inboundRequest.setProperty(HTTP_RESOURCE, DEFERRED_FOR_PAYLOAD_BASED_DISPATCHING);
-                return null;
-            }
-            if (topicIdentifier.equals(TOPIC_ID_PAYLOAD_KEY)) {
-                resourceName = retrieveResourceName(inboundRequest, servicesRegistry.getPayloadKeyResourceMap());
-            } else {
-                resourceName = retrieveResourceName(inboundRequest, servicesRegistry);
-            }
-        } else {
-            resourceName = retrieveResourceName(method, inboundRequest);
-        }
+        String resourceName = getResourceName(method, inboundRequest, servicesRegistry);
 
-        for (HttpResource resource : service.getResources()) {
-            if (resource.getName().equals(resourceName)) {
-                httpResource = resource;
-                break;
-            }
-        }
-
-        if (httpResource == null) {
-            if (RESOURCE_NAME_ON_INTENT_VERIFICATION.equals(resourceName)) {
-                //if the request is a GET request indicating an intent verification request, and the user has not
-                //specified an onIntentVerification resource, assume auto intent verification
-                Object target = ((BMap) (service.getBalService().getType()).getAnnotation(StringUtils.fromString(
-                        WEBSUB_PACKAGE_FULL_QUALIFIED_NAME + ":" + ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG)))
-                        .get(ANN_WEBSUB_ATTR_TARGET);
-                String annotatedTopic = "";
-
-                if (target instanceof BArray) {
-                    annotatedTopic = ((BArray) target).getString(1);
-                }
-
-                if (annotatedTopic.isEmpty() && service instanceof WebSubHttpService) {
-                    annotatedTopic = ((WebSubHttpService) service).getTopic();
-                }
-                inboundRequest.setProperty(ANNOTATED_TOPIC, annotatedTopic);
-                inboundRequest.setProperty(HTTP_RESOURCE, ANNOTATED_TOPIC);
-            } else if (RESOURCE_NAME_ON_SUBSCRIPTION_DENIED.equals(resourceName)) {
-                inboundRequest.setHttpStatusCode(200);
-                throw new BallerinaConnectorException("On subscription denied request is not handled in the service");
-            } else {
-                inboundRequest.setHttpStatusCode(404);
-                throw new BallerinaConnectorException("no matching WebSub Subscriber service  resource " + resourceName
-                                                              + " found for method : " + method);
-            }
-        }
-        return httpResource;
+        return getResource(resourceName, method, service, inboundRequest);
     }
 
     /**
-     * Method to retrieve resource names for default WebSub subscriber services.
+     * Method to retrieve resource names for incomming HTTP Reuqest
      *
-     * @param method    the method of the received request
-     * @return          {@link WebSubSubscriberConstants#RESOURCE_NAME_ON_INTENT_VERIFICATION} if the method is GET,
-     *                  {@link WebSubSubscriberConstants#RESOURCE_NAME_ON_NOTIFICATION} if the method is POST
+     * @param method            {@String} HTTP method for incomming request
+     * @param inboundRequest    {@HttpCarbonMessage} inbound HTTP Request
+     * @param serviceRegistry   {@WebSubServicesRegistry} WebSub service registry
+     * @return                  {@String} specifying the resource name if found
+     * @throws BallerinaConnectorException for any erroneous scenarios
+     */
+    private static String getResourceName(String requestMethod, 
+                                          HttpCarbonMessage inboundRequest,
+                                          WebSubServicesRegistry servicesRegistry) {
+        String topicIdentifier = servicesRegistry.getTopicIdentifier();
+        
+        if (TOPIC_ID_HEADER.equals(topicIdentifier) && HTTP_METHOD_POST.equalsIgnoreCase(requestMethod)) {
+            
+            String topic = inboundRequest.getHeader(servicesRegistry.getTopicHeader());
+        
+            return retrieveResourceNameFromTopic(StringUtils.fromString(topic), servicesRegistry.getHeaderResourceMap());
+        } else if (Objects.nonNull(topicIdentifier) && HTTP_METHOD_POST.equalsIgnoreCase(requestMethod)) {
+            
+            if (Objects.isNull(inboundRequest.getProperty(HTTP_RESOURCE))) {
+                inboundRequest.setProperty(HTTP_RESOURCE, DEFERRED_FOR_PAYLOAD_BASED_DISPATCHING);
+                return null;
+            } else {
+                if (topicIdentifier.equals(TOPIC_ID_PAYLOAD_KEY)) {
+                    return retrieveResourceName(inboundRequest, servicesRegistry.getPayloadKeyResourceMap());
+                } else {
+                    return retrieveResourceName(inboundRequest, servicesRegistry);
+                }
+            }
+        } else {
+            return retrieveResourceName(requestMethod, inboundRequest);
+        }
+    }
+
+    /**
+     * Method to retrieve resource names from HTTP Method and hub.mode
+     *
+     * @param requestMethod    {@String} HTTP method of the incomming request
+     * @return                 {@link WebSubSubscriberConstants#RESOURCE_NAME_ON_INTENT_VERIFICATION} if the method is GET,
+     *                         {@link WebSubSubscriberConstants#RESOURCE_NAME_ON_NOTIFICATION} if the method is POST
      * @throws BallerinaConnectorException for any method other than GET or POST
      */
-    private static String retrieveResourceName(String method, HttpCarbonMessage inboundRequest) {
-        switch (method) {
-            case HTTP_METHOD_POST:
-                return RESOURCE_NAME_ON_NOTIFICATION;
-            case HTTP_METHOD_GET:
-                String queryString = (String) inboundRequest.getProperty(HttpConstants.QUERY_STR);
-                BMap<BString, Object> params = ValueCreator.createMapValue();
-                String hubMode = "";
-                try {
-                    URIUtil.populateQueryParamMap(queryString, params);
-                    hubMode = params.getArrayValue(StringUtils.fromString("hub.mode")).getBString(0).getValue();
-                } catch (UnsupportedEncodingException e) {
-                    inboundRequest.setHttpStatusCode(404);
-                    throw new BallerinaConnectorException("Bad Request. No query params found");
-                }
-                if (hubMode.equalsIgnoreCase("denied")) {
-                    return RESOURCE_NAME_ON_SUBSCRIPTION_DENIED;
-                } else if (hubMode.equalsIgnoreCase("accepted")) {
-                    return RESOURCE_NAME_ON_INTENT_VERIFICATION;
-                }
-            default:
-                throw new BallerinaConnectorException("method not allowed for WebSub Subscriber Services : " + method);
+    private static String retrieveResourceName(String requestMethod, 
+                                               HttpCarbonMessage inboundRequest) {
+        if (HTTP_METHOD_POST.equalsIgnoreCase(requestMethod)) {
+            return RESOURCE_NAME_ON_NOTIFICATION;
+        } else if (HTTP_METHOD_GET.equalsIgnoreCase(requestMethod)) {
+            String queryString = (String) inboundRequest.getProperty(HttpConstants.QUERY_STR);
+            BMap<BString, Object> params = ValueCreator.createMapValue();
+            
+            String hubMode = "";
+            
+            try {
+                URIUtil.populateQueryParamMap(queryString, params);
+                hubMode = params.getArrayValue(StringUtils.fromString("hub.mode")).getBString(0).getValue();
+            } catch (UnsupportedEncodingException e) {
+                inboundRequest.setHttpStatusCode(404);
+                throw new BallerinaConnectorException("Bad Request. No query params found");
+            }
+
+            if (HUB_MODE_DENIED.equalsIgnoreCase(hubMode)) {
+                return RESOURCE_NAME_ON_SUBSCRIPTION_DENIED;
+            } else if (HUB_MODE_SUBSCRIBE.equalsIgnoreCase(hubMode)) {
+                return RESOURCE_NAME_ON_INTENT_VERIFICATION;
+            } else {
+                throw new BallerinaConnectorException(
+                    String.format("HubMode[%s] is not allowed for WebSub Subscriber Services", hubMode));
+            }
+        } else {
+            throw new BallerinaConnectorException(
+                String.format("HTTP Method [%s] not allowed for WebSub Subscriber Services", requestMethod));
         }
     }
 
@@ -217,13 +213,18 @@ class WebSubResourceDispatcher {
     private static String retrieveResourceName(HttpCarbonMessage inboundRequest,
                                                BMap<BString, BMap<BString, Object>> payloadKeyResourceMap) {
         BObject httpRequest = getHttpRequest(inboundRequest);
-        BMap<BString, ?> jsonBody = getJsonBody(httpRequest);
+        
+        BMap<BString, ?> requestBody = getJsonBody(httpRequest);
+        
         inboundRequest.setProperty(ENTITY_ACCESSED_REQUEST, httpRequest);
-        String resourceName = retrieveResourceNameForKey(jsonBody, payloadKeyResourceMap);
-        if (resourceName != null) {
+        
+        String resourceName = retrieveResourceNameForKey(requestBody, payloadKeyResourceMap);
+        
+        if (Objects.nonNull(resourceName) && !resourceName.isEmpty()) {
             return resourceName;
+        } else {
+            throw new BallerinaConnectorException("Matching resource not found for dispatching based on Payload Key");
         }
-        throw new BallerinaConnectorException("Matching resource not found for dispatching based on Payload Key");
     }
 
     private static String retrieveResourceNameForKey(BMap<BString, ?> jsonBody,
@@ -256,6 +257,58 @@ class WebSubResourceDispatcher {
         } else {
             throw new BallerinaConnectorException("resource not specified for topic : " + topic);
         }
+    }
+
+    /**
+     * Method to retrieve requested HTTP resource for incomming request
+     *
+     * @param resourceName    {@String} requested resource name
+     * @param requestMethod   {@String} HTTP method of incomming request
+     * @param service         {@HttpService} HTTP service
+     * @return                {@HttpResource} requested HTTP resource if found
+     * @throws BallerinaConnectorException for any erroneous scenarios
+     */
+    private static HttpResource getResource(String resourceName, 
+                                            String requestMethod,
+                                            HttpService service, 
+                                            HttpCarbonMessage inboundRequest) {
+        HttpResource requestedResource = null;
+
+        for (HttpResource resource : service.getResources()) {
+            if (resource.getName().equals(resourceName)) {
+                requestedResource = resource;
+                break;
+            }
+        }
+
+        if (Objects.isNull(requestedResource)) {
+            if (RESOURCE_NAME_ON_INTENT_VERIFICATION.equals(resourceName)) {
+                //if the request is a GET request indicating an intent verification request, and the user has not
+                //specified an onIntentVerification resource, assume auto intent verification
+                Object target = ((BMap) (service.getBalService().getType()).getAnnotation(StringUtils.fromString(
+                        WEBSUB_PACKAGE_FULL_QUALIFIED_NAME + ":" + ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG)))
+                        .get(ANN_WEBSUB_ATTR_TARGET);
+                String annotatedTopic = "";
+    
+                if (target instanceof BArray) {
+                    annotatedTopic = ((BArray) target).getString(1);
+                }
+    
+                if (annotatedTopic.isEmpty() && service instanceof WebSubHttpService) {
+                    annotatedTopic = ((WebSubHttpService) service).getTopic();
+                }
+                inboundRequest.setProperty(ANNOTATED_TOPIC, annotatedTopic);
+                inboundRequest.setProperty(HTTP_RESOURCE, ANNOTATED_TOPIC);
+            } else if (RESOURCE_NAME_ON_SUBSCRIPTION_DENIED.equals(resourceName)) {
+                inboundRequest.setHttpStatusCode(200);
+                throw new BallerinaConnectorException("On subscription denied request is not handled in the service");
+            } else {
+                inboundRequest.setHttpStatusCode(404);
+                throw new BallerinaConnectorException(String.format("no matching WebSub Subscriber service  resource [%s] found for method [%s]", resourceName, requestMethod));
+            }
+        }
+
+        return requestedResource;
     }
 
 }

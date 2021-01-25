@@ -21,8 +21,6 @@ import ballerina/test;
 listener Listener testListener = new(9090);
 
 @SubscriberServiceConfig {
-    path: "/websub",
-    subscribeOnStartUp: false,
     target: ["http://localhost:9191/websub/hub", "http://websubpubtopic.com"],
     leaseSeconds: 36000,
     secret: "Kslk30SNF2AChs2"
@@ -76,7 +74,7 @@ function testOnSubscriptionValidation() returns @tainted error? {
 function testOnIntentVerificationSuccess() returns @tainted error? {
     http:Request request = new;
 
-    var response = check httpClient->get("/?hub.mode=accepted&hub.topic=test&hub.challenge=1234", request);
+    var response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
     if (response is http:Response) {
         test:assertEquals(response.statusCode, 200);
         test:assertEquals(response.getTextPayload(), "1234");
@@ -90,7 +88,7 @@ function testOnIntentVerificationSuccess() returns @tainted error? {
 function testOnIntentVerificationFailure() returns @tainted error? {
     http:Request request = new;
 
-    var response = check httpClient->get("/?hub.mode=accepted&hub.topic=test1&hub.challenge=1234", request);
+    var response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
     if (response is http:Response) {
         test:assertEquals(response.statusCode, 404);
         test:assertEquals(response.getTextPayload(), "Hub topic not supported");
