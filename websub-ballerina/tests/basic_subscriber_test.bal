@@ -21,7 +21,6 @@ import ballerina/test;
 listener Listener testListener = new(9090);
 
 @SubscriberServiceConfig {
-    path: "/websub",
     subscribeOnStartUp: false,
     target: ["http://localhost:9191/websub/hub", "http://websubpubtopic.com"],
     leaseSeconds: 36000,
