@@ -96,9 +96,7 @@ class WebSubResourceDispatcher {
         } else if (Objects.nonNull(topicIdentifier) && HTTP_METHOD_POST.equalsIgnoreCase(requestMethod)) {
             
             if (Objects.isNull(inboundRequest.getProperty(HTTP_RESOURCE))) {
-                
                 inboundRequest.setProperty(HTTP_RESOURCE, DEFERRED_FOR_PAYLOAD_BASED_DISPATCHING);
-                
                 return null;
             } else {
                 if (topicIdentifier.equals(TOPIC_ID_PAYLOAD_KEY)) {
