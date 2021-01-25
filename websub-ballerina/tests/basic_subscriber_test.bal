@@ -76,7 +76,7 @@ function testOnSubscriptionValidation() returns @tainted error? {
 function testOnIntentVerificationSuccess() returns @tainted error? {
     http:Request request = new;
 
-    var response = check httpClient->get("/?hub.mode=accepted&hub.topic=test&hub.challenge=1234", request);
+    var response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
     if (response is http:Response) {
         test:assertEquals(response.statusCode, 200);
         test:assertEquals(response.getTextPayload(), "1234");
@@ -90,7 +90,7 @@ function testOnIntentVerificationSuccess() returns @tainted error? {
 function testOnIntentVerificationFailure() returns @tainted error? {
     http:Request request = new;
 
-    var response = check httpClient->get("/?hub.mode=accepted&hub.topic=test1&hub.challenge=1234", request);
+    var response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
     if (response is http:Response) {
         test:assertEquals(response.statusCode, 404);
         test:assertEquals(response.getTextPayload(), "Hub topic not supported");

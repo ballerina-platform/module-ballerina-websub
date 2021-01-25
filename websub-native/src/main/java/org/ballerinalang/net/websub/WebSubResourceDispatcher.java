@@ -56,17 +56,24 @@ import static org.ballerinalang.net.websub.WebSubUtils.getJsonBody;
  * @since 0.965.0
  */
 class WebSubResourceDispatcher {
+    private static final String HUB_MODE_DENIED = "denied";
+    private static final String HUB_MODE_SUBSCRIBE = "subscribe";
+    private static final String HUB_MODE_UNSUBSCRIBE = "unsubscribe";
 
-    static HttpResource findResource(HttpService service, HttpCarbonMessage inboundRequest,
+    static HttpResource findResource(HttpService service, 
+                                     HttpCarbonMessage inboundRequest, 
                                      WebSubServicesRegistry servicesRegistry)
-            throws BallerinaConnectorException, ServerConnectorException {
+                                     throws BallerinaConnectorException, ServerConnectorException {
 
         String method = inboundRequest.getHttpMethod();
         HttpResource httpResource = null;
         String resourceName;
 
         // TODO: 8/1/18 refactor this block to reduce checks
+
+
         String topicIdentifier = servicesRegistry.getTopicIdentifier();
+        
         if (TOPIC_ID_HEADER.equals(topicIdentifier) && HTTP_METHOD_POST.equals(method)) {
             String topic = inboundRequest.getHeader(servicesRegistry.getTopicHeader());
             resourceName = retrieveResourceNameFromTopic(StringUtils.fromString(topic), servicesRegistry.getHeaderResourceMap());
@@ -129,28 +136,34 @@ class WebSubResourceDispatcher {
      *                  {@link WebSubSubscriberConstants#RESOURCE_NAME_ON_NOTIFICATION} if the method is POST
      * @throws BallerinaConnectorException for any method other than GET or POST
      */
-    private static String retrieveResourceName(String method, HttpCarbonMessage inboundRequest) {
-        switch (method) {
-            case HTTP_METHOD_POST:
-                return RESOURCE_NAME_ON_NOTIFICATION;
-            case HTTP_METHOD_GET:
-                String queryString = (String) inboundRequest.getProperty(HttpConstants.QUERY_STR);
-                BMap<BString, Object> params = ValueCreator.createMapValue();
-                String hubMode = "";
-                try {
-                    URIUtil.populateQueryParamMap(queryString, params);
-                    hubMode = params.getArrayValue(StringUtils.fromString("hub.mode")).getBString(0).getValue();
-                } catch (UnsupportedEncodingException e) {
-                    inboundRequest.setHttpStatusCode(404);
-                    throw new BallerinaConnectorException("Bad Request. No query params found");
-                }
-                if (hubMode.equalsIgnoreCase("denied")) {
-                    return RESOURCE_NAME_ON_SUBSCRIPTION_DENIED;
-                } else if (hubMode.equalsIgnoreCase("accepted")) {
-                    return RESOURCE_NAME_ON_INTENT_VERIFICATION;
-                }
-            default:
-                throw new BallerinaConnectorException("method not allowed for WebSub Subscriber Services : " + method);
+    private static String retrieveResourceName(String method, 
+                                               HttpCarbonMessage inboundRequest) {
+        if (method == HTTP_METHOD_POST) {
+            return RESOURCE_NAME_ON_NOTIFICATION;
+        } else if (method == HTTP_METHOD_GET) {
+            String queryString = (String) inboundRequest.getProperty(HttpConstants.QUERY_STR);
+            BMap<BString, Object> params = ValueCreator.createMapValue();
+            String hubMode = "";
+            
+            try {
+                URIUtil.populateQueryParamMap(queryString, params);
+                hubMode = params.getArrayValue(StringUtils.fromString("hub.mode")).getBString(0).getValue();
+            } catch (UnsupportedEncodingException e) {
+                inboundRequest.setHttpStatusCode(404);
+                throw new BallerinaConnectorException("Bad Request. No query params found");
+            }
+
+            if (HUB_MODE_DENIED.equalsIgnoreCase(hubMode)) {
+                return RESOURCE_NAME_ON_SUBSCRIPTION_DENIED;
+            } else if (HUB_MODE_SUBSCRIBE.equalsIgnoreCase(hubMode)) {
+                return RESOURCE_NAME_ON_INTENT_VERIFICATION;
+            } else {
+                throw new BallerinaConnectorException(
+                    String.format("HubMode[%s] is not allowed for WebSub Subscriber Services", hubMode));
+            }
+        } else {
+            throw new BallerinaConnectorException(
+                String.format("HTTP Method [%s] not allowed for WebSub Subscriber Services", method));
         }
     }
 
