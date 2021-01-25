@@ -102,10 +102,8 @@ class WebSubResourceDispatcher {
                 return null;
             } else {
                 if (topicIdentifier.equals(TOPIC_ID_PAYLOAD_KEY)) {
-                
                     return retrieveResourceName(inboundRequest, servicesRegistry.getPayloadKeyResourceMap());
                 } else {
-                
                     return retrieveResourceName(inboundRequest, servicesRegistry);
                 }
             }
@@ -263,7 +261,7 @@ class WebSubResourceDispatcher {
         }
     }
 
-       /**
+    /**
      * Method to retrieve requested HTTP resource for incomming request
      *
      * @param resourceName    {@String} requested resource name
