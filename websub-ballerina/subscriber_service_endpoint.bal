@@ -122,7 +122,8 @@ public class Listener {
                 continue;
             }
 
-            boolean subscribeOnStartUp = <boolean> subscriptionDetails[ANNOT_FIELD_SUBSCRIBE_ON_STARTUP];
+            // todo Improve this by introducing proper configuration parameter
+            boolean subscribeOnStartUp = true;
 
             if (subscribeOnStartUp) {
                 string? resourceUrl = ();
