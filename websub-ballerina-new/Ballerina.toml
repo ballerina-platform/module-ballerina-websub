@@ -1,0 +1,128 @@
+[package]
+org = "ballerina"
+name = "websub"
+version = "@toml.version@"
+
+[[platform.java11.dependency]]
+path = "../websub-native-new/build/libs/websub-native-new-@project.version@.jar"
+groupId = "ballerina"
+artifactId = "web-sub"
+version = "@project.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/http-native-@http.native.version@.jar"
+groupId = "org.ballerinalang"
+artifactId = "http-native"
+version = "@http.native.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/netty-common-@netty.version@.jar"
+groupId = "io.netty"
+artifactId = "netty-common"
+version = "@netty.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/netty-buffer-@netty.version@.jar"
+groupId = "io.netty"
+artifactId = "netty-buffer"
+version = "@netty.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/netty-transport-@netty.version@.jar"
+groupId = "io.netty"
+artifactId = "netty-transport"
+version = "@netty.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/netty-resolver-@netty.version@.jar"
+groupId = "io.netty"
+artifactId = "netty-resolver"
+version = "@netty.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/netty-handler-@netty.version@.jar"
+groupId = "io.netty"
+artifactId = "netty-handler"
+version = "@netty.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/netty-codec-http-@netty.version@.jar"
+groupId = "io.netty"
+artifactId = "netty-codec-http"
+version = "@netty.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/netty-codec-@netty.version@.jar"
+groupId = "io.netty"
+artifactId = "netty-codec"
+version = "@netty.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/netty-handler-proxy-@netty.version@.jar"
+groupId = "io.netty"
+artifactId = "netty-handler-proxy"
+version = "@netty.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/netty-codec-http2-@netty.version@.jar"
+groupId = "io.netty"
+artifactId = "netty-codec-http2"
+version = "@netty.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/commons-pool-@wso2commonspool.version@.jar"
+groupId = "commons-pool.wso2"
+artifactId = "commons-pool"
+version = "@wso2commonspool.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/snakeyaml-@wso2snakeyaml.version@.jar"
+groupId = "org.wso2.orbit.org.yaml"
+artifactId = "snakeyaml"
+version = "@wso2snakeyaml.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/bcprov-jdk15on-@bouncycastle.version@.jar"
+groupId = "org.bouncycastle"
+artifactId = "bcprov-jdk15on"
+version = "@bouncycastle.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/bcpkix-jdk15on-@bouncycastle.version@.jar"
+groupId = "org.bouncycastle"
+artifactId = "bcpkix-jdk15on"
+version = "@bouncycastle.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/netty-tcnative-boringssl-static-@nettytcnative.version@.jar"
+groupId = "io.netty"
+artifactId = "netty-tcnative-boringssl-static"
+version = "@nettytcnative.version@"
+
+[[platform.java11.dependency]]
+path = "./lib/org.wso2.carbon.metrics.core-@wso2carbonmetrics.version@.jar"
+groupId = "org.wso2.carbon.metrics"
+artifactId = "org.wso2.carbon.metrics.core"
+version = "@wso2carbonmetrics.version@"
+
+
+[[platform.java11.dependency]]
+path = "./lib/guava-@guava.version@.jar"
+groupId = "com.google.guava"
+artifactId = "guava"
+version = "@guava.version@"
