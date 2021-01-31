@@ -53,9 +53,42 @@ service class HttpService {
 
     }
 
-    // [todo - ayesh] read the spec and implement proper HTTP GET methods which are required
     resource function get .(http:Caller caller, http:Request request) {
+        http:Response response = new;
+        response.statusCode = http:STATUS_OK;
 
+        RequestQueryParams params = retrieveRequestQueryParams(request);
+
+        match params.hubMode {
+            MODE_SUBSCRIBE | MODE_UNSUBSCRIBE => {
+                if (self.isSubscriptionVerificationAvailable) {
+                    processSubscriptionVerification(caller, response, <@untainted> params, self.subscriberService);
+                } else {
+                    response.statusCode = http:STATUS_NOT_IMPLEMENTED;
+                    response.setTextPayload(params.hubChallenge);
+                }
+            }
+            MODE_DENIED => {
+                if (self.isSubscriptionValidationDeniedAvailable) {
+                    processSubscriptionDenial(caller, response, <@untainted> params, self.subscriberService);
+                } else {
+                    response.statusCode = http:STATUS_OK;
+                    Acknowledgement result = {
+                        body: {
+                            "message": "Subscription Denial Acknowledged"
+                        }
+                    };
+                    updateResponseBody(response, result["body"], result["headers"]);
+                }
+            }
+            _ => {
+                response.statusCode = http:STATUS_BAD_REQUEST;
+                string errorMessage = "The request does not include valid `hub.mode` form param.";
+                response.setTextPayload(errorMessage);
+            }
+        }
+
+        respondToRequest(caller, response);
     }
 }
 

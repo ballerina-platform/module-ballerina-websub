@@ -24,6 +24,7 @@ import io.ballerina.runtime.api.async.StrandMetadata;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
@@ -41,7 +42,15 @@ public class SubscriberNativeOperationHandler {
         return ValueCreator.createArrayValue(methodNamesList.toArray(BString[]::new));
     }
 
-    private static Object invokeRemoteFunction(Environment env, BObject bSubscriberService, BMap<BString, Object> message,
+    public static Object callOnSubscriptionVerificationMethod(Environment env, BObject bSubscriberService, BMap<BString, Object> message) {
+        return invokeRemoteFunction(env, bSubscriberService, message, "callOnSubscriptionVerificationMethod", "onSubscriptionVerification");
+    }   
+
+    public static Object callOnSubscriptionDeniedMethod(Environment env, BObject bSubscriberService, BError message) {
+        return invokeRemoteFunction(env, bSubscriberService, message, "callOnSubscriptionDeniedMethod", "onSubscriptionValidationDenied"); 
+    }
+
+    private static Object invokeRemoteFunction(Environment env, BObject bSubscriberService, Object message,
                                                String parentFunctionName, String remoteFunctionName) {
         Module module = ModuleUtils.getModule();
         StrandMetadata metadata = new StrandMetadata(module.getOrg(), module.getName(), module.getVersion(), 
