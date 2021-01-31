@@ -53,7 +53,6 @@ const string CONTENT_TYPE = "Content-Type";
 #  value of this `HTTP Header` is used by subscriber to verify whether the content is published by a valid hub.
 const string X_HUB_SIGNATURE = "X-Hub-Signature";
 
-///////////////////////////////// Ballerina WebSub specific constants /////////////////////////////////
 # `hub.mode` value indicating "subscribe" mode, used by a hub to notify a subscription verification.
 const string MODE_SUBSCRIBE = "subscribe";
 # `hub.mode` value indicating "unsubscribe" mode, used by a hub to notify an unsubscription verification.
@@ -81,7 +80,6 @@ public const string SHA1 = "SHA1";
 # The constant used to represent SHA-256 cryptographic hash algorithm
 public const string SHA256 = "SHA256";
 
-///////////////////////////////// Custom Webhook/Extension specific constants /////////////////////////////////
 # The identifier to be used to identify the topic for dispatching with custom subscriber services.
 public type TopicIdentifier TOPIC_ID_HEADER|TOPIC_ID_PAYLOAD_KEY|TOPIC_ID_HEADER_AND_PAYLOAD;
 
@@ -100,12 +98,6 @@ public type SubscriptionVerification record {
     string hubTopic;
     string hubChallenge;
     string? hubLeaseSeconds;
-};
-
-public type SubscriptionDenied record {
-    string hubMode;
-    string hubTopic;
-    string hubReason;
 };
 
 public type ContentDistributionMessage record {
