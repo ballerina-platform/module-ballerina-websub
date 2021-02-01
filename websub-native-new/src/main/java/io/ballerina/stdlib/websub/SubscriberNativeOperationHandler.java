@@ -50,6 +50,10 @@ public class SubscriberNativeOperationHandler {
         return invokeRemoteFunction(env, bSubscriberService, message, "callOnSubscriptionDeniedMethod", "onSubscriptionValidationDenied"); 
     }
 
+    public static void callOnEventNotificationMethod(Environment env, BObject bSubscriberService, BMap<BString, Object> message) {
+        invokeRemoteFunction(env, bSubscriberService, message, "callOnEventNotificationMethod", "onEventNotification"); 
+    }
+
     private static Object invokeRemoteFunction(Environment env, BObject bSubscriberService, Object message,
                                                String parentFunctionName, String remoteFunctionName) {
         Module module = ModuleUtils.getModule();
