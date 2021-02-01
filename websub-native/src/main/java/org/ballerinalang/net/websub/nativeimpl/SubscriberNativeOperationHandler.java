@@ -51,6 +51,8 @@ import static org.ballerinalang.net.http.HttpConstants.DEFAULT_HOST;
 import static org.ballerinalang.net.http.HttpConstants.HTTP_DEFAULT_HOST;
 import static org.ballerinalang.net.http.HttpConstants.HTTP_SERVER_CONNECTOR;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG;
+import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_ACCEPT;
+import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_ACCEPT_LANGUAGE;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_CALLBACK;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_EXPECT_INTENT_VERIFICATION;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_LEASE_SECONDS;
@@ -59,8 +61,6 @@ import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_SUBSCRIPTION_HUB_CLIENT_CONFIG;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_SUBSCRIPTION_PUBLISHER_CLIENT_CONFIG;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_TARGET;
-import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_ACCEPT;
-import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ANN_WEBSUB_ATTR_ACCEPT_LANGUAGE;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ENDPOINT_CONFIG_HOST;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ENDPOINT_CONFIG_PORT;
 import static org.ballerinalang.net.websub.WebSubSubscriberConstants.ENDPOINT_CONFIG_SECURE_SOCKET_CONFIG;
@@ -88,7 +88,8 @@ import static org.ballerinalang.net.websub.WebSubSubscriberConstants.WEBSUB_SERV
  */
 public class SubscriberNativeOperationHandler {
 
-    private static final ArrayType mapArrayType = TypeCreator.createArrayType(TypeCreator.createMapType(PredefinedTypes.TYPE_ANY));
+    private static final ArrayType mapArrayType = TypeCreator.createArrayType(
+                                        TypeCreator.createMapType(PredefinedTypes.TYPE_ANY));
 
     /**
      * Initialize the WebSub subscriber endpoint.
@@ -262,8 +263,8 @@ public class SubscriberNativeOperationHandler {
                 HttpConstants.HTTP_SERVER_CONNECTOR);
         //TODO: check if isStarted check is required
         ServerConnectorFuture serverConnectorFuture = serverConnector.start();
-        WebSubServicesRegistry webSubServicesRegistry = (WebSubServicesRegistry) serviceEndpoint.getNativeData(
-                WebSubSubscriberConstants.WEBSUB_SERVICE_REGISTRY);
+        WebSubServicesRegistry webSubServicesRegistry = (WebSubServicesRegistry) serviceEndpoint
+                                                                        .getNativeData(WEBSUB_SERVICE_REGISTRY);
         serverConnectorFuture.setHttpConnectorListener(
                 new BallerinaWebSubConnectorListener(env.getRuntime(), webSubServicesRegistry, serviceEndpoint
                         .getMapValue(HttpConstants.SERVICE_ENDPOINT_CONFIG), subscriberServiceListener));
