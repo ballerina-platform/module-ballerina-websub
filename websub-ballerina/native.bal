@@ -26,6 +26,7 @@ isolated function callOnSubscriptionDeniedMethod(SubscriberService subscriberSer
     'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
 } external;
 
-isolated function callOnEventNotificationMethod(SubscriberService subscriberService, ContentDistributionMessage msg) = @java:Method {
+isolated function callOnEventNotificationMethod(SubscriberService subscriberService, ContentDistributionMessage msg) 
+                                returns Acknowledgement | SubscriptionDeletedError? = @java:Method {
     'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
 } external;

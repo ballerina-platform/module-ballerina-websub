@@ -20,8 +20,9 @@ public type SubscriberService service object {
 //  remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement?;
 
 //  remote function onSubscriptionVerification(SubscriptionVerification msg)
-//                    returns SubscriptionVerificationSuccess|SubscriptionVerificationError;
+//                    returns SubscriptionVerificationSuccess | SubscriptionVerificationError;
 
-//  remote function onEventNotification(ContentDistributionMessage event);
+//  remote function onEventNotification(ContentDistributionMessage event) 
+//                   returns Acknowledgment | SubscriptionDeletedError?;
 
 };

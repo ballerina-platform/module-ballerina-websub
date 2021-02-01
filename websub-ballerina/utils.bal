@@ -15,60 +15,6 @@
 // under the License.
 
 import ballerina/http;
-import ballerina/crypto;
-
-isolated function isVerifiedContent(http:Request request, 
-                                    string secret, 
-                                    json|xml|string|byte[] payload) returns boolean {
-    if (secret.trim().length() == 0) {
-        return true;
-    } else {
-        string | http:HeaderNotFoundError payloadSignature = request.getHeader(X_HUB_SIGNATURE);
-        if (payloadSignature is http:HeaderNotFoundError) {
-            return false;
-        } else {
-            int splitIdx = payloadSignature.indexOf("=") is () ? 0 : <int>payloadSignature.indexOf("=");
-            string algorithm = payloadSignature.substring(0, splitIdx);
-            string hmac = payloadSignature.substring(splitIdx + 1, payloadSignature.length());
-            string retrievedHashValue = retrieveContentHash(algorithm, secret, payload);
-            return hmac == retrievedHashValue;
-        }
-    }
-}
-
-isolated function retrieveContentHash(string algorithm, string key, json|xml|string|byte[] payload) returns string {
-    byte[] keyArr = key.toBytes();
-    byte[] contentPayload = [];
-    byte[] hashedContent = [];
-        
-    if (payload is byte[]) {
-        contentPayload = payload;
-    } else if (payload is string) {
-        contentPayload = (<string>payload).toBytes();
-    } else if (payload is xml) {
-        contentPayload = (<xml>payload).toString().toBytes();   
-    } else {
-        contentPayload = (<json>payload).toString().toBytes();
-    }
-
-    match algorithm {
-        "sha1" => {
-            hashedContent = crypto:hmacSha1(contentPayload, keyArr);
-        }
-        "sha256" => {
-            hashedContent = crypto:hmacSha256(contentPayload, keyArr);
-        }
-        "sha384" => {
-            hashedContent = crypto:hmacSha384(contentPayload, keyArr);
-        }
-        "sha512" => {
-            hashedContent = crypto:hmacSha512(contentPayload, keyArr);
-        }
-        _ => {}
-    }
-
-    return hashedContent.toBase64();
-}
 
 isolated function updateResponseBody(http:Response response, anydata? messageBody, map<string|string[]>? headers) {
     string payload = "";
@@ -92,24 +38,18 @@ isolated function updateResponseBody(http:Response response, anydata? messageBod
     }
 }
 
-isolated function retrieveRequestBody(http:Request request, string contentType) returns anydata? | http:ClientError? {
-    match contentType {
-        "application/json" => {
-            return request.getJsonPayload();
-        }
-        "application/xml" => {
-            return request.getXmlPayload();
-        }
-        "text/plain" => {
-            return request.getTextPayload();
-        }
-        "application/octet-stream" => {
-            return request.getBinaryPayload();
-        }
-        _ => {
-            return ();
+isolated function retrieveRequestHeaders(http:Request request) returns map<string|string[]> {
+    string[] headerNames = request.getHeaderNames();
+    map<string|string[]> headers = {};
+
+    foreach var headerName in headerNames {
+        http:HeaderNotFoundError | string[] headerValue = request.getHeaders(headerName);
+        if (headerValue is string[]) {
+            headers[headerName] = headerValue;
         }
     }
+
+    return headers;
 }
 
 isolated function retrieveRequestQueryParams(http:Request request) returns RequestQueryParams {

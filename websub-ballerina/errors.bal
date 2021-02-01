@@ -23,3 +23,6 @@ public type WebSubError distinct error;
 public type SubscriptionVerificationError distinct error;
 
 public type SubscriptionDeniedError distinct error;
+
+# Represents the subscription-delete action from the subscriber
+public type SubscriptionDeletedError distinct error;

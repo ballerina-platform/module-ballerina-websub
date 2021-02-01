@@ -15,7 +15,6 @@
 // under the License.
 
 import ballerina/http;
-// import ballerina/mime;
 
 isolated function processSubscriptionVerification(http:Caller caller,
                                                   http:Response response,
@@ -72,7 +71,55 @@ isolated function processEventNotification(http:Caller caller,
                                            http:Response response, 
                                            SubscriberService subscriberService,
                                            string secretKey) {
-    // string contentType = request.getContentType();
+    string contentType = request.getContentType();
 
-    // respondToRequest(caller, response);
+    map<string|string[]> headers = retrieveRequestHeaders(request);
+
+    ContentDistributionMessage? message = ();
+
+    match contentType {
+        "application/json" => {
+            message = {
+                headers: headers,
+                contentType: "application/json",
+                content: checkpanic request.getJsonPayload()
+            };
+        }
+        "application/xml" => {
+            message = {
+                headers: headers,
+                contentType: "application/xml",
+                content: checkpanic request.getXmlPayload()
+            };  
+        }
+        "text/plain" => {
+            message = {
+                headers: headers,
+                contentType: "text/plain",
+                content: checkpanic request.getTextPayload()
+            };              
+        }
+        "application/octet-stream" => {
+            message = {
+                headers: headers,
+                contentType: "application/octet-stream",
+                content: checkpanic request.getBinaryPayload()
+            };  
+        }
+        _ => {}
+    }
+
+    if (message is ()) {
+        response.statusCode = http:STATUS_BAD_REQUEST;
+    } else {
+        Acknowledgement | SubscriptionDeletedError? result = callOnEventNotificationMethod(
+                                                                    subscriberService, message);
+        if (result is Acknowledgement) {
+            updateResponseBody(response, result["body"], result["headers"]);
+        } else if (result is SubscriptionDeletedError) {
+            response.statusCode = http:STATUS_GONE;
+        }
+    }
+
+    respondToRequest(caller, response);
 }
