@@ -15,28 +15,9 @@
 // under the License.
 
 import ballerina/http;
-
-isolated function updateResponseBody(http:Response response, anydata? messageBody, map<string|string[]>? headers) {
-    string payload = "";
-    if (messageBody is map<string>) {
-        foreach var ['key, value] in messageBody.entries() {
-            payload = payload + "&" + 'key + "=" + value;
-        }
-    }
-    response.setTextPayload(payload);
-    response.setHeader("Content-type","application/x-www-form-urlencoded");
-    if (headers is map<string|string[]>) {
-        foreach var [header, value] in headers.entries() {
-            if (value is string) {
-                response.setHeader(header, value);
-            } else {
-                foreach var valueElement in value {
-                    response.addHeader(header, valueElement);
-                }
-            }
-        }
-    }
-}
+import ballerina/regex;
+import ballerina/lang.'string as strings;
+import ballerina/crypto;
 
 isolated function retrieveRequestHeaders(http:Request request) returns map<string|string[]> {
     string[] headerNames = request.getHeaderNames();
@@ -79,6 +60,76 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
     };
 
     return params;
+}
+
+isolated function verifyContent(http:Request request, string secret, string payload) returns boolean {
+    if (secret.trim().length() > 0) {
+        if (request.hasHeader(X_HUB_SIGNATURE)) {
+                var xHubSignature = request.getHeader(X_HUB_SIGNATURE);
+                
+                if (xHubSignature is http:HeaderNotFoundError || xHubSignature.trim().length() == 0) {
+                    return false;
+                } else {
+                    string[] splitSignature = regex:split(<string>xHubSignature, "=");
+                    string method = splitSignature[0];
+                    string signature = regex:replaceAll(<string>xHubSignature, method + "=", "");
+                
+                    string generatedSignature = retrieveContentHash(method, secret, payload);
+
+                    return strings:equalsIgnoreCaseAscii(signature, generatedSignature); 
+                }          
+        } else {
+            return false;
+        }
+    } else {
+        return true;
+    }
+}
+
+isolated function retrieveContentHash(string method, string key, string payload) returns string {
+    byte[] keyArr = key.toBytes();
+    byte[] contentPayload = payload.toBytes();
+    byte[] hashedContent = [];
+
+    match method {
+        "sha1" => {
+            hashedContent = crypto:hmacSha1(contentPayload, keyArr);
+        }
+        "sha256" => {
+            hashedContent = crypto:hmacSha256(contentPayload, keyArr);
+        }
+        "sha384" => {
+            hashedContent = crypto:hmacSha384(contentPayload, keyArr);
+        }
+        "sha512" => {
+            hashedContent = crypto:hmacSha512(contentPayload, keyArr);
+        }
+        _ => {}
+    }
+
+    return hashedContent.toBase64();
+}
+
+isolated function updateResponseBody(http:Response response, anydata? messageBody, map<string|string[]>? headers) {
+    string payload = "";
+    if (messageBody is map<string>) {
+        foreach var ['key, value] in messageBody.entries() {
+            payload = payload + "&" + 'key + "=" + value;
+        }
+    }
+    response.setTextPayload(payload);
+    response.setHeader("Content-type","application/x-www-form-urlencoded");
+    if (headers is map<string|string[]>) {
+        foreach var [header, value] in headers.entries() {
+            if (value is string) {
+                response.setHeader(header, value);
+            } else {
+                foreach var valueElement in value {
+                    response.addHeader(header, valueElement);
+                }
+            }
+        }
+    }
 }
 
 isolated function respondToRequest(http:Caller caller, http:Response response) {

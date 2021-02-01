@@ -34,11 +34,11 @@ isolated function processSubscriptionVerification(http:Caller caller,
         response.statusCode = http:STATUS_NOT_FOUND;
         string errorMessage = result.message();
         response.setTextPayload(errorMessage);
-        respondToRequest(caller, response);
+        // respondToRequest(caller, response);
     } else {
         response.statusCode = http:STATUS_OK;
         response.setTextPayload(params.hubChallenge);
-        respondToRequest(caller, response);
+        // respondToRequest(caller, response);
     }
 }
 
@@ -63,7 +63,7 @@ isolated function processSubscriptionDenial(http:Caller caller,
 
     response.statusCode = http:STATUS_OK;
     updateResponseBody(response, result["body"], result["headers"]);
-    respondToRequest(caller, response);
+    // respondToRequest(caller, response);
 }
 
 isolated function processEventNotification(http:Caller caller, 
@@ -71,6 +71,20 @@ isolated function processEventNotification(http:Caller caller,
                                            http:Response response, 
                                            SubscriberService subscriberService,
                                            string secretKey) {
+    var payload = request.getTextPayload();
+
+    boolean isVerifiedContent = false;
+    if (payload is string) {
+        isVerifiedContent = verifyContent(request, secretKey, payload);
+    } else {
+        response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+        return;
+    }
+
+    if (!isVerifiedContent) {
+        return;
+    }
+                                               
     string contentType = request.getContentType();
 
     map<string|string[]> headers = retrieveRequestHeaders(request);
@@ -111,15 +125,18 @@ isolated function processEventNotification(http:Caller caller,
 
     if (message is ()) {
         response.statusCode = http:STATUS_BAD_REQUEST;
+        return;
     } else {
         Acknowledgement | SubscriptionDeletedError? result = callOnEventNotificationMethod(
                                                                     subscriberService, message);
         if (result is Acknowledgement) {
             updateResponseBody(response, result["body"], result["headers"]);
+            return;
         } else if (result is SubscriptionDeletedError) {
             response.statusCode = http:STATUS_GONE;
+            return;
         }
     }
 
-    respondToRequest(caller, response);
+    // respondToRequest(caller, response);
 }
