@@ -336,7 +336,6 @@ publishing {
         maven(MavenPublication) {
             artifact source: createArtifactZip, extension: 'zip'
             artifact source: artifactCodeCoverageReport, classifier: 'jacoco'
-            artifact source: artifactCodeCoverageReport, classifier: getCheckedOutGitCommitHash()
         }
     }
 
