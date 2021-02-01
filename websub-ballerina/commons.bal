@@ -39,48 +39,26 @@ const string HUB_CALLBACK = "hub.callback";
 # be active.
 const string HUB_LEASE_SECONDS = "hub.lease_seconds";
 
+# Subscription denied request parameter 'hub.reason' represents the reason for subscription-denial.
+# This is an optional parameter
+const string HUB_REASON = "hub.reason";
+
 # Subscription parameter 'hub.secret' representing the secret key to use for authenticated content distribution.
 const string HUB_SECRET = "hub.secret";
 
-# `hub.mode` value indicating "subscription" mode, to subscribe to updates for a topic.
-const string MODE_SUBSCRIBE = "subscribe";
-
-# `hub.mode` value indicating "unsubscription" mode, to unsubscribe to updates for a topic.
-const string MODE_UNSUBSCRIBE = "unsubscribe";
-
-const string X_HUB_SIGNATURE = "X-Hub-Signature";
-
-///////////////////////////////// Ballerina WebSub specific constants /////////////////////////////////
-# `hub.mode` value indicating "publish" mode, used by a publisher to notify an update to a topic.
-const string MODE_PUBLISH = "publish";
-
-# `hub.mode` value indicating "register" mode, used by a publisher to register a topic at a hub.
-const string MODE_REGISTER = "register";
-
-# `hub.mode` value indicating "unregister" mode, used by a publisher to unregister a topic at a hub.
-const string MODE_UNREGISTER = "unregister";
-
-const string REMOTE_PUBLISHING_MODE_DIRECT = "direct";
-const string REMOTE_PUBLISHING_MODE_FETCH = "fetch";
-
-const string X_HUB_UUID = "X-Hub-Uuid";
-const string X_HUB_TOPIC = "X-Hub-Topic";
-
-const string ACCEPT_HEADER = "Accept";
-const string ACCEPT_LANGUAGE_HEADER = "Accept-Language";
+# `HTTP Content-Type` Header Name, used to include `Content-Type` header value manually to `HTTP Request`.
 const string CONTENT_TYPE = "Content-Type";
 
-const string ANN_NAME_WEBSUB_SUBSCRIBER_SERVICE_CONFIG = "SubscriberServiceConfig";
-const ANNOT_FIELD_TARGET = "target";
-const ANNOT_FIELD_ACCEPT = "accept";
-const ANNOT_FIELD_ACCEPT_LANGUAGE = "acceptLanguage";
-const ANNOT_FIELD_CALLBACK = "callback";
-const ANNOT_FIELD_LEASE_SECONDS = "leaseSeconds";
-const ANNOT_FIELD_SECRET = "secret";
-const ANNOT_FIELD_SUBSCRIBE_ON_STARTUP = "subscribeOnStartUp";
-const ANNOT_FIELD_EXPECT_INTENT_VERIFICATION = "expectIntentVerification";
-const ANNOT_FIELD_HUB_CLIENT_CONFIG = "hubClientConfig";
-const ANNOT_FIELD_PUBLISHER_CLIENT_CONFIG = "publisherClientConfig";
+# `HTTP X-Hub-Signature` Header Name, used to include `X-Hub-Signature` header value manually to `HTTP Request`,
+#  value of this `HTTP Header` is used by subscriber to verify whether the content is published by a valid hub.
+const string X_HUB_SIGNATURE = "X-Hub-Signature";
+
+# `hub.mode` value indicating "subscribe" mode, used by a hub to notify a subscription verification.
+const string MODE_SUBSCRIBE = "subscribe";
+# `hub.mode` value indicating "unsubscribe" mode, used by a hub to notify an unsubscription verification.
+const string MODE_UNSUBSCRIBE = "unsubscribe";
+# `hub.mode` value indicating "denied" mode, used by a hub to notify a subscription denial.
+const string MODE_DENIED = "denied";
 
 # The identifier to be used to identify the mode in which update content should be identified.
 public type RemotePublishMode PUBLISH_MODE_DIRECT|PUBLISH_MODE_FETCH;
@@ -102,7 +80,6 @@ public const string SHA1 = "SHA1";
 # The constant used to represent SHA-256 cryptographic hash algorithm
 public const string SHA256 = "SHA256";
 
-///////////////////////////////// Custom Webhook/Extension specific constants /////////////////////////////////
 # The identifier to be used to identify the topic for dispatching with custom subscriber services.
 public type TopicIdentifier TOPIC_ID_HEADER|TOPIC_ID_PAYLOAD_KEY|TOPIC_ID_HEADER_AND_PAYLOAD;
 
@@ -116,9 +93,6 @@ public const TOPIC_ID_PAYLOAD_KEY = "TOPIC_ID_PAYLOAD_KEY";
 # the JSON payload of the request.
 public const TOPIC_ID_HEADER_AND_PAYLOAD = "TOPIC_ID_HEADER_AND_PAYLOAD";
 
-///////////////////////////////////////////////////////////////////
-//////////////////// WebSub Subscriber Commons ////////////////////
-///////////////////////////////////////////////////////////////////
 public type SubscriptionVerification record {
     string hubMode;
     string hubTopic;
@@ -144,6 +118,14 @@ public type SubscriptionVerificationSuccess record {
 public type Acknowledgement record {
     *CommonResponse;
 };
+
+public type RequestQueryParams record {|
+    string hubMode = "";
+    string hubTopic = "";
+    string hubChallenge = "";
+    string? hubLeaseSeconds = ();
+    string hubReason = "";
+|};
 
 # Function to build the data source and validate the signature for requests received at the callback.
 #
