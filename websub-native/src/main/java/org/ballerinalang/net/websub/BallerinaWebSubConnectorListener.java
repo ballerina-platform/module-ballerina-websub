@@ -189,8 +189,8 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
                             getParamStringValue(params, PARAM_HUB_CHALLENGE));
                     if (params.containsKey(PARAM_HUB_LEASE_SECONDS)) {
                         long leaseSec = Long.parseLong(getParamStringValue(params, PARAM_HUB_LEASE_SECONDS).getValue());
-                        subscriptionVerificationMessage.put(StringUtils.fromString(SUBSCRIPTION_VERIFICATION_LEASE_SECONDS),
-                                leaseSec);
+                        subscriptionVerificationMessage.put(StringUtils
+                                            .fromString(SUBSCRIPTION_VERIFICATION_LEASE_SECONDS), leaseSec);
                     }
                 } catch (UnsupportedEncodingException e) {
                     log.error("Error populating query map for intent verification request received: "
@@ -317,7 +317,8 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
                 BMap<BString, Object> verificationSuccessResult = (BMap<BString, Object>) result;
                 updateResponseWithHeadersAndBody(response, verificationSuccessResult);
 
-                String payload = subscriptionVerificationMessage.getStringValue(StringUtils.fromString("hubChallenge")).getValue();
+                String payload = subscriptionVerificationMessage.getStringValue(
+                                                            StringUtils.fromString("hubChallenge")).getValue();
                 response.addHttpContent(new DefaultLastHttpContent(Unpooled.wrappedBuffer(payload.getBytes())));
                 response.setHttpStatusCode(HttpResponseStatus.OK.code());
             }
@@ -346,7 +347,11 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
                 ((BMap<BString, Object>) balRecord.getMapValue(StringUtils.fromString("body")));
         if (body != null && !body.isEmpty()) {
             for (Map.Entry<BString, Object> objectEntry : body.entrySet()) {
-                payload = payload + objectEntry.getKey().getValue() + "=" + ((BString) objectEntry.getValue()).getValue() + "&";
+                payload = payload 
+                          + objectEntry.getKey().getValue() 
+                          + "=" 
+                          + ((BString) objectEntry.getValue()).getValue() 
+                          + "&";
             }
             if (body.size() >= 1) {
                 payload = payload.substring(0, payload.length() - 2);
@@ -365,8 +370,9 @@ public class BallerinaWebSubConnectorListener extends BallerinaHTTPConnectorList
                 } else {
                     BArray headerElements = (BArray) objectEntry.getValue();
                     if (headerElements.size() > 1) {
-                        Iterator<String> valueIterator = Arrays.stream(headerElements.getStringArray()).map(String::valueOf)
-                                .iterator();
+                        Iterator<String> valueIterator = Arrays.stream(headerElements.getStringArray())
+                                                               .map(String::valueOf)
+                                                               .iterator();
                         httpHeaders.add(objectEntry.getKey().getValue(), valueIterator);
                     } else if (headerElements.size() == 1) {
                         httpHeaders.set(objectEntry.getKey().getValue(), headerElements.getBString(0).getValue());

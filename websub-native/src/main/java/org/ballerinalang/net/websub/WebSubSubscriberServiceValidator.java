@@ -88,7 +88,9 @@ public class WebSubSubscriberServiceValidator {
     private static void validateStructType(String resourceName, BLangSimpleVariable paramDetail, String packageName,
                                            String structuralTypeName, String paramPosition, DiagnosticLog dlog) {
         if (!(packageName.concat(":").concat(structuralTypeName)).equals((paramDetail.type).toString())) {
-            dlog.logDiagnostic(DiagnosticSeverity.ERROR, paramDetail.pos, "invalid resource signature for '" + resourceName
+            dlog.logDiagnostic(DiagnosticSeverity.ERROR, paramDetail.pos, 
+                    "invalid resource signature for '" 
+                    + resourceName
                     + "', expected '" + packageName.concat(":").concat(structuralTypeName) + "' as " + paramPosition
                     + " parameter");
         }
