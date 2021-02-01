@@ -15,55 +15,59 @@
 // under the License.
 
 import ballerina/http;
+import ballerina/crypto;
 
-isolated function processSubscriptionVerification(http:Caller caller,
-                                                  http:Response response,
-                                                  RequestQueryParams params, 
-                                                  SubscriberService subscriberService) {
-    SubscriptionVerification message = {
-        hubMode: params.hubMode,
-        hubTopic: params.hubTopic,
-        hubChallenge: params.hubChallenge,
-        hubLeaseSeconds: params.hubLeaseSeconds
-    };
-
-    SubscriptionVerificationSuccess | SubscriptionVerificationError result = callOnSubscriptionVerificationMethod(subscriberService, message);
-
-    if (result is SubscriptionVerificationError) {
-        result = <SubscriptionVerificationError>result;
-        response.statusCode = http:STATUS_NOT_FOUND;
-        string errorMessage = result.message();
-        response.setTextPayload(errorMessage);
-        respondToRequest(caller, response);
+isolated function isVerifiedContent(http:Request request, 
+                                    string secret, 
+                                    json|xml|string|byte[] payload) returns boolean {
+    if (secret.trim().length() == 0) {
+        return true;
     } else {
-        response.statusCode = http:STATUS_OK;
-        response.setTextPayload(params.hubChallenge);
-        respondToRequest(caller, response);
+        string | http:HeaderNotFoundError payloadSignature = request.getHeader(X_HUB_SIGNATURE);
+        if (payloadSignature is http:HeaderNotFoundError) {
+            return false;
+        } else {
+            int splitIdx = payloadSignature.indexOf("=") is () ? 0 : <int>payloadSignature.indexOf("=");
+            string algorithm = payloadSignature.substring(0, splitIdx);
+            string hmac = payloadSignature.substring(splitIdx + 1, payloadSignature.length());
+            string retrievedHashValue = retrieveContentHash(algorithm, secret, payload);
+            return hmac == retrievedHashValue;
+        }
     }
 }
 
-isolated function processSubscriptionDenial(http:Caller caller,
-                                            http:Response response,
-                                            RequestQueryParams params, 
-                                            SubscriberService subscriberService) {
-    string reason = params.hubReason.trim().length() == 0 ? "Hub has denied the susbcription" : params.hubReason;
-    SubscriptionDeniedError subscriptionDeniedMessage = error SubscriptionDeniedError(reason);
-    
-    var result = callOnSubscriptionDeniedMethod(subscriberService, subscriptionDeniedMessage);
-    
-    if (result is ()) {
-        result = <Acknowledgement>{
-            body: {
-                "message": "Subscription Denial Acknowledged"
-            }
-        };
+isolated function retrieveContentHash(string algorithm, string key, json|xml|string|byte[] payload) returns string {
+    byte[] keyArr = key.toBytes();
+    byte[] contentPayload = [];
+    byte[] hashedContent = [];
+        
+    if (payload is byte[]) {
+        contentPayload = payload;
+    } else if (payload is string) {
+        contentPayload = (<string>payload).toBytes();
+    } else if (payload is xml) {
+        contentPayload = (<xml>payload).toString().toBytes();   
     } else {
-        result = <Acknowledgement>result;
+        contentPayload = (<json>payload).toString().toBytes();
     }
 
-    response.statusCode = http:STATUS_OK;
-    updateResponseBody(response, result["body"], result["headers"]);
-    respondToRequest(caller, response);
+    match algorithm {
+        "sha1" => {
+            hashedContent = crypto:hmacSha1(contentPayload, keyArr);
+        }
+        "sha256" => {
+            hashedContent = crypto:hmacSha256(contentPayload, keyArr);
+        }
+        "sha384" => {
+            hashedContent = crypto:hmacSha384(contentPayload, keyArr);
+        }
+        "sha512" => {
+            hashedContent = crypto:hmacSha512(contentPayload, keyArr);
+        }
+        _ => {}
+    }
+
+    return hashedContent.toBase64();
 }
 
 isolated function updateResponseBody(http:Response response, anydata? messageBody, map<string|string[]>? headers) {
@@ -84,6 +88,26 @@ isolated function updateResponseBody(http:Response response, anydata? messageBod
                     response.addHeader(header, valueElement);
                 }
             }
+        }
+    }
+}
+
+isolated function retrieveRequestBody(http:Request request, string contentType) returns anydata? | http:ClientError? {
+    match contentType {
+        "application/json" => {
+            return request.getJsonPayload();
+        }
+        "application/xml" => {
+            return request.getXmlPayload();
+        }
+        "text/plain" => {
+            return request.getTextPayload();
+        }
+        "application/octet-stream" => {
+            return request.getBinaryPayload();
+        }
+        _ => {
+            return ();
         }
     }
 }

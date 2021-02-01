@@ -20,6 +20,8 @@ import ballerina/jballerina.java;
 
 service class HttpService {
     private SubscriberService subscriberService;
+    // [todo - ayesh] include mechanism to retrieve secret from annotation-config
+    private string secret = "";
     private boolean isSubscriptionValidationDeniedAvailable = false;
     private boolean isSubscriptionVerificationAvailable = false;
     private boolean isEventNotificationAvailable = false;
@@ -48,9 +50,17 @@ service class HttpService {
         }
     }
 
-    // [todo - ayesh] read the spec and implement proper HTTP POST methods which are required
     resource function post .(http:Caller caller, http:Request request) {
+        http:Response response = new;
+        response.statusCode = http:STATUS_ACCEPTED;
 
+        if (self.isEventNotificationAvailable) {
+            processEventNotification(caller, request, response, self.subscriberService, self.secret);
+        } else {
+            response.statusCode = http:STATUS_NOT_IMPLEMENTED;
+        }
+
+        respondToRequest(caller, response);
     }
 
     resource function get .(http:Caller caller, http:Request request) {
@@ -64,7 +74,7 @@ service class HttpService {
                 if (self.isSubscriptionVerificationAvailable) {
                     processSubscriptionVerification(caller, response, <@untainted> params, self.subscriberService);
                 } else {
-                    response.statusCode = http:STATUS_NOT_IMPLEMENTED;
+                    response.statusCode = http:STATUS_OK;
                     response.setTextPayload(params.hubChallenge);
                 }
             }
@@ -92,6 +102,6 @@ service class HttpService {
     }
 }
 
-isolated function getServiceMethodNames(SubscriberService hubService) returns string[] = @java:Method {
+isolated function getServiceMethodNames(SubscriberService subscriberService) returns string[] = @java:Method {
     'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
 } external;
