@@ -24,7 +24,6 @@ import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-
 import org.ballerinalang.net.http.HttpConstants;
 import org.ballerinalang.net.http.HttpResource;
 import org.ballerinalang.net.http.HttpService;
@@ -75,7 +74,7 @@ class WebSubResourceDispatcher {
     }
 
     /**
-     * Method to retrieve resource names for incomming HTTP Reuqest
+     * Method to retrieve resource names for incomming HTTP Reuqest.
      *
      * @param method            {@String} HTTP method for incomming request
      * @param inboundRequest    {@HttpCarbonMessage} inbound HTTP Request
@@ -92,7 +91,8 @@ class WebSubResourceDispatcher {
             
             String topic = inboundRequest.getHeader(servicesRegistry.getTopicHeader());
         
-            return retrieveResourceNameFromTopic(StringUtils.fromString(topic), servicesRegistry.getHeaderResourceMap());
+            return retrieveResourceNameFromTopic(
+                            StringUtils.fromString(topic), servicesRegistry.getHeaderResourceMap());
         } else if (Objects.nonNull(topicIdentifier) && HTTP_METHOD_POST.equalsIgnoreCase(requestMethod)) {
             
             if (Objects.isNull(inboundRequest.getProperty(HTTP_RESOURCE))) {
@@ -111,11 +111,13 @@ class WebSubResourceDispatcher {
     }
 
     /**
-     * Method to retrieve resource names from HTTP Method and hub.mode
+     * Method to retrieve resource names from HTTP Method and `hub.mode`.
      *
      * @param requestMethod    {@String} HTTP method of the incomming request
-     * @return                 {@link WebSubSubscriberConstants#RESOURCE_NAME_ON_INTENT_VERIFICATION} if the method is GET,
-     *                         {@link WebSubSubscriberConstants#RESOURCE_NAME_ON_NOTIFICATION} if the method is POST
+     * @return                 {@link WebSubSubscriberConstants#RESOURCE_NAME_ON_INTENT_VERIFICATION} 
+     *                          if the method is GET,
+     *                         {@link WebSubSubscriberConstants#RESOURCE_NAME_ON_NOTIFICATION} 
+     *                          if the method is POST
      * @throws BallerinaConnectorException for any method other than GET or POST
      */
     private static String retrieveResourceName(String requestMethod, 
@@ -260,7 +262,7 @@ class WebSubResourceDispatcher {
     }
 
     /**
-     * Method to retrieve requested HTTP resource for incomming request
+     * Method to retrieve requested HTTP resource for incomming request.
      *
      * @param resourceName    {@String} requested resource name
      * @param requestMethod   {@String} HTTP method of incomming request
@@ -304,7 +306,10 @@ class WebSubResourceDispatcher {
                 throw new BallerinaConnectorException("On subscription denied request is not handled in the service");
             } else {
                 inboundRequest.setHttpStatusCode(404);
-                throw new BallerinaConnectorException(String.format("no matching WebSub Subscriber service  resource [%s] found for method [%s]", resourceName, requestMethod));
+                throw new BallerinaConnectorException(
+                    String.format(
+                        "no matching WebSub Subscriber service  resource [%s] found for method [%s]", 
+                        resourceName, requestMethod));
             }
         }
 
