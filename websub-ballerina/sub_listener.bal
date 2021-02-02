@@ -44,9 +44,14 @@ public class Listener {
     # + name - The path of the Service to be hosted
     # + return - An `error`, if an error occurred during the service attaching process
     public isolated function attach(SubscriberService s, string[]|string? name = ()) returns error? {
-        // [todo - ayesh] initializing HTTP Service
-        self.httpService = check new(s);
-        checkpanic self.httpListener.attach(<HttpService> self.httpService, name);
+        var configuration = retrieveSubscriberServiceAnnotations(s);
+        if (configuration is SubscriberServiceConfiguration) {
+            string secretKey = configuration?.secret ?: "";
+            self.httpService = new(s, secretKey);
+            checkpanic self.httpListener.attach(<HttpService> self.httpService, name);
+        } else {
+            return error ListenerStartupError("Could not find the required service-configurations");
+        }
     }
 
     # Detaches the provided Service from the Listener.

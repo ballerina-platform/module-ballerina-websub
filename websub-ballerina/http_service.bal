@@ -19,7 +19,7 @@ import ballerina/jballerina.java;
 
 service class HttpService {
     private SubscriberService subscriberService;
-    private SubscriberServiceConfiguration? configurations;
+    private string secret;
     private boolean isSubscriptionValidationDeniedAvailable = false;
     private boolean isSubscriptionVerificationAvailable = false;
     private boolean isEventNotificationAvailable = false;
@@ -27,15 +27,12 @@ service class HttpService {
     # Invoked during the initialization of a `websub:HttpService`
     #
     # + subscriberService   - {@code websub:SubscriberService} provided service
-    public isolated function init(SubscriberService subscriberService) returns error? {
+    # + secret              - {@code string} subscriber-secret value
+    public isolated function init(SubscriberService subscriberService, string secret) {
         self.subscriberService = subscriberService;
+        self.secret = secret;
         
         string[] methodNames = getServiceMethodNames(subscriberService);
-
-        self.configurations = retrieveSubscriberServiceAnnotations(subscriberService);
-        if (self.configurations is ()) {
-            return error ServiceInitializationError("Could not find the required service-configurations");
-        }
         
         foreach var methodName in methodNames {
             match methodName {
@@ -58,10 +55,9 @@ service class HttpService {
         response.statusCode = http:STATUS_ACCEPTED;
 
         if (self.isEventNotificationAvailable) {
-            string secret = self.configurations?.secret ?: "";
             processEventNotification(caller, request, response, 
                                      self.subscriberService, 
-                                     secret);
+                                     self.secret);
         } else {
             response.statusCode = http:STATUS_NOT_IMPLEMENTED;
         }
