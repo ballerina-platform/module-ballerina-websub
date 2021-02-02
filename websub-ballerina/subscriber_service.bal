@@ -23,6 +23,6 @@ public type SubscriberService service object {
 //                    returns SubscriptionVerificationSuccess | SubscriptionVerificationError;
 
 //  remote function onEventNotification(ContentDistributionMessage event) 
-//                   returns Acknowledgment | SubscriptionDeletedError?;
+//                   returns Acknowledgement | SubscriptionDeletedError?;
 
 };
