@@ -29,15 +29,13 @@ import ballerina/http;
 # + publisherClientConfig - The configuration for the discovery client, to use if a resource URL is specified
 # + hubClientConfig - The configuration for the hub client used to interact with the discovered/specified hub
 public type SubscriberServiceConfiguration record {|
-    string|[string, string] target?;
+    string|[string, string] target;
     string|string[] accept?;
     string|string[] acceptLanguage?;
     int leaseSeconds?;
     string secret?;
-    string callback?;
-    boolean expectIntentVerification = false;
-    http:ClientConfiguration publisherClientConfig?;
-    http:ClientConfiguration hubClientConfig?;
+    http:ClientConfiguration discoveryConfig?;
+    http:ClientConfiguration subscriptionClientConfig?;
 |};
 
 # WebSub Subscriber Configuration for the service, indicating subscription related parameters.

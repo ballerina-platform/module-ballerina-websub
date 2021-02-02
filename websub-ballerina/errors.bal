@@ -14,18 +14,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
+# Represents a webSub distinct error.
+public type Error distinct error;
+
 # Represents a listener startup error.
-public type ListenerStartupError distinct error;
+public type ListenerStartupError distinct Error;
 
 # Represents a subscription-initiation failed error.
-public type SubscriptionInitiationFailedError distinct error;
+public type SubscriptionInitiationFailedError distinct Error;
 
-# Represents a webSub distinct error.
-public type WebSubError distinct error;
+# Represents a subscription-verificatation error.
+public type SubscriptionVerificationError distinct Error;
 
-public type SubscriptionVerificationError distinct error;
-
-public type SubscriptionDeniedError distinct error;
+# Represents a subscription denied error.
+public type SubscriptionDeniedError distinct Error;
 
 # Represents the subscription-delete action from the subscriber
-public type SubscriptionDeletedError distinct error;
+public type SubscriptionDeletedError distinct Error;

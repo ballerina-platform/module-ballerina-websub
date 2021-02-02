@@ -16,10 +16,8 @@
 
 import ballerina/http;
 
-isolated function processSubscriptionVerification(http:Caller caller,
-                                                  http:Response response,
-                                                  RequestQueryParams params, 
-                                                  SubscriberService subscriberService) {
+isolated function processSubscriptionVerification(http:Caller caller, http:Response response, 
+                                                  RequestQueryParams params, SubscriberService subscriberService) {
     SubscriptionVerification message = {
         hubMode: params.hubMode,
         hubTopic: params.hubTopic,
@@ -27,27 +25,22 @@ isolated function processSubscriptionVerification(http:Caller caller,
         hubLeaseSeconds: params.hubLeaseSeconds
     };
 
-    SubscriptionVerificationSuccess | SubscriptionVerificationError result = callOnSubscriptionVerificationMethod(subscriberService, message);
+    SubscriptionVerificationSuccess|SubscriptionVerificationError result = callOnSubscriptionVerificationMethod(subscriberService, message);
 
     if (result is SubscriptionVerificationError) {
         result = <SubscriptionVerificationError>result;
         response.statusCode = http:STATUS_NOT_FOUND;
         string errorMessage = result.message();
         response.setTextPayload(errorMessage);
-        // respondToRequest(caller, response);
     } else {
         response.statusCode = http:STATUS_OK;
         response.setTextPayload(params.hubChallenge);
-        // respondToRequest(caller, response);
     }
 }
 
-isolated function processSubscriptionDenial(http:Caller caller,
-                                            http:Response response,
-                                            RequestQueryParams params, 
-                                            SubscriberService subscriberService) {
-    string reason = params.hubReason.trim().length() == 0 ? "Hub has denied the susbcription" : params.hubReason;
-    SubscriptionDeniedError subscriptionDeniedMessage = error SubscriptionDeniedError(reason);
+isolated function processSubscriptionDenial(http:Caller caller, http:Response response,
+                                            RequestQueryParams params, SubscriberService subscriberService) {
+    SubscriptionDeniedError subscriptionDeniedMessage = error SubscriptionDeniedError(params.hubReason);
     
     var result = callOnSubscriptionDeniedMethod(subscriberService, subscriptionDeniedMessage);
     
@@ -66,10 +59,8 @@ isolated function processSubscriptionDenial(http:Caller caller,
     // respondToRequest(caller, response);
 }
 
-isolated function processEventNotification(http:Caller caller, 
-                                           http:Request request, 
-                                           http:Response response, 
-                                           SubscriberService subscriberService,
+isolated function processEventNotification(http:Caller caller, http:Request request, 
+                                           http:Response response, SubscriberService subscriberService,
                                            string secretKey) {
     var payload = request.getTextPayload();
 
@@ -127,8 +118,7 @@ isolated function processEventNotification(http:Caller caller,
         response.statusCode = http:STATUS_BAD_REQUEST;
         return;
     } else {
-        Acknowledgement | SubscriptionDeletedError? result = callOnEventNotificationMethod(
-                                                                    subscriberService, message);
+        Acknowledgement | SubscriptionDeletedError? result = callOnEventNotificationMethod(subscriberService, message);
         if (result is Acknowledgement) {
             updateResponseBody(response, result["body"], result["headers"]);
             return;

@@ -16,7 +16,6 @@
 
 import ballerina/http;
 import ballerina/regex;
-import ballerina/lang.'string as strings;
 import ballerina/crypto;
 
 isolated function retrieveSubscriberServiceAnnotations(SubscriberService serviceType) returns SubscriberServiceConfiguration? {
@@ -113,7 +112,7 @@ isolated function verifyContent(http:Request request, string secret, string payl
                 
                     string generatedSignature = retrieveContentHash(method, secret, payload);
 
-                    return strings:equalsIgnoreCaseAscii(signature, generatedSignature); 
+                    return signature == generatedSignature; 
                 }          
         } else {
             return false;

@@ -27,9 +27,9 @@ public class Listener {
     # provided to initialize the listener.
     #
     # + listenTo - An `http:Listener` or a port number to listen for the service
-    public isolated function init(int|http:Listener listenTo) returns error? {
+    public isolated function init(int|http:Listener listenTo, http:ListenerConfiguration? config = ()) returns error? {
         if (listenTo is int) {
-            self.httpListener = check new(listenTo);
+            self.httpListener = check new(listenTo, config);
         } else {
             self.httpListener = listenTo;
         }
@@ -46,11 +46,29 @@ public class Listener {
     public function attach(SubscriberService s, string[]|string? name = ()) returns error? {
         var configuration = retrieveSubscriberServiceAnnotations(s);
         if (configuration is SubscriberServiceConfiguration) {
-            self.httpService = check new(s, configuration);
+            string callbackUrl = self.retriveCallbackUrl(name);
+            self.httpService = check new(s, configuration, callbackUrl);
             checkpanic self.httpListener.attach(<HttpService> self.httpService, name);
         } else {
             return error ListenerStartupError("Could not find the required service-configurations");
         }
+    }
+    
+    isolated function retriveCallbackUrl(string[]|string? servicePath) returns string {
+        string host = self.listenerConfig.host;
+        string protocol = self.listenerConfig.secureSocket is () ? "http" : "https";
+        
+        string concatenatedServicePath = "";
+        
+        if (servicePath is string) {
+            concatenatedServicePath += "/" + <string>servicePath;
+        } else if (servicePath is string[]) {
+            foreach var pathSegment in <string[]>servicePath {
+                concatenatedServicePath += "/" + pathSegment;
+            }
+        }
+
+        return protocol + "://" + host + ":" + self.port.toString() + concatenatedServicePath;
     }
 
     # Detaches the provided Service from the Listener.
