@@ -16,9 +16,6 @@
 
 import ballerina/http;
 
-///////////////////////////
-/// Service Annotations ///
-///////////////////////////
 # Configuration for a WebSubSubscriber service.
 #
 # + target - The `string` resource URL for which discovery will be initiated to identify the hub and topic,
@@ -45,8 +42,3 @@ public type SubscriberServiceConfiguration record {|
 
 # WebSub Subscriber Configuration for the service, indicating subscription related parameters.
 public annotation SubscriberServiceConfiguration SubscriberServiceConfig on service;
-
-# Annotation to declare that the service represents a specific webhook.
-# Generic WebSub Subscriber service validation is not done for
-# service variables annotated as `@websub:SpecificSubscriber`.
-public const annotation SpecificSubscriber on source service;

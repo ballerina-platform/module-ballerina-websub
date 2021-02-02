@@ -15,13 +15,11 @@
 // under the License.
 
 import ballerina/http;
-// import ballerina/mime;
 import ballerina/jballerina.java;
 
 service class HttpService {
     private SubscriberService subscriberService;
-    // [todo - ayesh] include mechanism to retrieve secret from annotation-config
-    private string secret = "";
+    private SubscriberServiceConfiguration? configurations;
     private boolean isSubscriptionValidationDeniedAvailable = false;
     private boolean isSubscriptionVerificationAvailable = false;
     private boolean isEventNotificationAvailable = false;
@@ -29,10 +27,15 @@ service class HttpService {
     # Invoked during the initialization of a `websub:HttpService`
     #
     # + subscriberService   - {@code websub:SubscriberService} provided service
-    public isolated function init(SubscriberService subscriberService) {
+    public isolated function init(SubscriberService subscriberService) returns error? {
         self.subscriberService = subscriberService;
         
         string[] methodNames = getServiceMethodNames(subscriberService);
+
+        self.configurations = retrieveSubscriberServiceAnnotations(subscriberService);
+        if (self.configurations is ()) {
+            return error ServiceInitializationError("Could not find the required service-configurations");
+        }
         
         foreach var methodName in methodNames {
             match methodName {
@@ -55,7 +58,10 @@ service class HttpService {
         response.statusCode = http:STATUS_ACCEPTED;
 
         if (self.isEventNotificationAvailable) {
-            processEventNotification(caller, request, response, self.subscriberService, self.secret);
+            string secret = self.configurations?.secret ?: "";
+            processEventNotification(caller, request, response, 
+                                     self.subscriberService, 
+                                     secret);
         } else {
             response.statusCode = http:STATUS_NOT_IMPLEMENTED;
         }

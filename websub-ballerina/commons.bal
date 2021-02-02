@@ -402,8 +402,3 @@ public type SubscriptionChangeResponse record {|
 isolated function isSuccessStatusCode(int statusCode) returns boolean {
     return (200 <= statusCode && statusCode < 300);
 }
-
-isolated function retrieveSubscriberServiceAnnotations(SubscriberService serviceType) returns SubscriberServiceConfiguration? {
-    typedesc<any> serviceTypedesc = typeof serviceType;
-    return serviceTypedesc.@SubscriberServiceConfig;
-}

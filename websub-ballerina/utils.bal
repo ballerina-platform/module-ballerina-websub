@@ -19,6 +19,11 @@ import ballerina/regex;
 import ballerina/lang.'string as strings;
 import ballerina/crypto;
 
+isolated function retrieveSubscriberServiceAnnotations(SubscriberService serviceType) returns SubscriberServiceConfiguration? {
+    typedesc<any> serviceTypedesc = typeof serviceType;
+    return serviceTypedesc.@SubscriberServiceConfig;
+}
+
 isolated function retrieveRequestHeaders(http:Request request) returns map<string|string[]> {
     string[] headerNames = request.getHeaderNames();
     map<string|string[]> headers = {};

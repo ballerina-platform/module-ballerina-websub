@@ -45,7 +45,7 @@ public class Listener {
     # + return - An `error`, if an error occurred during the service attaching process
     public isolated function attach(SubscriberService s, string[]|string? name = ()) returns error? {
         // [todo - ayesh] initializing HTTP Service
-        self.httpService = new(s);
+        self.httpService = check new(s);
         checkpanic self.httpListener.attach(<HttpService> self.httpService, name);
     }
 
