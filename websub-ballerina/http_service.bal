@@ -31,6 +31,7 @@ service class HttpService {
     # + subscriberService   - {@code websub:SubscriberService} provided service
     # + serviceConfig       - {@code SubscriberServiceConfiguration} subscriber-service
     #                          related configurations
+    # + callback            - {@code string} dynamically generated callback-url
     public function init(SubscriberService subscriberService, SubscriberServiceConfiguration config, 
                          string callback) returns error? {
         self.subscriberService = subscriberService;
