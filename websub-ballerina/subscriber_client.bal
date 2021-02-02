@@ -81,8 +81,9 @@ public client class SubscriptionClient {
 # + subscriptionChangeRequest - The SubscriptionChangeRequest specifying the topic to subscribe and the
 #                               parameters to use
 # + return - An `http:Request` to be sent to the hub to subscribe/unsubscribe
-isolated function buildSubscriptionChangeRequest(@untainted string mode,
-                                        SubscriptionChangeRequest subscriptionChangeRequest) returns (http:Request) {
+isolated function buildSubscriptionChangeRequest(@untainted string mode, 
+                                                 SubscriptionChangeRequest subscriptionChangeRequest) 
+                                                returns (http:Request) {
     http:Request request = new;
 
     string callback = subscriptionChangeRequest.callback;

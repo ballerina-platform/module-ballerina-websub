@@ -17,6 +17,9 @@
 # Represents a listener startup error.
 public type ListenerStartupError distinct error;
 
+# Represents a subscription-initiation failed error.
+public type SubscriptionInitiationFailedError distinct error;
+
 # Represents a webSub distinct error.
 public type WebSubError distinct error;
 

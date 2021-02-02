@@ -15,11 +15,12 @@
 // under the License.
 
 import ballerina/http;
+import ballerina/log;
 import ballerina/jballerina.java;
 
 service class HttpService {
     private SubscriberService subscriberService;
-    private string secret;
+    private SubscriberServiceConfiguration serviceConfig;
     private boolean isSubscriptionValidationDeniedAvailable = false;
     private boolean isSubscriptionVerificationAvailable = false;
     private boolean isEventNotificationAvailable = false;
@@ -27,10 +28,12 @@ service class HttpService {
     # Invoked during the initialization of a `websub:HttpService`
     #
     # + subscriberService   - {@code websub:SubscriberService} provided service
-    # + secret              - {@code string} subscriber-secret value
-    public isolated function init(SubscriberService subscriberService, string secret) {
+    # + serviceConfig       - {@code SubscriberServiceConfiguration} subscriber-service
+    #                          related configurations
+    public function init(SubscriberService subscriberService, 
+                         SubscriberServiceConfiguration config) returns error? {
         self.subscriberService = subscriberService;
-        self.secret = secret;
+        self.serviceConfig = config;
         
         string[] methodNames = getServiceMethodNames(subscriberService);
         
@@ -48,6 +51,73 @@ service class HttpService {
                 _ => {}
             }
         }
+
+        var result = self.initiateSubscription();
+        if (result is error) {
+            string errorMsg = "Subscription initiation failed due to [" + result.message() + "]";
+            return error SubscriptionInitiationFailedError(errorMsg);
+        }
+    }
+
+    function initiateSubscription() returns error? {
+        string?|[string, string]? target = self.serviceConfig?.target ?: ();
+        
+        string hubUrl;
+        string topicUrl;
+        
+        if (target is ()) {
+            return error WebSubError("Required configuration \"target\" not found");
+        } else if (target is string) {
+            http:ClientConfiguration? publisherClientConfig = self.serviceConfig?.publisherClientConfig ?: ();
+            string?|string[] expectedMediaTypes = self.serviceConfig?.accept ?: ();
+            string?|string[] expectedLanguageTypes = self.serviceConfig?.acceptLanguage ?: ();
+
+            DiscoveryService discoveryClient = check new (target, publisherClientConfig);
+
+            var discoveryDetails = discoveryClient->discoverResourceUrls(expectedMediaTypes, expectedLanguageTypes);
+
+            if (discoveryDetails is [string, string]) {
+                [hubUrl, topicUrl] = <[string, string]> discoveryDetails;
+            } else {
+                return error WebSubError("Could not extract resource URLs");
+            }
+        } else {
+            [hubUrl, topicUrl] = <[string, string]> target;
+        }
+
+        http:ClientConfiguration? hubClientConfig = self.serviceConfig?.hubClientConfig ?: ();
+        SubscriptionClient subscriberClientEp = check new (hubUrl, hubClientConfig);
+
+            string callback = self.serviceConfig?.callback ?: "";
+            var request = retrieveSubscriptionRequest(topicUrl, callback, self.serviceConfig);
+
+            var response = subscriberClientEp->subscribe(request);
+
+            if (response is SubscriptionChangeResponse) {
+                string subscriptionSuccessMsg = "Subscription Request successfully sent to Hub[" 
+                                                + response.hub + "], for Topic[" 
+                                                + response.topic + "], with Callback [" + callback + "]";
+                log:print(subscriptionSuccessMsg + ". Awaiting intent verification.");
+            } else {
+                return response;
+            }
+        // if (subscriberClientEp is SubscriptionClient) {
+        //     string callback = self.serviceConfig?.callback ?: "";
+        //     var request = retrieveSubscriptionRequest(topicUrl, callback, self.serviceConfig);
+
+        //     var response = subscriberClientEp->subscribe(request);
+
+        //     if (response is SubscriptionChangeResponse) {
+        //         string subscriptionSuccessMsg = "Subscription Request successfully sent to Hub[" 
+        //                                         + response.hub + "], for Topic[" 
+        //                                         + response.topic + "], with Callback [" + callback + "]";
+        //         log:print(subscriptionSuccessMsg + ". Awaiting intent verification.");
+        //     } else {
+        //         return response;
+        //     }
+        // } else {
+        //     return error WebSubError("subscriberClientEp.message()");
+        // }
     }
 
     resource function post .(http:Caller caller, http:Request request) {
@@ -55,9 +125,10 @@ service class HttpService {
         response.statusCode = http:STATUS_ACCEPTED;
 
         if (self.isEventNotificationAvailable) {
+            string secretKey = self.serviceConfig?.secret ?: "";
             processEventNotification(caller, request, response, 
                                      self.subscriberService, 
-                                     self.secret);
+                                     secretKey);
         } else {
             response.statusCode = http:STATUS_NOT_IMPLEMENTED;
         }

@@ -24,6 +24,23 @@ isolated function retrieveSubscriberServiceAnnotations(SubscriberService service
     return serviceTypedesc.@SubscriberServiceConfig;
 }
 
+isolated function retrieveSubscriptionRequest(string topicUrl, string callback, 
+                                              SubscriberServiceConfiguration config) returns SubscriptionChangeRequest {        
+    SubscriptionChangeRequest request = { topic: topicUrl, callback: callback };
+        
+    var leaseSeconds = config?.leaseSeconds;
+    if (leaseSeconds is int) {
+        request.leaseSeconds = leaseSeconds;
+    }
+
+    var secret = config?.secret;
+    if (secret is string) {
+        request.secret = secret;
+    }
+
+    return request;
+}
+
 isolated function retrieveRequestHeaders(http:Request request) returns map<string|string[]> {
     string[] headerNames = request.getHeaderNames();
     map<string|string[]> headers = {};

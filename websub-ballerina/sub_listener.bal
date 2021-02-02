@@ -43,11 +43,10 @@ public class Listener {
     # + s - The `websub:SubscriberService` object to attach
     # + name - The path of the Service to be hosted
     # + return - An `error`, if an error occurred during the service attaching process
-    public isolated function attach(SubscriberService s, string[]|string? name = ()) returns error? {
+    public function attach(SubscriberService s, string[]|string? name = ()) returns error? {
         var configuration = retrieveSubscriberServiceAnnotations(s);
         if (configuration is SubscriberServiceConfiguration) {
-            string secretKey = configuration?.secret ?: "";
-            self.httpService = new(s, secretKey);
+            self.httpService = check new(s, configuration);
             checkpanic self.httpListener.attach(<HttpService> self.httpService, name);
         } else {
             return error ListenerStartupError("Could not find the required service-configurations");
