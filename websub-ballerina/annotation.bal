@@ -18,24 +18,23 @@ import ballerina/http;
 
 # Configuration for a WebSubSubscriber service.
 #
-# + target - The `string` resource URL for which discovery will be initiated to identify the hub and topic,
-#               or a tuple `[hub, topic]` representing a discovered hub and a topic
-# + accept - The expected media type
-# + acceptLanguage - The expected language type
-# + leaseSeconds - The period for which the subscription is expected to be active
-# + secret - The secret to be used for authenticated content distribution
-# + callback - The callback to use when registering, if unspecified host:port/path will be used
-# + expectIntentVerification - A `boolean` indicating whether an intent verification is expected from the hub
-# + publisherClientConfig - The configuration for the discovery client, to use if a resource URL is specified
-# + hubClientConfig - The configuration for the hub client used to interact with the discovered/specified hub
+# + target          - The `string` resource URL for which discovery will be initiated to identify the hub and topic,
+#                     or a tuple `[hub, topic]` representing a discovered hub and a topic
+# + leaseSeconds    - The period for which the subscription is expected to be active
+# + secret          - The secret to be used for authenticated content distribution
+# + httpConfig      - The configuration for the hub client used to interact with the discovered/specified hub
+# + discoveryConfig - HTTP client configurations for resource discovery
 public type SubscriberServiceConfiguration record {|
     string|[string, string] target;
-    string|string[] accept?;
-    string|string[] acceptLanguage?;
     int leaseSeconds?;
-    string secret?;
-    http:ClientConfiguration discoveryConfig?;
-    http:ClientConfiguration subscriptionClientConfig?;
+    string callback?;
+    string secret?;   
+    http:ClientConfiguration httpConfig?;
+    record {|
+        string|string[] accept?;
+        string|string[] acceptLanguage?;
+        http:ClientConfiguration httpConfig?;
+    |} discoveryConfig;
 |};
 
 # WebSub Subscriber Configuration for the service, indicating subscription related parameters.

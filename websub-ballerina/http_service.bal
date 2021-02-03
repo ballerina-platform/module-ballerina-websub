@@ -69,55 +69,49 @@ service class HttpService {
         string topicUrl;
         
         if (target is string) {
-            http:ClientConfiguration? discoveryConfig = self.serviceConfig?.discoveryConfig ?: ();
-            string?|string[] expectedMediaTypes = self.serviceConfig?.accept ?: ();
-            string?|string[] expectedLanguageTypes = self.serviceConfig?.acceptLanguage ?: ();
+            var discoveryConfig = self.serviceConfig.discoveryConfig;
+            http:ClientConfiguration? discoveryHttpConfig = discoveryConfig?.httpConfig ?: ();
+            string?|string[] expectedMediaTypes = discoveryConfig?.accept ?: ();
+            string?|string[] expectedLanguageTypes = discoveryConfig?.acceptLanguage ?: ();
 
-            DiscoveryService discoveryClient = check new (target, discoveryConfig);
+            DiscoveryService discoveryClient = check new (target, discoveryHttpConfig);
 
             var discoveryDetails = discoveryClient->discoverResourceUrls(expectedMediaTypes, expectedLanguageTypes);
 
             if (discoveryDetails is [string, string]) {
                 [hubUrl, topicUrl] = <[string, string]> discoveryDetails;
             } else {
-                return error Error("Could not extract resource URLs");
+                return error Error(discoveryDetails.message());
             }
         } else {
             [hubUrl, topicUrl] = <[string, string]> target;
         }
 
-        http:ClientConfiguration? subscriptionClientConfig = self.serviceConfig?.subscriptionClientConfig ?: ();
+        http:ClientConfiguration? subscriptionClientConfig = self.serviceConfig?.httpConfig ?: ();
         SubscriptionClient subscriberClientEp = check new (hubUrl, subscriptionClientConfig);
 
-            var request = retrieveSubscriptionRequest(topicUrl, self.callbackUrl, self.serviceConfig);
+        string callback = self.serviceConfig?.callback ?: self.callbackUrl;
 
-            var response = subscriberClientEp->subscribe(request);
+        var request = retrieveSubscriptionRequest(topicUrl, callback, self.serviceConfig);
 
-            if (response is SubscriptionChangeResponse) {
-                string subscriptionSuccessMsg = "Subscription Request successfully sent to Hub[" 
+        var response = subscriberClientEp->subscribe(request);
+
+        if (response is SubscriptionChangeResponse) {
+            string subscriptionSuccessMsg = "Subscription Request successfully sent to Hub[" 
+                                            + response.hub + "], for Topic[" 
                                                 + response.hub + "], for Topic[" 
-                                                + response.topic + "], with Callback [" + self.callbackUrl + "]";
-                log:print(subscriptionSuccessMsg + ". Awaiting intent verification.");
-            } else {
-                return response;
-            }
-        // if (subscriberClientEp is SubscriptionClient) {
-        //     string callback = self.serviceConfig?.callback ?: "";
-        //     var request = retrieveSubscriptionRequest(topicUrl, callback, self.serviceConfig);
-
-        //     var response = subscriberClientEp->subscribe(request);
-
-        //     if (response is SubscriptionChangeResponse) {
-        //         string subscriptionSuccessMsg = "Subscription Request successfully sent to Hub[" 
-        //                                         + response.hub + "], for Topic[" 
-        //                                         + response.topic + "], with Callback [" + callback + "]";
-        //         log:print(subscriptionSuccessMsg + ". Awaiting intent verification.");
-        //     } else {
-        //         return response;
-        //     }
-        // } else {
-        //     return error Error("subscriberClientEp.message()");
-        // }
+                                            + response.hub + "], for Topic[" 
+                                                + response.hub + "], for Topic[" 
+                                            + response.hub + "], for Topic[" 
+                                                + response.hub + "], for Topic[" 
+                                            + response.hub + "], for Topic[" 
+                                                + response.hub + "], for Topic[" 
+                                            + response.hub + "], for Topic[" 
+                                            + response.topic + "], with Callback [" + callback + "]";
+            log:print(subscriptionSuccessMsg + ". Awaiting intent verification.");
+        } else {
+            return response;
+        }
     }
 
     resource function post .(http:Caller caller, http:Request request) {
