@@ -352,7 +352,7 @@ publishing {
 }
 
 ballerinaBuild.dependsOn ":websub-native:build"
- ballerinaTest.dependsOn ":websub-native:build"
+ballerinaTest.dependsOn ":websub-native:build"
 unpackJballerinaTools.dependsOn copyToLib
 unpackStdLibs.dependsOn unpackJballerinaTools
 copyStdlibs.dependsOn unpackStdLibs

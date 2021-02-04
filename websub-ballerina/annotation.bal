@@ -1,4 +1,4 @@
-// Copyright (c) 2018 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 //
 // WSO2 Inc. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -16,37 +16,26 @@
 
 import ballerina/http;
 
-///////////////////////////
-/// Service Annotations ///
-///////////////////////////
 # Configuration for a WebSubSubscriber service.
 #
-# + target - The `string` resource URL for which discovery will be initiated to identify the hub and topic,
-#               or a tuple `[hub, topic]` representing a discovered hub and a topic
-# + accept - The expected media type
-# + acceptLanguage - The expected language type
-# + leaseSeconds - The period for which the subscription is expected to be active
-# + secret - The secret to be used for authenticated content distribution
-# + callback - The callback to use when registering, if unspecified host:port/path will be used
-# + expectIntentVerification - A `boolean` indicating whether an intent verification is expected from the hub
-# + publisherClientConfig - The configuration for the discovery client, to use if a resource URL is specified
-# + hubClientConfig - The configuration for the hub client used to interact with the discovered/specified hub
+# + target          - The `string` resource URL for which discovery will be initiated to identify the hub and topic,
+#                     or a tuple `[hub, topic]` representing a discovered hub and a topic
+# + leaseSeconds    - The period for which the subscription is expected to be active
+# + secret          - The secret to be used for authenticated content distribution
+# + httpConfig      - The configuration for the hub client used to interact with the discovered/specified hub
+# + discoveryConfig - HTTP client configurations for resource discovery
 public type SubscriberServiceConfiguration record {|
-    string|[string, string] target?;
-    string|string[] accept?;
-    string|string[] acceptLanguage?;
+    string|[string, string] target;
     int leaseSeconds?;
-    string secret?;
     string callback?;
-    boolean expectIntentVerification = false;
-    http:ClientConfiguration publisherClientConfig?;
-    http:ClientConfiguration hubClientConfig?;
+    string secret?;   
+    http:ClientConfiguration httpConfig?;
+    record {|
+        string|string[] accept?;
+        string|string[] acceptLanguage?;
+        http:ClientConfiguration httpConfig?;
+    |} discoveryConfig;
 |};
 
 # WebSub Subscriber Configuration for the service, indicating subscription related parameters.
 public annotation SubscriberServiceConfiguration SubscriberServiceConfig on service;
-
-# Annotation to declare that the service represents a specific webhook.
-# Generic WebSub Subscriber service validation is not done for
-# service variables annotated as `@websub:SpecificSubscriber`.
-public const annotation SpecificSubscriber on source service;

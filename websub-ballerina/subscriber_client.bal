@@ -81,8 +81,9 @@ public client class SubscriptionClient {
 # + subscriptionChangeRequest - The SubscriptionChangeRequest specifying the topic to subscribe and the
 #                               parameters to use
 # + return - An `http:Request` to be sent to the hub to subscribe/unsubscribe
-isolated function buildSubscriptionChangeRequest(@untainted string mode,
-                                        SubscriptionChangeRequest subscriptionChangeRequest) returns (http:Request) {
+isolated function buildSubscriptionChangeRequest(@untainted string mode, 
+                                                 SubscriptionChangeRequest subscriptionChangeRequest) 
+                                                returns (http:Request) {
     http:Request request = new;
 
     string callback = subscriptionChangeRequest.callback;
@@ -123,7 +124,7 @@ function processHubResponse(@untainted string hub, @untainted string mode,
 
     string topic = subscriptionChangeRequest.topic;
     if (response is error) {
-        return error WebSubError("Error occurred for request: Mode[" + mode+ "] at Hub[" + hub + "] - " + response.message());
+        return error Error("Error occurred for request: Mode[" + mode+ "] at Hub[" + hub + "] - " + response.message());
     } else {
         http:Response hubResponse = <http:Response> response;
         int responseStatusCode = hubResponse.statusCode;
@@ -134,7 +135,7 @@ function processHubResponse(@untainted string hub, @untainted string mode,
                 return invokeClientConnectorOnRedirection(redirected_hub, mode, subscriptionChangeRequest,
                                                             httpClient.config.auth, remainingRedirects - 1);
             }
-            return error WebSubError("Redirection response received for subscription change request made with " +
+            return error Error("Redirection response received for subscription change request made with " +
                                "followRedirects disabled or after maxCount exceeded: Hub [" + hub + "], Topic [" +
                                subscriptionChangeRequest.topic + "]");
         } else if (!isSuccessStatusCode(responseStatusCode)) {
@@ -145,7 +146,7 @@ function processHubResponse(@untainted string hub, @untainted string mode,
             } else {
                 errorMessage = errorMessage + " - Error occurred identifying cause: " + responsePayload.message();
             }
-            return error WebSubError(errorMessage);
+            return error Error(errorMessage);
         } else {
             if (responseStatusCode != http:STATUS_ACCEPTED) {
                 log:print("Subscription request considered successful for non 202 status code: "

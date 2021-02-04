@@ -15,48 +15,71 @@
 // under the License.
 
 import ballerina/io;
-import ballerina/http;
 import ballerina/test;
+import ballerina/http;
 
-listener Listener testListener = new(9090);
 
-@SubscriberServiceConfig {
-    target: ["http://localhost:9191/websub/hub", "http://websubpubtopic.com"],
-    leaseSeconds: 36000,
-    secret: "Kslk30SNF2AChs2"
-}
-service /subscriber on testListener {
-      remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement {
-            io:println("onSubscriptionValidationDenied invoked");
-            Acknowledgement ack = {
+listener http:Listener simpleHttpServiceListener = new (9191);
+listener Listener basicSubListerner = new (9090);
+
+var simpleHttpService = service object {
+        resource function get discovery(http:Caller caller, http:Request request) {
+            http:Response response = new;
+            response.addHeader("Link", "<http://127.0.0.1:9191/common/hub>; rel=\"hub\"");
+            response.addHeader("Link", "<https://sample.topic.com>; rel=\"self\"");
+            var resp = caller->respond(response);
+        }
+
+        resource function post hub(http:Caller caller, http:Request request) {
+            var resp = caller->respond();
+        }
+    };
+
+var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, secret: "Kslk30SNF2AChs2", discoveryConfig: {}} 
+                              service object {
+    remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
+        io:println("onSubscriptionValidationDenied invoked");
+        Acknowledgement ack = {
                   headers: {"header1": "value"},
                   body: {"formparam1": "value1"}
-              };
-            return ack;
+        };
+        return ack;
+    }
+
+    remote function onSubscriptionVerification(SubscriptionVerification msg)
+                        returns SubscriptionVerificationSuccess | SubscriptionVerificationError {
+        io:println("onSubscriptionVerification invoked");
+        if (msg.hubTopic == "test1") {
+            return error SubscriptionVerificationError("Hub topic not supported");
+        } else {
+            return {};
+        }
       }
 
-      remote function onSubscriptionVerification(SubscriptionVerification msg)
-                        returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
-            io:println("onSubscriptionVerification invoked");
-            if (msg.hubTopic == "test") {
-                return {};
-            } else {
-                return error SubscriptionVerificationError("Hub topic not supported");
-            }
-      }
+    remote function onEventNotification(ContentDistributionMessage event) 
+                        returns Acknowledgement | SubscriptionDeletedError? {
+        io:println("onEventNotification invoked: ", event);
+        return {};
+    }
+};
 
-      remote function onEventNotification(ContentDistributionMessage event) {
-            io:println("onEventNotification invoked");
-            io:println(event.headers);
-            io:println(event.contentType);
-            io:println(event.content);
-      }
+@test:BeforeSuite
+function beforeGroupsFunc() {
+    io:println("I'm the before groups function!");
+    checkpanic simpleHttpServiceListener.attach(simpleHttpService, "/common");
+    checkpanic basicSubListerner.attach(simpleSubscriberService, "/subscriber");
+}
+
+@test:AfterSuite { }
+function afterGroupsFunc() {
+    io:println("I'm the after groups function!");
+    checkpanic simpleHttpServiceListener.gracefulStop();
+    checkpanic basicSubListerner.gracefulStop();
 }
 
 http:Client httpClient = checkpanic new("http://localhost:9090/subscriber");
 
-@test:Config {
-}
+@test:Config { }
 function testOnSubscriptionValidation() returns @tainted error? {
     http:Request request = new;
 
@@ -69,8 +92,7 @@ function testOnSubscriptionValidation() returns @tainted error? {
     }
 }
 
-@test:Config {
-}
+@test:Config { }
 function testOnIntentVerificationSuccess() returns @tainted error? {
     http:Request request = new;
 
@@ -83,8 +105,7 @@ function testOnIntentVerificationSuccess() returns @tainted error? {
     }
 }
 
-@test:Config {
-}
+@test:Config { }
 function testOnIntentVerificationFailure() returns @tainted error? {
     http:Request request = new;
 
@@ -97,8 +118,7 @@ function testOnIntentVerificationFailure() returns @tainted error? {
     }
 }
 
-@test:Config {
-}
+@test:Config { }
 function testOnEventNotificationSuccess() returns @tainted error? {
     http:Request request = new;
     json payload =  {"action": "publish", "mode": "remote-hub"};
@@ -113,8 +133,7 @@ function testOnEventNotificationSuccess() returns @tainted error? {
 }
 
 
-@test:Config {
-}
+@test:Config {}
 function testOnEventNotificationSuccessXml() returns @tainted error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
