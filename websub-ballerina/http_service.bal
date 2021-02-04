@@ -51,7 +51,9 @@ service class HttpService {
                 "onEventNotification" => {
                     self.isEventNotificationAvailable = true;
                 }
-                _ => {}
+                _ => {
+                    log:printError("Unrecognized method [" + methodName + "] found in the implementation");
+                }
             }
         }
 
@@ -97,15 +99,7 @@ service class HttpService {
         var response = subscriberClientEp->subscribe(request);
 
         if (response is SubscriptionChangeResponse) {
-            string subscriptionSuccessMsg = "Subscription Request successfully sent to Hub[" 
-                                            + response.hub + "], for Topic[" 
-                                                + response.hub + "], for Topic[" 
-                                            + response.hub + "], for Topic[" 
-                                                + response.hub + "], for Topic[" 
-                                            + response.hub + "], for Topic[" 
-                                                + response.hub + "], for Topic[" 
-                                            + response.hub + "], for Topic[" 
-                                                + response.hub + "], for Topic[" 
+            string subscriptionSuccessMsg = "Subscription Request successfully sent to Hub["
                                             + response.hub + "], for Topic[" 
                                             + response.topic + "], with Callback [" + callback + "]";
             log:print(subscriptionSuccessMsg + ". Awaiting intent verification.");

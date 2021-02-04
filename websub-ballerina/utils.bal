@@ -17,6 +17,7 @@
 import ballerina/http;
 import ballerina/regex;
 import ballerina/crypto;
+import ballerina/log;
 
 isolated function retrieveSubscriberServiceAnnotations(SubscriberService serviceType) returns SubscriberServiceConfiguration? {
     typedesc<any> serviceTypedesc = typeof serviceType;
@@ -140,7 +141,9 @@ isolated function retrieveContentHash(string method, string key, string payload)
         "sha512" => {
             hashedContent = crypto:hmacSha512(contentPayload, keyArr);
         }
-        _ => {}
+        _ => {
+            log:printError("Unrecognized hashning-method [" + method + "] found");
+        }
     }
 
     return hashedContent.toBase64();

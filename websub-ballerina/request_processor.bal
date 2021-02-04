@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/http;
+import ballerina/log;
 
 isolated function processSubscriptionVerification(http:Caller caller, http:Response response, 
                                                   RequestQueryParams params, SubscriberService subscriberService) {
@@ -57,7 +58,6 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
 
     response.statusCode = http:STATUS_OK;
     updateResponseBody(response, result["body"], result["headers"]);
-    // respondToRequest(caller, response);
 }
 
 isolated function processEventNotification(http:Caller caller, http:Request request, 
@@ -78,9 +78,7 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
     }
                                                
     string contentType = request.getContentType();
-
     map<string|string[]> headers = retrieveRequestHeaders(request);
-
     ContentDistributionMessage? message = ();
 
     match contentType {
@@ -112,7 +110,9 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
                 content: checkpanic request.getBinaryPayload()
             };  
         }
-        _ => {}
+        _ => {
+            log:printError("Unrecognized content-type [" + contentType + "] found");
+        }
     }
 
     if (message is ()) {
@@ -128,6 +128,4 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
             return;
         }
     }
-
-    // respondToRequest(caller, response);
 }
