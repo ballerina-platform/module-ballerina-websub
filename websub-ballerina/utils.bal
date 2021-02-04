@@ -57,19 +57,19 @@ isolated function retrieveRequestHeaders(http:Request request) returns map<strin
 isolated function retrieveRequestQueryParams(http:Request request) returns RequestQueryParams {
     map<string[]> queryParams = request.getQueryParams();
 
-    string hubMode = "";
+    string? hubMode = ();
     if (queryParams.hasKey(HUB_MODE)) {
         string[] hubModeValues = queryParams.get(HUB_MODE);
         hubMode = hubModeValues.length() == 1 ? hubModeValues[0] : "";
     }
 
-    string hubTopic = "";
+    string? hubTopic = ();
     if (queryParams.hasKey(HUB_TOPIC)) {
         string[] hubTopicValues = queryParams.get(HUB_TOPIC);
         hubTopic = hubTopicValues.length() == 1 ? hubTopicValues[0] : "";
     }
 
-    string hubChallenge = "";
+    string? hubChallenge = ();
     if (queryParams.hasKey(HUB_CHALLENGE)) {
         string[] hubChallengeValues = queryParams.get(HUB_CHALLENGE);
         hubChallenge = hubChallengeValues.length() == 1 ? hubChallengeValues[0] : "";
@@ -81,7 +81,7 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
         hubLeaseSeconds = hubLeaseSecondsValues.length() == 1 ? hubLeaseSecondsValues[0] : ();
     }
 
-    string hubReason = "";
+    string? hubReason = ();
     if (queryParams.hasKey(HUB_REASON)) {
         string[] hubReasonValues = queryParams.get(HUB_REASON);
         hubReason = hubReasonValues.length() == 1 ? hubReasonValues[0] : "";

@@ -136,11 +136,15 @@ service class HttpService {
 
         match params.hubMode {
             MODE_SUBSCRIBE | MODE_UNSUBSCRIBE => {
-                if (self.isSubscriptionVerificationAvailable) {
-                    processSubscriptionVerification(caller, response, <@untainted> params, self.subscriberService);
+                if (params.hubChallenge is () || params.hubTopic is ()) {
+                    response.statusCode = http:STATUS_BAD_REQUEST;
                 } else {
-                    response.statusCode = http:STATUS_OK;
-                    response.setTextPayload(params.hubChallenge);
+                    if (self.isSubscriptionVerificationAvailable) {
+                        processSubscriptionVerification(caller, response, <@untainted> params, self.subscriberService);
+                    } else {
+                        response.statusCode = http:STATUS_OK;
+                        response.setTextPayload(<string>params.hubChallenge);
+                    }
                 }
             }
             MODE_DENIED => {

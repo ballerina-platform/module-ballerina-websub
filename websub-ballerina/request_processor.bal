@@ -19,9 +19,9 @@ import ballerina/http;
 isolated function processSubscriptionVerification(http:Caller caller, http:Response response, 
                                                   RequestQueryParams params, SubscriberService subscriberService) {
     SubscriptionVerification message = {
-        hubMode: params.hubMode,
-        hubTopic: params.hubTopic,
-        hubChallenge: params.hubChallenge,
+        hubMode: <string>params.hubMode,
+        hubTopic: <string>params.hubTopic,
+        hubChallenge: <string>params.hubChallenge,
         hubLeaseSeconds: params.hubLeaseSeconds
     };
 
@@ -34,14 +34,15 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
         response.setTextPayload(errorMessage);
     } else {
         response.statusCode = http:STATUS_OK;
-        response.setTextPayload(params.hubChallenge);
+        response.setTextPayload(<string>params.hubChallenge);
     }
 }
 
 isolated function processSubscriptionDenial(http:Caller caller, http:Response response,
                                             RequestQueryParams params, SubscriberService subscriberService) {
-    SubscriptionDeniedError subscriptionDeniedMessage = error SubscriptionDeniedError(params.hubReason);
-    
+    var reason = params.hubReason is () ? "" : <string>params.hubReason;
+    SubscriptionDeniedError subscriptionDeniedMessage = error SubscriptionDeniedError(reason);
+
     var result = callOnSubscriptionDeniedMethod(subscriberService, subscriptionDeniedMessage);
     
     if (result is ()) {

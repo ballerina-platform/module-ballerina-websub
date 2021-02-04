@@ -84,11 +84,11 @@ public type Acknowledgement record {
 };
 
 public type RequestQueryParams record {|
-    string hubMode = "";
-    string hubTopic = "";
-    string hubChallenge = "";
-    string? hubLeaseSeconds = ();
-    string hubReason = "";
+    string? hubMode;
+    string? hubTopic;
+    string? hubChallenge;
+    string? hubLeaseSeconds;
+    string? hubReason;
 |};
 
 # Record representing a WebSub subscription change request.
