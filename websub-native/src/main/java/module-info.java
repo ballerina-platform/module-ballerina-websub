@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -17,15 +17,6 @@
  */
 
 module io.ballerina.stdlib.websub {
-    requires io.ballerina.stdlib.io;
-    requires io.netty.buffer;
-    requires org.slf4j;
     requires io.ballerina.lang;
     requires io.ballerina.runtime;
-    requires io.netty.codec.http;
-    requires io.netty.codec;
-    requires io.ballerina.lang.value;
-    requires io.ballerina.stdlib.mime;
-    requires io.ballerina.stdlib.http;
-    requires io.ballerina.tools.api;
 }
