@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/http;
+import ballerina/log;
 
 # Represents a Subscriber Service listener endpoint.
 public class Listener {
@@ -61,6 +62,10 @@ public class Listener {
     isolated function retriveCallbackUrl(string[]|string? servicePath) returns string {
         string host = self.listenerConfig.host;
         string protocol = self.listenerConfig.secureSocket is () ? "http" : "https";
+
+        if (protocol == "http") {
+            log:print("Using [HTTP] instead of [HTTPS]");
+        }
         
         string concatenatedServicePath = "";
         

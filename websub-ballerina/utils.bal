@@ -216,7 +216,7 @@ isolated function respondToRequest(http:Caller caller, http:Response response) {
 # Checks whether response is successfull 
 # 
 # + statusCode  - statusCode found in the {@code http:Response}
-# + returns     - `true` if the `statusCode` is between 200 to 300, else false
+# + return     - `true` if the `statusCode` is between 200 to 300, else false
 isolated function isSuccessStatusCode(int statusCode) returns boolean {
     return (200 <= statusCode && statusCode < 300);
 }
