@@ -54,6 +54,10 @@ public class Listener {
         }
     }
     
+    # Dynamically generates the call-back URL for subscriber-service
+    # 
+    # + servicePath - The path on which the service is hosted
+    # + return     - {@code string} contaning the generated URL
     isolated function retriveCallbackUrl(string[]|string? servicePath) returns string {
         string host = self.listenerConfig.host;
         string protocol = self.listenerConfig.secureSocket is () ? "http" : "https";
