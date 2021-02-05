@@ -45,39 +45,39 @@ public class Listener {
     # + name - The path of the Service to be hosted
     # + return - An `error`, if an error occurred during the service attaching process
     public function attach(SubscriberService s, string[]|string? name = ()) returns error? {
+        if (self.listenerConfig.secureSocket is ()) {
+            log:print("Using [HTTP] instead of [HTTPS] for listener");
+        }
+
         var configuration = retrieveSubscriberServiceAnnotations(s);
+        
         if (configuration is SubscriberServiceConfiguration) {
-            string callbackUrl = self.retriveCallbackUrl(name);
+            string[]|string servicePath = self.retrieveServicePath(name);
+            string callbackUrl = retriveCallbackUrl(servicePath, self.port, self.listenerConfig);
             self.httpService = check new(s, configuration, callbackUrl);
-            checkpanic self.httpListener.attach(<HttpService> self.httpService, name);
+
+            checkpanic self.httpListener.attach(<HttpService> self.httpService, servicePath);
         } else {
             return error ListenerStartupError("Could not find the required service-configurations");
         }
     }
     
-    # Dynamically generates the call-back URL for subscriber-service
+    # Retrieves the service-path for the HTTP Service
     # 
-    # + servicePath - The path on which the service is hosted
-    # + return     - {@code string} contaning the generated URL
-    isolated function retriveCallbackUrl(string[]|string? servicePath) returns string {
-        string host = self.listenerConfig.host;
-        string protocol = self.listenerConfig.secureSocket is () ? "http" : "https";
-
-        if (protocol == "http") {
-            log:print("Using [HTTP] instead of [HTTPS]");
-        }
-        
-        string concatenatedServicePath = "";
-        
-        if (servicePath is string) {
-            concatenatedServicePath += "/" + <string>servicePath;
-        } else if (servicePath is string[]) {
-            foreach var pathSegment in <string[]>servicePath {
-                concatenatedServicePath += "/" + pathSegment;
+    # + name    - user provided service path
+    # + return  - {@code string} or {@code string[]} value for service path
+    private function retrieveServicePath(string[]|string? name) returns string[]|string {
+        if (name is ()) {
+            return generateUniqueUrlSegment();
+        } else if (name is string) {
+            return name;
+        } else {
+            if ((<string[]>name).length() == 0) {
+                return generateUniqueUrlSegment();
+            } else {
+                return <string[]>name;
             }
         }
-
-        return protocol + "://" + host + ":" + self.port.toString() + concatenatedServicePath;
     }
 
     # Detaches the provided Service from the Listener.

@@ -18,13 +18,44 @@ import ballerina/http;
 import ballerina/regex;
 import ballerina/crypto;
 import ballerina/log;
+import ballerina/jballerina.java;
 
 # Retrieves the `websub:SubscriberServiceConfig` annotation values
 # 
-# + return - {@code websub:SubscriberServiceConfiguration} if present or {@code nil} if absent
+# + return - {@code websub:SubscriberServiceConfiguration} if present or `nil` if absent
 isolated function retrieveSubscriberServiceAnnotations(SubscriberService serviceType) returns SubscriberServiceConfiguration? {
     typedesc<any> serviceTypedesc = typeof serviceType;
     return serviceTypedesc.@SubscriberServiceConfig;
+}
+
+# Dynamically generates the call-back URL for subscriber-service
+# 
+# + servicePath   - service path on which the service will be hosted
+# + config        - {@code http:ListenerConfiguration} in use
+# + return        - {@code string} contaning the generated URL
+isolated function retriveCallbackUrl(string[]|string servicePath, 
+                                     int port, http:ListenerConfiguration config) returns string {
+    string host = config.host;
+    string protocol = config.secureSocket is () ? "http" : "https";        
+    string concatenatedServicePath = "";
+        
+    if (servicePath is string) {
+        concatenatedServicePath += "/" + <string>servicePath;
+    } else {
+        foreach var pathSegment in <string[]>servicePath {
+            concatenatedServicePath += "/" + pathSegment;
+        }
+    }
+
+    return protocol + "://" + host + ":" + port.toString() + concatenatedServicePath;
+}
+
+# Generates a unique URL segment for the subscriber service
+# 
+# + return - {@code string} containing the generated unique URL path segment
+isolated function generateUniqueUrlSegment() returns string {
+    // todo - [ayesh] properly implement this method
+    return "/" + generateRandomString(10);
 }
 
 # Generate the `websub:SubscriptionChangeRequest` from the configurations.
@@ -220,3 +251,11 @@ isolated function respondToRequest(http:Caller caller, http:Response response) {
 isolated function isSuccessStatusCode(int statusCode) returns boolean {
     return (200 <= statusCode && statusCode < 300);
 }
+
+# Invoke native method to generate random-string with a given length.
+# 
+# + targetStringLength - expected length for the generated string
+# + return             - {@code string} randomly generated string with the given length
+isolated function generateRandomString(int targetStringLength) returns string = @java:Method {
+    'class: "io.ballerina.stdlib.websub.NativeStringUtils"
+} external;
