@@ -18,22 +18,7 @@ import ballerina/io;
 import ballerina/test;
 import ballerina/http;
 
-
-listener http:Listener simpleHttpServiceListener = new (9191);
-listener Listener basicSubListerner = new (9090);
-
-var simpleHttpService = service object {
-        resource function get discovery(http:Caller caller, http:Request request) {
-            http:Response response = new;
-            response.addHeader("Link", "<http://127.0.0.1:9191/common/hub>; rel=\"hub\"");
-            response.addHeader("Link", "<https://sample.topic.com>; rel=\"self\"");
-            var resp = caller->respond(response);
-        }
-
-        resource function post hub(http:Caller caller, http:Request request) {
-            var resp = caller->respond();
-        }
-    };
+listener Listener listenerGroupOne = new (9090);
 
 var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, secret: "Kslk30SNF2AChs2", discoveryConfig: {}} 
                               service object {
@@ -63,23 +48,21 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
     }
 };
 
-@test:BeforeSuite
-function beforeGroupsFunc() {
-    io:println("I'm the before groups function!");
-    checkpanic simpleHttpServiceListener.attach(simpleHttpService, "/common");
-    checkpanic basicSubListerner.attach(simpleSubscriberService, "/subscriber");
+@test:BeforeGroups { value:["g1"] }
+function beforeGroupOne() {
+    checkpanic listenerGroupOne.attach(simpleSubscriberService, "/subscriber");
 }
 
-@test:AfterSuite { }
-function afterGroupsFunc() {
-    io:println("I'm the after groups function!");
-    checkpanic simpleHttpServiceListener.gracefulStop();
-    checkpanic basicSubListerner.gracefulStop();
+@test:AfterGroups { value:["g1"] }
+function afterGroupOne() {
+    checkpanic listenerGroupOne.gracefulStop();
 }
 
 http:Client httpClient = checkpanic new("http://localhost:9090/subscriber");
 
-@test:Config { }
+@test:Config { 
+    groups: ["g1"]
+}
 function testOnSubscriptionValidation() returns @tainted error? {
     http:Request request = new;
 
@@ -92,7 +75,9 @@ function testOnSubscriptionValidation() returns @tainted error? {
     }
 }
 
-@test:Config { }
+@test:Config {
+    groups: ["g1"]
+ }
 function testOnIntentVerificationSuccess() returns @tainted error? {
     http:Request request = new;
 
@@ -105,7 +90,9 @@ function testOnIntentVerificationSuccess() returns @tainted error? {
     }
 }
 
-@test:Config { }
+@test:Config { 
+    groups: ["g1"]
+}
 function testOnIntentVerificationFailure() returns @tainted error? {
     http:Request request = new;
 
@@ -118,7 +105,9 @@ function testOnIntentVerificationFailure() returns @tainted error? {
     }
 }
 
-@test:Config { }
+@test:Config {
+    groups: ["g1"]
+ }
 function testOnEventNotificationSuccess() returns @tainted error? {
     http:Request request = new;
     json payload =  {"action": "publish", "mode": "remote-hub"};
@@ -133,7 +122,9 @@ function testOnEventNotificationSuccess() returns @tainted error? {
 }
 
 
-@test:Config {}
+@test:Config {
+    groups: ["g1"]
+}
 function testOnEventNotificationSuccessXml() returns @tainted error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
