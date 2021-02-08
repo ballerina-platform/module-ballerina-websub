@@ -54,7 +54,6 @@ isolated function retriveCallbackUrl(string[]|string servicePath,
 # 
 # + return - {@code string} containing the generated unique URL path segment
 isolated function generateUniqueUrlSegment() returns string {
-    // todo - [ayesh] properly implement this method
     return "/" + generateRandomString(10);
 }
 
