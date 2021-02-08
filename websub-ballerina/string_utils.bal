@@ -17,6 +17,10 @@
 import ballerina/lang.'string as strings;
 import ballerina/random;
 
+# Generates a random-string of givent length
+# 
+# + length - required length of the generated string
+# + return - generated random string value or `error` if any error occurred in the execution
 isolated function generateRandomString(int length) returns string | error {
     int[] codePoints = [];
 

@@ -19,9 +19,9 @@ import ballerina/log;
 
 # Porcesses the subscription / unsubscription intent verification requests from `hub`
 # 
-# + caller            - {@code http:Caller} reference
-# + response          - {@code http:Response} to be returned to the caller
-# + params            - query parameters retrieved from the {@code http:Request}
+# + caller - {@code http:Caller} reference
+# + response - {@code http:Response} to be returned to the caller
+# + params - query parameters retrieved from the {@code http:Request}
 # + subscriberService - service to be invoked via native method
 isolated function processSubscriptionVerification(http:Caller caller, http:Response response, 
                                                   RequestQueryParams params, SubscriberService subscriberService) {
@@ -47,9 +47,9 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
 
 # Porcesses the subscription / unsubscription denial requests from `hub`
 # 
-# + caller            - {@code http:Caller} reference
-# + response          - {@code http:Response} to be returned to the caller
-# + params            - query parameters retrieved from the {@code http:Request}
+# + caller - {@code http:Caller} reference
+# + response - {@code http:Response} to be returned to the caller
+# + params - query parameters retrieved from the {@code http:Request}
 # + subscriberService - service to be invoked via native method
 isolated function processSubscriptionDenial(http:Caller caller, http:Response response,
                                             RequestQueryParams params, SubscriberService subscriberService) {
@@ -74,11 +74,11 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
 
 # Porcesses the content distribution requests from `hub`
 # 
-# + caller            - {@code http:Caller} reference
-# + request           - original HTTP request
-# + response          - {@code http:Response} to be returned to the caller
+# + caller - {@code http:Caller} reference
+# + request - original HTTP request
+# + response - {@code http:Response} to be returned to the caller
 # + subscriberService - service to be invoked via native method
-# + secretKey         - pre-shared client-secret value
+# + secretKey - pre-shared client-secret value
 isolated function processEventNotification(http:Caller caller, http:Request request, 
                                            http:Response response, SubscriberService subscriberService,
                                            string secretKey) {

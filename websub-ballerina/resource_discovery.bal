@@ -25,7 +25,7 @@ public client class DiscoveryService {
 
     # Invoked during the initialization of a `websub:DiscoveryService`
     #
-    # + resourceUrl           - user provided resource-URL
+    # + resourceUrl - user provided resource-URL
     # + publisherClientConfig - {@code http:ClientConfiguration} if present to be used to
     #                           initialize underlying {@code http:Client}
     public function init(string discoveryUrl, 
@@ -36,9 +36,9 @@ public client class DiscoveryService {
 
     # Discovers the hub and topic URLs defined by a resource URL.
     #
-    # + expectedMediaTypes    - The expected media types for the subscriber client
+    # + expectedMediaTypes - The expected media types for the subscriber client
     # + expectedLanguageTypes - The expected language types for the subscriber client
-    # + return                - A `(hub, topic)` as a `(string, string)` if successful or else an `error` if not
+    # + return - A `(hub, topic)` as a `(string, string)` if successful or else an `error` if not
     remote function discoverResourceUrls(string?|string[] expectedMediaTypes, string?|string[] expectedLanguageTypes) 
                                         returns @tainted [string, string]|error {
         http:Request request = new;

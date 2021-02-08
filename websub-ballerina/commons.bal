@@ -68,9 +68,9 @@ const string COMMON_SERVICE_PATH = "subscriber";
 
 # Record representing the subscription / unsubscription intent verification request-body.
 # 
-# + hubMode         - current hub.mode parameter (subscribe / unsubscribe)
-# + hubTopic        - topic URL
-# + hubChallenge    - hub.challenge parameter used for verification
+# + hubMode - current hub.mode parameter (subscribe / unsubscribe)
+# + hubTopic - topic URL
+# + hubChallenge - hub.challenge parameter used for verification
 # + hubLeaseSeconds - hub.lease_seconds parameter used to validate the expiration of subscription
 public type SubscriptionVerification record {
     string hubMode;
@@ -81,9 +81,9 @@ public type SubscriptionVerification record {
 
 # Record representing the content-distribution request.
 # 
-# + headers     - request headers retrieve from the original `http:Request`
+# + headers - request headers retrieve from the original `http:Request`
 # + contentType - content-type header value of the original `http:Request`
-# + content     - received content
+# + content - received content
 public type ContentDistributionMessage record {
     map<string|string[]>? headers = ();
     string? contentType = ();
@@ -93,7 +93,7 @@ public type ContentDistributionMessage record {
 # Record representing the common-response to be returned.
 # 
 # + headers - additional headers to be included in `http:Response`
-# + body    - content to be included in `http:Response` body
+# + body - content to be included in `http:Response` body
 type CommonResponse record {|
     map<string|string[]>? headers = ();
     map<string>? body = ();
@@ -135,11 +135,11 @@ public type SubscriptionChangeResponse record {|
 
 # Record representing the query-parameters retrieved from the `http:Request`
 # 
-# + hubMode         - value for the hub.mode parameter
-# + hubTopic        - value for the hub.topic parameter
-# + hubChallenge    - value for the hub.challenge parameter
+# + hubMode - value for the hub.mode parameter
+# + hubTopic - value for the hub.topic parameter
+# + hubChallenge - value for the hub.challenge parameter
 # + hubLeaseSeconds - value for the hub.lease_seconds parameter
-# + hubReason       - value for the hub.reason parameter
+# + hubReason - value for the hub.reason parameter
 public type RequestQueryParams record {|
     string? hubMode;
     string? hubTopic;

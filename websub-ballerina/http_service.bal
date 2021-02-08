@@ -29,10 +29,10 @@ service class HttpService {
 
     # Invoked during the initialization of a `websub:HttpService`
     #
-    # + subscriberService   - {@code websub:SubscriberService} provided service
-    # + serviceConfig       - {@code SubscriberServiceConfiguration} subscriber-service
-    #                          related configurations
-    # + callback            - {@code string} dynamically generated callback-url
+    # + subscriberService - {@code websub:SubscriberService} provided service
+    # + serviceConfig - {@code SubscriberServiceConfiguration} subscriber-service
+    #                   related configurations
+    # + callback - {@code string} dynamically generated callback-url
     public function init(SubscriberService subscriberService, SubscriberServiceConfiguration config, 
                          string callback) returns error? {
         self.subscriberService = subscriberService;
@@ -114,7 +114,7 @@ service class HttpService {
 
     # Resource-Method handling the HTTP POST requests
     # 
-    # + caller  - {@code http:Caller} reference
+    # + caller - {@code http:Caller} reference
     # + request - {@code http:Request} reference
     resource function post .(http:Caller caller, http:Request request) {
         http:Response response = new;
@@ -132,7 +132,7 @@ service class HttpService {
 
     # Resource-Method handling the HTTP GET requests
     # 
-    # + caller  - {@code http:Caller} reference
+    # + caller - {@code http:Caller} reference
     # + request - {@code http:Request} reference
     resource function get .(http:Caller caller, http:Request request) {
         http:Response response = new;
@@ -179,8 +179,8 @@ service class HttpService {
 
 # Invoke native method to retrive implemented method names in the subscriber service
 # 
-# + subscriberService   - current subscriber-service
-# + return             - {@code string[]} containing the method-names in current implementation
+# + subscriberService - current subscriber-service
+# + return - {@code string[]} containing the method-names in current implementation
 isolated function getServiceMethodNames(SubscriberService subscriberService) returns string[] = @java:Method {
     'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
 } external;

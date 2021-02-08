@@ -66,8 +66,8 @@ public class Listener {
     
     # Retrieves the service-path for the HTTP Service
     # 
-    # + name    - user provided service path
-    # + return  - {@code string} or {@code string[]} value for service path
+    # + name - user provided service path
+    # + return - {@code string} or {@code string[]} value for service path
     private function retrieveServicePath(string[]|string? name) returns string[]|string {
         if (name is ()) {
             return generateUniqueUrlSegment();
@@ -84,7 +84,7 @@ public class Listener {
 
     # Logs the generated callback URL if the service-path was not defined.
     # 
-    # + name        - user provided service path
+    # + name - user provided service path
     # + callbackUrl - retrieved callback URL
     private function logGeneratedCallbackUrl(string[]|string? name, string callbackUrl) {
         if (name is ()) {
