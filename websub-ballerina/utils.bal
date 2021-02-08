@@ -155,7 +155,10 @@ isolated function updateResponseBody(http:Response response, anydata? messageBod
         foreach var ['key, value] in messageBody.entries() {
             payload = payload + "&" + 'key + "=" + value;
         }
+    } else if (messageBody is string) {
+        payload = messageBody;
     }
+
     response.setTextPayload(payload);
     response.setHeader("Content-type","application/x-www-form-urlencoded");
     if (headers is map<string|string[]>) {

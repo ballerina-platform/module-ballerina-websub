@@ -31,8 +31,9 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
     if (result is SubscriptionVerificationError) {
         result = <SubscriptionVerificationError>result;
         response.statusCode = http:STATUS_NOT_FOUND;
-        string errorMessage = result.message();
-        response.setTextPayload(errorMessage);
+        var errorDetails = result.detail();
+        anydata? responseBody = errorDetails["body"] is () ? result.message() : errorDetails["body"];
+        updateResponseBody(response, responseBody, errorDetails["headers"]);
     } else {
         response.statusCode = http:STATUS_OK;
         response.setTextPayload(<string>params.hubChallenge);
@@ -122,10 +123,11 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
         Acknowledgement | SubscriptionDeletedError? result = callOnEventNotificationMethod(subscriberService, message);
         if (result is Acknowledgement) {
             updateResponseBody(response, result["body"], result["headers"]);
-            return;
         } else if (result is SubscriptionDeletedError) {
             response.statusCode = http:STATUS_GONE;
-            return;
+            var errorDetails = result.detail();
+            updateResponseBody(response, errorDetails["body"], errorDetails["headers"]);
         }
+        return;
     }
 }
