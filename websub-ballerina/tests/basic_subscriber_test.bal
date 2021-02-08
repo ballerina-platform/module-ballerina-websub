@@ -50,7 +50,7 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
 
 @test:BeforeGroups { value:["g1"] }
 function beforeGroupOne() {
-    checkpanic listenerGroupOne.attach(simpleSubscriberService, "/subscriber");
+    checkpanic listenerGroupOne.attach(simpleSubscriberService, "subscriber");
 }
 
 @test:AfterGroups { value:["g1"] }

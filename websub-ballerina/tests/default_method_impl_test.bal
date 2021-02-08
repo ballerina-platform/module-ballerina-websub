@@ -31,7 +31,7 @@ var serviceWithDefaultImpl = @SubscriberServiceConfig { target: "http://0.0.0.0:
 
 @test:BeforeGroups { value:["g2"] }
 function beforeGroupTwo() {
-    checkpanic listenerGroupTwo.attach(serviceWithDefaultImpl, "/subscriber");
+    checkpanic listenerGroupTwo.attach(serviceWithDefaultImpl, "subscriber");
 }
 
 @test:AfterGroups { value:["g2"] }
@@ -77,5 +77,5 @@ function testOnIntentVerificationSuccessDefaultImpl() returns @tainted error? {
 function testUniqueStringGeneration() returns @tainted error? {
     var generatedString = generateUniqueUrlSegment();
     io:println("Generated String: ", generatedString);
-    test:assertEquals(generatedString.length(), 11);
+    test:assertEquals(generatedString.length(), 10);
 }
