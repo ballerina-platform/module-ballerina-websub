@@ -28,13 +28,13 @@ var serviceWithPathGeneration = @SubscriberServiceConfig { target: "http://0.0.0
     }
 };
 
-@test:AfterGroups { value:["g3"] }
+@test:AfterGroups { value:["service-path-generation"] }
 function afterPathGenerationTest() {
     checkpanic pathGenerationListener.gracefulStop();
 }
 
 @test:Config { 
-    groups: ["g3"]
+    groups: ["service-path-generation"]
 }
 function testServicePathGeneration() returns @tainted error? {
     do {

@@ -29,12 +29,12 @@ var serviceWithDefaultImpl = @SubscriberServiceConfig { target: "http://0.0.0.0:
     }
 };
 
-@test:BeforeGroups { value:["g2"] }
+@test:BeforeGroups { value:["default-method-impl"] }
 function beforeGroupTwo() {
     checkpanic listenerGroupTwo.attach(serviceWithDefaultImpl, "subscriber");
 }
 
-@test:AfterGroups { value:["g2"] }
+@test:AfterGroups { value:["default-method-impl"] }
 function afterGroupTwo() {
     checkpanic listenerGroupTwo.gracefulStop();
 }
@@ -42,7 +42,7 @@ function afterGroupTwo() {
 http:Client httpClientGroupTwo = checkpanic new("http://localhost:9091/subscriber");
 
 @test:Config { 
-    groups: ["g2"]
+    groups: ["default-method-impl"]
 }
 function testOnSubscriptionValidationDefaultImpl() returns @tainted error? {
     http:Request request = new;
@@ -57,7 +57,7 @@ function testOnSubscriptionValidationDefaultImpl() returns @tainted error? {
 }
 
 @test:Config {
-    groups: ["g2"]
+    groups: ["default-method-impl"]
  }
 function testOnIntentVerificationSuccessDefaultImpl() returns @tainted error? {
     http:Request request = new;
@@ -72,7 +72,7 @@ function testOnIntentVerificationSuccessDefaultImpl() returns @tainted error? {
 }
 
 @test:Config {
-    groups: ["g3"]
+    groups: ["default-method-impl"]
 }
 function testUniqueStringGeneration() returns @tainted error? {
     var generatedString = generateUniqueUrlSegment();

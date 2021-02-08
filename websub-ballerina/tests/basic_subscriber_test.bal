@@ -48,20 +48,20 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
     }
 };
 
-@test:BeforeGroups { value:["g1"] }
-function beforeGroupOne() {
+@test:BeforeGroups { value:["simple-subscriber"] }
+function beforeSimpleSubscriberTest() {
     checkpanic listenerGroupOne.attach(simpleSubscriberService, "subscriber");
 }
 
-@test:AfterGroups { value:["g1"] }
-function afterGroupOne() {
+@test:AfterGroups { value:["simple-subscriber"] }
+function afterSimpleSubscriberTest() {
     checkpanic listenerGroupOne.gracefulStop();
 }
 
 http:Client httpClient = checkpanic new("http://localhost:9090/subscriber");
 
 @test:Config { 
-    groups: ["g1"]
+    groups: ["simple-subscriber"]
 }
 function testOnSubscriptionValidation() returns @tainted error? {
     http:Request request = new;
@@ -76,7 +76,7 @@ function testOnSubscriptionValidation() returns @tainted error? {
 }
 
 @test:Config {
-    groups: ["g1"]
+    groups: ["simple-subscriber"]
  }
 function testOnIntentVerificationSuccess() returns @tainted error? {
     http:Request request = new;
@@ -91,7 +91,7 @@ function testOnIntentVerificationSuccess() returns @tainted error? {
 }
 
 @test:Config { 
-    groups: ["g1"]
+    groups: ["simple-subscriber"]
 }
 function testOnIntentVerificationFailure() returns @tainted error? {
     http:Request request = new;
@@ -106,7 +106,7 @@ function testOnIntentVerificationFailure() returns @tainted error? {
 }
 
 @test:Config {
-    groups: ["g1"]
+    groups: ["simple-subscriber"]
  }
 function testOnEventNotificationSuccess() returns @tainted error? {
     http:Request request = new;
@@ -123,7 +123,7 @@ function testOnEventNotificationSuccess() returns @tainted error? {
 
 
 @test:Config {
-    groups: ["g1"]
+    groups: ["simple-subscriber"]
 }
 function testOnEventNotificationSuccessXml() returns @tainted error? {
     http:Request request = new;
