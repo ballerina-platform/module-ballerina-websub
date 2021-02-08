@@ -187,6 +187,7 @@ task updateTomlFile {
         def stdlibDependentIoVersion = project.stdlibIoVersion.split("-")[0]
         def stdlibDependentRegexVersion = project.stdlibRegexVersion.split("-")[0]
         def stdlibDependentUuidVersion = project.stdlibUuidVersion.split("-")[0]
+        def stdlibDependentRandomVersion = project.stdlibRandomVersion.split("-")[0]
 
         def newConfig = ballerinaConfigFile.text.replace("@project.version@", project.version)
         newConfig = newConfig.replace("@toml.version@", tomlVersion)
@@ -215,6 +216,7 @@ task updateTomlFile {
         newDependencyConfig = newDependencyConfig.replace("@stdlib.io.version@", stdlibDependentIoVersion)
         newDependencyConfig = newDependencyConfig.replace("@stdlib.regex.version@", stdlibDependentRegexVersion)
         newDependencyConfig = newDependencyConfig.replace("@stdlib.uuid.version@", stdlibDependentUuidVersion)
+        newDependencyConfig = newDependencyConfig.replace("@stdlib.random.version@", stdlibDependentRandomVersion)
         ballerinaDependencyFile.text = newDependencyConfig
     }
 }

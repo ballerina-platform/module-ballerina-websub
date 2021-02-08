@@ -18,12 +18,12 @@ import ballerina/http;
 
 # Configuration for a WebSubSubscriber service.
 #
-# + target          - The `string` resource URL for which discovery will be initiated to identify the hub and topic,
-#                     or a tuple `[hub, topic]` representing a discovered hub and a topic
-# + leaseSeconds    - The period for which the subscription is expected to be active
-# + callback        - The callback URL for subscriber-service
-# + secret          - The secret to be used for authenticated content distribution
-# + httpConfig      - The configuration for the hub client used to interact with the discovered/specified hub
+# + target - The `string` resource URL for which discovery will be initiated to identify the hub and topic,
+#            or a tuple `[hub, topic]` representing a discovered hub and a topic
+# + leaseSeconds - The period for which the subscription is expected to be active
+# + callback - The callback URL for subscriber-service
+# + secret - The secret to be used for authenticated content distribution
+# + httpConfig - The configuration for the hub client used to interact with the discovered/specified hub
 # + discoveryConfig - HTTP client configurations for resource discovery
 public type SubscriberServiceConfiguration record {|
     string|[string, string] target;

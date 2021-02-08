@@ -18,10 +18,16 @@ import ballerina/http;
 import ballerina/lang.'string as strings;
 import ballerina/regex;
 
+# Represents resource-discovery service which identify the `hub` and `topic` from `resource-URL`.
 public client class DiscoveryService {
     private string resourceUrl;
     private http:Client discoveryClientEp;
 
+    # Invoked during the initialization of a `websub:DiscoveryService`
+    #
+    # + resourceUrl - user provided resource-URL
+    # + publisherClientConfig - {@code http:ClientConfiguration} if present to be used to
+    #                           initialize underlying {@code http:Client}
     public function init(string discoveryUrl, 
                          http:ClientConfiguration? publisherClientConfig) returns error? {
         self.resourceUrl = discoveryUrl;
@@ -84,7 +90,7 @@ public client class DiscoveryService {
 #
 # + response - An `http:Response` received
 # + return - A `(topic, hubs)` if parsing and extraction is successful or else an `error` if not
-function extractTopicAndHubUrls(http:Response response) returns @tainted [string, string[]]|error {
+isolated function extractTopicAndHubUrls(http:Response response) returns @tainted [string, string[]]|error {
     string[] linkHeaders = [];
     if (response.hasHeader("Link")) {
         linkHeaders = check response.getHeaders("Link");

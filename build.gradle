@@ -50,6 +50,7 @@ ext.stdlibRegexVersion = project.stdlibRegexVersion
 ext.stdlibUuidVersion = project.stdlibUuidVersion
 ext.stdlibJwtVersion = project.stdlibJwtVersion
 ext.stdlibOAuth2Version = project.stdlibOAuth2Version
+ext.stdlibRandomVersion = project.stdlibRandomVersion
 
 allprojects {
     group = project.group
@@ -224,6 +225,7 @@ subprojects {
         ballerinaStdLibs "org.ballerinalang:uuid-ballerina:${stdlibUuidVersion}"
         ballerinaStdLibs "org.ballerinalang:jwt-ballerina:${stdlibJwtVersion}"
         ballerinaStdLibs "org.ballerinalang:oauth2-ballerina:${stdlibOAuth2Version}"
+        ballerinaStdLibs "org.ballerinalang:random-ballerina:${stdlibRandomVersion}"
     }
 }
 

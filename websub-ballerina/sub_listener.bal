@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/http;
+import ballerina/log;
 
 # Represents a Subscriber Service listener endpoint.
 public class Listener {
@@ -44,31 +45,55 @@ public class Listener {
     # + name - The path of the Service to be hosted
     # + return - An `error`, if an error occurred during the service attaching process
     public function attach(SubscriberService s, string[]|string? name = ()) returns error? {
+        if (self.listenerConfig.secureSocket is ()) {
+            log:print("Using [HTTP] instead of [HTTPS] for listener");
+        }
+
         var configuration = retrieveSubscriberServiceAnnotations(s);
+        
         if (configuration is SubscriberServiceConfiguration) {
-            string callbackUrl = self.retriveCallbackUrl(name);
+            string[]|string servicePath = self.retrieveServicePath(name);
+            string callbackUrl = retriveCallbackUrl(servicePath, self.port, self.listenerConfig);
+
+            self.logGeneratedCallbackUrl(name, callbackUrl);
+
             self.httpService = check new(s, configuration, callbackUrl);
-            checkpanic self.httpListener.attach(<HttpService> self.httpService, name);
+            checkpanic self.httpListener.attach(<HttpService> self.httpService, servicePath);
         } else {
             return error ListenerError("Could not find the required service-configurations");
         }
     }
     
-    isolated function retriveCallbackUrl(string[]|string? servicePath) returns string {
-        string host = self.listenerConfig.host;
-        string protocol = self.listenerConfig.secureSocket is () ? "http" : "https";
-        
-        string concatenatedServicePath = "";
-        
-        if (servicePath is string) {
-            concatenatedServicePath += "/" + <string>servicePath;
-        } else if (servicePath is string[]) {
-            foreach var pathSegment in <string[]>servicePath {
-                concatenatedServicePath += "/" + pathSegment;
+    # Retrieves the service-path for the HTTP Service
+    # 
+    # + name - user provided service path
+    # + return - {@code string} or {@code string[]} value for service path
+    private function retrieveServicePath(string[]|string? name) returns string[]|string {
+        if (name is ()) {
+            return generateUniqueUrlSegment();
+        } else if (name is string) {
+            return name;
+        } else {
+            if ((<string[]>name).length() == 0) {
+                return generateUniqueUrlSegment();
+            } else {
+                return <string[]>name;
             }
         }
+    }
 
-        return protocol + "://" + host + ":" + self.port.toString() + concatenatedServicePath;
+    # Logs the generated callback URL if the service-path was not defined.
+    # 
+    # + name - user provided service path
+    # + callbackUrl - retrieved callback URL
+    private function logGeneratedCallbackUrl(string[]|string? name, string callbackUrl) {
+        if (name is ()) {
+            log:print("Could not find service-path. Hence generated callback URL [" + callbackUrl + "]");
+        } else if (name is string[]) {
+            if (name.length() == 0) {
+                log:print("Could not find service-path. Hence generated callback URL [" + callbackUrl + "]");
+            }
+        }
     }
 
     # Detaches the provided Service from the Listener.

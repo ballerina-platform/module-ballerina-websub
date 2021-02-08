@@ -19,11 +19,54 @@ import ballerina/regex;
 import ballerina/crypto;
 import ballerina/log;
 
+# Retrieves the `websub:SubscriberServiceConfig` annotation values
+# 
+# + return - {@code websub:SubscriberServiceConfiguration} if present or `nil` if absent
 isolated function retrieveSubscriberServiceAnnotations(SubscriberService serviceType) returns SubscriberServiceConfiguration? {
     typedesc<any> serviceTypedesc = typeof serviceType;
     return serviceTypedesc.@SubscriberServiceConfig;
 }
 
+# Dynamically generates the call-back URL for subscriber-service
+# 
+# + servicePath - service path on which the service will be hosted
+# + config - {@code http:ListenerConfiguration} in use
+# + return - {@code string} contaning the generated URL
+isolated function retriveCallbackUrl(string[]|string servicePath, 
+                                     int port, http:ListenerConfiguration config) returns string {
+    string host = config.host;
+    string protocol = config.secureSocket is () ? "http" : "https";        
+    string concatenatedServicePath = "";
+        
+    if (servicePath is string) {
+        concatenatedServicePath += "/" + <string>servicePath;
+    } else {
+        foreach var pathSegment in <string[]>servicePath {
+            concatenatedServicePath += "/" + pathSegment;
+        }
+    }
+
+    return protocol + "://" + host + ":" + port.toString() + concatenatedServicePath;
+}
+
+# Generates a unique URL segment for the subscriber service
+# 
+# + return - {@code string} containing the generated unique URL path segment
+isolated function generateUniqueUrlSegment() returns string {
+    var generatedString = generateRandomString(10);
+    if (generatedString is string) {
+        return generatedString;
+    } else {
+        return COMMON_SERVICE_PATH;
+    }
+}
+
+# Generate the `websub:SubscriptionChangeRequest` from the configurations.
+# 
+# + topicUrl - `topic` to which subscriber want to subscribe
+# + callback - Subscriber callback URL to be used by the `hub`
+# + config - user defined subscriber-service configurations
+# + return - {@code websub:SubscriptionChangeRequest} from the configurations provided
 isolated function retrieveSubscriptionRequest(string topicUrl, string callback, 
                                               SubscriberServiceConfiguration config) returns SubscriptionChangeRequest {        
     SubscriptionChangeRequest request = { topic: topicUrl, callback: callback };
@@ -41,6 +84,10 @@ isolated function retrieveSubscriptionRequest(string topicUrl, string callback,
     return request;
 }
 
+# Retrieve the request-headers from the `http:Request`.
+# 
+# + request - {@code http:Request} to be processed
+# + return - {@code map<string|string[]>} containing the header values
 isolated function retrieveRequestHeaders(http:Request request) returns map<string|string[]> {
     string[] headerNames = request.getHeaderNames();
     map<string|string[]> headers = {};
@@ -55,6 +102,10 @@ isolated function retrieveRequestHeaders(http:Request request) returns map<strin
     return headers;
 }
 
+# Retrieve request query parameters.
+# 
+# + request - {@code http:Request} to be processed
+# + return - {@code websub:RequestQueryParams} containing the query parameter values
 isolated function retrieveRequestQueryParams(http:Request request) returns RequestQueryParams {
     map<string[]> queryParams = request.getQueryParams();
 
@@ -99,6 +150,12 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
     return params;
 }
 
+# Verifies the `http:Request` payload with the provided signature value.
+# 
+# + request - current {@code http:Request}
+# + secret - pre-shared client-secret value
+# + payload - {@code string} value of the request body
+# + return - `true` if the verification is successfull, else `false`
 isolated function verifyContent(http:Request request, string secret, string payload) returns boolean {
     if (secret.trim().length() > 0) {
         if (request.hasHeader(X_HUB_SIGNATURE)) {
@@ -123,6 +180,12 @@ isolated function verifyContent(http:Request request, string secret, string payl
     }
 }
 
+# Generates HMac value for the paload depending on the provided algorithm.
+# 
+# + method - `HMac` algorithm to be used
+# + key - pre-shared secret-key value
+# + payload - content to be hashed
+# + return - `Base64` encoded {@code string} value of the hash
 isolated function retrieveContentHash(string method, string key, string payload) returns string {
     byte[] keyArr = key.toBytes();
     byte[] contentPayload = payload.toBytes();
@@ -149,6 +212,11 @@ isolated function retrieveContentHash(string method, string key, string payload)
     return hashedContent.toBase64();
 }
 
+# Updates `http:Response` body with provided parameters.
+# 
+# + response - {@code http:Response} to be updated
+# + messageBody - content for the response body
+# + headers - additional header-parameters to included in the response
 isolated function updateResponseBody(http:Response response, anydata? messageBody, map<string|string[]>? headers) {
     string payload = "";
     if (messageBody is map<string>) {
@@ -174,6 +242,18 @@ isolated function updateResponseBody(http:Response response, anydata? messageBod
     }
 }
 
+# Respond to the received `http:Request`.
+# 
+# + caller - {@code http:Caller} which intiate the request
+# + response - {@code http:Response} to be sent to the caller
 isolated function respondToRequest(http:Caller caller, http:Response response) {
     var responseError = caller->respond(response);
+}
+
+# Checks whether response is successfull 
+# 
+# + statusCode - statusCode found in the {@code http:Response}
+# + return - `true` if the `statusCode` is between 200 to 300, else false
+isolated function isSuccessStatusCode(int statusCode) returns boolean {
+    return (200 <= statusCode && statusCode < 300);
 }
