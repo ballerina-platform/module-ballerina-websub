@@ -18,7 +18,6 @@ import ballerina/http;
 import ballerina/regex;
 import ballerina/crypto;
 import ballerina/log;
-import ballerina/jballerina.java;
 
 # Retrieves the `websub:SubscriberServiceConfig` annotation values
 # 
@@ -54,7 +53,12 @@ isolated function retriveCallbackUrl(string[]|string servicePath,
 # 
 # + return - {@code string} containing the generated unique URL path segment
 isolated function generateUniqueUrlSegment() returns string {
-    return generateRandomString(10);
+    var generatedString = generateRandomString(10);
+    if (generatedString is string) {
+        return generatedString;
+    } else {
+        return COMMON_SERVICE_PATH;
+    }
 }
 
 # Generate the `websub:SubscriptionChangeRequest` from the configurations.
@@ -250,11 +254,3 @@ isolated function respondToRequest(http:Caller caller, http:Response response) {
 isolated function isSuccessStatusCode(int statusCode) returns boolean {
     return (200 <= statusCode && statusCode < 300);
 }
-
-# Invoke native method to generate random-string with a given length.
-# 
-# + targetStringLength - expected length for the generated string
-# + return             - {@code string} randomly generated string with the given length
-isolated function generateRandomString(int targetStringLength) returns string = @java:Method {
-    'class: "io.ballerina.stdlib.websub.NativeStringUtils"
-} external;

@@ -63,6 +63,9 @@ const string CONTENT_TYPE = "Content-Type";
 #  value of this `HTTP Header` is used by subscriber to verify whether the content is published by a valid hub.
 const string X_HUB_SIGNATURE = "X-Hub-Signature";
 
+# Common service-path to be used if the path-generation failed
+const string COMMON_SERVICE_PATH = "subscriber";
+
 # Record representing the subscription / unsubscription intent verification request-body.
 # 
 # + hubMode         - current hub.mode parameter (subscribe / unsubscribe)
