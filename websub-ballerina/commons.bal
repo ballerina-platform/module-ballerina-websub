@@ -65,10 +65,10 @@ const string X_HUB_SIGNATURE = "X-Hub-Signature";
 
 # Record representing the subscription / unsubscription intent verification request-body.
 # 
-# + hubMode         - current `hub.mode` parameter (subscribe / unsubscribe)
+# + hubMode         - current hub.mode parameter (subscribe / unsubscribe)
 # + hubTopic        - topic URL
-# + hubChallenge    - `hub.challenge` parameter used for verification
-# + hubLeaseSeconds -  `hub.lease_seconds` parameter used to validate the expiration of subscription
+# + hubChallenge    - hub.challenge parameter used for verification
+# + hubLeaseSeconds - hub.lease_seconds parameter used to validate the expiration of subscription
 public type SubscriptionVerification record {
     string hubMode;
     string hubTopic;
@@ -132,11 +132,11 @@ public type SubscriptionChangeResponse record {|
 
 # Record representing the query-parameters retrieved from the `http:Request`
 # 
-# + hubMode         - value for the `hub.mode` parameter
-# + hubTopic        - value for the `hub.topic` parameter
-# + hubChallenge    - value for the `hub.challenge` parameter
-# + hubLeaseSeconds - value for the `hub.lease_seconds` parameter
-# + hubReason       - value for the `hub.reason` parameter
+# + hubMode         - value for the hub.mode parameter
+# + hubTopic        - value for the hub.topic parameter
+# + hubChallenge    - value for the hub.challenge parameter
+# + hubLeaseSeconds - value for the hub.lease_seconds parameter
+# + hubReason       - value for the hub.reason parameter
 public type RequestQueryParams record {|
     string? hubMode;
     string? hubTopic;
