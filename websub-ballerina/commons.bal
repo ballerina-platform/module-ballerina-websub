@@ -41,8 +41,21 @@ const string HUB_REASON = "hub.reason";
 # Subscription parameter 'hub.secret' representing the secret key to use for authenticated content distribution.
 const string HUB_SECRET = "hub.secret";
 
+# `hub.mode` value indicating "subscribe" mode, used by a hub to notify a subscription verification.
+const string MODE_SUBSCRIBE = "subscribe";
+
+# `hub.mode` value indicating "unsubscribe" mode, used by a hub to notify an unsubscription verification.
+const string MODE_UNSUBSCRIBE = "unsubscribe";
+
+# `hub.mode` value indicating "denied" mode, used by a hub to notify a subscription denial.
+const string MODE_DENIED = "denied";
+
+# HTTP `Accept` Header name used to include `Accept` header value manually to `HTTP Request`
 const string ACCEPT_HEADER = "Accept";
+
+# HTTP `Accept-Language` Header name used to include `Accept-Language` header value manually to `HTTP Request`
 const string ACCEPT_LANGUAGE_HEADER = "Accept-Language";
+
 # `HTTP Content-Type` Header Name, used to include `Content-Type` header value manually to `HTTP Request`.
 const string CONTENT_TYPE = "Content-Type";
 
@@ -50,13 +63,15 @@ const string CONTENT_TYPE = "Content-Type";
 #  value of this `HTTP Header` is used by subscriber to verify whether the content is published by a valid hub.
 const string X_HUB_SIGNATURE = "X-Hub-Signature";
 
-# `hub.mode` value indicating "subscribe" mode, used by a hub to notify a subscription verification.
-const string MODE_SUBSCRIBE = "subscribe";
-# `hub.mode` value indicating "unsubscribe" mode, used by a hub to notify an unsubscription verification.
-const string MODE_UNSUBSCRIBE = "unsubscribe";
-# `hub.mode` value indicating "denied" mode, used by a hub to notify a subscription denial.
-const string MODE_DENIED = "denied";
+# Common service-path to be used if the path-generation failed
+const string COMMON_SERVICE_PATH = "subscriber";
 
+# Record representing the subscription / unsubscription intent verification request-body.
+# 
+# + hubMode - current hub.mode parameter (subscribe / unsubscribe)
+# + hubTopic - topic URL
+# + hubChallenge - hub.challenge parameter used for verification
+# + hubLeaseSeconds - hub.lease_seconds parameter used to validate the expiration of subscription
 public type SubscriptionVerification record {
     string hubMode;
     string hubTopic;
@@ -64,34 +79,37 @@ public type SubscriptionVerification record {
     string? hubLeaseSeconds;
 };
 
+# Record representing the content-distribution request.
+# 
+# + headers - request headers retrieve from the original `http:Request`
+# + contentType - content-type header value of the original `http:Request`
+# + content - received content
 public type ContentDistributionMessage record {
     map<string|string[]>? headers = ();
     string? contentType = ();
     json|xml|string|byte[] content;
 };
 
+# Record representing the common-response to be returned.
+# 
+# + headers - additional headers to be included in `http:Response`
+# + body - content to be included in `http:Response` body
 type CommonResponse record {|
     map<string|string[]>? headers = ();
     map<string>? body = ();
 |};
 
+# Record representing the subscription / unsubscription intent verification success.
 public type SubscriptionVerificationSuccess record {
     *CommonResponse;
 };
 
+# Record representing the subscription-denial / content-distribution acknowledgement
 public type Acknowledgement record {
     *CommonResponse;
 };
 
-public type RequestQueryParams record {|
-    string? hubMode;
-    string? hubTopic;
-    string? hubChallenge;
-    string? hubLeaseSeconds;
-    string? hubReason;
-|};
-
-# Record representing a WebSub subscription change request.
+# Record representing a WebSub subscription change request-body.
 #
 # + topic - The topic for which the subscription/unsubscription request is sent
 # + callback - The callback which should be registered/unregistered for the subscription/unsubscription request sent
@@ -115,6 +133,17 @@ public type SubscriptionChangeResponse record {|
     http:Response response;
 |};
 
-isolated function isSuccessStatusCode(int statusCode) returns boolean {
-    return (200 <= statusCode && statusCode < 300);
-}
+# Record representing the query-parameters retrieved from the `http:Request`
+# 
+# + hubMode - value for the hub.mode parameter
+# + hubTopic - value for the hub.topic parameter
+# + hubChallenge - value for the hub.challenge parameter
+# + hubLeaseSeconds - value for the hub.lease_seconds parameter
+# + hubReason - value for the hub.reason parameter
+public type RequestQueryParams record {|
+    string? hubMode;
+    string? hubTopic;
+    string? hubChallenge;
+    string? hubLeaseSeconds;
+    string? hubReason;
+|};
