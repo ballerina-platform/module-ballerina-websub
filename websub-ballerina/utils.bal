@@ -54,7 +54,7 @@ isolated function retriveCallbackUrl(string[]|string servicePath,
 # 
 # + return - {@code string} containing the generated unique URL path segment
 isolated function generateUniqueUrlSegment() returns string {
-    return "/" + generateRandomString(10);
+    return generateRandomString(10);
 }
 
 # Generate the `websub:SubscriptionChangeRequest` from the configurations.

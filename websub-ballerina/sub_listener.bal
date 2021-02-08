@@ -54,8 +54,10 @@ public class Listener {
         if (configuration is SubscriberServiceConfiguration) {
             string[]|string servicePath = self.retrieveServicePath(name);
             string callbackUrl = retriveCallbackUrl(servicePath, self.port, self.listenerConfig);
-            self.httpService = check new(s, configuration, callbackUrl);
 
+            self.logGeneratedCallbackUrl(name, callbackUrl);
+
+            self.httpService = check new(s, configuration, callbackUrl);
             checkpanic self.httpListener.attach(<HttpService> self.httpService, servicePath);
         } else {
             return error ListenerStartupError("Could not find the required service-configurations");
@@ -76,6 +78,20 @@ public class Listener {
                 return generateUniqueUrlSegment();
             } else {
                 return <string[]>name;
+            }
+        }
+    }
+
+    # Logs the generated callback URL if the service-path was not defined.
+    # 
+    # + name        - user provided service path
+    # + callbackUrl - retrieved callback URL
+    private function logGeneratedCallbackUrl(string[]|string? name, string callbackUrl) {
+        if (name is ()) {
+            log:print("Could not find service-path. Hence generated callback URL [" + callbackUrl + "]");
+        } else if (name is string[]) {
+            if (name.length() == 0) {
+                log:print("Could not find service-path. Hence generated callback URL [" + callbackUrl + "]");
             }
         }
     }
