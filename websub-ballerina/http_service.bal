@@ -83,7 +83,7 @@ service class HttpService {
             if (discoveryDetails is [string, string]) {
                 [hubUrl, topicUrl] = <[string, string]> discoveryDetails;
             } else {
-                return error Error(discoveryDetails.message());
+                return error ResourceDiscoveryFailedError(discoveryDetails.message());
             }
         } else {
             [hubUrl, topicUrl] = <[string, string]> target;

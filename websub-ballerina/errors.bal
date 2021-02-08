@@ -15,19 +15,28 @@
 // under the License.
 
 # Represents a webSub distinct error.
-public type Error distinct error;
+public type Error distinct error<CommonResponse>;
 
-# Represents a listener startup error.
-public type ListenerStartupError distinct Error;
+# Represents a websub internal error
+public type InternalError distinct Error;
+
+# Represents a websub external error
+public type ExternalError distinct Error;
+
+# Represents a listener errors.
+public type ListenerError distinct InternalError;
+
+# Represents a resource-discovery failed error.
+public type ResourceDiscoveryFailedError distinct InternalError;
 
 # Represents a subscription-initiation failed error.
-public type SubscriptionInitiationFailedError distinct Error;
+public type SubscriptionInitiationFailedError distinct InternalError;
 
 # Represents a subscription-verificatation error.
-public type SubscriptionVerificationError distinct Error;
+public type SubscriptionVerificationError distinct ExternalError;
 
 # Represents a subscription denied error.
-public type SubscriptionDeniedError distinct Error;
+public type SubscriptionDeniedError distinct ExternalError;
 
 # Represents the subscription-delete action from the subscriber
-public type SubscriptionDeletedError distinct Error;
+public type SubscriptionDeletedError distinct ExternalError;

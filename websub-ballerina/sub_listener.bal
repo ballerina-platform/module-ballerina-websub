@@ -50,7 +50,7 @@ public class Listener {
             self.httpService = check new(s, configuration, callbackUrl);
             checkpanic self.httpListener.attach(<HttpService> self.httpService, name);
         } else {
-            return error ListenerStartupError("Could not find the required service-configurations");
+            return error ListenerError("Could not find the required service-configurations");
         }
     }
     

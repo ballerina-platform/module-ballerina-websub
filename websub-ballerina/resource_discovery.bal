@@ -74,7 +74,7 @@ public client class DiscoveryService {
                 return topicAndHubs;
             }
         } else {
-            return error Error("Error occurred with WebSub discovery for Resource URL [" + self.resourceUrl + "]: " +
+            return error ResourceDiscoveryFailedError("Error occurred with WebSub discovery for Resource URL [" + self.resourceUrl + "]: " +
                             (<error>discoveryResponse).message());
         }                                       
     }
@@ -91,11 +91,11 @@ function extractTopicAndHubUrls(http:Response response) returns @tainted [string
     }
     
     if (response.statusCode == http:STATUS_NOT_ACCEPTABLE) {
-        return error Error("Content negotiation failed.Accept and/or Accept-Language headers mismatch");
+        return error ResourceDiscoveryFailedError("Content negotiation failed.Accept and/or Accept-Language headers mismatch");
     }
     
     if (linkHeaders.length() == 0) {
-        return error Error("Link header unavailable in discovery response");
+        return error ResourceDiscoveryFailedError("Link header unavailable in discovery response");
     }
 
     int hubIndex = 0;
@@ -119,7 +119,7 @@ function extractTopicAndHubUrls(http:Response response) returns @tainted [string
                 hubIndex += 1;
             } else if (strings:includes(linkConstituents[1], "rel=\"self\"")) {
                 if (topic != "") {
-                    return error Error("Link Header contains > 1 self URLs");
+                    return error ResourceDiscoveryFailedError("Link Header contains > 1 self URLs");
                 } else {
                     topic = url;
                 }
@@ -130,5 +130,5 @@ function extractTopicAndHubUrls(http:Response response) returns @tainted [string
     if (hubs.length() > 0 && topic != "") {
         return [topic, hubs];
     }
-    return error Error("Hub and/or Topic URL(s) not identified in link header of discovery response");
+    return error ResourceDiscoveryFailedError("Hub and/or Topic URL(s) not identified in link header of discovery response");
 }
