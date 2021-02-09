@@ -18,9 +18,9 @@ import ballerina/io;
 import ballerina/test;
 import ballerina/http;
 
-listener Listener listenerGroupOne = new (9090);
+listener Listener basicSubscriberListener = new (9090);
 
-var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, secret: "Kslk30SNF2AChs2", discoveryConfig: {}} 
+var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, discoveryConfig: {}} 
                               service object {
     remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         io:println("onSubscriptionValidationDenied invoked");
@@ -50,12 +50,12 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
 
 @test:BeforeGroups { value:["simple-subscriber"] }
 function beforeSimpleSubscriberTest() {
-    checkpanic listenerGroupOne.attach(simpleSubscriberService, "subscriber");
+    checkpanic basicSubscriberListener.attach(simpleSubscriberService, "subscriber");
 }
 
 @test:AfterGroups { value:["simple-subscriber"] }
 function afterSimpleSubscriberTest() {
-    checkpanic listenerGroupOne.gracefulStop();
+    checkpanic basicSubscriberListener.gracefulStop();
 }
 
 http:Client httpClient = checkpanic new("http://localhost:9090/subscriber");
