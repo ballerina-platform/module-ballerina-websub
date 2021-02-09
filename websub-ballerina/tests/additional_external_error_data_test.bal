@@ -25,7 +25,7 @@ var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http
                               service object {
     remote function onSubscriptionVerification(SubscriptionVerification msg)
                         returns SubscriptionVerificationSuccess | SubscriptionVerificationError {
-        io:println("[ADDITIONAL_DETAILS] onSubscriptionVerification invoked");
+        io:println("onSubscriptionVerification invoked");
         if (msg.hubTopic == "test1") {
 
             return error SubscriptionVerificationError(
@@ -39,7 +39,7 @@ var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http
 
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
-        io:println("[ADDITIONAL_DETAILS] onEventNotification invoked: ", event);
+        io:println("onEventNotification invoked: ", event);
         return error SubscriptionDeletedError(
             "Subscriber wants to unsubscribe",
             headers = {"header1": "value"}, 
