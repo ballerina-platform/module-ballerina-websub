@@ -41,7 +41,9 @@ var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http
                         returns Acknowledgement | SubscriptionDeletedError? {
         io:println("[ADDITIONAL_DETAILS] onEventNotification invoked: ", event);
         return error SubscriptionDeletedError(
-            "Subscriber wants to unsubscribe");
+            "Subscriber wants to unsubscribe",
+            headers = {"header1": "value"}, 
+            body = {"message": "Unsubscribing from the topic"});
     }
 };
 
@@ -87,7 +89,7 @@ function testOnEventNotificationFailedErrorDetails() returns @tainted error? {
     xml requestPayload = xml `<body><action>publish</action></body>`;
     request.setPayload(requestPayload);
 
-    var response = check httpClient->post("/", request);
+    var response = check subscriberServiceErrorDetailsClientEp->post("/", request);
     if (response is http:Response) {
         test:assertEquals(response.statusCode, 410);
         var payload = response.getTextPayload();

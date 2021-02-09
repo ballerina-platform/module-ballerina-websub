@@ -18,7 +18,7 @@ import ballerina/io;
 import ballerina/test;
 import ballerina/http;
 
-listener Listener listenerGroupTwo = new (9091);
+listener Listener serviceWithDefaultImplListener = new (9091);
 
 var serviceWithDefaultImpl = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, secret: "Kslk30SNF2AChs2", discoveryConfig: {}} 
                               service object {
@@ -31,15 +31,15 @@ var serviceWithDefaultImpl = @SubscriberServiceConfig { target: "http://0.0.0.0:
 
 @test:BeforeGroups { value:["default-method-impl"] }
 function beforeGroupTwo() {
-    checkpanic listenerGroupTwo.attach(serviceWithDefaultImpl, "subscriber");
+    checkpanic serviceWithDefaultImplListener.attach(serviceWithDefaultImpl, "subscriber");
 }
 
 @test:AfterGroups { value:["default-method-impl"] }
 function afterGroupTwo() {
-    checkpanic listenerGroupTwo.gracefulStop();
+    checkpanic serviceWithDefaultImplListener.gracefulStop();
 }
 
-http:Client httpClientGroupTwo = checkpanic new("http://localhost:9091/subscriber");
+http:Client serviceWithDefaultImplClientEp = checkpanic new("http://localhost:9091/subscriber");
 
 @test:Config { 
     groups: ["default-method-impl"]
@@ -47,7 +47,7 @@ http:Client httpClientGroupTwo = checkpanic new("http://localhost:9091/subscribe
 function testOnSubscriptionValidationDefaultImpl() returns @tainted error? {
     http:Request request = new;
 
-    var response = check httpClientGroupTwo->get("/?hub.mode=denied&hub.reason=justToTest", request);
+    var response = check serviceWithDefaultImplClientEp->get("/?hub.mode=denied&hub.reason=justToTest", request);
     if (response is http:Response) {
         test:assertEquals(response.statusCode, 200);
         io:println(response.getTextPayload());
@@ -62,7 +62,7 @@ function testOnSubscriptionValidationDefaultImpl() returns @tainted error? {
 function testOnIntentVerificationSuccessDefaultImpl() returns @tainted error? {
     http:Request request = new;
 
-    var response = check httpClientGroupTwo->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
+    var response = check serviceWithDefaultImplClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
     if (response is http:Response) {
         test:assertEquals(response.statusCode, 200);
         test:assertEquals(response.getTextPayload(), "1234");
