@@ -35,7 +35,7 @@ public type SubscriberServiceConfiguration record {|
         string|string[] accept?;
         string|string[] acceptLanguage?;
         http:ClientConfiguration httpConfig?;
-    |} discoveryConfig;
+    |} discoveryConfig?;
 |};
 
 # WebSub Subscriber Configuration for the service, indicating subscription related parameters.

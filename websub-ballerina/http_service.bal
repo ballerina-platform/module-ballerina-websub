@@ -75,7 +75,7 @@ service class HttpService {
         string topicUrl;
         
         if (target is string) {
-            var discoveryConfig = self.serviceConfig.discoveryConfig;
+            var discoveryConfig = self.serviceConfig?.discoveryConfig;
             http:ClientConfiguration? discoveryHttpConfig = discoveryConfig?.httpConfig ?: ();
             string?|string[] expectedMediaTypes = discoveryConfig?.accept ?: ();
             string?|string[] expectedLanguageTypes = discoveryConfig?.acceptLanguage ?: ();
