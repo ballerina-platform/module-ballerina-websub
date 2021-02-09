@@ -20,7 +20,7 @@ import ballerina/http;
 
 listener Listener basicSubscriberListener = new (9090);
 
-var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, discoveryConfig: {}} 
+var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000 } 
                               service object {
     remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         io:println("onSubscriptionValidationDenied invoked");

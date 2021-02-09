@@ -21,7 +21,7 @@ import ballerina/test;
 
 listener Listener additionalErrorDetailsListener = new (9093);
 
-var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, discoveryConfig: {}} 
+var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000 } 
                               service object {
     remote function onSubscriptionVerification(SubscriptionVerification msg)
                         returns SubscriptionVerificationSuccess | SubscriptionVerificationError {
