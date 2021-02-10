@@ -99,7 +99,14 @@ function testOnIntentVerificationFailure() returns @tainted error? {
     var response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
     if (response is http:Response) {
         test:assertEquals(response.statusCode, 404);
-        test:assertEquals(response.getTextPayload(), "Hub topic not supported");
+        var payload = response.getTextPayload();
+        if (payload is error) {
+            test:assertFail("Could not retrieve response body");
+        } else {
+            var responseBody = decodeResponseBody(payload);
+            io:println(responseBody);
+            test:assertEquals(responseBody["reason"], "Hub topic not supported");
+        }
     } else {
         test:assertFail("UnsubscriptionIntentVerification test failed");
     }

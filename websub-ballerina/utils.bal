@@ -18,6 +18,7 @@ import ballerina/http;
 import ballerina/regex;
 import ballerina/crypto;
 import ballerina/log;
+import ballerina/lang.'string as strings;
 
 # Retrieves the `websub:SubscriberServiceConfig` annotation values
 # 
@@ -217,14 +218,17 @@ isolated function retrieveContentHash(string method, string key, string payload)
 # + response - {@code http:Response} to be updated
 # + messageBody - content for the response body
 # + headers - additional header-parameters to included in the response
-isolated function updateResponseBody(http:Response response, anydata? messageBody, map<string|string[]>? headers) {
-    string payload = "";
-    if (messageBody is map<string>) {
+# + reason - reason for action execution failure / success
+isolated function updateResponseBody(http:Response response, anydata? messageBody, 
+                                     map<string|string[]>? headers, string? reason = ()) {
+    string payload = reason is () ? "" : "reason=" + reason;
+    if (messageBody is map<string> && messageBody.length() > 0) {
+        string[] messageParams = [];
+        payload += "&";
         foreach var ['key, value] in messageBody.entries() {
-            payload = payload + "&" + 'key + "=" + value;
+            messageParams.push('key + "=" + value);
         }
-    } else if (messageBody is string) {
-        payload = messageBody;
+        payload += strings:'join("&", ...messageParams);
     }
 
     response.setTextPayload(payload);

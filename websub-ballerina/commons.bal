@@ -95,8 +95,8 @@ public type ContentDistributionMessage record {
 # + headers - additional headers to be included in `http:Response`
 # + body - content to be included in `http:Response` body
 type CommonResponse record {|
-    map<string|string[]>? headers = ();
-    map<string>? body = ();
+    map<string|string[]> headers?;
+    map<string> body?;
 |};
 
 # Record representing the subscription / unsubscription intent verification success.
