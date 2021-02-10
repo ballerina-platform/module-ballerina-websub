@@ -14,16 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/io;
+import ballerina/log;
 import ballerina/test;
 import ballerina/http;
 
-listener Listener listenerGroupOne = new (9090);
+listener Listener basicSubscriberListener = new (9090);
 
-var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, secret: "Kslk30SNF2AChs2", discoveryConfig: {}} 
+var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000 } 
                               service object {
     remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
-        io:println("onSubscriptionValidationDenied invoked");
+        log:print("onSubscriptionValidationDenied invoked");
         Acknowledgement ack = {
                   headers: {"header1": "value"},
                   body: {"formparam1": "value1"}
@@ -33,7 +33,7 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
 
     remote function onSubscriptionVerification(SubscriptionVerification msg)
                         returns SubscriptionVerificationSuccess | SubscriptionVerificationError {
-        io:println("onSubscriptionVerification invoked");
+        log:print("onSubscriptionVerification invoked");
         if (msg.hubTopic == "test1") {
             return error SubscriptionVerificationError("Hub topic not supported");
         } else {
@@ -43,19 +43,19 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
 
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
-        io:println("onEventNotification invoked: ", event);
+        log:print("onEventNotification invoked ", contentDistributionMessage = event);
         return {};
     }
 };
 
 @test:BeforeGroups { value:["simple-subscriber"] }
 function beforeSimpleSubscriberTest() {
-    checkpanic listenerGroupOne.attach(simpleSubscriberService, "subscriber");
+    checkpanic basicSubscriberListener.attach(simpleSubscriberService, "subscriber");
 }
 
 @test:AfterGroups { value:["simple-subscriber"] }
 function afterSimpleSubscriberTest() {
-    checkpanic listenerGroupOne.gracefulStop();
+    checkpanic basicSubscriberListener.gracefulStop();
 }
 
 http:Client httpClient = checkpanic new("http://localhost:9090/subscriber");
@@ -69,7 +69,6 @@ function testOnSubscriptionValidation() returns @tainted error? {
     var response = check httpClient->get("/?hub.mode=denied&hub.reason=justToTest", request);
     if (response is http:Response) {
         test:assertEquals(response.statusCode, 200);
-        io:println(response.getTextPayload());
     } else {
         test:assertFail("UnsubscriptionIntentVerification test failed");
     }
@@ -99,7 +98,14 @@ function testOnIntentVerificationFailure() returns @tainted error? {
     var response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
     if (response is http:Response) {
         test:assertEquals(response.statusCode, 404);
-        test:assertEquals(response.getTextPayload(), "Hub topic not supported");
+        var payload = response.getTextPayload();
+        if (payload is error) {
+            test:assertFail("Could not retrieve response body");
+        } else {
+            var responseBody = decodeResponseBody(payload);
+            log:print("Decoded payload retrieved ", payload = responseBody);
+            test:assertEquals(responseBody["reason"], "Hub topic not supported");
+        }
     } else {
         test:assertFail("UnsubscriptionIntentVerification test failed");
     }

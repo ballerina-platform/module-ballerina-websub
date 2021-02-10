@@ -75,7 +75,7 @@ service class HttpService {
         string topicUrl;
         
         if (target is string) {
-            var discoveryConfig = self.serviceConfig.discoveryConfig;
+            var discoveryConfig = self.serviceConfig?.discoveryConfig;
             http:ClientConfiguration? discoveryHttpConfig = discoveryConfig?.httpConfig ?: ();
             string?|string[] expectedMediaTypes = discoveryConfig?.accept ?: ();
             string?|string[] expectedLanguageTypes = discoveryConfig?.acceptLanguage ?: ();
@@ -87,7 +87,7 @@ service class HttpService {
             if (discoveryDetails is [string, string]) {
                 [hubUrl, topicUrl] = <[string, string]> discoveryDetails;
             } else {
-                return error Error(discoveryDetails.message());
+                return error ResourceDiscoveryFailedError(discoveryDetails.message());
             }
         } else {
             [hubUrl, topicUrl] = <[string, string]> target;

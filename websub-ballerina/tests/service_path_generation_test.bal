@@ -14,16 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/io;
+import ballerina/log;
 import ballerina/test;
 
 listener Listener pathGenerationListener = new (9092);
 
-var serviceWithPathGeneration = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, secret: "Kslk30SNF2AChs2", discoveryConfig: {}} 
+var serviceWithPathGeneration = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, secret: "Kslk30SNF2AChs2" } 
                               service object {
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
-        io:println("onEventNotification invoked: ", event);
+        log:print("onEventNotification invoked ", contentDistributionMessage = event);
         return {};
     }
 };

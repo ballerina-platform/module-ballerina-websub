@@ -15,10 +15,13 @@
 // under the License.
 
 # Represents a webSub distinct error.
-public type Error distinct error;
+public type Error distinct error<CommonResponse>;
 
-# Represents a listener startup error.
-public type ListenerStartupError distinct Error;
+# Represents a listener errors.
+public type ListenerError distinct Error;
+
+# Represents a resource-discovery failed error.
+public type ResourceDiscoveryFailedError distinct Error;
 
 # Represents a subscription-initiation failed error.
 public type SubscriptionInitiationFailedError distinct Error;
