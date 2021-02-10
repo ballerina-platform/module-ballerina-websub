@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/io;
+import ballerina/log;
 import ballerina/http;
 import ballerina/regex;   
 import ballerina/test;
@@ -25,7 +25,7 @@ var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http
                               service object {
     remote function onSubscriptionVerification(SubscriptionVerification msg)
                         returns SubscriptionVerificationSuccess | SubscriptionVerificationError {
-        io:println("onSubscriptionVerification invoked");
+        log:print("onSubscriptionVerification invoked ", verificationMessage = msg);
         if (msg.hubTopic == "test1") {
 
             return error SubscriptionVerificationError(
@@ -39,7 +39,7 @@ var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http
 
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
-        io:println("onEventNotification invoked: ", event);
+        log:print("onEventNotification invoked: ", contentDistributionNotification = event);
         return error SubscriptionDeletedError(
             "Subscriber wants to unsubscribe",
             headers = {"header1": "value"}, 
@@ -73,7 +73,7 @@ function testOnIntentVerificationFailedErrorDetails() returns @tainted error? {
             test:assertFail("Could not retrieve response body");
         } else {
             var responseBody = decodeResponseBody(payload);
-            io:println(responseBody);
+            log:print("Retrieved payload decoded ", payload = responseBody);
             test:assertEquals(responseBody["message"], "Hub topic not supported");
         }
     } else {
@@ -97,7 +97,7 @@ function testOnEventNotificationFailedErrorDetails() returns @tainted error? {
             test:assertFail("Could not retrieve response body");
         } else {
             var responseBody = decodeResponseBody(payload);
-            io:println(responseBody);
+            log:print("Retrieved payload decoded ", payload = responseBody);
             test:assertEquals(responseBody["message"], "Unsubscribing from the topic");
         }
     } else {

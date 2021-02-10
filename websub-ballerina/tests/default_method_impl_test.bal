@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/io;
+import ballerina/log;
 import ballerina/test;
 import ballerina/http;
 
@@ -24,7 +24,7 @@ var serviceWithDefaultImpl = @SubscriberServiceConfig { target: "http://0.0.0.0:
                               service object {
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
-        io:println("onEventNotification invoked: ", event);
+        log:print("onEventNotification invoked ", contentDistributionMessage = event);
         return {};
     }
 };
@@ -50,7 +50,6 @@ function testOnSubscriptionValidationDefaultImpl() returns @tainted error? {
     var response = check serviceWithDefaultImplClientEp->get("/?hub.mode=denied&hub.reason=justToTest", request);
     if (response is http:Response) {
         test:assertEquals(response.statusCode, 200);
-        io:println(response.getTextPayload());
     } else {
         test:assertFail("UnsubscriptionIntentVerification test failed");
     }
@@ -76,6 +75,6 @@ function testOnIntentVerificationSuccessDefaultImpl() returns @tainted error? {
 }
 function testUniqueStringGeneration() returns @tainted error? {
     var generatedString = generateUniqueUrlSegment();
-    io:println("Generated String: ", generatedString);
+    log:print("Generated unique string ", value = generatedString);
     test:assertEquals(generatedString.length(), 10);
 }
