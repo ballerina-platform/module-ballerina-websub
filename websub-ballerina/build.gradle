@@ -373,6 +373,7 @@ ballerinaBuild.dependsOn test
 ballerinaTest.dependsOn ":${packageName}-native:build"
 ballerinaTest.dependsOn updateTomlFile
 ballerinaTest.dependsOn initializeVariables
+test.dependsOn ballerinaTest
 
 updateTomlFile.dependsOn copyStdlibs
 copyStdlibs.dependsOn unpackStdLibs
