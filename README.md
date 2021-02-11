@@ -6,17 +6,16 @@ Ballerina WebSub Library
   [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/websub.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fwebsub)
   [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-The WebSub library is one of the standard library modules of the<a target="_blank" href="https://ballerina.io/"> Ballerina</a> language.
+The WebSub package is one of the standard library packages of the <a target="_blank" href="https://ballerina.io/">Ballerina</a> language.
 
-This library provides the capability to easily introduce publishers and subscribers that are WebSub-compliant. The ballerina/websub library comes with an in-built WebSub Hub service, which can be brought up by publishers that need to bring up a hub.
+This package provides the capability to easily implement a WebSub compliant **Subscriber Service**.
 
-For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/swan-lake/learn/by-example/websub-internal-hub-sample.html).
-
+ For more information, go to [The WebSub Module](https://ballerina.io/learn/api-docs/ballerina/websub/index.html).
 ## Issues and Projects
 
 Issues and Projects tabs are disabled for this repository as this is part of the Ballerina Standard Library. To report bugs, request new features, start new discussions, view project boards, etc. please visit Ballerina Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library).
 
-This repository only contains the source code for the module.
+This repository only contains the source code for the package.
 
 ## Building from the Source
 
@@ -34,15 +33,15 @@ This repository only contains the source code for the module.
 
 Execute the commands below to build from source.
 
-1. To build the library:
+1. To build the package:
         
         ./gradlew clean build
 
-1. To build the module without the tests:
+1. To build the package without the tests:
 
         ./gradlew clean build -x test
 
-1. To debug the tests:
+1. To debug the package tests:
 
         ./gradlew clean build -Pdebug=<port>
 
