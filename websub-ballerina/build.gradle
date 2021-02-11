@@ -340,10 +340,6 @@ task createArtifactZip(type: Zip) {
     from ballerinaBuild
 }
 
-def getCheckedOutGitCommitHash() {
-    'git rev-parse --verify --short HEAD'.execute().text.trim()
-}
-
 task createTestableJarZip(type: Zip) {
     archiveName("${packageOrg}-${packageName}-${project.version}-testable-jars.zip")
     destinationDir(file("${buildDir}/distributions"))
