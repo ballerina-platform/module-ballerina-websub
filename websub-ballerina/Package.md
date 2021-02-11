@@ -3,8 +3,6 @@
 This package contains an implementation of the W3C [**WebSub**](https://www.w3.org/TR/websub/) recommendation, which facilitates a push-based content delivery/notification mechanism between publishers and subscribers.
 
 This implementation supports introducing WebSub Subscriber, A party interested in receiving update notifications for particular topics.
-
- For more information, go to [The WebSub Module](https://ballerina.io/learn/api-docs/ballerina/websub/index.html).
 ### Basic flow with WebSub
 1. The subscriber discovers from the publisher, the topic it needs to subscribe to and the hub(s) that deliver notifications on updates of the topic.
 
