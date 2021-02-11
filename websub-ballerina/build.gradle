@@ -251,8 +251,6 @@ task revertTomlFile {
 }
 
 task ballerinaTest {
-    dependsOn(updateTomlFile)
-    dependsOn(initializeVariables)
     finalizedBy(revertTomlFile)
 
     doLast {
@@ -270,8 +268,6 @@ task ballerinaTest {
 
 task ballerinaBuild {
     inputs.dir file(project.projectDir)
-    dependsOn(updateTomlFile)
-    dependsOn(initializeVariables)
     finalizedBy(revertTomlFile)
 
     doLast {
@@ -371,9 +367,12 @@ publishing {
 
 ballerinaBuild.dependsOn ":${packageName}-native:build"
 ballerinaBuild.dependsOn updateTomlFile
+ballerinaBuild.dependsOn initializeVariables
 ballerinaBuild.dependsOn test
 
 ballerinaTest.dependsOn ":${packageName}-native:build"
+ballerinaTest.dependsOn updateTomlFile
+ballerinaTest.dependsOn initializeVariables
 
 updateTomlFile.dependsOn copyStdlibs
 copyStdlibs.dependsOn unpackStdLibs
