@@ -8,7 +8,7 @@ Ballerina WebSub Library
 
 The WebSub package is one of the standard library packages of the <a target="_blank" href="https://ballerina.io/">Ballerina</a> language.
 
-This package provides the capability to easily introduce publishers and subscribers that are WebSub-compliant. The ballerina/websub package comes with an in-built WebSub Hub service, which can be brought up by publishers that need to bring up a hub.
+This package provides the capability to easily implement a WebSub compliant **Subscriber Service**.
 
 ## Issues and Projects
 
