@@ -86,7 +86,14 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
 
     boolean isVerifiedContent = false;
     if (payload is string) {
-        isVerifiedContent = verifyContent(request, secretKey, payload);
+        var verificationResponse = verifyContent(request, secretKey, payload);
+        
+        if (verificationResponse is boolean) {
+            isVerifiedContent = verificationResponse;
+        } else {
+            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            return;
+        }
     } else {
         response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
         return;

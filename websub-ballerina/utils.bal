@@ -157,7 +157,7 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
 # + secret - pre-shared client-secret value
 # + payload - {@code string} value of the request body
 # + return - `true` if the verification is successfull, else `false`
-isolated function verifyContent(http:Request request, string secret, string payload) returns boolean {
+isolated function verifyContent(http:Request request, string secret, string payload) returns boolean|error {
     if (secret.trim().length() > 0) {
         if (request.hasHeader(X_HUB_SIGNATURE)) {
                 var xHubSignature = request.getHeader(X_HUB_SIGNATURE);
@@ -169,9 +169,9 @@ isolated function verifyContent(http:Request request, string secret, string payl
                     string method = splitSignature[0];
                     string signature = regex:replaceAll(<string>xHubSignature, method + "=", "");
                 
-                    string generatedSignature = retrieveContentHash(method, secret, payload);
+                    byte[] generatedSignature = check retrieveContentHash(method, secret, payload);
 
-                    return signature == generatedSignature; 
+                    return signature == generatedSignature.toBase64(); 
                 }          
         } else {
             return false;
@@ -187,30 +187,30 @@ isolated function verifyContent(http:Request request, string secret, string payl
 # + key - pre-shared secret-key value
 # + payload - content to be hashed
 # + return - `Base64` encoded {@code string} value of the hash
-isolated function retrieveContentHash(string method, string key, string payload) returns string {
+isolated function retrieveContentHash(string method, string key, string payload) returns byte[]|error {
     byte[] keyArr = key.toBytes();
     byte[] contentPayload = payload.toBytes();
     byte[] hashedContent = [];
 
     match method {
         "sha1" => {
-            hashedContent = crypto:hmacSha1(contentPayload, keyArr);
+            return crypto:hmacSha1(contentPayload, keyArr);
         }
         "sha256" => {
-            hashedContent = crypto:hmacSha256(contentPayload, keyArr);
+            return crypto:hmacSha256(contentPayload, keyArr);
         }
         "sha384" => {
-            hashedContent = crypto:hmacSha384(contentPayload, keyArr);
+            return crypto:hmacSha384(contentPayload, keyArr);
         }
         "sha512" => {
-            hashedContent = crypto:hmacSha512(contentPayload, keyArr);
+            return crypto:hmacSha512(contentPayload, keyArr);
         }
         _ => {
-            log:printError("Unrecognized hashning-method [" + method + "] found");
+            string errorMsg = "Unrecognized hashning-method [" + method + "] found";
+            log:printError(errorMsg);
+            return error Error(errorMsg);
         }
     }
-
-    return hashedContent.toBase64();
 }
 
 # Updates `http:Response` body with provided parameters.
