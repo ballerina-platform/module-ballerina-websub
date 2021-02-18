@@ -254,7 +254,6 @@ task revertTomlFile {
 }
 
 task ballerinaTest {
-    finalizedBy(revertTomlFile)
 
     doLast {
         exec {
@@ -271,7 +270,6 @@ task ballerinaTest {
 
 task ballerinaBuild {
     inputs.dir file(project.projectDir)
-    finalizedBy(revertTomlFile)
 
     doLast {
         // Build and populate caches
