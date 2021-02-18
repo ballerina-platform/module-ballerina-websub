@@ -157,8 +157,12 @@ task initializeVariables {
 
 
     gradle.taskGraph.whenReady { graph ->
-        if (graph.hasTask(":${packageName}-ballerina:build") || graph.hasTask(":${packageName}-ballerina:publish")) {
+        if (graph.hasTask(":${packageName}-ballerina:build") || 
+                graph.hasTask(":${packageName}-ballerina:publish") ||
+                graph.hasTask(":${packageName}-ballerina:publishToMavenLocal")) {
             ballerinaTest.enabled = false
+        } else {
+            ballerinaTest.enabled = true
         }
 
         if (graph.hasTask(":${packageName}-ballerina:test")) {
@@ -251,7 +255,6 @@ task revertTomlFile {
 }
 
 task ballerinaTest {
-    finalizedBy(revertTomlFile)
 
     doLast {
         exec {
@@ -268,7 +271,6 @@ task ballerinaTest {
 
 task ballerinaBuild {
     inputs.dir file(project.projectDir)
-    finalizedBy(revertTomlFile)
 
     doLast {
         // Build and populate caches
@@ -316,6 +318,10 @@ task ballerinaBuild {
 
 task ballerinaPublish {
     doLast {
+        if (project.version.endsWith('-SNAPSHOT')) {
+            return
+        }
+
         if (ballerinaCentralAccessToken != null) {
             println("Publishing to the ballerina central...")
             exec {
@@ -327,6 +333,8 @@ task ballerinaPublish {
                     commandLine 'sh', '-c', "$distributionBinPath/bal push ${packageName}"
                 }
             }
+        } else {
+            throw new InvalidUserDataException("Central Access Token is not present")
         }
     }
 }
@@ -365,22 +373,29 @@ publishing {
     }
 }
 
-ballerinaBuild.dependsOn ":${packageName}-native:build"
-ballerinaBuild.dependsOn updateTomlFile
-ballerinaBuild.dependsOn initializeVariables
-ballerinaBuild.dependsOn test
+unpackJballerinaTools.dependsOn copyToLib
+unpackStdLibs.dependsOn unpackJballerinaTools
+copyStdlibs.dependsOn unpackStdLibs
+updateTomlFile.dependsOn copyStdlibs
 
 ballerinaTest.dependsOn ":${packageName}-native:build"
 ballerinaTest.dependsOn updateTomlFile
 ballerinaTest.dependsOn initializeVariables
+ballerinaTest.finalizedBy revertTomlFile
 test.dependsOn ballerinaTest
 
-updateTomlFile.dependsOn copyStdlibs
-copyStdlibs.dependsOn unpackStdLibs
-unpackStdLibs.dependsOn unpackJballerinaTools
-unpackJballerinaTools.dependsOn copyToLib
-
+ballerinaBuild.dependsOn test
+ballerinaBuild.dependsOn ":${packageName}-native:build"
+ballerinaBuild.dependsOn updateTomlFile
+ballerinaBuild.dependsOn initializeVariables
+ballerinaBuild.finalizedBy revertTomlFile
 build.dependsOn ballerinaBuild
-createTestableJarZip.dependsOn ballerinaBuild
+
+ballerinaPublish.dependsOn ":${packageName}-native:build"
 ballerinaPublish.dependsOn ballerinaBuild
+ballerinaPublish.dependsOn updateTomlFile
+ballerinaPublish.dependsOn initializeVariables
+ballerinaPublish.finalizedBy revertTomlFile
 publish.dependsOn ballerinaPublish
+
+createTestableJarZip.dependsOn ballerinaBuild
