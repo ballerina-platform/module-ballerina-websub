@@ -157,8 +157,10 @@ task initializeVariables {
 
 
     gradle.taskGraph.whenReady { graph ->
-        if (graph.hasTask(":${packageName}-ballerina:build") || graph.hasTask(":${packageName}-ballerina:publish")) {
+        if (graph.hasTask(":${packageName}-ballerina:build")) {
             ballerinaTest.enabled = false
+        } else {
+            ballerinaTest.enabled = true
         }
 
         if (graph.hasTask(":${packageName}-ballerina:test")) {
@@ -167,8 +169,9 @@ task initializeVariables {
             testParams = "--skip-tests"
         }
 
-        if (graph.hasTask(":${packageName}-ballerina:publish")) {
+        if (graph.hasTask(":${packageName}-ballerina:publish") || graph.hasTask(":${packageName}-ballerina:publishToMavenLocal")) {
             ballerinaPublish.enabled = true
+            ballerinaTest.enabled = false
         } else {
             ballerinaPublish.enabled = false
         }
@@ -365,22 +368,29 @@ publishing {
     }
 }
 
-ballerinaBuild.dependsOn ":${packageName}-native:build"
-ballerinaBuild.dependsOn updateTomlFile
-ballerinaBuild.dependsOn initializeVariables
-ballerinaBuild.dependsOn test
+unpackJballerinaTools.dependsOn copyToLib
+unpackStdLibs.dependsOn unpackJballerinaTools
+copyStdlibs.dependsOn unpackStdLibs
+updateTomlFile.dependsOn copyStdlibs
 
 ballerinaTest.dependsOn ":${packageName}-native:build"
 ballerinaTest.dependsOn updateTomlFile
 ballerinaTest.dependsOn initializeVariables
+ballerinaTest.finalizedBy revertTomlFile
 test.dependsOn ballerinaTest
 
-updateTomlFile.dependsOn copyStdlibs
-copyStdlibs.dependsOn unpackStdLibs
-unpackStdLibs.dependsOn unpackJballerinaTools
-unpackJballerinaTools.dependsOn copyToLib
-
+ballerinaBuild.dependsOn test
+ballerinaBuild.dependsOn ":${packageName}-native:build"
+ballerinaBuild.dependsOn updateTomlFile
+ballerinaBuild.dependsOn initializeVariables
+ballerinaBuild.finalizedBy revertTomlFile
 build.dependsOn ballerinaBuild
-createTestableJarZip.dependsOn ballerinaBuild
+
+ballerinaPublish.dependsOn ":${packageName}-native:build"
 ballerinaPublish.dependsOn ballerinaBuild
+ballerinaPublish.dependsOn updateTomlFile
+ballerinaPublish.dependsOn initializeVariables
+ballerinaPublish.finalizedBy revertTomlFile
 publish.dependsOn ballerinaPublish
+
+createTestableJarZip.dependsOn ballerinaBuild
