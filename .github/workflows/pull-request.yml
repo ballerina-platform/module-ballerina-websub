@@ -1,6 +1,10 @@
 name: Ballerina Websub module build
 
-on: [push, pull_request]
+on:
+    pull_request:
+    push:
+        branches-ignore:
+            - main
 
 jobs:
   ubuntu-build:
