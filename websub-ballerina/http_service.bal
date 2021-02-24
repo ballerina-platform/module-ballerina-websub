@@ -92,6 +92,7 @@ service class HttpService {
         } else if (target is [string, string]) {
             [hubUrl, topicUrl] = <[string, string]> target;
         } else {
+            log:print("Subscription not initiated as subscriber target-URL is not provided");
             return;
         }
 
