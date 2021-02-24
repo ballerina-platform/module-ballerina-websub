@@ -120,7 +120,7 @@ public class Listener {
         if (serviceConfig is SubscriberServiceConfiguration) {
             var result = initiateSubscription(serviceConfig, <string>callback);
             if (result is error) {
-                string errorMsg = "Subscription initiation failed due to [" + result.message() + "]";
+                string errorMsg = "Subscription initiation failed due to [${result.message()}]";
                 return error SubscriptionInitiationFailedError(errorMsg);
             }
         }
@@ -184,10 +184,9 @@ function initiateSubscription(SubscriberServiceConfiguration serviceConfig, stri
     var response = subscriberClientEp->subscribe(request);
 
     if (response is SubscriptionChangeResponse) {
-        string subscriptionSuccessMsg = "Subscription Request successfully sent to Hub["
-                                            + response.hub + "], for Topic[" 
-                                            + response.topic + "], with Callback [" + callback + "]";
-        log:print(subscriptionSuccessMsg + ". Awaiting intent verification.");
+        string subscriptionSuccessMsg = "Subscription Request successfully sent to Hub[${response.hub}]," 
+                                            + "for Topic[${response.topic}], with Callback [${callback}]";
+        log:print("${subscriptionSuccessMsg}. Awaiting intent verification.");
     } else {
         return response;
     }
