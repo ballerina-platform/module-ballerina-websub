@@ -69,7 +69,7 @@ service class HttpService {
     # 
     # + return - An `error`, if an error occurred during the subscription-initiation
     function initiateSubscription() returns error? {
-        string|[string, string] target = self.serviceConfig.target;
+        string|[string, string]? target = self.serviceConfig?.target;
         
         string hubUrl;
         string topicUrl;
@@ -89,8 +89,10 @@ service class HttpService {
             } else {
                 return error ResourceDiscoveryFailedError(discoveryDetails.message());
             }
-        } else {
+        } else if (target is [string, string]) {
             [hubUrl, topicUrl] = <[string, string]> target;
+        } else {
+            return;
         }
 
         http:ClientConfiguration? subscriptionClientConfig = self.serviceConfig?.httpConfig ?: ();
