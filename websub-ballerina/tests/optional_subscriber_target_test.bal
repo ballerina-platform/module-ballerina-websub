@@ -39,6 +39,7 @@ function afterOptionalTargetUrlTest() {
 function testOptionalTargetUrl() returns @tainted error? {
     do {
         var attached = optionalTargetListener.attach(optionalSubscriberTarget);
+        var result = optionalTargetListener.'start();
     } on fail error e {
         test:assertFail("Could not start the subscriber-service without subscriber-target-url : " + e.message());
     }
