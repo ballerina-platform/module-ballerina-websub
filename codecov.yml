@@ -6,4 +6,3 @@ fixes:
 
 ignore:
   - "**/tests"
-  
