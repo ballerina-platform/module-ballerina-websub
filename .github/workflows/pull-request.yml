@@ -22,7 +22,6 @@ jobs:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew build --scan
-
       - name: Archive Error Log
         uses: actions/upload-artifact@v2
         if: failure()
@@ -30,6 +29,8 @@ jobs:
           name: Ballerina Internal Log
           path: websubhub-ballerina/ballerina-internal.log
           if-no-files-found: ignore
+      - name: Generate Codecov Report
+        uses: codecov/codecov-action@v1
       - name: Archive Code Coverage JSON
         uses: actions/upload-artifact@v2
         with:
