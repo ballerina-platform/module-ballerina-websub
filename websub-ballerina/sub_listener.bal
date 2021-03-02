@@ -21,6 +21,8 @@ import ballerina/log;
 public class Listener {
     private http:Listener httpListener;
     private http:ListenerConfiguration listenerConfig;
+    private SubscriberServiceConfiguration? serviceConfig;
+    private string? callbackUrl;
     private int port;
     private HttpService? httpService;
 
@@ -37,6 +39,8 @@ public class Listener {
         self.listenerConfig = self.httpListener.getConfig();
         self.port = self.httpListener.getPort();
         self.httpService = ();
+        self.serviceConfig = ();
+        self.callbackUrl = ();
     }
 
     # Attaches the provided Service to the Listener.
@@ -52,13 +56,14 @@ public class Listener {
         var configuration = retrieveSubscriberServiceAnnotations(s);
         
         if (configuration is SubscriberServiceConfiguration) {
+            self.serviceConfig = configuration;
             string[]|string servicePath = self.retrieveServicePath(name);
             string callbackUrl = retriveCallbackUrl(servicePath, self.port, self.listenerConfig);
-
+            self.callbackUrl = callbackUrl;
             self.logGeneratedCallbackUrl(name, callbackUrl);
 
-            self.httpService = check new(s, configuration, callbackUrl);
-            checkpanic self.httpListener.attach(<HttpService> self.httpService, servicePath);
+            self.httpService = check new(s, configuration?.secret);
+            check self.httpListener.attach(<HttpService> self.httpService, servicePath);
         } else {
             return error ListenerError("Could not find the required service-configurations");
         }
@@ -101,14 +106,24 @@ public class Listener {
     # + s - The service to be detached
     # + return - An `error`, if an error occurred during the service detaching process
     public isolated function detach(SubscriberService s) returns error? {
-        checkpanic self.httpListener.detach(<HttpService> self.httpService);
+        check self.httpListener.detach(<HttpService> self.httpService);
     }
 
     # Starts the attached Service.
     #
     # + return - An `error`, if an error occurred during the listener starting process
-    public isolated function 'start() returns error? {
-        checkpanic self.httpListener.'start();
+    public function 'start() returns error? {
+        check self.httpListener.'start();
+
+        var serviceConfig = self.serviceConfig;
+        var callback = self.callbackUrl;
+        if (serviceConfig is SubscriberServiceConfiguration) {
+            var result = initiateSubscription(serviceConfig, <string>callback);
+            if (result is error) {
+                string errorMsg = "Subscription initiation failed due to [${result.message()}]";
+                return error SubscriptionInitiationFailedError(errorMsg);
+            }
+        }
     }
 
     # Gracefully stops the hub listener. Already accepted requests will be served before the connection closure.
@@ -123,5 +138,50 @@ public class Listener {
     # + return - An `error`, if an error occurred during the listener stopping process
     public isolated function immediateStop() returns error? {
         return self.httpListener.immediateStop();
+    }
+}
+
+# Initiate the subscription to the `topic` in the mentioned `hub`
+#
+# + serviceConfig - {@code SubscriberServiceConfiguration} subscriber-service
+#                   related configurations
+# + return - An `error`, if an error occurred during the subscription-initiation
+function initiateSubscription(SubscriberServiceConfiguration serviceConfig, string callbackUrl) returns error? {
+    string|[string, string]? target = serviceConfig?.target;
+        
+    string hubUrl;
+    string topicUrl;
+        
+    if (target is string) {
+        var discoveryConfig = serviceConfig?.discoveryConfig;
+        http:ClientConfiguration? discoveryHttpConfig = discoveryConfig?.httpConfig ?: ();
+        string?|string[] expectedMediaTypes = discoveryConfig?.accept ?: ();
+        string?|string[] expectedLanguageTypes = discoveryConfig?.acceptLanguage ?: ();
+
+        DiscoveryService discoveryClient = check new (target, discoveryHttpConfig);
+        var discoveryDetails = discoveryClient->discoverResourceUrls(expectedMediaTypes, expectedLanguageTypes);
+        if (discoveryDetails is [string, string]) {
+            [hubUrl, topicUrl] = <[string, string]> discoveryDetails;
+        } else {
+            return error ResourceDiscoveryFailedError(discoveryDetails.message());
+        }
+    } else if (target is [string, string]) {
+        [hubUrl, topicUrl] = <[string, string]> target;
+    } else {
+        log:print("Subscription not initiated as subscriber target-URL is not provided");
+        return;
+    }
+
+    http:ClientConfiguration? subscriptionClientConfig = serviceConfig?.httpConfig ?: ();
+    SubscriptionClient subscriberClientEp = check new (hubUrl, subscriptionClientConfig);
+    string callback = serviceConfig?.callback ?: callbackUrl;
+    var request = retrieveSubscriptionRequest(topicUrl, callback, serviceConfig);
+    var response = subscriberClientEp->subscribe(request);
+    if (response is SubscriptionChangeResponse) {
+        string subscriptionSuccessMsg = "Subscription Request successfully sent to Hub[${response.hub}]," 
+                                            + "for Topic[${response.topic}], with Callback [${callback}]";
+        log:print("${subscriptionSuccessMsg}. Awaiting intent verification.");
+    } else {
+        return response;
     }
 }
