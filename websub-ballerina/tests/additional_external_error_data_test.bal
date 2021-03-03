@@ -65,7 +65,7 @@ http:Client subscriberServiceErrorDetailsClientEp = checkpanic new("http://local
 function testOnIntentVerificationFailedErrorDetails() returns @tainted error? {
     http:Request request = new;
 
-    var response = check subscriberServiceErrorDetailsClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
+    var response = subscriberServiceErrorDetailsClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
     if (response is http:Response) {
         test:assertEquals(response.statusCode, 404);
         var payload = response.getTextPayload();
@@ -89,7 +89,7 @@ function testOnEventNotificationFailedErrorDetails() returns @tainted error? {
     xml requestPayload = xml `<body><action>publish</action></body>`;
     request.setPayload(requestPayload);
 
-    var response = check subscriberServiceErrorDetailsClientEp->post("/", request);
+    var response = subscriberServiceErrorDetailsClientEp->post("/", request);
     if (response is http:Response) {
         test:assertEquals(response.statusCode, 410);
         var payload = response.getTextPayload();
