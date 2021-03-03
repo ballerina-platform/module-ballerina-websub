@@ -47,12 +47,8 @@ http:Client serviceWithDefaultImplClientEp = checkpanic new("http://localhost:90
 function testOnSubscriptionValidationDefaultImpl() returns @tainted error? {
     http:Request request = new;
 
-    var response = serviceWithDefaultImplClientEp->get("/?hub.mode=denied&hub.reason=justToTest", request);
-    if (response is http:Response) {
-        test:assertEquals(response.statusCode, 200);
-    } else {
-        test:assertFail("UnsubscriptionIntentVerification test failed");
-    }
+    var response = check serviceWithDefaultImplClientEp->get("/?hub.mode=denied&hub.reason=justToTest", request);
+    test:assertEquals(response.statusCode, 200);
 }
 
 @test:Config {
@@ -61,13 +57,9 @@ function testOnSubscriptionValidationDefaultImpl() returns @tainted error? {
 function testOnIntentVerificationSuccessDefaultImpl() returns @tainted error? {
     http:Request request = new;
 
-    var response = serviceWithDefaultImplClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
-    if (response is http:Response) {
-        test:assertEquals(response.statusCode, 200);
-        test:assertEquals(response.getTextPayload(), "1234");
-    } else {
-        test:assertFail("UnsubscriptionIntentVerification test failed");
-    }
+    var response = check serviceWithDefaultImplClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
+    test:assertEquals(response.statusCode, 200);
+    test:assertEquals(response.getTextPayload(), "1234");
 }
 
 @test:Config {

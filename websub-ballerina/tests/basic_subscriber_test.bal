@@ -66,12 +66,8 @@ http:Client httpClient = checkpanic new("http://localhost:9090/subscriber");
 function testOnSubscriptionValidation() returns @tainted error? {
     http:Request request = new;
 
-    var response = httpClient->get("/?hub.mode=denied&hub.reason=justToTest", request);
-    if (response is http:Response) {
-        test:assertEquals(response.statusCode, 200);
-    } else {
-        test:assertFail("UnsubscriptionIntentVerification test failed");
-    }
+    var response = check httpClient->get("/?hub.mode=denied&hub.reason=justToTest", request);
+    test:assertEquals(response.statusCode, 200);
 }
 
 @test:Config {
@@ -80,13 +76,9 @@ function testOnSubscriptionValidation() returns @tainted error? {
 function testOnIntentVerificationSuccess() returns @tainted error? {
     http:Request request = new;
 
-    var response = httpClient->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
-    if (response is http:Response) {
-        test:assertEquals(response.statusCode, 200);
-        test:assertEquals(response.getTextPayload(), "1234");
-    } else {
-        test:assertFail("UnsubscriptionIntentVerification test failed");
-    }
+    var response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
+    test:assertEquals(response.statusCode, 200);
+    test:assertEquals(response.getTextPayload(), "1234");
 }
 
 @test:Config { 
@@ -95,19 +87,15 @@ function testOnIntentVerificationSuccess() returns @tainted error? {
 function testOnIntentVerificationFailure() returns @tainted error? {
     http:Request request = new;
 
-    var response = httpClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
-    if (response is http:Response) {
-        test:assertEquals(response.statusCode, 404);
-        var payload = response.getTextPayload();
-        if (payload is error) {
-            test:assertFail("Could not retrieve response body");
-        } else {
-            var responseBody = decodeResponseBody(payload);
-            log:print("Decoded payload retrieved ", payload = responseBody);
-            test:assertEquals(responseBody["reason"], "Hub topic not supported");
-        }
+    var response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
+    test:assertEquals(response.statusCode, 404);
+    var payload = response.getTextPayload();
+    if (payload is error) {
+        test:assertFail("Could not retrieve response body");
     } else {
-        test:assertFail("UnsubscriptionIntentVerification test failed");
+        var responseBody = decodeResponseBody(payload);
+        log:print("Decoded payload retrieved ", payload = responseBody);
+        test:assertEquals(responseBody["reason"], "Hub topic not supported");
     }
 }
 
@@ -119,12 +107,8 @@ function testOnEventNotificationSuccess() returns @tainted error? {
     json payload =  {"action": "publish", "mode": "remote-hub"};
     request.setPayload(payload);
 
-    var response = httpClient->post("/", request);
-    if (response is http:Response) {
-        test:assertEquals(response.statusCode, 202);
-    } else {
-        test:assertFail("UnsubscriptionIntentVerification test failed");
-    }
+    var response = check httpClient->post("/", request);
+    test:assertEquals(response.statusCode, 202);
 }
 
 
@@ -136,10 +120,6 @@ function testOnEventNotificationSuccessXml() returns @tainted error? {
     xml payload = xml `<body><action>publish</action></body>`;
     request.setPayload(payload);
 
-    var response = httpClient->post("/", request);
-    if (response is http:Response) {
-        test:assertEquals(response.statusCode, 202);
-    } else {
-        test:assertFail("UnsubscriptionIntentVerification test failed");
-    }
+    var response = check httpClient->post("/", request);
+    test:assertEquals(response.statusCode, 202);
 }

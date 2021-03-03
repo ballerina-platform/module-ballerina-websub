@@ -65,19 +65,15 @@ http:Client subscriberServiceErrorDetailsClientEp = checkpanic new("http://local
 function testOnIntentVerificationFailedErrorDetails() returns @tainted error? {
     http:Request request = new;
 
-    var response = subscriberServiceErrorDetailsClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
-    if (response is http:Response) {
-        test:assertEquals(response.statusCode, 404);
-        var payload = response.getTextPayload();
-        if (payload is error) {
-            test:assertFail("Could not retrieve response body");
-        } else {
-            var responseBody = decodeResponseBody(payload);
-            log:print("Retrieved payload decoded ", payload = responseBody);
-            test:assertEquals(responseBody["message"], "Hub topic not supported");
-        }
+    var response = check subscriberServiceErrorDetailsClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
+    test:assertEquals(response.statusCode, 404);
+    var payload = response.getTextPayload();
+    if (payload is error) {
+        test:assertFail("Could not retrieve response body");
     } else {
-        test:assertFail("UnsubscriptionIntentVerification test failed");
+        var responseBody = decodeResponseBody(payload);
+        log:print("Retrieved payload decoded ", payload = responseBody);
+        test:assertEquals(responseBody["message"], "Hub topic not supported");
     }
 }
 
@@ -89,19 +85,15 @@ function testOnEventNotificationFailedErrorDetails() returns @tainted error? {
     xml requestPayload = xml `<body><action>publish</action></body>`;
     request.setPayload(requestPayload);
 
-    var response = subscriberServiceErrorDetailsClientEp->post("/", request);
-    if (response is http:Response) {
-        test:assertEquals(response.statusCode, 410);
-        var payload = response.getTextPayload();
-        if (payload is error) {
-            test:assertFail("Could not retrieve response body");
-        } else {
-            var responseBody = decodeResponseBody(payload);
-            log:print("Retrieved payload decoded ", payload = responseBody);
-            test:assertEquals(responseBody["message"], "Unsubscribing from the topic");
-        }
+    var response = check subscriberServiceErrorDetailsClientEp->post("/", request);
+    test:assertEquals(response.statusCode, 410);
+    var payload = response.getTextPayload();
+    if (payload is error) {
+        test:assertFail("Could not retrieve response body");
     } else {
-        test:assertFail("UnsubscriptionIntentVerification test failed");
+        var responseBody = decodeResponseBody(payload);
+        log:print("Retrieved payload decoded ", payload = responseBody);
+        test:assertEquals(responseBody["message"], "Unsubscribing from the topic");
     }
 }
 
