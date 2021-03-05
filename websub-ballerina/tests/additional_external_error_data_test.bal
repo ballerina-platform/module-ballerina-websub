@@ -65,16 +65,11 @@ http:Client subscriberServiceErrorDetailsClientEp = checkpanic new("http://local
 function testOnIntentVerificationFailedErrorDetails() returns @tainted error? {
     http:Request request = new;
 
-    var response = check subscriberServiceErrorDetailsClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
+    http:Response response = check subscriberServiceErrorDetailsClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
     test:assertEquals(response.statusCode, 404);
-    var payload = response.getTextPayload();
-    if (payload is error) {
-        test:assertFail("Could not retrieve response body");
-    } else {
-        var responseBody = decodeResponseBody(payload);
-        log:print("Retrieved payload decoded ", payload = responseBody);
-        test:assertEquals(responseBody["message"], "Hub topic not supported");
-    }
+    string payload = check response.getTextPayload();
+    map<string> responseBody = decodeResponseBody(payload);
+    test:assertEquals(responseBody["message"], "Hub topic not supported");
 }
 
 @test:Config { 
@@ -85,16 +80,11 @@ function testOnEventNotificationFailedErrorDetails() returns @tainted error? {
     xml requestPayload = xml `<body><action>publish</action></body>`;
     request.setPayload(requestPayload);
 
-    var response = check subscriberServiceErrorDetailsClientEp->post("/", request);
+    http:Response response = check subscriberServiceErrorDetailsClientEp->post("/", request);
     test:assertEquals(response.statusCode, 410);
-    var payload = response.getTextPayload();
-    if (payload is error) {
-        test:assertFail("Could not retrieve response body");
-    } else {
-        var responseBody = decodeResponseBody(payload);
-        log:print("Retrieved payload decoded ", payload = responseBody);
-        test:assertEquals(responseBody["message"], "Unsubscribing from the topic");
-    }
+    string payload = check response.getTextPayload();
+    map<string> responseBody = decodeResponseBody(payload);
+    test:assertEquals(responseBody["message"], "Unsubscribing from the topic");
 }
 
 isolated function decodeResponseBody(string payload) returns map<string> {
