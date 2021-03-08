@@ -21,6 +21,7 @@ description = 'Ballerina - Websub Ballerina Generator'
 
 def packageName = "websub"
 def packageOrg = "ballerina"
+def platform = "java11"
 def snapshotVersion = "-SNAPSHOT"
 def tomlVersion = project.version.replace("${snapshotVersion}", "")
 def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
@@ -281,9 +282,11 @@ task ballerinaBuild {
                 commandLine 'sh', '-c', "$balJavaDebugParam $distributionBinPath/bal build ${testParams} ${debugParams}"
             }
         }
-        copy {
-            from file("$project.projectDir/target/bala")
-            into file("$artifactCacheParent/bala/${packageOrg}/${packageName}/${tomlVersion}")
+        file("$project.projectDir/target/bala").eachFileMatch(~/.*.bala/) { balaFile ->
+            copy {
+                from zipTree(balaFile)
+                into file("$artifactCacheParent/bala/${packageOrg}/${packageName}/${tomlVersion}/${platform}")
+            }
         }
         copy {
             from file("$project.projectDir/target/cache")
