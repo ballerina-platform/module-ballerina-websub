@@ -20,8 +20,8 @@ version = "@stdlib.crypto.version@"
 
 [[dependency]]
 org = "ballerina"
-name = "encoding"
-version = "@stdlib.encoding.version@"
+name = "url"
+version = "@stdlib.url.version@"
 
 [[dependency]]
 org = "ballerina"
