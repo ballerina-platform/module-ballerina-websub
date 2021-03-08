@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/encoding;
+import ballerina/url;
 import ballerina/http;
 import ballerina/log;
 import ballerina/mime;
@@ -87,7 +87,7 @@ isolated function buildSubscriptionChangeRequest(@untainted string mode,
     http:Request request = new;
 
     string callback = subscriptionChangeRequest.callback;
-    var encodedCallback = encoding:encodeUriComponent(callback, "UTF-8");
+    var encodedCallback = url:encode(callback, "UTF-8");
     if (encodedCallback is string) {
         callback = encodedCallback;
     }
