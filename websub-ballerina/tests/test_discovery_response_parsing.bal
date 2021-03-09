@@ -24,90 +24,74 @@ final string HUB_THREE = "https://three.hub.ballerina.com";
 final string TOPIC_ONE = "https://topic.ballerina.com";
 
 @test:Config {}
-function testTopicAndSingleHubAsSingleLinkHeader() {
+function testTopicAndSingleHubAsSingleLinkHeader() returns @tainted error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\", <" + TOPIC_ONE + ">; rel=\"self\"");
-    var results = extractTopicAndHubUrls(response);
-    if (results is [string, string[]]) {
-        string topic = results[0];
-        string[] hubs = results[1];
-        test:assertEquals(topic, TOPIC_ONE, msg = "incorrect topic extraction from discovery response");
-        test:assertEquals(hubs.length(), 1, msg = "incorrect no. of hubs extracted from discovery response");
-        test:assertEquals(hubs[0], HUB_ONE, msg = "incorrect hub extraction from discovery response");
-    } else {
-        test:assertFail(results.message());
-    }
+    [string, string[]] results = check extractTopicAndHubUrls(response);
+    string topic = results[0];
+    string[] hubs = results[1];
+    test:assertEquals(topic, TOPIC_ONE, msg = "incorrect topic extraction from discovery response");
+    test:assertEquals(hubs.length(), 1, msg = "incorrect no. of hubs extracted from discovery response");
+    test:assertEquals(hubs[0], HUB_ONE, msg = "incorrect hub extraction from discovery response");
 }
 
 @test:Config {
     dependsOn: [testTopicAndSingleHubAsSingleLinkHeader]
 }
-function testTopicAndSingleHubAsMultipleLinkHeaders() {
+function testTopicAndSingleHubAsMultipleLinkHeaders() returns @tainted error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"self\"");
-    var results = extractTopicAndHubUrls(response);
-    if (results is [string, string[]]) {
-        string topic = results[0];
-        string[] hubs = results[1];
-        test:assertEquals(topic, TOPIC_ONE, msg = "incorrect topic extraction from discovery response");
-        test:assertEquals(hubs.length(), 1, msg = "incorrect no. of hubs extracted from discovery response");
-        test:assertEquals(hubs[0], HUB_ONE, msg = "incorrect hub extraction from discovery response");
-    } else {
-        test:assertFail(results.message());
-    }
+    [string, string[]] results = check extractTopicAndHubUrls(response);
+    string topic = results[0];
+    string[] hubs = results[1];
+    test:assertEquals(topic, TOPIC_ONE, msg = "incorrect topic extraction from discovery response");
+    test:assertEquals(hubs.length(), 1, msg = "incorrect no. of hubs extracted from discovery response");
+    test:assertEquals(hubs[0], HUB_ONE, msg = "incorrect hub extraction from discovery response");
 }
 
 @test:Config {
     dependsOn: [testTopicAndSingleHubAsMultipleLinkHeaders]
 }
-function testTopicAndMultipleHubsAsSingleLinkHeader() {
+function testTopicAndMultipleHubsAsSingleLinkHeader() returns @tainted error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\", <" + HUB_TWO + ">; rel=\"hub\", <" + HUB_THREE +
             ">; rel=\"hub\", <" + TOPIC_ONE + ">; rel=\"self\"");
 
-    var results = extractTopicAndHubUrls(response);
-    if (results is [string, string[]]) {
-        string topic = results[0];
-        string[] hubs = results[1];
-        test:assertEquals(topic, TOPIC_ONE, msg = "incorrect topic extraction from discovery response");
-        test:assertEquals(hubs.length(), 3, msg = "incorrect no. of hubs extracted from discovery response");
-        test:assertEquals(hubs[0], HUB_ONE, msg = "incorrect hub extraction from discovery response");
-        test:assertEquals(hubs[1], HUB_TWO, msg = "incorrect hub extraction from discovery response");
-        test:assertEquals(hubs[2], HUB_THREE, msg = "incorrect hub extraction from discovery response");
-    } else {
-        test:assertFail(results.message());
-    }
+    [string, string[]] results = check extractTopicAndHubUrls(response);
+    string topic = results[0];
+    string[] hubs = results[1];
+    test:assertEquals(topic, TOPIC_ONE, msg = "incorrect topic extraction from discovery response");
+    test:assertEquals(hubs.length(), 3, msg = "incorrect no. of hubs extracted from discovery response");
+    test:assertEquals(hubs[0], HUB_ONE, msg = "incorrect hub extraction from discovery response");
+    test:assertEquals(hubs[1], HUB_TWO, msg = "incorrect hub extraction from discovery response");
+    test:assertEquals(hubs[2], HUB_THREE, msg = "incorrect hub extraction from discovery response");
 }
 
 @test:Config {
     dependsOn: [testTopicAndMultipleHubsAsSingleLinkHeader]
 }
-function testTopicAndMultipleHubsAsMultipleLinkHeaders() {
+function testTopicAndMultipleHubsAsMultipleLinkHeaders() returns @tainted error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"self\"");
     response.addHeader("Link", "<" + HUB_TWO + ">; rel=\"hub\"");
     response.addHeader("Link", "<" + HUB_THREE + ">; rel=\"hub\"");
 
-    var results = extractTopicAndHubUrls(response);
-    if (results is [string, string[]]) {
-        string topic = results[0];
-        string[] hubs = results[1];
-        test:assertEquals(topic, TOPIC_ONE, msg = "incorrect topic extraction from discovery response");
-        test:assertEquals(hubs.length(), 3, msg = "incorrect no. of hubs extracted from discovery response");
-        test:assertEquals(hubs[0], HUB_ONE, msg = "incorrect hub extraction from discovery response");
-        test:assertEquals(hubs[1], HUB_TWO, msg = "incorrect hub extraction from discovery response");
-        test:assertEquals(hubs[2], HUB_THREE, msg = "incorrect hub extraction from discovery response");
-    } else {
-        test:assertFail(results.message());
-    }
+    [string, string[]] results = check extractTopicAndHubUrls(response);
+    string topic = results[0];
+    string[] hubs = results[1];
+    test:assertEquals(topic, TOPIC_ONE, msg = "incorrect topic extraction from discovery response");
+    test:assertEquals(hubs.length(), 3, msg = "incorrect no. of hubs extracted from discovery response");
+    test:assertEquals(hubs[0], HUB_ONE, msg = "incorrect hub extraction from discovery response");
+    test:assertEquals(hubs[1], HUB_TWO, msg = "incorrect hub extraction from discovery response");
+    test:assertEquals(hubs[2], HUB_THREE, msg = "incorrect hub extraction from discovery response");
 }
 
 @test:Config {
     dependsOn: [testTopicAndMultipleHubsAsMultipleLinkHeaders]
 }
-function testMissingTopicWithSingleLinkHeader() {
+function testMissingTopicWithSingleLinkHeader() returns @tainted error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\", <" + TOPIC_ONE + ">; rel=\"not_self\"");
     var results = extractTopicAndHubUrls(response);
@@ -122,7 +106,7 @@ function testMissingTopicWithSingleLinkHeader() {
 @test:Config {
     dependsOn: [testMissingTopicWithSingleLinkHeader]
 }
-function testMissingTopicWithMultipleLinkHeaders() {
+function testMissingTopicWithMultipleLinkHeaders() returns @tainted error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"not_self\"");
@@ -138,7 +122,7 @@ function testMissingTopicWithMultipleLinkHeaders() {
 @test:Config {
     dependsOn: [testMissingTopicWithMultipleLinkHeaders]
 }
-function testMissingHubWithSingleLinkHeader() {
+function testMissingHubWithSingleLinkHeader() returns @tainted error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\", <" + TOPIC_ONE + ">; rel=\"self\"");
     var results = extractTopicAndHubUrls(response);
@@ -153,7 +137,7 @@ function testMissingHubWithSingleLinkHeader() {
 @test:Config {
     dependsOn: [testMissingHubWithSingleLinkHeader]
 }
-function testMissingHubWithMultipleLinkHeaders() {
+function testMissingHubWithMultipleLinkHeaders() returns @tainted error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"self\"");
@@ -169,7 +153,7 @@ function testMissingHubWithMultipleLinkHeaders() {
 @test:Config {
     dependsOn: [testMissingHubWithMultipleLinkHeaders]
 }
-function testMissingLinkHeader() {
+function testMissingLinkHeader() returns @tainted error? {
     http:Response response = new;
     var results = extractTopicAndHubUrls(response);
     if (results is error) {
@@ -183,7 +167,7 @@ function testMissingLinkHeader() {
 @test:Config {
     dependsOn: [testMissingLinkHeader]
 }
-function testSingleLinkHeaderWithMultipleTopics() {
+function testSingleLinkHeaderWithMultipleTopics() returns @tainted error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\", <" + TOPIC_ONE + ">; rel=\"self\", <" +
             HUB_TWO + ">; rel=\"self\"");
@@ -199,7 +183,7 @@ function testSingleLinkHeaderWithMultipleTopics() {
 @test:Config {
     dependsOn: [testSingleLinkHeaderWithMultipleTopics]
 }
-function testMultipleLinkHeadersWithMultipleTopics() {
+function testMultipleLinkHeadersWithMultipleTopics() returns @tainted error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"self\"");

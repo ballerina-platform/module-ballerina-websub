@@ -239,11 +239,11 @@ import ballerina/websub;
 }
 service specificSubscriber on new WebhookListener(8080) {
     resource function onIssueOpened(websub:Notification notification, IssueOpenedEvent issueOpened) {
-        log:print(io:sprintf("Issue opened: ID: %s, Title: %s", issueOpened.id, issueOpened.title));
+        log:print("Issue opened: ", IssueId = issueOpened.id, IssueTitle = issueOpened.title);
     }
     
     resource function onIssueAssigned(websub:Notification notification, IssueAssignedEvent issueAssigned) {
-        log:print(io:sprintf("Issue ID %s assigned to %s", issueAssigned.id, issueAssigned.assignedTo));
+        log:print("Issue assigned to user : ", IssueId = issueAssigned.id, UserId = issueAssigned.assignedTo);
     }
 }
 ```

@@ -171,7 +171,7 @@ isolated function verifyContent(http:Request request, string secret, string payl
                 
                     byte[] generatedSignature = check retrieveContentHash(method, secret, payload);
 
-                    return signature == generatedSignature.toBase64(); 
+                    return signature == generatedSignature.toBase16(); 
                 }          
         } else {
             return false;
@@ -186,7 +186,7 @@ isolated function verifyContent(http:Request request, string secret, string payl
 # + method - `HMac` algorithm to be used
 # + key - pre-shared secret-key value
 # + payload - content to be hashed
-# + return - `Base64` encoded {@code string} value of the hash
+# + return - {@code byte[]} representing the `hMac`
 isolated function retrieveContentHash(string method, string key, string payload) returns byte[]|error {
     byte[] keyArr = key.toBytes();
     byte[] contentPayload = payload.toBytes();
@@ -206,7 +206,7 @@ isolated function retrieveContentHash(string method, string key, string payload)
             return crypto:hmacSha512(contentPayload, keyArr);
         }
         _ => {
-            string errorMsg = "Unrecognized hashning-method [" + method + "] found";
+            string errorMsg = "Unrecognized hashning-method [${method}] found";
             log:printError(errorMsg);
             return error Error(errorMsg);
         }

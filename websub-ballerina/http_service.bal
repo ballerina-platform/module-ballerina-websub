@@ -21,8 +21,7 @@ import ballerina/jballerina.java;
 # Represent underlying HTTP Service on top of which the Subscriber-Serivice runs.
 service class HttpService {
     private SubscriberService subscriberService;
-    private SubscriberServiceConfiguration serviceConfig;
-    private string callbackUrl;
+    private string? secretKey;
     private boolean isSubscriptionValidationDeniedAvailable = false;
     private boolean isSubscriptionVerificationAvailable = false;
     private boolean isEventNotificationAvailable = false;
@@ -33,11 +32,9 @@ service class HttpService {
     # + serviceConfig - {@code SubscriberServiceConfiguration} subscriber-service
     #                   related configurations
     # + callback - {@code string} dynamically generated callback-url
-    public function init(SubscriberService subscriberService, SubscriberServiceConfiguration config, 
-                         string callback) returns error? {
+    public function init(SubscriberService subscriberService, string? secretKey) returns error? {
         self.subscriberService = subscriberService;
-        self.serviceConfig = config;
-        self.callbackUrl = callback;
+        self.secretKey = secretKey;
         
         string[] methodNames = getServiceMethodNames(subscriberService);
         
@@ -57,59 +54,6 @@ service class HttpService {
                 }
             }
         }
-
-        var result = self.initiateSubscription();
-        if (result is error) {
-            string errorMsg = "Subscription initiation failed due to [" + result.message() + "]";
-            return error SubscriptionInitiationFailedError(errorMsg);
-        }
-    }
-
-    # Initiate the subscription to the `topic` in the mentioned `hub`
-    # 
-    # + return - An `error`, if an error occurred during the subscription-initiation
-    function initiateSubscription() returns error? {
-        string|[string, string] target = self.serviceConfig.target;
-        
-        string hubUrl;
-        string topicUrl;
-        
-        if (target is string) {
-            var discoveryConfig = self.serviceConfig?.discoveryConfig;
-            http:ClientConfiguration? discoveryHttpConfig = discoveryConfig?.httpConfig ?: ();
-            string?|string[] expectedMediaTypes = discoveryConfig?.accept ?: ();
-            string?|string[] expectedLanguageTypes = discoveryConfig?.acceptLanguage ?: ();
-
-            DiscoveryService discoveryClient = check new (target, discoveryHttpConfig);
-
-            var discoveryDetails = discoveryClient->discoverResourceUrls(expectedMediaTypes, expectedLanguageTypes);
-
-            if (discoveryDetails is [string, string]) {
-                [hubUrl, topicUrl] = <[string, string]> discoveryDetails;
-            } else {
-                return error ResourceDiscoveryFailedError(discoveryDetails.message());
-            }
-        } else {
-            [hubUrl, topicUrl] = <[string, string]> target;
-        }
-
-        http:ClientConfiguration? subscriptionClientConfig = self.serviceConfig?.httpConfig ?: ();
-        SubscriptionClient subscriberClientEp = check new (hubUrl, subscriptionClientConfig);
-
-        string callback = self.serviceConfig?.callback ?: self.callbackUrl;
-
-        var request = retrieveSubscriptionRequest(topicUrl, callback, self.serviceConfig);
-
-        var response = subscriberClientEp->subscribe(request);
-
-        if (response is SubscriptionChangeResponse) {
-            string subscriptionSuccessMsg = "Subscription Request successfully sent to Hub["
-                                            + response.hub + "], for Topic[" 
-                                            + response.topic + "], with Callback [" + callback + "]";
-            log:print(subscriptionSuccessMsg + ". Awaiting intent verification.");
-        } else {
-            return response;
-        }
     }
 
     # Resource-Method handling the HTTP POST requests
@@ -121,7 +65,7 @@ service class HttpService {
         response.statusCode = http:STATUS_ACCEPTED;
 
         if (self.isEventNotificationAvailable) {
-            string secretKey = self.serviceConfig?.secret ?: "";
+            string secretKey = self.secretKey is () ? "" : <string>self.secretKey;
             processEventNotification(caller, request, response, self.subscriberService, secretKey);
         } else {
             response.statusCode = http:STATUS_NOT_IMPLEMENTED;
