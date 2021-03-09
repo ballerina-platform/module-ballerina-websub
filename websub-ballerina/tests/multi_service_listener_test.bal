@@ -76,14 +76,99 @@ service /subscriberTwo on multiServiceListener {
     }
 }
 
-http:Client clientEp1 = checkpanic new("http://localhost:9096/subscriberOne");
+http:Client clientForServiceOne = checkpanic new("http://localhost:9096/subscriberOne");
+http:Client clientForServiceTwo = checkpanic new("http://localhost:9096/subscriberTwo");
 
 @test:Config { 
     groups: ["multiServiceListener"]
 }
-function testOnSubscriptionValidationWithMultiServiceListener() returns @tainted error? {
+function testOnSubscriptionValidationWithServiceOne() returns @tainted error? {
     http:Request request = new;
 
-    http:Response response = check clientEp1->get("/?hub.mode=denied&hub.reason=justToTest", request);
+    http:Response response = check clientForServiceOne->get("/?hub.mode=denied&hub.reason=justToTest", request);
     test:assertEquals(response.statusCode, 200);
+}
+
+@test:Config { 
+    groups: ["multiServiceListener"]
+}
+function testOnSubscriptionValidationWithServiceTwo() returns @tainted error? {
+    http:Request request = new;
+
+    http:Response response = check clientForServiceTwo->get("/?hub.mode=denied&hub.reason=justToTest", request);
+    test:assertEquals(response.statusCode, 200);
+}
+
+@test:Config { 
+    groups: ["multiServiceListener"]
+}
+function testOnIntentVerificationFailureServiceOne() returns @tainted error? {
+    http:Request request = new;
+
+    http:Response response = check clientForServiceOne->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
+    test:assertEquals(response.statusCode, 404);
+    string payload = check response.getTextPayload();
+    map<string> responseBody = decodeResponseBody(payload);
+    test:assertEquals(responseBody["reason"], "Hub topic not supported");
+}
+
+@test:Config { 
+    groups: ["multiServiceListener"]
+}
+function testOnIntentVerificationFailureServiceTwo() returns @tainted error? {
+    http:Request request = new;
+
+    http:Response response = check clientForServiceTwo->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
+    test:assertEquals(response.statusCode, 404);
+    string payload = check response.getTextPayload();
+    map<string> responseBody = decodeResponseBody(payload);
+    test:assertEquals(responseBody["reason"], "Hub topic not supported");
+}
+
+@test:Config {
+    groups: ["multiServiceListener"]
+ }
+function testOnEventNotificationSuccessServiceOne() returns @tainted error? {
+    http:Request request = new;
+    json payload =  {"action": "publish", "mode": "remote-hub"};
+    request.setPayload(payload);
+
+    http:Response response = check clientForServiceOne->post("/", request);
+    test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["multiServiceListener"]
+ }
+function testOnEventNotificationSuccessServiceTwo() returns @tainted error? {
+    http:Request request = new;
+    json payload =  {"action": "publish", "mode": "remote-hub"};
+    request.setPayload(payload);
+
+    http:Response response = check clientForServiceTwo->post("/", request);
+    test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["multiServiceListener"]
+}
+function testOnEventNotificationSuccessXmlServiceOne() returns @tainted error? {
+    http:Request request = new;
+    xml payload = xml `<body><action>publish</action></body>`;
+    request.setPayload(payload);
+
+    http:Response response = check clientForServiceOne->post("/", request);
+    test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["multiServiceListener"]
+}
+function testOnEventNotificationSuccessXmlServiceTwo() returns @tainted error? {
+    http:Request request = new;
+    xml payload = xml `<body><action>publish</action></body>`;
+    request.setPayload(payload);
+
+    http:Response response = check clientForServiceTwo->post("/", request);
+    test:assertEquals(response.statusCode, 202);
 }
