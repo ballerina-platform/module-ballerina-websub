@@ -32,7 +32,7 @@ service class HttpService {
     # + serviceConfig - {@code SubscriberServiceConfiguration} subscriber-service
     #                   related configurations
     # + callback - {@code string} dynamically generated callback-url
-    public function init(SubscriberService subscriberService, string? secretKey) returns error? {
+    isolated function init(SubscriberService subscriberService, string? secretKey) returns error? {
         self.subscriberService = subscriberService;
         self.secretKey = secretKey;
         
@@ -60,7 +60,7 @@ service class HttpService {
     # 
     # + caller - {@code http:Caller} reference
     # + request - {@code http:Request} reference
-    resource function post .(http:Caller caller, http:Request request) {
+    isolated resource function post .(http:Caller caller, http:Request request) {
         http:Response response = new;
         response.statusCode = http:STATUS_ACCEPTED;
 
@@ -78,7 +78,7 @@ service class HttpService {
     # 
     # + caller - {@code http:Caller} reference
     # + request - {@code http:Request} reference
-    resource function get .(http:Caller caller, http:Request request) {
+    isolated resource function get .(http:Caller caller, http:Request request) {
         http:Response response = new;
         response.statusCode = http:STATUS_OK;
 

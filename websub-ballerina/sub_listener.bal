@@ -30,10 +30,14 @@ public class Listener {
     # provided to initialize the listener.
     #
     # + listenTo - An `http:Listener` or a port number to listen for the service
-    public isolated function init(int|http:Listener listenTo, http:ListenerConfiguration? config = ()) returns error? {
+    # + config - `websub:ListenerConfiguration` to be provided to underlying HTTP Listener
+    public isolated function init(int|http:Listener listenTo, ListenerConfiguration? config = ()) returns error? {
         if (listenTo is int) {
             self.httpListener = check new(listenTo, config);
         } else {
+            if (config is ListenerConfiguration) {
+                log:print("Provided `websub:ListenerConfiguration` will be overridden by the given http listener configurations");
+            }
             self.httpListener = listenTo;
         }
         self.listenerConfig = self.httpListener.getConfig();
@@ -120,7 +124,7 @@ public class Listener {
         if (serviceConfig is SubscriberServiceConfiguration) {
             var result = initiateSubscription(serviceConfig, <string>callback);
             if (result is error) {
-                string errorMsg = "Subscription initiation failed due to [${result.message()}]";
+                string errorMsg = string`Subscription initiation failed due to [${result.message()}]`;
                 return error SubscriptionInitiationFailedError(errorMsg);
             }
         }

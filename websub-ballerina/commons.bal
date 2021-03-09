@@ -109,6 +109,11 @@ public type Acknowledgement record {
     *CommonResponse;
 };
 
+# Provides a set of configurations for configure the underlying HTTP listener of the WebSub listener.
+public type ListenerConfiguration record {|
+    *http:ListenerConfiguration;
+|};
+
 # Record representing a WebSub subscription change request-body.
 #
 # + topic - The topic for which the subscription/unsubscription request is sent
