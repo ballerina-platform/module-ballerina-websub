@@ -34,7 +34,7 @@ def distributionPath =  project.projectDir.absolutePath + "/build/target/extract
 def originalDependencies = ballerinaDependencyFile.text
 def distributionBinPath = distributionPath + "/bin"
 def originalConfig = ballerinaConfigFile.text
-def testCoverageParam = "--code-coverage --includes=io.ballerina.stdlib.websub*:ballerina*"
+def testCoverageParam = "--code-coverage --includes=io.ballerina.stdlib.websub.*:ballerina.*"
 
 configurations {
     jbalTools
