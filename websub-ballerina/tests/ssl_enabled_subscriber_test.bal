@@ -32,7 +32,7 @@ listener Listener sslEnabledListener = new(9095, listenerConfigs);
 @SubscriberServiceConfig {} 
 service /subscriber on sslEnabledListener {
     remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
-        log:print("onSubscriptionValidationDenied invoked");
+        log:printDebug("onSubscriptionValidationDenied invoked");
         Acknowledgement ack = {
                   headers: {"header1": "value"},
                   body: {"formparam1": "value1"}
@@ -42,7 +42,7 @@ service /subscriber on sslEnabledListener {
 
     remote function onSubscriptionVerification(SubscriptionVerification msg)
                         returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
-        log:print("onSubscriptionVerification invoked");
+        log:printDebug("onSubscriptionVerification invoked");
         if (msg.hubTopic == "test1") {
             return error SubscriptionVerificationError("Hub topic not supported");
         } else {
@@ -52,7 +52,7 @@ service /subscriber on sslEnabledListener {
 
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
-        log:print("onEventNotification invoked ", contentDistributionMessage = event);
+        log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
         return {};
     }
 }

@@ -50,7 +50,7 @@ service class HttpService {
                     self.isEventNotificationAvailable = true;
                 }
                 _ => {
-                    log:printError("Unrecognized method [" + methodName + "] found in the implementation");
+                    log:printError(string`Unrecognized method [${methodName}] found in the implementation`);
                 }
             }
         }
