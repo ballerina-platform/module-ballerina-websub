@@ -20,7 +20,7 @@ import ballerina/http;
 
 ListenerConfiguration listenerConfigs = {
     secureSocket: {
-        keyStore: {
+        key: {
             path: "tests/resources/ballerinaKeystore.pkcs12",
             password: "ballerina"
         }
@@ -59,7 +59,7 @@ service /subscriber on sslEnabledListener {
 
 http:ClientConfiguration httpsConfig = {
     secureSocket: {
-        trustStore: {
+        cert: {
             path: "tests/resources/ballerinaTruststore.pkcs12",
             password: "ballerina"
         }
