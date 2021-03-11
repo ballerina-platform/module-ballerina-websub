@@ -65,12 +65,32 @@ public class Listener {
             string callbackUrl = retriveCallbackUrl(servicePath, self.port, self.listenerConfig);
             self.callbackUrl = callbackUrl;
             self.logGeneratedCallbackUrl(name, callbackUrl);
-
             self.httpService = check new(s, configuration?.secret);
             check self.httpListener.attach(<HttpService> self.httpService, servicePath);
         } else {
             return error ListenerError("Could not find the required service-configurations");
         }
+    }
+
+    # Setup the provided Service with given configurations and attaches it to the listener
+    #
+    # + s - The `websub:SubscriberService` object to attach
+    # + configuration - `SubscriberServiceConfiguration` which should be incorporated into the provided Service 
+    # + name - The path of the Service to be hosted
+    # + return - An `error`, if an error occurred during the service attaching process
+    public function initialize(SubscriberService s, SubscriberServiceConfiguration configuration, string[]|string? name = ()) returns error? {
+        if (self.listenerConfig.secureSocket is ()) {
+            log:printWarn("HTTPS is recommended but using HTTP");
+        }
+        
+        self.serviceConfig = configuration;
+        string[]|string servicePath = self.retrieveServicePath(name);
+        string callbackUrl = retriveCallbackUrl(servicePath, self.port, self.listenerConfig);
+        self.callbackUrl = callbackUrl;
+        self.logGeneratedCallbackUrl(name, callbackUrl);    
+        self.httpService = check new(s, configuration?.secret);
+        check self.httpListener.attach(<HttpService> self.httpService, servicePath);        
+            
     }
     
     # Retrieves the service-path for the HTTP Service
