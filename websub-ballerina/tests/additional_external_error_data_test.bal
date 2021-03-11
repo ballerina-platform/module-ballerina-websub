@@ -25,7 +25,7 @@ var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http
                               service object {
     remote function onSubscriptionVerification(SubscriptionVerification msg)
                         returns SubscriptionVerificationSuccess | SubscriptionVerificationError {
-        log:print("onSubscriptionVerification invoked ", verificationMessage = msg);
+        log:printDebug("onSubscriptionVerification invoked ", verificationMessage = msg);
         if (msg.hubTopic == "test1") {
 
             return error SubscriptionVerificationError(
@@ -39,7 +39,7 @@ var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http
 
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
-        log:print("onEventNotification invoked: ", contentDistributionNotification = event);
+        log:printDebug("onEventNotification invoked: ", contentDistributionNotification = event);
         return error SubscriptionDeletedError(
             "Subscriber wants to unsubscribe",
             headers = {"header1": "value"}, 
