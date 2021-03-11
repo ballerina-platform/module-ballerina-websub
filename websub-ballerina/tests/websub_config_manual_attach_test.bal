@@ -1,4 +1,4 @@
-// Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2018 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 //
 // WSO2 Inc. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -18,10 +18,8 @@ import ballerina/log;
 import ballerina/test;
 import ballerina/http;
 
-listener Listener basicSubscriberListener = new (9090);
-
-var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000 } 
-                              service object {
+service class SimpleWebsubService {
+    *SubscriberService;
     remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         log:printDebug("onSubscriptionValidationDenied invoked");
         Acknowledgement ack = {
@@ -46,48 +44,52 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
         log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
         return {};
     }
-};
-
-@test:BeforeGroups { value:["simple-subscriber"] }
-function beforeSimpleSubscriberTest() {
-    checkpanic basicSubscriberListener.attach(simpleSubscriberService, "subscriber");
 }
 
-@test:AfterGroups { value:["simple-subscriber"] }
-function afterSimpleSubscriberTest() {
-    checkpanic basicSubscriberListener.gracefulStop();
+listener Listener manualConfigAttachListener = new (9097);
+SimpleWebsubService simpleSubscriberServiceInstace = new;
+
+@test:BeforeGroups { value:["manualConfigAttach"] }
+function beforeManualConfigAttachTest() {
+    SubscriberServiceConfiguration config = {
+        target: "http://0.0.0.0:9191/common/discovery",
+        leaseSeconds: 36000
+    };
+    checkpanic manualConfigAttachListener.initialize(simpleSubscriberServiceInstace, config, "subscriber");
 }
 
-http:Client httpClient = checkpanic new("http://localhost:9090/subscriber");
+@test:AfterGroups { value:["manualConfigAttach"] }
+function afterManualConfigAttachTest() {
+    checkpanic manualConfigAttachListener.gracefulStop();
+}
+
+http:Client manualConfigAttachClientEp = checkpanic new("http://localhost:9097/subscriber");
 
 @test:Config { 
-    groups: ["simple-subscriber"]
+    groups: ["manualConfigAttach"]
 }
-function testOnSubscriptionValidation() returns @tainted error? {
+function testOnSubscriptionValidationWithManualConfigAttach() returns @tainted error? {
     http:Request request = new;
-
-    http:Response response = check httpClient->get("/?hub.mode=denied&hub.reason=justToTest", request);
+    http:Response response = check manualConfigAttachClientEp->get("/?hub.mode=denied&hub.reason=justToTest", request);
     test:assertEquals(response.statusCode, 200);
 }
 
 @test:Config {
-    groups: ["simple-subscriber"]
+    groups: ["manualConfigAttach"]
  }
-function testOnIntentVerificationSuccess() returns @tainted error? {
+function testOnIntentVerificationSuccessWithManualConfigAttach() returns @tainted error? {
     http:Request request = new;
-
-    http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
+    http:Response response = check manualConfigAttachClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
     test:assertEquals(response.statusCode, 200);
     test:assertEquals(response.getTextPayload(), "1234");
 }
 
 @test:Config { 
-    groups: ["simple-subscriber"]
+    groups: ["manualConfigAttach"]
 }
-function testOnIntentVerificationFailure() returns @tainted error? {
+function testOnIntentVerificationFailureWithManualConfigAttach() returns @tainted error? {
     http:Request request = new;
-
-    http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
+    http:Response response = check manualConfigAttachClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
     map<string> responseBody = decodeResponseBody(payload);
@@ -95,26 +97,24 @@ function testOnIntentVerificationFailure() returns @tainted error? {
 }
 
 @test:Config {
-    groups: ["simple-subscriber"]
+    groups: ["manualConfigAttach"]
  }
-function testOnEventNotificationSuccess() returns @tainted error? {
+function testOnEventNotificationSuccessWithManualConfigAttach() returns @tainted error? {
     http:Request request = new;
     json payload =  {"action": "publish", "mode": "remote-hub"};
     request.setPayload(payload);
-
-    http:Response response = check httpClient->post("/", request);
+    http:Response response = check manualConfigAttachClientEp->post("/", request);
     test:assertEquals(response.statusCode, 202);
 }
 
 
 @test:Config {
-    groups: ["simple-subscriber"]
+    groups: ["manualConfigAttach"]
 }
-function testOnEventNotificationSuccessXml() returns @tainted error? {
+function testOnEventNotificationSuccessXmlWithManualConfigAttach() returns @tainted error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
     request.setPayload(payload);
-
-    http:Response response = check httpClient->post("/", request);
+    http:Response response = check manualConfigAttachClientEp->post("/", request);
     test:assertEquals(response.statusCode, 202);
 }

@@ -23,7 +23,7 @@ var optionalSubscriberTarget = @SubscriberServiceConfig { leaseSeconds: 36000, s
                               service object {
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
-        log:print("onEventNotification invoked ", contentDistributionMessage = event);
+        log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
         return {};
     }
 };

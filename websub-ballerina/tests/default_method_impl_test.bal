@@ -24,7 +24,7 @@ var serviceWithDefaultImpl = @SubscriberServiceConfig { target: "http://0.0.0.0:
                               service object {
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
-        log:print("onEventNotification invoked ", contentDistributionMessage = event);
+        log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
         return {};
     }
 };
