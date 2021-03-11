@@ -21,7 +21,7 @@ import ballerina/http;
 service class SimpleWebsubService {
     *SubscriberService;
     remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
-        log:print("onSubscriptionValidationDenied invoked");
+        log:printDebug("onSubscriptionValidationDenied invoked");
         Acknowledgement ack = {
                   headers: {"header1": "value"},
                   body: {"formparam1": "value1"}
@@ -31,7 +31,7 @@ service class SimpleWebsubService {
 
     remote function onSubscriptionVerification(SubscriptionVerification msg)
                         returns SubscriptionVerificationSuccess | SubscriptionVerificationError {
-        log:print("onSubscriptionVerification invoked");
+        log:printDebug("onSubscriptionVerification invoked");
         if (msg.hubTopic == "test1") {
             return error SubscriptionVerificationError("Hub topic not supported");
         } else {
@@ -41,12 +41,12 @@ service class SimpleWebsubService {
 
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
-        log:print("onEventNotification invoked ", contentDistributionMessage = event);
+        log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
         return {};
     }
 }
 
-listener Listener manualConfigAttachListener = new (9096);
+listener Listener manualConfigAttachListener = new (9097);
 SimpleWebsubService simpleSubscriberServiceInstace = new;
 
 @test:BeforeGroups { value:["manualConfigAttach"] }
@@ -63,20 +63,15 @@ function afterManualConfigAttachTest() {
     checkpanic manualConfigAttachListener.gracefulStop();
 }
 
-http:Client manualConfigAttachClientEp = checkpanic new("http://localhost:9096/subscriber");
+http:Client manualConfigAttachClientEp = checkpanic new("http://localhost:9097/subscriber");
 
 @test:Config { 
     groups: ["manualConfigAttach"]
 }
 function testOnSubscriptionValidationWithManualConfigAttach() returns @tainted error? {
     http:Request request = new;
-
-    var response = check manualConfigAttachClientEp->get("/?hub.mode=denied&hub.reason=justToTest", request);
-    if (response is http:Response) {
-        test:assertEquals(response.statusCode, 200);
-    } else {
-        test:assertFail("UnsubscriptionIntentVerification test failed");
-    }
+    http:Response response = check manualConfigAttachClientEp->get("/?hub.mode=denied&hub.reason=justToTest", request);
+    test:assertEquals(response.statusCode, 200);
 }
 
 @test:Config {
@@ -84,14 +79,9 @@ function testOnSubscriptionValidationWithManualConfigAttach() returns @tainted e
  }
 function testOnIntentVerificationSuccessWithManualConfigAttach() returns @tainted error? {
     http:Request request = new;
-
-    var response = check manualConfigAttachClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
-    if (response is http:Response) {
-        test:assertEquals(response.statusCode, 200);
-        test:assertEquals(response.getTextPayload(), "1234");
-    } else {
-        test:assertFail("UnsubscriptionIntentVerification test failed");
-    }
+    http:Response response = check manualConfigAttachClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
+    test:assertEquals(response.statusCode, 200);
+    test:assertEquals(response.getTextPayload(), "1234");
 }
 
 @test:Config { 
@@ -99,21 +89,11 @@ function testOnIntentVerificationSuccessWithManualConfigAttach() returns @tainte
 }
 function testOnIntentVerificationFailureWithManualConfigAttach() returns @tainted error? {
     http:Request request = new;
-
-    var response = check manualConfigAttachClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
-    if (response is http:Response) {
-        test:assertEquals(response.statusCode, 404);
-        var payload = response.getTextPayload();
-        if (payload is error) {
-            test:assertFail("Could not retrieve response body");
-        } else {
-            var responseBody = decodeResponseBody(payload);
-            log:print("Decoded payload retrieved ", payload = responseBody);
-            test:assertEquals(responseBody["reason"], "Hub topic not supported");
-        }
-    } else {
-        test:assertFail("UnsubscriptionIntentVerification test failed");
-    }
+    http:Response response = check manualConfigAttachClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
+    test:assertEquals(response.statusCode, 404);
+    string payload = check response.getTextPayload();
+    map<string> responseBody = decodeResponseBody(payload);
+    test:assertEquals(responseBody["reason"], "Hub topic not supported");
 }
 
 @test:Config {
@@ -123,13 +103,8 @@ function testOnEventNotificationSuccessWithManualConfigAttach() returns @tainted
     http:Request request = new;
     json payload =  {"action": "publish", "mode": "remote-hub"};
     request.setPayload(payload);
-
-    var response = check manualConfigAttachClientEp->post("/", request);
-    if (response is http:Response) {
-        test:assertEquals(response.statusCode, 202);
-    } else {
-        test:assertFail("UnsubscriptionIntentVerification test failed");
-    }
+    http:Response response = check manualConfigAttachClientEp->post("/", request);
+    test:assertEquals(response.statusCode, 202);
 }
 
 
@@ -140,11 +115,6 @@ function testOnEventNotificationSuccessXmlWithManualConfigAttach() returns @tain
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
     request.setPayload(payload);
-
-    var response = check manualConfigAttachClientEp->post("/", request);
-    if (response is http:Response) {
-        test:assertEquals(response.statusCode, 202);
-    } else {
-        test:assertFail("UnsubscriptionIntentVerification test failed");
-    }
+    http:Response response = check manualConfigAttachClientEp->post("/", request);
+    test:assertEquals(response.statusCode, 202);
 }

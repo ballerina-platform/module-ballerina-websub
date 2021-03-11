@@ -80,7 +80,7 @@ public class Listener {
     # + return - An `error`, if an error occurred during the service attaching process
     public function initialize(SubscriberService s, SubscriberServiceConfiguration configuration, string[]|string? name = ()) returns error? {
         if (self.listenerConfig.secureSocket is ()) {
-            log:print("HTTPS is recommended but using HTTP");
+            log:printWarn("HTTPS is recommended but using HTTP");
         }
         
         self.serviceConfig = configuration;
