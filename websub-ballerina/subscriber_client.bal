@@ -149,8 +149,7 @@ function processHubResponse(@untainted string hub, @untainted string mode,
             return error SubscriptionInitiationFailedError(errorMessage);
         } else {
             if (responseStatusCode != http:STATUS_ACCEPTED) {
-                log:print("Subscription request considered successful for non 202 status code: "
-                                + responseStatusCode.toString());
+                log:printWarn(string`Subscription request considered successful for non 202 status code: ${responseStatusCode.toString()}`);
             }
             SubscriptionChangeResponse subscriptionChangeResponse = {hub:hub, topic:topic, response:hubResponse};
             return subscriptionChangeResponse;

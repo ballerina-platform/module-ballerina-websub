@@ -18,10 +18,19 @@ import ballerina/log;
 import ballerina/test;
 import ballerina/http;
 
-listener Listener basicSubscriberListener = new (9090);
+ListenerConfiguration listenerConfigs = {
+    secureSocket: {
+        key: {
+            path: "tests/resources/ballerinaKeystore.pkcs12",
+            password: "ballerina"
+        }
+    }
+};
 
-var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000 } 
-                              service object {
+listener Listener sslEnabledListener = new(9095, listenerConfigs);
+
+@SubscriberServiceConfig {} 
+service /subscriber on sslEnabledListener {
     remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         log:printDebug("onSubscriptionValidationDenied invoked");
         Acknowledgement ack = {
@@ -32,7 +41,7 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
     }
 
     remote function onSubscriptionVerification(SubscriptionVerification msg)
-                        returns SubscriptionVerificationSuccess | SubscriptionVerificationError {
+                        returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
         log:printDebug("onSubscriptionVerification invoked");
         if (msg.hubTopic == "test1") {
             return error SubscriptionVerificationError("Hub topic not supported");
@@ -42,52 +51,50 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
       }
 
     remote function onEventNotification(ContentDistributionMessage event) 
-                        returns Acknowledgement | SubscriptionDeletedError? {
+                        returns Acknowledgement|SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
         return {};
     }
+}
+
+http:ClientConfiguration httpsConfig = {
+    secureSocket: {
+        cert: {
+            path: "tests/resources/ballerinaTruststore.pkcs12",
+            password: "ballerina"
+        }
+    }
 };
-
-@test:BeforeGroups { value:["simple-subscriber"] }
-function beforeSimpleSubscriberTest() {
-    checkpanic basicSubscriberListener.attach(simpleSubscriberService, "subscriber");
-}
-
-@test:AfterGroups { value:["simple-subscriber"] }
-function afterSimpleSubscriberTest() {
-    checkpanic basicSubscriberListener.gracefulStop();
-}
-
-http:Client httpClient = checkpanic new("http://localhost:9090/subscriber");
+http:Client sslEnabledClient = checkpanic new("https://localhost:9095/subscriber", httpsConfig);
 
 @test:Config { 
-    groups: ["simple-subscriber"]
+    groups: ["sslEnabledSubscriber"]
 }
-function testOnSubscriptionValidation() returns @tainted error? {
+function testOnSubscriptionValidationWithSsl() returns @tainted error? {
     http:Request request = new;
 
-    http:Response response = check httpClient->get("/?hub.mode=denied&hub.reason=justToTest", request);
+    http:Response response = check sslEnabledClient->get("/?hub.mode=denied&hub.reason=justToTest", request);
     test:assertEquals(response.statusCode, 200);
 }
 
 @test:Config {
-    groups: ["simple-subscriber"]
+    groups: ["sslEnabledSubscriber"]
  }
-function testOnIntentVerificationSuccess() returns @tainted error? {
+function testOnIntentVerificationSuccessWithSsl() returns @tainted error? {
     http:Request request = new;
 
-    http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
+    http:Response response = check sslEnabledClient->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
     test:assertEquals(response.statusCode, 200);
     test:assertEquals(response.getTextPayload(), "1234");
 }
 
 @test:Config { 
-    groups: ["simple-subscriber"]
+    groups: ["sslEnabledSubscriber"]
 }
-function testOnIntentVerificationFailure() returns @tainted error? {
+function testOnIntentVerificationFailureWithSsl() returns @tainted error? {
     http:Request request = new;
 
-    http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
+    http:Response response = check sslEnabledClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
     map<string> responseBody = decodeResponseBody(payload);
@@ -95,26 +102,26 @@ function testOnIntentVerificationFailure() returns @tainted error? {
 }
 
 @test:Config {
-    groups: ["simple-subscriber"]
+    groups: ["sslEnabledSubscriber"]
  }
-function testOnEventNotificationSuccess() returns @tainted error? {
+function testOnEventNotificationSuccessWithSsl() returns @tainted error? {
     http:Request request = new;
     json payload =  {"action": "publish", "mode": "remote-hub"};
     request.setPayload(payload);
 
-    http:Response response = check httpClient->post("/", request);
+    http:Response response = check sslEnabledClient->post("/", request);
     test:assertEquals(response.statusCode, 202);
 }
 
 
 @test:Config {
-    groups: ["simple-subscriber"]
+    groups: ["sslEnabledSubscriber"]
 }
-function testOnEventNotificationSuccessXml() returns @tainted error? {
+function testOnEventNotificationSuccessXmlWithSsl() returns @tainted error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
     request.setPayload(payload);
 
-    http:Response response = check httpClient->post("/", request);
+    http:Response response = check sslEnabledClient->post("/", request);
     test:assertEquals(response.statusCode, 202);
 }
