@@ -22,7 +22,7 @@ const string HASH_KEY = "secret";
     groups: ["contentHashRetrieval"]
 }
 function testContentHashForSha1() returns @tainted error? {
-    byte[] hashedContent = check retrieveContentHash("sha1", HASH_KEY, "This is sample content");
+    byte[] hashedContent = check retrieveContentHash(SHA1, HASH_KEY, "This is sample content");
     test:assertTrue(hashedContent.length() > 0);
 }
 
@@ -30,7 +30,7 @@ function testContentHashForSha1() returns @tainted error? {
     groups: ["contentHashRetrieval"]
 }
 function testContentHashForSha256() returns @tainted error? {
-    byte[] hashedContent = check retrieveContentHash("sha256", HASH_KEY, "This is sample content");
+    byte[] hashedContent = check retrieveContentHash(SHA_256, HASH_KEY, "This is sample content");
     test:assertTrue(hashedContent.length() > 0);
 }
 
@@ -38,7 +38,7 @@ function testContentHashForSha256() returns @tainted error? {
     groups: ["contentHashRetrieval"]
 }
 function testContentHashForSha384() returns @tainted error? {
-    byte[] hashedContent = check retrieveContentHash("sha384", HASH_KEY, "This is sample content");
+    byte[] hashedContent = check retrieveContentHash(SHA_384, HASH_KEY, "This is sample content");
     test:assertTrue(hashedContent.length() > 0);
 }
 
@@ -46,7 +46,7 @@ function testContentHashForSha384() returns @tainted error? {
     groups: ["contentHashRetrieval"]
 }
 function testContentHashForSha512() returns @tainted error? {
-    byte[] hashedContent = check retrieveContentHash("sha512", HASH_KEY, "This is sample content");
+    byte[] hashedContent = check retrieveContentHash(SHA_512, HASH_KEY, "This is sample content");
     test:assertTrue(hashedContent.length() > 0);
 }
 

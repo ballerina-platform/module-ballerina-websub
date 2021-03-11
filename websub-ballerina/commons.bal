@@ -66,6 +66,12 @@ const string X_HUB_SIGNATURE = "X-Hub-Signature";
 # Common service-path to be used if the path-generation failed
 const string COMMON_SERVICE_PATH = "subscriber";
 
+# HMAC Algorithms used for content verification
+const string SHA1 = "sha1";
+const string SHA_256 = "sha256";
+const string SHA_384 = "sha384";
+const string SHA_512 = "sha512";
+
 # Record representing the subscription / unsubscription intent verification request-body.
 # 
 # + hubMode - current hub.mode parameter (subscribe / unsubscribe)

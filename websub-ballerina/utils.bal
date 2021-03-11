@@ -193,16 +193,16 @@ isolated function retrieveContentHash(string method, string key, string payload)
     byte[] hashedContent = [];
 
     match method {
-        "sha1" => {
+        SHA1 => {
             return crypto:hmacSha1(contentPayload, keyArr);
         }
-        "sha256" => {
+        SHA_256 => {
             return crypto:hmacSha256(contentPayload, keyArr);
         }
-        "sha384" => {
+        SHA_384 => {
             return crypto:hmacSha384(contentPayload, keyArr);
         }
-        "sha512" => {
+        SHA_512 => {
             return crypto:hmacSha512(contentPayload, keyArr);
         }
         _ => {
