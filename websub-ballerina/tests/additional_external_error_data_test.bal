@@ -63,9 +63,7 @@ http:Client subscriberServiceErrorDetailsClientEp = checkpanic new("http://local
     groups: ["service-with-additional-details"]
 }
 function testOnIntentVerificationFailedErrorDetails() returns @tainted error? {
-    http:Request request = new;
-
-    http:Response response = check subscriberServiceErrorDetailsClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
+    http:Response response = check subscriberServiceErrorDetailsClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
     map<string> responseBody = decodeResponseBody(payload);

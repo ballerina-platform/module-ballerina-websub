@@ -64,9 +64,7 @@ http:Client httpClient = checkpanic new("http://localhost:9090/subscriber");
     groups: ["simple-subscriber"]
 }
 function testOnSubscriptionValidation() returns @tainted error? {
-    http:Request request = new;
-
-    http:Response response = check httpClient->get("/?hub.mode=denied&hub.reason=justToTest", request);
+    http:Response response = check httpClient->get("/?hub.mode=denied&hub.reason=justToTest");
     test:assertEquals(response.statusCode, 200);
 }
 
@@ -74,9 +72,7 @@ function testOnSubscriptionValidation() returns @tainted error? {
     groups: ["simple-subscriber"]
  }
 function testOnIntentVerificationSuccess() returns @tainted error? {
-    http:Request request = new;
-
-    http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
+    http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234");
     test:assertEquals(response.statusCode, 200);
     test:assertEquals(response.getTextPayload(), "1234");
 }
@@ -85,9 +81,7 @@ function testOnIntentVerificationSuccess() returns @tainted error? {
     groups: ["simple-subscriber"]
 }
 function testOnIntentVerificationFailure() returns @tainted error? {
-    http:Request request = new;
-
-    http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
+    http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
     map<string> responseBody = decodeResponseBody(payload);

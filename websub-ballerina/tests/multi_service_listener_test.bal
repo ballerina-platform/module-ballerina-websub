@@ -83,9 +83,7 @@ http:Client clientForServiceTwo = checkpanic new("http://localhost:9096/subscrib
     groups: ["multiServiceListener"]
 }
 function testOnSubscriptionValidationWithServiceOne() returns @tainted error? {
-    http:Request request = new;
-
-    http:Response response = check clientForServiceOne->get("/?hub.mode=denied&hub.reason=justToTest", request);
+    http:Response response = check clientForServiceOne->get("/?hub.mode=denied&hub.reason=justToTest");
     test:assertEquals(response.statusCode, 200);
 }
 
@@ -93,9 +91,7 @@ function testOnSubscriptionValidationWithServiceOne() returns @tainted error? {
     groups: ["multiServiceListener"]
 }
 function testOnSubscriptionValidationWithServiceTwo() returns @tainted error? {
-    http:Request request = new;
-
-    http:Response response = check clientForServiceTwo->get("/?hub.mode=denied&hub.reason=justToTest", request);
+    http:Response response = check clientForServiceTwo->get("/?hub.mode=denied&hub.reason=justToTest");
     test:assertEquals(response.statusCode, 200);
 }
 
@@ -103,9 +99,7 @@ function testOnSubscriptionValidationWithServiceTwo() returns @tainted error? {
     groups: ["multiServiceListener"]
 }
 function testOnIntentVerificationFailureServiceOne() returns @tainted error? {
-    http:Request request = new;
-
-    http:Response response = check clientForServiceOne->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
+    http:Response response = check clientForServiceOne->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
     map<string> responseBody = decodeResponseBody(payload);
@@ -116,9 +110,7 @@ function testOnIntentVerificationFailureServiceOne() returns @tainted error? {
     groups: ["multiServiceListener"]
 }
 function testOnIntentVerificationFailureServiceTwo() returns @tainted error? {
-    http:Request request = new;
-
-    http:Response response = check clientForServiceTwo->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
+    http:Response response = check clientForServiceTwo->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
     map<string> responseBody = decodeResponseBody(payload);
