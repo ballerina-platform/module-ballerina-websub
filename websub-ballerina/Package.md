@@ -47,7 +47,7 @@ This package allows introducing a WebSub Subscriber Service with `onSubscription
     @websub:SubscriberServiceConfig {
         target: ["<HUB_URL>", "<TOPIC_URL>"], 
         leaseSeconds: 36000,
-        secret: "<SECRET>
+        secret: "<SECRET>"
     } 
     service /subscriber on sslEnabledListener {
         remote function onSubscriptionValidationDenied(websub:SubscriptionDeniedError msg) returns websub:Acknowledgement? {
