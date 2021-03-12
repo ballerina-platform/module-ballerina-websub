@@ -71,9 +71,7 @@ http:Client sslEnabledClient = checkpanic new("https://localhost:9095/subscriber
     groups: ["sslEnabledSubscriber"]
 }
 function testOnSubscriptionValidationWithSsl() returns @tainted error? {
-    http:Request request = new;
-
-    http:Response response = check sslEnabledClient->get("/?hub.mode=denied&hub.reason=justToTest", request);
+    http:Response response = check sslEnabledClient->get("/?hub.mode=denied&hub.reason=justToTest");
     test:assertEquals(response.statusCode, 200);
 }
 
@@ -81,9 +79,7 @@ function testOnSubscriptionValidationWithSsl() returns @tainted error? {
     groups: ["sslEnabledSubscriber"]
  }
 function testOnIntentVerificationSuccessWithSsl() returns @tainted error? {
-    http:Request request = new;
-
-    http:Response response = check sslEnabledClient->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
+    http:Response response = check sslEnabledClient->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234");
     test:assertEquals(response.statusCode, 200);
     test:assertEquals(response.getTextPayload(), "1234");
 }
@@ -92,9 +88,7 @@ function testOnIntentVerificationSuccessWithSsl() returns @tainted error? {
     groups: ["sslEnabledSubscriber"]
 }
 function testOnIntentVerificationFailureWithSsl() returns @tainted error? {
-    http:Request request = new;
-
-    http:Response response = check sslEnabledClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
+    http:Response response = check sslEnabledClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
     map<string> responseBody = decodeResponseBody(payload);

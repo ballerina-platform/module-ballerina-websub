@@ -45,9 +45,7 @@ http:Client serviceWithDefaultImplClientEp = checkpanic new("http://localhost:90
     groups: ["default-method-impl"]
 }
 function testOnSubscriptionValidationDefaultImpl() returns @tainted error? {
-    http:Request request = new;
-
-    http:Response response = check serviceWithDefaultImplClientEp->get("/?hub.mode=denied&hub.reason=justToTest", request);
+    http:Response response = check serviceWithDefaultImplClientEp->get("/?hub.mode=denied&hub.reason=justToTest");
     test:assertEquals(response.statusCode, 200);
 }
 
@@ -55,9 +53,7 @@ function testOnSubscriptionValidationDefaultImpl() returns @tainted error? {
     groups: ["default-method-impl"]
  }
 function testOnIntentVerificationSuccessDefaultImpl() returns @tainted error? {
-    http:Request request = new;
-
-    http:Response response = check serviceWithDefaultImplClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
+    http:Response response = check serviceWithDefaultImplClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234");
     test:assertEquals(response.statusCode, 200);
     test:assertEquals(response.getTextPayload(), "1234");
 }

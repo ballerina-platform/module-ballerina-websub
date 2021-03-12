@@ -69,8 +69,7 @@ http:Client manualConfigAttachClientEp = checkpanic new("http://localhost:9097/s
     groups: ["manualConfigAttach"]
 }
 function testOnSubscriptionValidationWithManualConfigAttach() returns @tainted error? {
-    http:Request request = new;
-    http:Response response = check manualConfigAttachClientEp->get("/?hub.mode=denied&hub.reason=justToTest", request);
+    http:Response response = check manualConfigAttachClientEp->get("/?hub.mode=denied&hub.reason=justToTest");
     test:assertEquals(response.statusCode, 200);
 }
 
@@ -78,8 +77,7 @@ function testOnSubscriptionValidationWithManualConfigAttach() returns @tainted e
     groups: ["manualConfigAttach"]
  }
 function testOnIntentVerificationSuccessWithManualConfigAttach() returns @tainted error? {
-    http:Request request = new;
-    http:Response response = check manualConfigAttachClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234", request);
+    http:Response response = check manualConfigAttachClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234");
     test:assertEquals(response.statusCode, 200);
     test:assertEquals(response.getTextPayload(), "1234");
 }
@@ -88,8 +86,7 @@ function testOnIntentVerificationSuccessWithManualConfigAttach() returns @tainte
     groups: ["manualConfigAttach"]
 }
 function testOnIntentVerificationFailureWithManualConfigAttach() returns @tainted error? {
-    http:Request request = new;
-    http:Response response = check manualConfigAttachClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234", request);
+    http:Response response = check manualConfigAttachClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
     map<string> responseBody = decodeResponseBody(payload);

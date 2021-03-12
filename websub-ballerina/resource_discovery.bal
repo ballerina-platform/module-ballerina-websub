@@ -40,11 +40,10 @@ public client class DiscoveryService {
     # + expectedLanguageTypes - The expected language types for the subscriber client
     # + return - A `(hub, topic)` as a `(string, string)` if successful or else an `error` if not
     remote function discoverResourceUrls(string?|string[] expectedMediaTypes, string?|string[] expectedLanguageTypes) 
-                                        returns @tainted [string, string]|error {
-        http:Request request = new;
-    
+                                        returns @tainted [string, string]|error {    
+        map<string|string[]> headers = {};
         if (expectedMediaTypes is string) {
-            request.addHeader(ACCEPT_HEADER, expectedMediaTypes);
+            headers[ACCEPT_HEADER] = expectedMediaTypes;
         }
     
         if (expectedMediaTypes is string[]) {
@@ -52,11 +51,11 @@ public client class DiscoveryService {
             foreach int expectedMediaTypeIndex in 1 ... (expectedMediaTypes.length() - 1) {
                 acceptMeadiaTypesString = acceptMeadiaTypesString.concat(", ", expectedMediaTypes[expectedMediaTypeIndex]);
             }
-            request.addHeader(ACCEPT_HEADER, acceptMeadiaTypesString);
+            headers[ACCEPT_HEADER] = acceptMeadiaTypesString;
         }
     
         if (expectedLanguageTypes is string) {
-            request.addHeader(ACCEPT_LANGUAGE_HEADER, expectedLanguageTypes);
+            headers[ACCEPT_LANGUAGE_HEADER] = expectedLanguageTypes;
         }
     
         if (expectedLanguageTypes is string[]) {
@@ -64,10 +63,10 @@ public client class DiscoveryService {
             foreach int expectedLanguageTypeIndex in 1 ... (expectedLanguageTypes.length() - 1) {
                 acceptLanguageTypesString = acceptLanguageTypesString.concat(", ", expectedLanguageTypes[expectedLanguageTypeIndex]);
             }
-            request.addHeader(ACCEPT_LANGUAGE_HEADER, acceptLanguageTypesString);
+            headers[ACCEPT_LANGUAGE_HEADER] = acceptLanguageTypesString;
         }
 
-        var discoveryResponse = self.discoveryClientEp->get("", request);
+        var discoveryResponse = self.discoveryClientEp->get("", headers);
 
         if (discoveryResponse is http:Response) {
             var topicAndHubs = extractTopicAndHubUrls(discoveryResponse);
