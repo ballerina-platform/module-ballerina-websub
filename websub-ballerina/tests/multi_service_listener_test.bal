@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/log;
+import ballerina/io;
 import ballerina/test;
 import ballerina/http;
 
@@ -43,7 +44,8 @@ service /subscriberOne on multiServiceListener {
 
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
-        log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        //log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        io:println("onEventNotification invoked ", event);
         return {};
     }
 }
@@ -71,7 +73,8 @@ service /subscriberTwo on multiServiceListener {
 
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
-        log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        //log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        io:println("onEventNotification invoked ", event);
         return {};
     }
 }

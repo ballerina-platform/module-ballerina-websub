@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/log;
+import ballerina/io;
 import ballerina/http;
 import ballerina/regex;   
 import ballerina/test;
@@ -39,7 +40,8 @@ var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http
 
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
-        log:printDebug("onEventNotification invoked: ", contentDistributionNotification = event);
+        //log:printDebug("onEventNotification invoked: ", contentDistributionNotification = event);
+        io:println("onEventNotification invoked: ", event);
         return error SubscriptionDeletedError(
             "Subscriber wants to unsubscribe",
             headers = {"header1": "value"}, 

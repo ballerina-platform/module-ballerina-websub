@@ -16,6 +16,7 @@
 
 import ballerina/http;
 import ballerina/log;
+import ballerina/mime;
 
 # Porcesses the subscription / unsubscription intent verification requests from `hub`
 # 
@@ -82,21 +83,37 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
 isolated function processEventNotification(http:Caller caller, http:Request request, 
                                            http:Response response, SubscriberService subscriberService,
                                            string secretKey) {
-    var payload = request.getTextPayload();
-
     boolean isVerifiedContent = false;
-    if (payload is string) {
-        var verificationResponse = verifyContent(request, secretKey, payload);
-        
-        if (verificationResponse is boolean) {
-            isVerifiedContent = verificationResponse;
+    var payloadType = request.getContentType();
+
+    if (payloadType.includes("multipart")) {
+        var payload = request.getBodyParts();
+        if (payload is mime:Entity[]) {
+            var verificationResponse = verifyContent(request, secretKey, payload);      
+            if (verificationResponse is boolean) {
+                isVerifiedContent = verificationResponse;
+            } else {
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                return;
+            }
         } else {
             response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
             return;
         }
     } else {
-        response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-        return;
+        var payload = request.getTextPayload();
+        if (payload is string) {
+            var verificationResponse = verifyContent(request, secretKey, payload);
+            if (verificationResponse is boolean) {
+                isVerifiedContent = verificationResponse;
+            } else {
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                return;
+            }
+        } else {
+            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            return;
+        }
     }
 
     if (!isVerifiedContent) {
