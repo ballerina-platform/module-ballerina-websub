@@ -17,6 +17,7 @@
 import ballerina/log;
 import ballerina/test;
 import ballerina/http;
+import ballerina/io;
 
 service class SimpleWebsubService {
     *SubscriberService;
@@ -41,7 +42,8 @@ service class SimpleWebsubService {
 
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
-        log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        //log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        io:println("onEventNotification invoked ", event);
         return {};
     }
 }
