@@ -36,8 +36,8 @@ This package allows introducing a WebSub Subscriber Service with `onSubscription
     websub:ListenerConfiguration listenerConfigs = {
         secureSocket: {
             key: {
-                path: "<KEYSTORE_PATH>",
-                password: "<KEYSTORE_PASSWORD>"
+                certFile: "../resource/path/to/public.crt",
+                keyFile: "../resource/path/to/private.key"
             }
         }
     };
