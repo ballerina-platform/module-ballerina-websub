@@ -18,6 +18,7 @@ import ballerina/log;
 import ballerina/test;
 import ballerina/http;
 import ballerina/io;
+import ballerina/mime;
 
 listener Listener multiServiceListener = new(9096);
 
@@ -162,6 +163,46 @@ function testOnEventNotificationSuccessXmlServiceOne() returns @tainted error? {
 function testOnEventNotificationSuccessXmlServiceTwo() returns @tainted error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
+    request.setPayload(payload);
+
+    http:Response response = check clientForServiceTwo->post("/", request);
+    test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["multiServiceListener"]
+}
+function testOnEventNotificationSuccessMimeServiceOne() returns @tainted error? {
+    http:Request request = new;
+    mime:Entity jsonBodyPart = new;
+    jsonBodyPart.setContentDisposition(getContentDispositionForFormData("json part"));
+    jsonBodyPart.setJson({"name": "ballerina"});
+
+    mime:Entity textBodyPart = new;
+    textBodyPart.setContentDisposition(getContentDispositionForFormData("text part"));
+    textBodyPart.setText("Sample text");
+
+    mime:Entity[] payload = [jsonBodyPart, textBodyPart];
+    request.setPayload(payload);
+
+    http:Response response = check clientForServiceOne->post("/", request);
+    test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["multiServiceListener"]
+}
+function testOnEventNotificationSuccessMimeServiceTwo() returns @tainted error? {
+    http:Request request = new;
+    mime:Entity jsonBodyPart = new;
+    jsonBodyPart.setContentDisposition(getContentDispositionForFormData("json part"));
+    jsonBodyPart.setJson({"name": "ballerina"});
+
+    mime:Entity textBodyPart = new;
+    textBodyPart.setContentDisposition(getContentDispositionForFormData("text part"));
+    textBodyPart.setText("Sample text");
+
+    mime:Entity[] payload = [jsonBodyPart, textBodyPart];
     request.setPayload(payload);
 
     http:Response response = check clientForServiceTwo->post("/", request);
