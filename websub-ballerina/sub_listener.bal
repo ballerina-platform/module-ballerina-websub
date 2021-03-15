@@ -78,7 +78,7 @@ public class Listener {
     # + configuration - `SubscriberServiceConfiguration` which should be incorporated into the provided Service 
     # + name - The path of the Service to be hosted
     # + return - An `error`, if an error occurred during the service attaching process
-    public function initialize(SubscriberService s, SubscriberServiceConfiguration configuration, string[]|string? name = ()) returns error? {
+    public function attachWithConfig(SubscriberService s, SubscriberServiceConfiguration configuration, string[]|string? name = ()) returns error? {
         if (self.listenerConfig.secureSocket is ()) {
             log:printWarn("HTTPS is recommended but using HTTP");
         }
