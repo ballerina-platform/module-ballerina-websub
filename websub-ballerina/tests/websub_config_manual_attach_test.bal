@@ -55,7 +55,7 @@ function beforeManualConfigAttachTest() {
         target: "http://0.0.0.0:9191/common/discovery",
         leaseSeconds: 36000
     };
-    checkpanic manualConfigAttachListener.initialize(simpleSubscriberServiceInstace, config, "subscriber");
+    checkpanic manualConfigAttachListener.attachWithConfig(simpleSubscriberServiceInstace, config, "subscriber");
 }
 
 @test:AfterGroups { value:["manualConfigAttach"] }
