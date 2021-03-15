@@ -14,9 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/log;
 import ballerina/test;
 import ballerina/http;
+import ballerina/io;
 
 listener Listener serviceWithDefaultImplListener = new (9091);
 
@@ -24,7 +24,8 @@ var serviceWithDefaultImpl = @SubscriberServiceConfig { target: "http://0.0.0.0:
                               service object {
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
-        log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        //log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        io:println("onEventNotification invoked ", event);
         return {};
     }
 };

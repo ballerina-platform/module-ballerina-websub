@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/log;
+import ballerina/io;
 import ballerina/test;
 
 listener Listener optionalTargetListener = new (9094);
@@ -23,7 +23,8 @@ var optionalSubscriberTarget = @SubscriberServiceConfig { leaseSeconds: 36000, s
                               service object {
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
-        log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        //log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        io:println("onEventNotification invoked ", event);
         return {};
     }
 };

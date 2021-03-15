@@ -17,6 +17,7 @@
 import ballerina/log;
 import ballerina/test;
 import ballerina/http;
+import ballerina/io;
 
 listener Listener basicSubscriberListener = new (9090);
 
@@ -43,7 +44,8 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
 
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
-        log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        //log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        io:println("onEventNotification invoked ", event);
         return {};
     }
 };
@@ -107,6 +109,26 @@ function testOnEventNotificationSuccess() returns @tainted error? {
 function testOnEventNotificationSuccessXml() returns @tainted error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
+    request.setPayload(payload);
+
+    http:Response response = check httpClient->post("/", request);
+    test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["simple-subscriber"]
+}
+function testOnEventNotificationSuccessMime() returns @tainted error? {
+    http:Request request = new;
+    mime:Entity jsonBodyPart = new;
+    jsonBodyPart.setContentDisposition(getContentDispositionForFormData("json part"));
+    jsonBodyPart.setJson({"name": "wso2"});
+
+    mime:Entity textBodyPart = new;
+    textBodyPart.setContentDisposition(getContentDispositionForFormData("text part"));
+    textBodyPart.setText("Sample text");
+
+    mime:Entity[] payload = [jsonBodyPart, textBodyPart];
     request.setPayload(payload);
 
     http:Response response = check httpClient->post("/", request);
