@@ -131,7 +131,7 @@ function testOnEventNotificationSuccessMime() returns @tainted error? {
     http:Request request = new;
     mime:Entity jsonBodyPart = new;
     jsonBodyPart.setContentDisposition(getContentDispositionForFormData("json part"));
-    jsonBodyPart.setJson({"name": "ballerina"});
+    jsonBodyPart.setJson({"name": "wso2"});
 
     mime:Entity textBodyPart = new;
     textBodyPart.setContentDisposition(getContentDispositionForFormData("text part"));
