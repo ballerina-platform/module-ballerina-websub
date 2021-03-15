@@ -17,6 +17,7 @@
 import ballerina/log;
 import ballerina/test;
 import ballerina/http;
+import ballerina/io;
 
 listener Listener basicSubscriberListener = new (9090);
 
@@ -43,7 +44,8 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
 
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
-        log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        //log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        io:println("onEventNotification invoked ", event);
         return {};
     }
 };

@@ -17,6 +17,7 @@
 import ballerina/log;
 import ballerina/test;
 import ballerina/http;
+import ballerina/io;
 
 ListenerConfiguration listenerConfigs = {
     secureSocket: {
@@ -52,7 +53,8 @@ service /subscriber on sslEnabledListener {
 
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
-        log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        //log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        io:println("onEventNotification invoked ", event);
         return {};
     }
 }
