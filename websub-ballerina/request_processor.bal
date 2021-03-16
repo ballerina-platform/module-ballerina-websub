@@ -84,12 +84,12 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
                                            http:Response response, SubscriberService subscriberService,
                                            string secretKey) {
     boolean isVerifiedContent = false;
-    var payloadType = request.getContentType();
+    string payloadType = request.getContentType();
 
     if (payloadType.includes("multipart")) {
         var payload = request.getBodyParts();
         if (payload is mime:Entity[]) {
-            var verificationResponse = verifyContent(request, secretKey, payload);      
+            var verificationResponse = verifyContent(request, secretKey, payload);  
             if (verificationResponse is boolean) {
                 isVerifiedContent = verificationResponse;
             } else {
@@ -115,7 +115,7 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
             return;
         }
     }
-
+    
     if (!isVerifiedContent) {
         return;
     }
