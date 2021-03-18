@@ -9,6 +9,6 @@ import io.ballerina.projects.plugins.CompilerPluginContext;
 public class WebSubCompilerPlugin extends CompilerPlugin {
     @Override
     public void init(CompilerPluginContext context) {
-        context.addCodeAnalyzer(new WebSubSyntaxAnalyzer());
+        context.addCodeAnalyzer(new WebSubCodeAnalyzer());
     }
 }
