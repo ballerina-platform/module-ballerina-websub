@@ -1,8 +1,0 @@
-codecov:
-  require_ci_to_pass: no
-
-fixes:
-  - "ballerina/websub/*/::websub-ballerina/"
-
-ignore:
-  - "**/tests"
