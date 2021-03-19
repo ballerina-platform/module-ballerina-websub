@@ -13,7 +13,7 @@ plugins {
 
 rootProject.name = 'websub'
 include(':build-config:checkstyle')
-include ':websub-native', ':websub-ballerina', ':websub-compiler-plugin'
+include ':websub-native', ':websub-ballerina', ':websub-compiler-plugin', ':websub-compiler-plugin-test'
 
 gradleEnterprise {
     buildScan {

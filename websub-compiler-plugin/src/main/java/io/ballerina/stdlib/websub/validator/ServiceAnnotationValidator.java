@@ -1,5 +1,7 @@
 package io.ballerina.stdlib.websub.validator;
 
+import io.ballerina.compiler.syntax.tree.ExpressionNode;
+import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
@@ -15,10 +17,22 @@ public class ServiceAnnotationValidator implements AnalysisTask<SyntaxNodeAnalys
     @Override
     public void perform(SyntaxNodeAnalysisContext context) {
         ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) context.node();
-        DiagnosticInfo info = new DiagnosticInfo(
-                "WEBSUB_101", "Service declaration found", DiagnosticSeverity.WARNING);
-        Diagnostic diagnostic = DiagnosticFactory.createDiagnostic(info, serviceDeclarationNode.location());
-        context.reportDiagnostic(diagnostic);
+        SeparatedNodeList<ExpressionNode> attachedExpressions = serviceDeclarationNode.expressions();
+        attachedExpressions.forEach(e -> {
+            String syntaxType = e.kind().stringValue();
+            String msg = String.format("Found [%s] type expression on service declaration", syntaxType);
+            DiagnosticInfo info = new DiagnosticInfo(
+                    "WEBSUB_101", msg, DiagnosticSeverity.WARNING);
+            Diagnostic diagnostic = DiagnosticFactory.createDiagnostic(info, serviceDeclarationNode.location());
+            context.reportDiagnostic(diagnostic);
+        });
+
+//        DiagnosticInfo info = new DiagnosticInfo(
+//                "WEBSUB_101", "Service declaration found", DiagnosticSeverity.WARNING);
+//        Diagnostic diagnostic = DiagnosticFactory.createDiagnostic(info, serviceDeclarationNode.location());
+//        context.reportDiagnostic(diagnostic);
+
+
 //        ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) context.node();
 //        NonTerminalNode parentNode = serviceDeclarationNode.parent();
 //        if (Objects.isNull(parentNode) || !(parentNode instanceof AnnotationNode)) {
