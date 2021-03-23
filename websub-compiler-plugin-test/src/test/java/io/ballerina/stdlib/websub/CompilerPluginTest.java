@@ -26,7 +26,6 @@ import io.ballerina.projects.directory.BuildProject;
 import io.ballerina.projects.environment.Environment;
 import io.ballerina.projects.environment.EnvironmentBuilder;
 import io.ballerina.tools.diagnostics.DiagnosticInfo;
-import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 import java.io.PrintStream;
@@ -51,13 +50,16 @@ public class CompilerPluginTest {
         PackageCompilation compilation = currentPackage.getCompilation();
 
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        System.out.println("Found diagnostic-results ");
         diagnosticResult.diagnostics().forEach(d -> {
             DiagnosticInfo info = d.diagnosticInfo();
             String msg = String.format(
                     "Received Diagnostic [%s] with description [%s]",
                     info.code(), info.messageFormat());
-            Reporter.log(msg, 1, true);
+                    System.out.println(msg);
         });
+
+         System.out.println("Test case completed");
 //        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
 //        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
 //        Assert.assertEquals(diagnostic.diagnosticInfo().code(), "WEBSUB_101");
