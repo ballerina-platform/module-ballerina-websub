@@ -1,6 +1,5 @@
 package io.ballerina.stdlib.websub.validator;
 
-import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 
@@ -10,6 +9,6 @@ import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 public class ServiceAnnotationValidator implements AnalysisTask<SyntaxNodeAnalysisContext> {
     @Override
     public void perform(SyntaxNodeAnalysisContext context) {
-        ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) context.node();
+
     }
 }
