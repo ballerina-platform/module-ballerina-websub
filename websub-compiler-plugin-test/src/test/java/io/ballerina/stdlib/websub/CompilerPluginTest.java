@@ -54,7 +54,7 @@ public class CompilerPluginTest {
         diagnosticResult.diagnostics().forEach(d -> {
             DiagnosticInfo info = d.diagnosticInfo();
             String msg = String.format(
-                    "Received Diagnostic [%s] with description [%s]",
+                    "[SERVICE_DECL_WITH_NEW] Received Diagnostic [%s] with description [%s]",
                     info.code(), info.messageFormat());
                     System.out.println(msg);
         });
@@ -63,6 +63,24 @@ public class CompilerPluginTest {
 //        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
 //        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
 //        Assert.assertEquals(diagnostic.diagnosticInfo().code(), "WEBSUB_101");
+    }
+
+    @Test
+    public void testCompilerPluginForNamedListener() {
+        Package currentPackage = loadPackage("sample_2");
+        PackageCompilation compilation = currentPackage.getCompilation();
+
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        System.out.println("Found diagnostic-results ");
+        diagnosticResult.diagnostics().forEach(d -> {
+            DiagnosticInfo info = d.diagnosticInfo();
+            String msg = String.format(
+                    "[SERVICE_DECL_WITH_LISTENER] Received Diagnostic [%s] with description [%s]",
+                    info.code(), info.messageFormat());
+            System.out.println(msg);
+        });
+
+        System.out.println("Test case completed");
     }
 
     private Package loadPackage(String path) {
