@@ -19,47 +19,26 @@ import ballerina/regex;
 import ballerina/crypto;
 import ballerina/log;
 import ballerina/lang.'string as strings;
+import ballerina/random;
 
-# Retrieves the `websub:SubscriberServiceConfig` annotation values
+# Generates a random-string of given length
 # 
-# + return - {@code websub:SubscriberServiceConfiguration} if present or `nil` if absent
-isolated function retrieveSubscriberServiceAnnotations(SubscriberService serviceType) returns SubscriberServiceConfiguration? {
-    typedesc<any> serviceTypedesc = typeof serviceType;
-    return serviceTypedesc.@SubscriberServiceConfig;
-}
-
-# Dynamically generates the call-back URL for subscriber-service
-# 
-# + servicePath - service path on which the service will be hosted
-# + config - {@code http:ListenerConfiguration} in use
-# + return - {@code string} contaning the generated URL
-isolated function retriveCallbackUrl(string[]|string servicePath, 
-                                     int port, http:ListenerConfiguration config) returns string {
-    string host = config.host;
-    string protocol = config.secureSocket is () ? "http" : "https";        
-    string concatenatedServicePath = "";
-        
-    if (servicePath is string) {
-        concatenatedServicePath += "/" + <string>servicePath;
-    } else {
-        foreach var pathSegment in <string[]>servicePath {
-            concatenatedServicePath += "/" + pathSegment;
+# + length - required length of the generated string
+# + return - generated random string value or `error` if any error occurred in the execution
+isolated function generateRandomString(int length) returns string | error {
+    int[] codePoints = [];
+    int leftLimit = 48; // numeral '0'
+    int rightLimit = 122; // letter 'z'
+    int iterator = 0;
+    while (iterator < length) {
+        int randomInt = check random:createIntInRange(leftLimit, rightLimit);
+        // character literals from 48 - 57 are numbers | 65 - 90 are capital letters | 97 - 122 are simple letters
+        if (randomInt <= 57 || randomInt >= 65) && (randomInt <= 90 || randomInt >= 97) {
+            codePoints.push(randomInt);
+            iterator += 1;
         }
     }
-
-    return protocol + "://" + host + ":" + port.toString() + concatenatedServicePath;
-}
-
-# Generates a unique URL segment for the subscriber service
-# 
-# + return - {@code string} containing the generated unique URL path segment
-isolated function generateUniqueUrlSegment() returns string {
-    var generatedString = generateRandomString(10);
-    if (generatedString is string) {
-        return generatedString;
-    } else {
-        return COMMON_SERVICE_PATH;
-    }
+    return strings:fromCodePointInts(codePoints);
 }
 
 # Generate the `websub:SubscriptionChangeRequest` from the configurations.

@@ -79,27 +79,18 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
 # + response - {@code http:Response} to be returned to the caller
 # + subscriberService - service to be invoked via native method
 # + secretKey - pre-shared client-secret value
+# + return - {@code error} is there is an execution exception or else {@code nil}
 isolated function processEventNotification(http:Caller caller, http:Request request, 
                                            http:Response response, SubscriberService subscriberService,
-                                           string secretKey) {
+                                           string secretKey) returns error? {
     var payload = request.getTextPayload();
-
-    boolean isVerifiedContent = false;
     if (payload is string) {
-        var verificationResponse = verifyContent(request, secretKey, payload);
-        
-        if (verificationResponse is boolean) {
-            isVerifiedContent = verificationResponse;
-        } else {
-            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+        boolean isVerifiedContent = check verifyContent(request, secretKey, payload);
+        if (!isVerifiedContent) {
             return;
         }
     } else {
         response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-        return;
-    }
-
-    if (!isVerifiedContent) {
         return;
     }
                                                
@@ -112,28 +103,28 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
             message = {
                 headers: headers,
                 contentType: "application/json",
-                content: checkpanic request.getJsonPayload()
+                content: check request.getJsonPayload()
             };
         }
         "application/xml" => {
             message = {
                 headers: headers,
                 contentType: "application/xml",
-                content: checkpanic request.getXmlPayload()
+                content: check request.getXmlPayload()
             };  
         }
         "text/plain" => {
             message = {
                 headers: headers,
                 contentType: "text/plain",
-                content: checkpanic request.getTextPayload()
+                content: check request.getTextPayload()
             };              
         }
         "application/octet-stream" => {
             message = {
                 headers: headers,
                 contentType: "application/octet-stream",
-                content: checkpanic request.getBinaryPayload()
+                content: check request.getBinaryPayload()
             };  
         }
         _ => {
@@ -145,7 +136,7 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
         response.statusCode = http:STATUS_BAD_REQUEST;
         return;
     } else {
-        Acknowledgement | SubscriptionDeletedError? result = callOnEventNotificationMethod(subscriberService, message);
+        Acknowledgement|SubscriptionDeletedError? result = callOnEventNotificationMethod(subscriberService, message);
         if (result is Acknowledgement) {
             updateResponseBody(response, result["body"], result["headers"]);
         } else if (result is SubscriptionDeletedError) {

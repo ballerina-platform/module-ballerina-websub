@@ -63,10 +63,12 @@ service class HttpService {
     isolated resource function post .(http:Caller caller, http:Request request) {
         http:Response response = new;
         response.statusCode = http:STATUS_ACCEPTED;
-
         if (self.isEventNotificationAvailable) {
             string secretKey = self.secretKey is () ? "" : <string>self.secretKey;
-            processEventNotification(caller, request, response, self.subscriberService, secretKey);
+            var result = processEventNotification(caller, request, response, self.subscriberService, secretKey);
+            if (result is error) {
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            }
         } else {
             response.statusCode = http:STATUS_NOT_IMPLEMENTED;
         }

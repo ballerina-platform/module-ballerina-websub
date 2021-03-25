@@ -22,7 +22,7 @@ listener Listener basicSubscriberListener = new (9090);
 
 var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000 } 
                               service object {
-    remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
+    remote isolated function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         log:printDebug("onSubscriptionValidationDenied invoked");
         Acknowledgement ack = {
                   headers: {"header1": "value"},
@@ -31,8 +31,8 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
         return ack;
     }
 
-    remote function onSubscriptionVerification(SubscriptionVerification msg)
-                        returns SubscriptionVerificationSuccess | SubscriptionVerificationError {
+    remote isolated function onSubscriptionVerification(SubscriptionVerification msg)
+                        returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
         log:printDebug("onSubscriptionVerification invoked");
         if (msg.hubTopic == "test1") {
             return error SubscriptionVerificationError("Hub topic not supported");
@@ -41,8 +41,8 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
         }
       }
 
-    remote function onEventNotification(ContentDistributionMessage event) 
-                        returns Acknowledgement | SubscriptionDeletedError? {
+    remote isolated function onEventNotification(ContentDistributionMessage event) 
+                        returns Acknowledgement|SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
         return {};
     }
