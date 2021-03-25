@@ -30,7 +30,7 @@ public client class SubscriptionClient {
     #
     # + url    - The URL at which the subscription should be changed
     # + config - The `http:ClientConfiguration` for the underlying client or `()`
-    public function init(string url, http:ClientConfiguration? config = ()) returns error? {
+    public isolated function init(string url, http:ClientConfiguration? config = ()) returns error? {
         self.url = url;
         self.httpClient = check new (self.url, config);
         self.followRedirects = config?.followRedirects;

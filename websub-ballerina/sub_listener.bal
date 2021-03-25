@@ -52,19 +52,18 @@ public class Listener {
     # + s - The `websub:SubscriberService` object to attach
     # + name - The path of the Service to be hosted
     # + return - An `error`, if an error occurred during the service attaching process
-    public function attach(SubscriberService s, string[]|string? name = ()) returns error? {
+    public isolated function attach(SubscriberService s, string[]|string? name = ()) returns error? {
         if (self.listenerConfig.secureSocket is ()) {
             log:printWarn("HTTPS is recommended but using HTTP");
         }
 
         var configuration = retrieveSubscriberServiceAnnotations(s);
-        
         if (configuration is SubscriberServiceConfiguration) {
             self.serviceConfig = configuration;
             string[]|string servicePath = retrieveServicePath(name);
-            string callbackUrl = retriveCallbackUrl(servicePath, self.port, self.listenerConfig);
-            self.callbackUrl = callbackUrl;
-            logGeneratedCallbackUrl(name, callbackUrl);
+            string generatedCallbackUrl = generateCallbackUrl(servicePath, self.port, self.listenerConfig);
+            self.callbackUrl = configuration?.callback ?: generatedCallbackUrl;
+            logGeneratedCallbackUrl(name, generatedCallbackUrl);
             self.httpService = check new(s, configuration?.secret);
             check self.httpListener.attach(<HttpService> self.httpService, servicePath);
         } else {
@@ -78,16 +77,16 @@ public class Listener {
     # + configuration - `SubscriberServiceConfiguration` which should be incorporated into the provided Service 
     # + name - The path of the Service to be hosted
     # + return - An `error`, if an error occurred during the service attaching process
-    public function attachWithConfig(SubscriberService s, SubscriberServiceConfiguration configuration, string[]|string? name = ()) returns error? {
+    public isolated function attachWithConfig(SubscriberService s, SubscriberServiceConfiguration configuration, string[]|string? name = ()) returns error? {
         if (self.listenerConfig.secureSocket is ()) {
             log:printWarn("HTTPS is recommended but using HTTP");
         }
         
         self.serviceConfig = configuration;
         string[]|string servicePath = retrieveServicePath(name);
-        string callbackUrl = retriveCallbackUrl(servicePath, self.port, self.listenerConfig);
-        self.callbackUrl = callbackUrl;
-        logGeneratedCallbackUrl(name, callbackUrl);    
+        string generatedCallbackUrl = generateCallbackUrl(servicePath, self.port, self.listenerConfig);
+        self.callbackUrl = configuration?.callback ?: generatedCallbackUrl;
+        logGeneratedCallbackUrl(name, generatedCallbackUrl);    
         self.httpService = check new(s, configuration?.secret);
         check self.httpListener.attach(<HttpService> self.httpService, servicePath);        
             
@@ -176,7 +175,7 @@ isolated function generateUniqueUrlSegment() returns string {
 # + servicePath - service path on which the service will be hosted
 # + config - {@code http:ListenerConfiguration} in use
 # + return - {@code string} contaning the generated URL
-isolated function retriveCallbackUrl(string[]|string servicePath, 
+isolated function generateCallbackUrl(string[]|string servicePath, 
                                      int port, http:ListenerConfiguration config) returns string {
     string host = config.host;
     string protocol = config.secureSocket is () ? "http" : "https";        
@@ -240,11 +239,10 @@ function initiateSubscription(SubscriberServiceConfiguration serviceConfig, stri
 
     http:ClientConfiguration? subscriptionClientConfig = serviceConfig?.httpConfig ?: ();
     SubscriptionClient subscriberClientEp = check new (hubUrl, subscriptionClientConfig);
-    string callback = serviceConfig?.callback ?: callbackUrl;
-    var request = retrieveSubscriptionRequest(topicUrl, callback, serviceConfig);
+    SubscriptionChangeRequest request = retrieveSubscriptionRequest(topicUrl, callbackUrl, serviceConfig);
     var response = subscriberClientEp->subscribe(request);
     if (response is SubscriptionChangeResponse) {
-        string subscriptionSuccessMsg = string`Subscription Request successfully sent to Hub[${response.hub}], for Topic[${response.topic}], with Callback [${callback}]`;
+        string subscriptionSuccessMsg = string`Subscription Request successfully sent to Hub[${response.hub}], for Topic[${response.topic}], with Callback [${callbackUrl}]`;
         log:printInfo(string`${subscriptionSuccessMsg}. Awaiting intent verification.`);
     } else {
         return response;
