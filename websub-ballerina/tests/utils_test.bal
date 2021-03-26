@@ -120,6 +120,51 @@ isolated function testServicePathRetrievalForEmptyServicePath() returns @tainted
 }
 
 @test:Config { 
+    groups: ["completeServicePathRetrieval"]
+}
+isolated function testCompleteServicePathRetrievalWithString() returns @tainted error? {
+    string expectedServicePath = "/subscriber";
+    string generatedServicePath = retrieveCompleteServicePath("subscriber");
+    test:assertEquals(generatedServicePath, expectedServicePath, "Generated service-path does not matched expected service-path"); 
+}
+
+@test:Config { 
+    groups: ["completeServicePathRetrieval"]
+}
+isolated function testCompleteServicePathRetrievalWithStringArray() returns @tainted error? {
+    string expectedServicePath = "/subscriber/foo/bar";
+    string generatedServicePath = retrieveCompleteServicePath(["subscriber", "foo", "bar"]);
+    test:assertEquals(generatedServicePath, expectedServicePath, "Generated service-path does not matched expected service-path"); 
+}
+
+@test:Config { 
+    groups: ["retrieveCallbackUrl"]
+}
+isolated function testCallbackUrlRetrievalWithNoCallback() returns @tainted error? {
+    string expectedCallbackUrl = "http://0.0.0.0:9090/subscriber";
+    string retrievedCallbackUrl = retrieveCallbackUrl((), false, "subscriber", 9090, {});
+    test:assertEquals(retrievedCallbackUrl, expectedCallbackUrl, "Retrieved callback url does not match expected callback url");
+}
+
+@test:Config { 
+    groups: ["retrieveCallbackUrl"]
+}
+isolated function testCallbackUrlRetrievalWithCallbackAppendingDisabled() returns @tainted error? {
+    string expectedCallbackUrl = "http://0.0.0.0:9090/subscriber";
+    string retrievedCallbackUrl = retrieveCallbackUrl("http://0.0.0.0:9090/subscriber", false, "subscriber", 9090, {});
+    test:assertEquals(retrievedCallbackUrl, expectedCallbackUrl, "Retrieved callback url does not match expected callback url");
+}
+
+@test:Config { 
+    groups: ["retrieveCallbackUrl"]
+}
+isolated function testCallbackUrlRetrievalWithCallbackAppendingEnabled() returns @tainted error? {
+    string expectedCallbackUrl = "http://0.0.0.0:9090/subscriber/foo";
+    string retrievedCallbackUrl = retrieveCallbackUrl("http://0.0.0.0:9090", true, ["subscriber", "foo"], 9090, {});
+    test:assertEquals(retrievedCallbackUrl, expectedCallbackUrl, "Retrieved callback url does not match expected callback url");
+}
+
+@test:Config { 
     groups: ["callbackUrlGeneration"]
 }
 isolated function testCallbackUrlGenerationHttpsWithNoHostConfig() returns @tainted error? {
@@ -186,4 +231,28 @@ isolated function testCallbackUrlForArrayTypeServicePath() returns @tainted erro
     string expectedCallbackUrl = "http://192.168.1.1:9090/subscriber/foo/bar";
     string generatedCallbackUrl = generateCallbackUrl(["subscriber", "foo", "bar"], 9090, config);
     test:assertEquals(generatedCallbackUrl, expectedCallbackUrl, "Generated callback url does not match expected callback url");   
+}
+
+@test:Config { 
+    groups: ["logCallbackUrl"]
+}
+isolated function testCallbackUrlLoggingSuccess() returns @tainted error? {
+    boolean isLoggingEnabled = isLoggingGeneratedCallback((), ());
+    test:assertTrue(isLoggingEnabled, "Callback URL logging is disabled for valid scenario");
+}
+
+@test:Config { 
+    groups: ["logCallbackUrl"]
+}
+isolated function testCallbackUrlLoggingFailure() returns @tainted error? {
+    boolean isLoggingEnabled = isLoggingGeneratedCallback("https://test.com/callback", ());
+    test:assertFalse(isLoggingEnabled, "Callback URL logging is enabled for invalid scenario");
+}
+
+@test:Config { 
+    groups: ["logCallbackUrl"]
+}
+isolated function testCallbackUrlLoggingFailureForServicePathProvided() returns @tainted error? {
+    boolean isLoggingEnabled = isLoggingGeneratedCallback((), "subscriber");
+    test:assertFalse(isLoggingEnabled, "Callback URL logging is enabled for invalid scenario");
 }
