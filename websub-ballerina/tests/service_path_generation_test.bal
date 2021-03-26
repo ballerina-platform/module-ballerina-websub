@@ -36,10 +36,10 @@ function afterPathGenerationTest() {
 @test:Config { 
     groups: ["service-path-generation"]
 }
-function testServicePathGeneration() returns @tainted error? {
+function testServicePathGeneration() {
     do {
-        var attached = pathGenerationListener.attach(serviceWithPathGeneration);
+        check pathGenerationListener.attach(serviceWithPathGeneration);
     } on fail error e {
-        test:assertFail("Could not start the subscriber-service with service-path generation : " + e.message());
+        test:assertFail(string`Could not start the subscriber-service with service-path generation : ${e.message()}`);
     }
 }

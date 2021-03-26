@@ -229,8 +229,9 @@ isolated function updateResponseBody(http:Response response, anydata? messageBod
 # 
 # + caller - {@code http:Caller} which intiate the request
 # + response - {@code http:Response} to be sent to the caller
-isolated function respondToRequest(http:Caller caller, http:Response response) {
-    var responseError = caller->respond(response);
+# + return - {@code error} if there is an error in the execution or else nil
+isolated function respondToRequest(http:Caller caller, http:Response response) returns error? {
+    check caller->respond(response);
 }
 
 # Checks whether response is successfull 

@@ -36,11 +36,11 @@ function afterOptionalTargetUrlTest() {
 @test:Config { 
     groups: ["optional-subscriber-target"]
 }
-function testOptionalTargetUrl() returns @tainted error? {
+function testOptionalTargetUrl() {
     do {
-        var attached = optionalTargetListener.attach(optionalSubscriberTarget);
-        var result = optionalTargetListener.'start();
+        check optionalTargetListener.attach(optionalSubscriberTarget);
+        check optionalTargetListener.'start();
     } on fail error e {
-        test:assertFail("Could not start the subscriber-service without subscriber-target-url : " + e.message());
+        test:assertFail(string`Could not start the subscriber-service without subscriber-target-url : ${e.message()}`);
     }
 }
