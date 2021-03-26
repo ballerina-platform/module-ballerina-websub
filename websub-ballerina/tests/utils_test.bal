@@ -66,7 +66,7 @@ isolated function testContentHashError() returns @tainted error? {
 
 var validSubscriberServiceDeclaration = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000 } 
                               service object {
-    remote function onEventNotification(ContentDistributionMessage event) 
+    isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
         return ACKNOWLEDGEMENT;
     }
@@ -81,7 +81,7 @@ function testSubscriberServiceAnnotationRetrievalSuccess() returns @tainted erro
 }
 
 var invalidSubscriberServiceDeclaration = service object {
-    remote function onEventNotification(ContentDistributionMessage event) 
+    isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
         return ACKNOWLEDGEMENT;
     }

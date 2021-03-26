@@ -104,12 +104,7 @@ service class HttpService {
                     processSubscriptionDenial(caller, response, <@untainted> params, self.subscriberService);
                 } else {
                     response.statusCode = http:STATUS_OK;
-                    Acknowledgement result = {
-                        body: {
-                            "message": "Subscription Denial Acknowledged"
-                        }
-                    };
-                    updateResponseBody(response, result["body"], result["headers"]);
+                    updateResponseBody(response, ACKNOWLEDGEMENT["body"], ACKNOWLEDGEMENT["headers"]);
                 }
             }
             _ => {

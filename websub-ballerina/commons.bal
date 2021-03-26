@@ -161,7 +161,7 @@ type RequestQueryParams record {|
 |};
 
 # Common Responses to be used in subscriber-service implementation
-public final Acknowledgement ACKNOWLEDGEMENT = {};
-public final SubscriptionVerificationSuccess SUBSCRIPTION_VERIFICATION_SUCCESS = {};
+public final readonly & Acknowledgement ACKNOWLEDGEMENT = {};
+public final readonly & SubscriptionVerificationSuccess SUBSCRIPTION_VERIFICATION_SUCCESS = {};
 public final SubscriptionVerificationError SUBSCRIPTION_VERIFICATION_ERROR = error SubscriptionVerificationError("Subscription verification failed");
 public final SubscriptionDeletedError SUBSCRIPTION_DELETED_ERROR = error SubscriptionDeletedError("Subscription deleted");

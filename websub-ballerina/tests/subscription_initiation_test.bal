@@ -48,7 +48,7 @@ isolated function getServiceConfig(string|[string, string] target) returns Subsc
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-function testSubscriptionInitiationSuccessWithDiscoveryUrl() returns @tainted error? {
+isolated function testSubscriptionInitiationSuccessWithDiscoveryUrl() returns @tainted error? {
     SubscriberServiceConfiguration config = getServiceConfig(DISCOVERY_SUCCESS_URL);
     check initiateSubscription(config, CALLBACK);
 }
@@ -56,7 +56,7 @@ function testSubscriptionInitiationSuccessWithDiscoveryUrl() returns @tainted er
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-function testSubscriptionInitiationSuccessWithHubAndTopic() returns @tainted error? {
+isolated function testSubscriptionInitiationSuccessWithHubAndTopic() returns @tainted error? {
     SubscriberServiceConfiguration config = getServiceConfig([ HUB_SUCCESS_URL, COMMON_TOPIC ]);
     check initiateSubscription(config, CALLBACK);
 }
@@ -64,7 +64,7 @@ function testSubscriptionInitiationSuccessWithHubAndTopic() returns @tainted err
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @tainted error? {
+isolated function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @tainted error? {
     SubscriberServiceConfiguration config = getServiceConfig(DISCOVERY_FAILURE_URL);
     var response = initiateSubscription(config, CALLBACK);
     test:assertTrue(response is ResourceDiscoveryFailedError);
@@ -73,7 +73,7 @@ function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @tainted er
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-function testSubscriptionInitiationFailureWithHubAndTopic() returns @tainted error? {
+isolated function testSubscriptionInitiationFailureWithHubAndTopic() returns @tainted error? {
     SubscriberServiceConfiguration config = getServiceConfig([ HUB_FAILURE_URL, COMMON_TOPIC ]);
     var response = initiateSubscription(config, CALLBACK);
     test:assertTrue(response is SubscriptionInitiationFailedError);

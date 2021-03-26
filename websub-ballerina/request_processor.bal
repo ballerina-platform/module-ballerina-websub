@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/http;
+import ballerina/mime;
 import ballerina/log;
 
 # Porcesses the subscription / unsubscription intent verification requests from `hub`
@@ -33,9 +34,7 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
     };
 
     SubscriptionVerificationSuccess|SubscriptionVerificationError result = callOnSubscriptionVerificationMethod(subscriberService, message);
-
     if (result is SubscriptionVerificationError) {
-        result = <SubscriptionVerificationError>result;
         response.statusCode = http:STATUS_NOT_FOUND;
         var errorDetails = result.detail();
         updateResponseBody(response, errorDetails["body"], errorDetails["headers"], result.message());
@@ -55,19 +54,10 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
                                             RequestQueryParams params, SubscriberService subscriberService) {
     var reason = params.hubReason is () ? "" : <string>params.hubReason;
     SubscriptionDeniedError subscriptionDeniedMessage = error SubscriptionDeniedError(reason);
-
-    var result = callOnSubscriptionDeniedMethod(subscriberService, subscriptionDeniedMessage);
-    
+    Acknowledgement? result = callOnSubscriptionDeniedMethod(subscriberService, subscriptionDeniedMessage);
     if (result is ()) {
-        result = <Acknowledgement>{
-            body: {
-                "message": "Subscription Denial Acknowledged"
-            }
-        };
-    } else {
-        result = <Acknowledgement>result;
+        result = ACKNOWLEDGEMENT;
     }
-
     response.statusCode = http:STATUS_OK;
     updateResponseBody(response, result["body"], result["headers"]);
 }
@@ -83,14 +73,9 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
 isolated function processEventNotification(http:Caller caller, http:Request request, 
                                            http:Response response, SubscriberService subscriberService,
                                            string secretKey) returns error? {
-    var payload = request.getTextPayload();
-    if (payload is string) {
-        boolean isVerifiedContent = check verifyContent(request, secretKey, payload);
-        if (!isVerifiedContent) {
-            return;
-        }
-    } else {
-        response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+    string payload = check request.getTextPayload();
+    boolean isVerifiedContent = check verifyContent(request, secretKey, payload);
+    if (!isVerifiedContent) {
         return;
     }
                                                
@@ -99,34 +84,35 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
     ContentDistributionMessage? message = ();
 
     match contentType {
-        "application/json" => {
+        mime:APPLICATION_JSON => {
             message = {
                 headers: headers,
-                contentType: "application/json",
+                contentType: contentType,
                 content: check request.getJsonPayload()
             };
         }
-        "application/xml" => {
+        mime:APPLICATION_XML => {
             message = {
                 headers: headers,
-                contentType: "application/xml",
+                contentType: contentType,
                 content: check request.getXmlPayload()
             };  
         }
-        "text/plain" => {
+        mime:TEXT_PLAIN => {
             message = {
                 headers: headers,
-                contentType: "text/plain",
+                contentType: contentType,
                 content: check request.getTextPayload()
             };              
         }
-        "application/octet-stream" => {
+        mime:APPLICATION_OCTET_STREAM => {
             message = {
                 headers: headers,
-                contentType: "application/octet-stream",
+                contentType: contentType,
                 content: check request.getBinaryPayload()
             };  
         }
+        // todo include form-url-encoded
         _ => {
             log:printError(string`Unrecognized content-type [${contentType}] found`);
         }
