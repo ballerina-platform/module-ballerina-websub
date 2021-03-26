@@ -21,7 +21,7 @@ listener Listener pathGenerationListener = new (9092);
 
 var serviceWithPathGeneration = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, secret: "Kslk30SNF2AChs2" } 
                               service object {
-    remote function onEventNotification(ContentDistributionMessage event) 
+    isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
         return {};

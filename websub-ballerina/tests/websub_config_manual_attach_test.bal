@@ -20,7 +20,7 @@ import ballerina/http;
 
 service class SimpleWebsubService {
     *SubscriberService;
-    remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
+    remote isolated function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         log:printDebug("onSubscriptionValidationDenied invoked");
         Acknowledgement ack = {
                   headers: {"header1": "value"},
@@ -29,7 +29,7 @@ service class SimpleWebsubService {
         return ack;
     }
 
-    remote function onSubscriptionVerification(SubscriptionVerification msg)
+    remote isolated function onSubscriptionVerification(SubscriptionVerification msg)
                         returns SubscriptionVerificationSuccess | SubscriptionVerificationError {
         log:printDebug("onSubscriptionVerification invoked");
         if (msg.hubTopic == "test1") {
@@ -39,7 +39,7 @@ service class SimpleWebsubService {
         }
       }
 
-    remote function onEventNotification(ContentDistributionMessage event) 
+    remote isolated function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
         return {};

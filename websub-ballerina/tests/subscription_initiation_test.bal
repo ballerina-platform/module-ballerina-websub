@@ -25,19 +25,19 @@ const string HUB_FAILURE_URL = "http://127.0.0.1:9192/common/failed";
 const string COMMON_TOPIC = "https://sample.topic.com";
 
 service /common on new http:Listener(9192) {
-    resource function get discovery(http:Caller caller, http:Request request) {
+    isolated resource function get discovery(http:Caller caller, http:Request request) {
         http:Response response = new;
         response.addHeader("Link", "<http://127.0.0.1:9192/common/hub>; rel=\"hub\"");
         response.addHeader("Link", "<https://sample.topic.com>; rel=\"self\"");
         var resp = caller->respond(response);
     }
 
-    resource function post hub(http:Caller caller, http:Request request) {
+    isolated resource function post hub(http:Caller caller, http:Request request) {
         var resp = caller->respond();
     }
 }
 
-function getServiceConfig(string|[string, string] target) returns SubscriberServiceConfiguration {
+isolated function getServiceConfig(string|[string, string] target) returns SubscriberServiceConfiguration {
     return {
         target: target,
         leaseSeconds: 36000,

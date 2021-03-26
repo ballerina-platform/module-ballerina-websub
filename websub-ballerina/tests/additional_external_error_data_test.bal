@@ -23,7 +23,7 @@ listener Listener additionalErrorDetailsListener = new (9093);
 
 var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000 } 
                               service object {
-    remote function onSubscriptionVerification(SubscriptionVerification msg)
+    remote isolated function onSubscriptionVerification(SubscriptionVerification msg)
                         returns SubscriptionVerificationSuccess | SubscriptionVerificationError {
         log:printDebug("onSubscriptionVerification invoked ", verificationMessage = msg);
         if (msg.hubTopic == "test1") {
@@ -37,7 +37,7 @@ var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http
         }
       }
 
-    remote function onEventNotification(ContentDistributionMessage event) 
+    remote isolated function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked: ", contentDistributionNotification = event);
         return error SubscriptionDeletedError(

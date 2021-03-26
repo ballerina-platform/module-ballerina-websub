@@ -22,7 +22,7 @@ listener Listener multiServiceListener = new(9096);
 
 @SubscriberServiceConfig {} 
 service /subscriberOne on multiServiceListener {
-    remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
+    isolated remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         log:printDebug("onSubscriptionValidationDenied invoked");
         Acknowledgement ack = {
                   headers: {"header1": "value"},
@@ -31,7 +31,7 @@ service /subscriberOne on multiServiceListener {
         return ack;
     }
 
-    remote function onSubscriptionVerification(SubscriptionVerification msg)
+    isolated remote function onSubscriptionVerification(SubscriptionVerification msg)
                         returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
         log:printDebug("onSubscriptionVerification invoked");
         if (msg.hubTopic == "test1") {
@@ -41,7 +41,7 @@ service /subscriberOne on multiServiceListener {
         }
       }
 
-    remote function onEventNotification(ContentDistributionMessage event) 
+    isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
         return {};
@@ -50,7 +50,7 @@ service /subscriberOne on multiServiceListener {
 
 @SubscriberServiceConfig {} 
 service /subscriberTwo on multiServiceListener {
-    remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
+    isolated remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         log:printDebug("onSubscriptionValidationDenied invoked");
         Acknowledgement ack = {
                   headers: {"header1": "value"},
@@ -59,7 +59,7 @@ service /subscriberTwo on multiServiceListener {
         return ack;
     }
 
-    remote function onSubscriptionVerification(SubscriptionVerification msg)
+    isolated remote function onSubscriptionVerification(SubscriptionVerification msg)
                         returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
         log:printDebug("onSubscriptionVerification invoked");
         if (msg.hubTopic == "test1") {
@@ -69,7 +69,7 @@ service /subscriberTwo on multiServiceListener {
         }
       }
 
-    remote function onEventNotification(ContentDistributionMessage event) 
+    isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
         return {};

@@ -21,7 +21,7 @@ const string HASH_KEY = "secret";
 @test:Config { 
     groups: ["contentHashRetrieval"]
 }
-function testContentHashForSha1() returns @tainted error? {
+isolated function testContentHashForSha1() returns @tainted error? {
     byte[] hashedContent = check retrieveContentHash(SHA1, HASH_KEY, "This is sample content");
     test:assertTrue(hashedContent.length() > 0);
 }
@@ -29,7 +29,7 @@ function testContentHashForSha1() returns @tainted error? {
 @test:Config { 
     groups: ["contentHashRetrieval"]
 }
-function testContentHashForSha256() returns @tainted error? {
+isolated function testContentHashForSha256() returns @tainted error? {
     byte[] hashedContent = check retrieveContentHash(SHA_256, HASH_KEY, "This is sample content");
     test:assertTrue(hashedContent.length() > 0);
 }
@@ -37,7 +37,7 @@ function testContentHashForSha256() returns @tainted error? {
 @test:Config { 
     groups: ["contentHashRetrieval"]
 }
-function testContentHashForSha384() returns @tainted error? {
+isolated function testContentHashForSha384() returns @tainted error? {
     byte[] hashedContent = check retrieveContentHash(SHA_384, HASH_KEY, "This is sample content");
     test:assertTrue(hashedContent.length() > 0);
 }
@@ -45,7 +45,7 @@ function testContentHashForSha384() returns @tainted error? {
 @test:Config { 
     groups: ["contentHashRetrieval"]
 }
-function testContentHashForSha512() returns @tainted error? {
+isolated function testContentHashForSha512() returns @tainted error? {
     byte[] hashedContent = check retrieveContentHash(SHA_512, HASH_KEY, "This is sample content");
     test:assertTrue(hashedContent.length() > 0);
 }
@@ -53,7 +53,7 @@ function testContentHashForSha512() returns @tainted error? {
 @test:Config { 
     groups: ["contentHashRetrieval"]
 }
-function testContentHashError() returns @tainted error? {
+isolated function testContentHashError() returns @tainted error? {
     var hashedContent = retrieveContentHash("xyz", HASH_KEY, "This is sample content");
     string expectedErrorMsg = "Unrecognized hashning-method [xyz] found";
     if (hashedContent is error) {
