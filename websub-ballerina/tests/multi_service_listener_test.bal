@@ -22,57 +22,49 @@ listener Listener multiServiceListener = new(9096);
 
 @SubscriberServiceConfig {} 
 service /subscriberOne on multiServiceListener {
-    isolated remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
+    remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         log:printDebug("onSubscriptionValidationDenied invoked");
-        Acknowledgement ack = {
-                  headers: {"header1": "value"},
-                  body: {"formparam1": "value1"}
-        };
-        return ack;
+        return ACKNOWLEDGEMENT;
     }
 
-    isolated remote function onSubscriptionVerification(SubscriptionVerification msg)
+    remote function onSubscriptionVerification(SubscriptionVerification msg)
                         returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
         log:printDebug("onSubscriptionVerification invoked");
         if (msg.hubTopic == "test1") {
-            return error SubscriptionVerificationError("Hub topic not supported");
+            return SUBSCRIPTION_VERIFICATION_ERROR;
         } else {
-            return {};
+            return SUBSCRIPTION_VERIFICATION_SUCCESS;
         }
       }
 
-    isolated remote function onEventNotification(ContentDistributionMessage event) 
+    remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
-        return {};
+        return ACKNOWLEDGEMENT;
     }
 }
 
 @SubscriberServiceConfig {} 
 service /subscriberTwo on multiServiceListener {
-    isolated remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
+    remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         log:printDebug("onSubscriptionValidationDenied invoked");
-        Acknowledgement ack = {
-                  headers: {"header1": "value"},
-                  body: {"formparam1": "value1"}
-        };
-        return ack;
+        return ACKNOWLEDGEMENT;
     }
 
-    isolated remote function onSubscriptionVerification(SubscriptionVerification msg)
+    remote function onSubscriptionVerification(SubscriptionVerification msg)
                         returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
         log:printDebug("onSubscriptionVerification invoked");
         if (msg.hubTopic == "test1") {
-            return error SubscriptionVerificationError("Hub topic not supported");
+            return SUBSCRIPTION_VERIFICATION_ERROR;
         } else {
-            return {};
+            return SUBSCRIPTION_VERIFICATION_SUCCESS;
         }
       }
 
-    isolated remote function onEventNotification(ContentDistributionMessage event) 
+    remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
-        return {};
+        return ACKNOWLEDGEMENT;
     }
 }
 
@@ -103,7 +95,7 @@ function testOnIntentVerificationFailureServiceOne() returns @tainted error? {
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
     map<string> responseBody = decodeResponseBody(payload);
-    test:assertEquals(responseBody["reason"], "Hub topic not supported");
+    test:assertEquals(responseBody["reason"], "Subscription verification failed");
 }
 
 @test:Config { 
@@ -114,7 +106,7 @@ function testOnIntentVerificationFailureServiceTwo() returns @tainted error? {
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
     map<string> responseBody = decodeResponseBody(payload);
-    test:assertEquals(responseBody["reason"], "Hub topic not supported");
+    test:assertEquals(responseBody["reason"], "Subscription verification failed");
 }
 
 @test:Config {

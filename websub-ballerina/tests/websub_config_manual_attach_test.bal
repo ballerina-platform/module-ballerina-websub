@@ -20,29 +20,25 @@ import ballerina/http;
 
 service class SimpleWebsubService {
     *SubscriberService;
-    remote isolated function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
+    remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         log:printDebug("onSubscriptionValidationDenied invoked");
-        Acknowledgement ack = {
-                  headers: {"header1": "value"},
-                  body: {"formparam1": "value1"}
-        };
-        return ack;
+        return ACKNOWLEDGEMENT;
     }
 
-    remote isolated function onSubscriptionVerification(SubscriptionVerification msg)
-                        returns SubscriptionVerificationSuccess | SubscriptionVerificationError {
+    remote function onSubscriptionVerification(SubscriptionVerification msg)
+                        returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
         log:printDebug("onSubscriptionVerification invoked");
         if (msg.hubTopic == "test1") {
-            return error SubscriptionVerificationError("Hub topic not supported");
+            return SUBSCRIPTION_VERIFICATION_ERROR;
         } else {
-            return {};
+            return SUBSCRIPTION_VERIFICATION_SUCCESS;
         }
       }
 
-    remote isolated function onEventNotification(ContentDistributionMessage event) 
-                        returns Acknowledgement | SubscriptionDeletedError? {
+    remote function onEventNotification(ContentDistributionMessage event) 
+                        returns Acknowledgement|SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
-        return {};
+        return ACKNOWLEDGEMENT;
     }
 }
 
@@ -90,7 +86,7 @@ function testOnIntentVerificationFailureWithManualConfigAttach() returns @tainte
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
     map<string> responseBody = decodeResponseBody(payload);
-    test:assertEquals(responseBody["reason"], "Hub topic not supported");
+    test:assertEquals(responseBody["reason"], "Subscription verification failed");
 }
 
 @test:Config {

@@ -151,10 +151,17 @@ public type SubscriptionChangeResponse record {|
 # + hubChallenge - value for the hub.challenge parameter
 # + hubLeaseSeconds - value for the hub.lease_seconds parameter
 # + hubReason - value for the hub.reason parameter
-public type RequestQueryParams record {|
+type RequestQueryParams record {|
+// todo mark parameters as optional
     string? hubMode;
     string? hubTopic;
     string? hubChallenge;
     string? hubLeaseSeconds;
     string? hubReason;
 |};
+
+# Common Responses to be used in subscriber-service implementation
+public final Acknowledgement ACKNOWLEDGEMENT = {};
+public final SubscriptionVerificationSuccess SUBSCRIPTION_VERIFICATION_SUCCESS = {};
+public final SubscriptionVerificationError SUBSCRIPTION_VERIFICATION_ERROR = error SubscriptionVerificationError("Subscription verification failed");
+public final SubscriptionDeletedError SUBSCRIPTION_DELETED_ERROR = error SubscriptionDeletedError("Subscription deleted");

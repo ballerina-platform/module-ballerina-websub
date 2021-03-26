@@ -21,10 +21,10 @@ listener Listener optionalTargetListener = new (9094);
 
 var optionalSubscriberTarget = @SubscriberServiceConfig { leaseSeconds: 36000, secret: "Kslk30SNF2AChs2" } 
                               service object {
-    isolated remote function onEventNotification(ContentDistributionMessage event) 
+    remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
-        return {};
+        return ACKNOWLEDGEMENT;
     }
 };
 
