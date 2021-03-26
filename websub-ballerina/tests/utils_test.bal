@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/test;
+import ballerina/http;
 
 const string HASH_KEY = "secret";
 
@@ -61,4 +62,128 @@ isolated function testContentHashError() returns @tainted error? {
     } else {
         test:assertFail("Content hash generation not properly working for unidentified hash-method");
     }
+}
+
+var validSubscriberServiceDeclaration = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000 } 
+                              service object {
+    isolated remote function onEventNotification(ContentDistributionMessage event) 
+                        returns Acknowledgement|SubscriptionDeletedError? {
+        return {};
+    }
+};
+
+@test:Config { 
+    groups: ["serviceAnnotationRetrieval"]
+}
+function testSubscriberServiceAnnotationRetrievalSuccess() returns @tainted error? {
+    var configuration = retrieveSubscriberServiceAnnotations(validSubscriberServiceDeclaration);
+    test:assertTrue(configuration is SubscriberServiceConfiguration, "service annotation retrieval failed for valid service declaration");
+}
+
+var invalidSubscriberServiceDeclaration = service object {
+    isolated remote function onEventNotification(ContentDistributionMessage event) 
+                        returns Acknowledgement|SubscriptionDeletedError? {
+        return {};
+    }
+};
+
+@test:Config { 
+    groups: ["serviceAnnotationRetrieval"]
+}
+function testSubscriberServiceAnnotationRetrievalFailure() returns @tainted error? {
+    var configuration = retrieveSubscriberServiceAnnotations(invalidSubscriberServiceDeclaration);
+    test:assertTrue(configuration is (), "service annotation retrieval success for invalid service declaration");
+}
+
+@test:Config { 
+    groups: ["servicePathRetrieval"]
+}
+isolated function testServicePathRetrievalForString() returns @tainted error? {
+    var servicePath = retrieveServicePath("subscriber");
+    test:assertTrue(servicePath is string, "Service path retrieval failed for 'string'");
+}
+
+@test:Config { 
+    groups: ["servicePathRetrieval"]
+}
+isolated function testServicePathRetrievalForStringArray() returns @tainted error? {
+    var servicePath = retrieveServicePath(["subscriber", "foo", "bar"]);
+    test:assertTrue(servicePath is string[], "Service path retrieval failed for 'string array'");
+}
+
+@test:Config { 
+    groups: ["servicePathRetrieval"]
+}
+isolated function testServicePathRetrievalForEmptyServicePath() returns @tainted error? {
+    var servicePath = retrieveServicePath(());
+    test:assertTrue(servicePath is string, "Service path retrieval failed for 'empty service path'");
+}
+
+@test:Config { 
+    groups: ["callbackUrlGeneration"]
+}
+isolated function testCallbackUrlGenerationHttpsWithNoHostConfig() returns @tainted error? {
+    http:ListenerConfiguration config = {
+        secureSocket: {
+            key: {
+                path: "tests/resources/ballerinaKeystore.pkcs12",
+                password: "ballerina"
+            }
+        }
+    };
+    string expectedCallbackUrl = "https://0.0.0.0:9090/subscriber";
+    string generatedCallbackUrl = generateCallbackUrl("subscriber", 9090, config);
+    test:assertEquals(generatedCallbackUrl, expectedCallbackUrl, "Generated callback url does not match expected callback url");
+}
+
+@test:Config { 
+    groups: ["callbackUrlGeneration"]
+}
+isolated function testCallbackUrlGenerationHttpWithNoHostConfig() returns @tainted error? {
+    http:ListenerConfiguration config = {};
+    string expectedCallbackUrl = "http://0.0.0.0:9090/subscriber";
+    string generatedCallbackUrl = generateCallbackUrl("subscriber", 9090, config);
+    test:assertEquals(generatedCallbackUrl, expectedCallbackUrl, "Generated callback url does not match expected callback url");
+}
+
+@test:Config { 
+    groups: ["callbackUrlGeneration"]
+}
+isolated function testCallbackUrlGenerationHttpsWithHostConfig() returns @tainted error? {
+    http:ListenerConfiguration config = {
+        host: "192.168.1.1",
+        secureSocket: {
+            key: {
+                path: "tests/resources/ballerinaKeystore.pkcs12",
+                password: "ballerina"
+            }
+        }
+    };
+    string expectedCallbackUrl = "https://192.168.1.1:9090/subscriber";
+    string generatedCallbackUrl = generateCallbackUrl("subscriber", 9090, config);
+    test:assertEquals(generatedCallbackUrl, expectedCallbackUrl, "Generated callback url does not match expected callback url");
+}
+
+@test:Config { 
+    groups: ["callbackUrlGeneration"]
+}
+isolated function testCallbackUrlGenerationHttpWithHostConfig() returns @tainted error? {
+    http:ListenerConfiguration config = {
+        host: "192.168.1.1"
+    };
+    string expectedCallbackUrl = "http://192.168.1.1:9090/subscriber";
+    string generatedCallbackUrl = generateCallbackUrl("subscriber", 9090, config);
+    test:assertEquals(generatedCallbackUrl, expectedCallbackUrl, "Generated callback url does not match expected callback url");
+}
+
+@test:Config { 
+    groups: ["callbackUrlGeneration"]
+}
+isolated function testCallbackUrlForArrayTypeServicePath() returns @tainted error? {
+    http:ListenerConfiguration config = {
+        host: "192.168.1.1"
+    };
+    string expectedCallbackUrl = "http://192.168.1.1:9090/subscriber/foo/bar";
+    string generatedCallbackUrl = generateCallbackUrl(["subscriber", "foo", "bar"], 9090, config);
+    test:assertEquals(generatedCallbackUrl, expectedCallbackUrl, "Generated callback url does not match expected callback url");   
 }

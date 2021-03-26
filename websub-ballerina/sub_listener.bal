@@ -31,13 +31,11 @@ public class Listener {
     #
     # + listenTo - An `http:Listener` or a port number to listen for the service
     # + config - `websub:ListenerConfiguration` to be provided to underlying HTTP Listener
-    public isolated function init(int|http:Listener listenTo, ListenerConfiguration? config = ()) returns error? {
+    public isolated function init(int|http:Listener listenTo, *ListenerConfiguration config) returns error? {
         if (listenTo is int) {
             self.httpListener = check new(listenTo, config);
         } else {
-            if (config is ListenerConfiguration) {
-                log:printWarn("Provided `websub:ListenerConfiguration` will be overridden by the given http listener configurations");
-            }
+            log:printWarn("Provided `websub:ListenerConfiguration` will be overridden by the given http listener configurations");
             self.httpListener = listenTo;
         }
         self.listenerConfig = self.httpListener.getConfig();
@@ -49,22 +47,22 @@ public class Listener {
 
     # Attaches the provided Service to the Listener.
     #
-    # + s - The `websub:SubscriberService` object to attach
+    # + subscriberService - The `websub:SubscriberService` object to attach
     # + name - The path of the Service to be hosted
     # + return - An `error`, if an error occurred during the service attaching process
-    public isolated function attach(SubscriberService s, string[]|string? name = ()) returns error? {
+    public isolated function attach(SubscriberService subscriberService, string[]|string? name = ()) returns error? {
         if (self.listenerConfig.secureSocket is ()) {
             log:printWarn("HTTPS is recommended but using HTTP");
         }
 
-        var configuration = retrieveSubscriberServiceAnnotations(s);
+        var configuration = retrieveSubscriberServiceAnnotations(subscriberService);
         if (configuration is SubscriberServiceConfiguration) {
             self.serviceConfig = configuration;
             string[]|string servicePath = retrieveServicePath(name);
             string generatedCallbackUrl = generateCallbackUrl(servicePath, self.port, self.listenerConfig);
             self.callbackUrl = configuration?.callback ?: generatedCallbackUrl;
             logGeneratedCallbackUrl(name, generatedCallbackUrl);
-            self.httpService = check new(s, configuration?.secret);
+            self.httpService = check new(subscriberService, configuration?.secret);
             check self.httpListener.attach(<HttpService> self.httpService, servicePath);
         } else {
             return error ListenerError("Could not find the required service-configurations");
@@ -73,11 +71,11 @@ public class Listener {
 
     # Setup the provided Service with given configurations and attaches it to the listener
     #
-    # + s - The `websub:SubscriberService` object to attach
+    # + subscriberService - The `websub:SubscriberService` object to attach
     # + configuration - `SubscriberServiceConfiguration` which should be incorporated into the provided Service 
     # + name - The path of the Service to be hosted
     # + return - An `error`, if an error occurred during the service attaching process
-    public isolated function attachWithConfig(SubscriberService s, SubscriberServiceConfiguration configuration, string[]|string? name = ()) returns error? {
+    public isolated function attachWithConfig(SubscriberService subscriberService, SubscriberServiceConfiguration configuration, string[]|string? name = ()) returns error? {
         if (self.listenerConfig.secureSocket is ()) {
             log:printWarn("HTTPS is recommended but using HTTP");
         }
@@ -87,7 +85,7 @@ public class Listener {
         string generatedCallbackUrl = generateCallbackUrl(servicePath, self.port, self.listenerConfig);
         self.callbackUrl = configuration?.callback ?: generatedCallbackUrl;
         logGeneratedCallbackUrl(name, generatedCallbackUrl);    
-        self.httpService = check new(s, configuration?.secret);
+        self.httpService = check new(subscriberService, configuration?.secret);
         check self.httpListener.attach(<HttpService> self.httpService, servicePath);        
             
     }
@@ -180,7 +178,6 @@ isolated function generateCallbackUrl(string[]|string servicePath,
     string host = config.host;
     string protocol = config.secureSocket is () ? "http" : "https";        
     string concatenatedServicePath = "";
-        
     if (servicePath is string) {
         concatenatedServicePath += "/" + <string>servicePath;
     } else {
@@ -188,8 +185,7 @@ isolated function generateCallbackUrl(string[]|string servicePath,
             concatenatedServicePath += "/" + pathSegment;
         }
     }
-
-    return protocol + "://" + host + ":" + port.toString() + concatenatedServicePath;
+    return string`${protocol}://${host}:${port.toString()}${concatenatedServicePath}`;
 }
 
 # Logs the generated callback URL if the service-path was not defined.
@@ -237,8 +233,7 @@ function initiateSubscription(SubscriberServiceConfiguration serviceConfig, stri
         return;
     }
 
-    http:ClientConfiguration? subscriptionClientConfig = serviceConfig?.httpConfig ?: ();
-    SubscriptionClient subscriberClientEp = check new (hubUrl, subscriptionClientConfig);
+    SubscriptionClient subscriberClientEp = check getSubscriberClient(hubUrl, serviceConfig?.httpConfig);
     SubscriptionChangeRequest request = retrieveSubscriptionRequest(topicUrl, callbackUrl, serviceConfig);
     var response = subscriberClientEp->subscribe(request);
     if (response is SubscriptionChangeResponse) {
@@ -246,5 +241,13 @@ function initiateSubscription(SubscriberServiceConfiguration serviceConfig, stri
         log:printInfo(string`${subscriptionSuccessMsg}. Awaiting intent verification.`);
     } else {
         return response;
+    }
+}
+
+isolated function getSubscriberClient(string hubUrl, http:ClientConfiguration? config) returns SubscriptionClient|error {
+    if (config is http:ClientConfiguration) {
+        return check new SubscriptionClient(hubUrl, config); 
+    } else {
+        return check new SubscriptionClient(hubUrl);
     }
 }
