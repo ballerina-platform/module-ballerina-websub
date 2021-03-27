@@ -38,7 +38,7 @@ function afterPathGenerationTest() {
 }
 function testServicePathGeneration() returns @tainted error? {
     do {
-        var attached = pathGenerationListener.attach(serviceWithPathGeneration);
+        check pathGenerationListener.attach(serviceWithPathGeneration);
     } on fail error e {
         test:assertFail("Could not start the subscriber-service with service-path generation : " + e.message());
     }

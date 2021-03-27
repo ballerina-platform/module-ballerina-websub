@@ -251,7 +251,7 @@ isolated function updateResponseBody(http:Response response, anydata? messageBod
 # + caller - {@code http:Caller} which intiate the request
 # + response - {@code http:Response} to be sent to the caller
 isolated function respondToRequest(http:Caller caller, http:Response response) {
-    var responseError = caller->respond(response);
+    http:ListenerError? responseError = caller->respond(response);
 }
 
 # Checks whether response is successfull 
