@@ -60,7 +60,6 @@ service class HttpService {
     # 
     # + caller - {@code http:Caller} reference
     # + request - {@code http:Request} reference
-    # + return - {@code error} if there is an error in the execution or else nil
     isolated resource function post .(http:Caller caller, http:Request request) {
         http:Response response = new;
         response.statusCode = http:STATUS_ACCEPTED;

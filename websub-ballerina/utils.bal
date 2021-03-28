@@ -89,11 +89,11 @@ isolated function retrieveRequestHeaders(http:Request request) returns map<strin
 isolated function retrieveRequestQueryParams(http:Request request) returns RequestQueryParams {
     map<string[]> queryParams = request.getQueryParams();
 
-    string? hubMode = retrieveParamValue(queryParams, HUB_MODE);
-    string? hubTopic = retrieveParamValue(queryParams, HUB_TOPIC);
-    string? hubChallenge = retrieveParamValue(queryParams, HUB_CHALLENGE);
-    string? hubLeaseSeconds = retrieveParamValue(queryParams, HUB_LEASE_SECONDS);
-    string? hubReason = retrieveParamValue(queryParams, HUB_REASON);
+    string? hubMode = request.getQueryParamValue(HUB_MODE);
+    string? hubTopic = request.getQueryParamValue(HUB_TOPIC);
+    string? hubChallenge = request.getQueryParamValue(HUB_CHALLENGE);
+    string? hubLeaseSeconds = request.getQueryParamValue(HUB_LEASE_SECONDS);
+    string? hubReason = request.getQueryParamValue(HUB_REASON);
 
     if (hubMode is string) {
         if (hubTopic is string && hubChallenge is string) {
@@ -114,20 +114,6 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
     } else {
         return {};
     }
-}
-
-# Retrieve query parameter value if present.
-# 
-# + params - {@code map<string[]>} containing all the available query parameters
-# + 'key - requested query parameter
-# + return - {@code string} value of the requested query parameter if present or else nil
-isolated function retrieveParamValue(map<string[]> params, string 'key) returns string? {
-    if (params.hasKey('key)) {
-        string[] values = params.get('key);
-        return values.length() >= 1 ? values[0] : ();
-    } else {
-        return ();
-    } 
 }
 
 # Verifies the `http:Request` payload with the provided signature value.
