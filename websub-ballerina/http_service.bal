@@ -61,7 +61,7 @@ service class HttpService {
     # + caller - {@code http:Caller} reference
     # + request - {@code http:Request} reference
     # + return - {@code error} if there is an error in the execution or else nil
-    isolated resource function post .(http:Caller caller, http:Request request) returns error? {
+    isolated resource function post .(http:Caller caller, http:Request request) {
         http:Response response = new;
         response.statusCode = http:STATUS_ACCEPTED;
         if (self.isEventNotificationAvailable) {
@@ -74,7 +74,7 @@ service class HttpService {
             response.statusCode = http:STATUS_NOT_IMPLEMENTED;
         }
 
-        check respondToRequest(caller, response);
+        respondToRequest(caller, response);
     }
 
     # Resource-Method handling the HTTP GET requests
@@ -82,7 +82,7 @@ service class HttpService {
     # + caller - {@code http:Caller} reference
     # + request - {@code http:Request} reference
     # + return - {@code error} if there is an error in the execution or else nil
-    isolated resource function get .(http:Caller caller, http:Request request) returns error? {
+    isolated resource function get .(http:Caller caller, http:Request request) {
         http:Response response = new;
         response.statusCode = http:STATUS_OK;
 
@@ -116,7 +116,7 @@ service class HttpService {
             }
         }
 
-        check respondToRequest(caller, response);
+        respondToRequest(caller, response);
     }
 }
 
