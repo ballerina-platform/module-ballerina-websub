@@ -152,12 +152,11 @@ public type SubscriptionChangeResponse record {|
 # + hubLeaseSeconds - value for the hub.lease_seconds parameter
 # + hubReason - value for the hub.reason parameter
 type RequestQueryParams record {|
-// todo mark parameters as optional
-    string? hubMode;
-    string? hubTopic;
-    string? hubChallenge;
-    string? hubLeaseSeconds;
-    string? hubReason;
+    string hubMode?;
+    string hubTopic?;
+    string hubChallenge?;
+    string? hubLeaseSeconds = ();
+    string hubReason?;
 |};
 
 # Common Responses to be used in subscriber-service implementation

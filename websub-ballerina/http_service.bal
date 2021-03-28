@@ -81,23 +81,22 @@ service class HttpService {
     # 
     # + caller - {@code http:Caller} reference
     # + request - {@code http:Request} reference
-    # + return - {@code error} if there is an error in the execution or else nil
     isolated resource function get .(http:Caller caller, http:Request request) {
         http:Response response = new;
         response.statusCode = http:STATUS_OK;
 
         RequestQueryParams params = retrieveRequestQueryParams(request);
 
-        match params.hubMode {
+        match params?.hubMode {
             MODE_SUBSCRIBE | MODE_UNSUBSCRIBE => {
-                if (params.hubChallenge is () || params.hubTopic is ()) {
+                if (params?.hubChallenge is () || params?.hubTopic is ()) {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                 } else {
                     if (self.isSubscriptionVerificationAvailable) {
                         processSubscriptionVerification(caller, response, <@untainted> params, self.subscriberService);
                     } else {
                         response.statusCode = http:STATUS_OK;
-                        response.setTextPayload(<string>params.hubChallenge);
+                        response.setTextPayload(<string>params?.hubChallenge);
                     }
                 }
             }

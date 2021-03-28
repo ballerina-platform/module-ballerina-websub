@@ -27,10 +27,10 @@ import ballerina/log;
 isolated function processSubscriptionVerification(http:Caller caller, http:Response response, 
                                                   RequestQueryParams params, SubscriberService subscriberService) {
     SubscriptionVerification message = {
-        hubMode: <string>params.hubMode,
-        hubTopic: <string>params.hubTopic,
-        hubChallenge: <string>params.hubChallenge,
-        hubLeaseSeconds: params.hubLeaseSeconds
+        hubMode: <string>params?.hubMode,
+        hubTopic: <string>params?.hubTopic,
+        hubChallenge: <string>params?.hubChallenge,
+        hubLeaseSeconds: params?.hubLeaseSeconds
     };
 
     SubscriptionVerificationSuccess|SubscriptionVerificationError result = callOnSubscriptionVerificationMethod(subscriberService, message);
@@ -40,7 +40,7 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
         updateResponseBody(response, errorDetails["body"], errorDetails["headers"], result.message());
     } else {
         response.statusCode = http:STATUS_OK;
-        response.setTextPayload(<string>params.hubChallenge);
+        response.setTextPayload(<string>params?.hubChallenge);
     }
 }
 
@@ -52,7 +52,7 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
 # + subscriberService - service to be invoked via native method
 isolated function processSubscriptionDenial(http:Caller caller, http:Response response,
                                             RequestQueryParams params, SubscriberService subscriberService) {
-    var reason = params.hubReason is () ? "" : <string>params.hubReason;
+    var reason = params?.hubReason is () ? "" : <string>params?.hubReason;
     SubscriptionDeniedError subscriptionDeniedMessage = error SubscriptionDeniedError(reason);
     Acknowledgement? result = callOnSubscriptionDeniedMethod(subscriberService, subscriptionDeniedMessage);
     if (result is ()) {

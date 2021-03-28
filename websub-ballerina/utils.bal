@@ -89,45 +89,45 @@ isolated function retrieveRequestHeaders(http:Request request) returns map<strin
 isolated function retrieveRequestQueryParams(http:Request request) returns RequestQueryParams {
     map<string[]> queryParams = request.getQueryParams();
 
-    string? hubMode = ();
-    if (queryParams.hasKey(HUB_MODE)) {
-        string[] hubModeValues = queryParams.get(HUB_MODE);
-        hubMode = hubModeValues.length() == 1 ? hubModeValues[0] : "";
+    string? hubMode = retrieveParamValue(queryParams, HUB_MODE);
+    string? hubTopic = retrieveParamValue(queryParams, HUB_TOPIC);
+    string? hubChallenge = retrieveParamValue(queryParams, HUB_CHALLENGE);
+    string? hubLeaseSeconds = retrieveParamValue(queryParams, HUB_LEASE_SECONDS);
+    string? hubReason = retrieveParamValue(queryParams, HUB_REASON);
+
+    if (hubMode is string) {
+        if (hubTopic is string && hubChallenge is string) {
+            return {
+                hubMode: hubMode,
+                hubTopic: hubTopic,
+                hubChallenge: hubChallenge,
+                hubLeaseSeconds: hubLeaseSeconds
+            };
+        } else if (hubReason is string) {
+            return {
+                hubMode: hubMode,
+                hubReason: hubReason
+            };
+        } else {
+            return {};
+        }
+    } else {
+        return {};
     }
+}
 
-    string? hubTopic = ();
-    if (queryParams.hasKey(HUB_TOPIC)) {
-        string[] hubTopicValues = queryParams.get(HUB_TOPIC);
-        hubTopic = hubTopicValues.length() == 1 ? hubTopicValues[0] : "";
-    }
-
-    string? hubChallenge = ();
-    if (queryParams.hasKey(HUB_CHALLENGE)) {
-        string[] hubChallengeValues = queryParams.get(HUB_CHALLENGE);
-        hubChallenge = hubChallengeValues.length() == 1 ? hubChallengeValues[0] : "";
-    }
-
-    string? hubLeaseSeconds = ();
-    if (queryParams.hasKey(HUB_LEASE_SECONDS)) { 
-        string[] hubLeaseSecondsValues =  queryParams.get(HUB_LEASE_SECONDS);
-        hubLeaseSeconds = hubLeaseSecondsValues.length() == 1 ? hubLeaseSecondsValues[0] : ();
-    }
-
-    string? hubReason = ();
-    if (queryParams.hasKey(HUB_REASON)) {
-        string[] hubReasonValues = queryParams.get(HUB_REASON);
-        hubReason = hubReasonValues.length() == 1 ? hubReasonValues[0] : "";
-    }
-
-    RequestQueryParams params = {
-        hubMode: hubMode,
-        hubTopic: hubTopic,
-        hubChallenge: hubChallenge,
-        hubLeaseSeconds: hubLeaseSeconds,
-        hubReason: hubReason
-    };
-
-    return params;
+# Retrieve query parameter value if present.
+# 
+# + params - {@code map<string[]>} containing all the available query parameters
+# + 'key - requested query parameter
+# + return - {@code string} value of the requested query parameter if present or else nil
+isolated function retrieveParamValue(map<string[]> params, string 'key) returns string? {
+    if (params.hasKey('key)) {
+        string[] values = params.get('key);
+        return values.length() >= 1 ? values[0] : ();
+    } else {
+        return ();
+    } 
 }
 
 # Verifies the `http:Request` payload with the provided signature value.
