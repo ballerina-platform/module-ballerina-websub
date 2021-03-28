@@ -52,16 +52,19 @@ This package allows introducing a WebSub Subscriber Service with `onSubscription
     service /subscriber on sslEnabledListener {
         remote function onSubscriptionValidationDenied(websub:SubscriptionDeniedError msg) returns websub:Acknowledgement? {
             // implement subscription validation denied logic here
+            return websub:ACKNOWLEDGEMENT;
         }
 
         remote function onSubscriptionVerification(websub:SubscriptionVerification msg)
                         returns websub:SubscriptionVerificationSuccess|websub:SubscriptionVerificationError {
             // implement subscription intent verification logic here
+            return websub:SUBSCRIPTION_VERIFICATION_SUCCESS;
         }
 
         remote function onEventNotification(websub:ContentDistributionMessage event) 
                         returns websub:Acknowledgement|websub:SubscriptionDeletedError? {
             // implement on event notification logic here
+            return websub:ACKNOWLEDGEMENT;
         }
     }
     ```
