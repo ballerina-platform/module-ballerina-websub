@@ -117,11 +117,21 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
     }
 }
 
+# Retrieves request payload for content-verification
+# 
+# + request - original {@code http:Request} object
+# + return - {@code string} containg the text-representation of the payload or {@code error}
 isolated function retrieveTextPayload(http:Request request) returns string|error {
     string contentType = request.getContentType();
     match request.getContentType() {
         mime:APPLICATION_FORM_URLENCODED => {
-            return request.getQueryParams().toString();
+            string[] queryParams = [];
+            foreach var ['key, values] in request.getQueryParams().entries() {
+                string concatenatedValue = strings:'join(",", ...values);
+                string query = string`${'key}=${concatenatedValue}`;
+                queryParams.push(query);
+            }
+            return strings:'join("&", ...queryParams);
         }
         _ => {
             return check request.getTextPayload();
@@ -146,9 +156,7 @@ isolated function verifyContent(http:Request request, string secret, string payl
                     string[] splitSignature = regex:split(<string>xHubSignature, "=");
                     string method = splitSignature[0];
                     string signature = regex:replaceAll(<string>xHubSignature, method + "=", "");
-                
                     byte[] generatedSignature = check retrieveContentHash(method, secret, payload);
-
                     return signature == generatedSignature.toBase16(); 
                 }          
         } else {
