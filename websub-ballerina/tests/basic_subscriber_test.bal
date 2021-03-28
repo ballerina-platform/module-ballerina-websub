@@ -17,6 +17,7 @@
 import ballerina/log;
 import ballerina/test;
 import ballerina/http;
+import ballerina/mime;
 
 listener Listener basicSubscriberListener = new (9090);
 
@@ -39,17 +40,26 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
 
     isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
-        log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        match event.contentType {
+            mime:APPLICATION_FORM_URLENCODED => {
+                map<string[]> content = <map<string[]>> event.content;
+                log:printInfo("URL encoded content received ", content = content);
+            }
+            _ => {
+                log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+            }
+        }
+        
         return ACKNOWLEDGEMENT;
     }
 };
 
-@test:BeforeGroups { value:["simple-subscriber"] }
+@test:BeforeGroups { value:["simpleSubscriber"] }
 function beforeSimpleSubscriberTest() {
     checkpanic basicSubscriberListener.attach(simpleSubscriberService, "subscriber");
 }
 
-@test:AfterGroups { value:["simple-subscriber"] }
+@test:AfterGroups { value:["simpleSubscriber"] }
 function afterSimpleSubscriberTest() {
     checkpanic basicSubscriberListener.gracefulStop();
 }
@@ -57,7 +67,7 @@ function afterSimpleSubscriberTest() {
 http:Client httpClient = checkpanic new("http://localhost:9090/subscriber");
 
 @test:Config { 
-    groups: ["simple-subscriber"]
+    groups: ["simpleSubscriber"]
 }
 function testOnSubscriptionValidation() returns @tainted error? {
     http:Response response = check httpClient->get("/?hub.mode=denied&hub.reason=justToTest");
@@ -65,7 +75,7 @@ function testOnSubscriptionValidation() returns @tainted error? {
 }
 
 @test:Config {
-    groups: ["simple-subscriber"]
+    groups: ["simpleSubscriber"]
  }
 function testOnIntentVerificationSuccess() returns @tainted error? {
     http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234");
@@ -74,7 +84,7 @@ function testOnIntentVerificationSuccess() returns @tainted error? {
 }
 
 @test:Config { 
-    groups: ["simple-subscriber"]
+    groups: ["simpleSubscriber"]
 }
 function testOnIntentVerificationFailure() returns @tainted error? {
     http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
@@ -85,7 +95,7 @@ function testOnIntentVerificationFailure() returns @tainted error? {
 }
 
 @test:Config {
-    groups: ["simple-subscriber"]
+    groups: ["simpleSubscriber"]
  }
 function testOnEventNotificationSuccess() returns @tainted error? {
     http:Request request = new;
@@ -98,7 +108,7 @@ function testOnEventNotificationSuccess() returns @tainted error? {
 
 
 @test:Config {
-    groups: ["simple-subscriber"]
+    groups: ["simpleSubscriber"]
 }
 function testOnEventNotificationSuccessXml() returns @tainted error? {
     http:Request request = new;
@@ -106,5 +116,15 @@ function testOnEventNotificationSuccessXml() returns @tainted error? {
     request.setPayload(payload);
 
     http:Response response = check httpClient->post("/", request);
+    test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["simpleSubscriber"]
+}
+function testOnEventNotificationSuccessForUrlEncoded() returns @tainted error? {
+    http:Request request = new;
+    check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
+    http:Response response = check httpClient->post("/?param1=value1&param2=value2", request);
     test:assertEquals(response.statusCode, 202);
 }

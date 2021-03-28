@@ -17,6 +17,7 @@
 import ballerina/log;
 import ballerina/test;
 import ballerina/http;
+import ballerina/mime;
 
 listener Listener multiServiceListener = new(9096);
 
@@ -154,5 +155,25 @@ function testOnEventNotificationSuccessXmlServiceTwo() returns @tainted error? {
     request.setPayload(payload);
 
     http:Response response = check clientForServiceTwo->post("/", request);
+    test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["multiServiceListener"]
+}
+function testOnEventNotificationSuccessForUrlEncodedServiceOne() returns @tainted error? {
+    http:Request request = new;
+    check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
+    http:Response response = check clientForServiceOne->post("/?param1=value1&param2=value2", request);
+    test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["multiServiceListener"]
+}
+function testOnEventNotificationSuccessForUrlEncodedServiceTwo() returns @tainted error? {
+    http:Request request = new;
+    check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
+    http:Response response = check clientForServiceTwo->post("/?param1=value1&param2=value2", request);
     test:assertEquals(response.statusCode, 202);
 }

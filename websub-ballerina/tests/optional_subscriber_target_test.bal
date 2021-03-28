@@ -28,13 +28,13 @@ var optionalSubscriberTarget = @SubscriberServiceConfig { leaseSeconds: 36000, s
     }
 };
 
-@test:AfterGroups { value:["optional-subscriber-target"] }
+@test:AfterGroups { value:["optionalSubscriberTarget"] }
 function afterOptionalTargetUrlTest() {
     checkpanic optionalTargetListener.gracefulStop();
 }
 
 @test:Config { 
-    groups: ["optional-subscriber-target"]
+    groups: ["optionalSubscriberTarget"]
 }
 function testOptionalTargetUrl() {
     do {

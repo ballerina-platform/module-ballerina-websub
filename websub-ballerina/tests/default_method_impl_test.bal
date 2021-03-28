@@ -29,12 +29,12 @@ var serviceWithDefaultImpl = @SubscriberServiceConfig { target: "http://0.0.0.0:
     }
 };
 
-@test:BeforeGroups { value:["default-method-impl"] }
+@test:BeforeGroups { value:["defaultMethodImpl"] }
 function beforeGroupTwo() {
     checkpanic serviceWithDefaultImplListener.attach(serviceWithDefaultImpl, "subscriber");
 }
 
-@test:AfterGroups { value:["default-method-impl"] }
+@test:AfterGroups { value:["defaultMethodImpl"] }
 function afterGroupTwo() {
     checkpanic serviceWithDefaultImplListener.gracefulStop();
 }
@@ -42,7 +42,7 @@ function afterGroupTwo() {
 http:Client serviceWithDefaultImplClientEp = checkpanic new("http://localhost:9091/subscriber");
 
 @test:Config { 
-    groups: ["default-method-impl"]
+    groups: ["defaultMethodImpl"]
 }
 function testOnSubscriptionValidationDefaultImpl() returns @tainted error? {
     http:Response response = check serviceWithDefaultImplClientEp->get("/?hub.mode=denied&hub.reason=justToTest");
@@ -50,7 +50,7 @@ function testOnSubscriptionValidationDefaultImpl() returns @tainted error? {
 }
 
 @test:Config {
-    groups: ["default-method-impl"]
+    groups: ["defaultMethodImpl"]
  }
 function testOnIntentVerificationSuccessDefaultImpl() returns @tainted error? {
     http:Response response = check serviceWithDefaultImplClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234");
@@ -59,7 +59,7 @@ function testOnIntentVerificationSuccessDefaultImpl() returns @tainted error? {
 }
 
 @test:Config {
-    groups: ["default-method-impl"]
+    groups: ["defaultMethodImpl"]
 }
 isolated function testUniqueStringGeneration() returns @tainted error? {
     string generatedString = generateUniqueUrlSegment();

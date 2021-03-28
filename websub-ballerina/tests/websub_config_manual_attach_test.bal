@@ -17,6 +17,7 @@
 import ballerina/log;
 import ballerina/test;
 import ballerina/http;
+import ballerina/mime;
 
 service class SimpleWebsubService {
     *SubscriberService;
@@ -109,5 +110,15 @@ function testOnEventNotificationSuccessXmlWithManualConfigAttach() returns @tain
     xml payload = xml `<body><action>publish</action></body>`;
     request.setPayload(payload);
     http:Response response = check manualConfigAttachClientEp->post("/", request);
+    test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["manualConfigAttach"]
+}
+function testOnEventNotificationSuccessForUrlEncodedWithManualConfigAttach() returns @tainted error? {
+    http:Request request = new;
+    check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
+    http:Response response = check manualConfigAttachClientEp->post("/?param1=value1&param2=value2", request);
     test:assertEquals(response.statusCode, 202);
 }

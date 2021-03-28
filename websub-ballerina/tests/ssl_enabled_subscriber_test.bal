@@ -17,6 +17,7 @@
 import ballerina/log;
 import ballerina/test;
 import ballerina/http;
+import ballerina/mime;
 
 ListenerConfiguration listenerConfigs = {
     secureSocket: {
@@ -113,5 +114,15 @@ function testOnEventNotificationSuccessXmlWithSsl() returns @tainted error? {
     request.setPayload(payload);
 
     http:Response response = check sslEnabledClient->post("/", request);
+    test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["sslEnabledSubscriber"]
+}
+function testOnEventNotificationSuccessForUrlEncodedWithSsl() returns @tainted error? {
+    http:Request request = new;
+    check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
+    http:Response response = check sslEnabledClient->post("/?param1=value1&param2=value2", request);
     test:assertEquals(response.statusCode, 202);
 }
