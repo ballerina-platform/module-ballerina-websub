@@ -57,7 +57,6 @@ http:Client contentVerificationClient = checkpanic new("http://localhost:9098/su
 function testOnEventNotificationSuccessForContentVerification() returns @tainted error? {
     http:Request request = new;
     json payload =  {"action":"publish","mode":"remote-hub"};
-    log:printInfo("[JSON_CONTENT] ", content = payload.toJsonString());
     byte[] payloadHash = check retrievePayloadSignature(hashKey, payload);
     request.setHeader("X-Hub-Signature", string`sha256=${payloadHash.toBase16()}`);
     request.setPayload(payload);
