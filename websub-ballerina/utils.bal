@@ -20,6 +20,7 @@ import ballerina/crypto;
 import ballerina/log;
 import ballerina/lang.'string as strings;
 import ballerina/random;
+import ballerina/mime;
 
 # Generates a random-string of given length
 # 
@@ -113,6 +114,18 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
         }
     } else {
         return {};
+    }
+}
+
+isolated function retrieveTextPayload(http:Request request) returns string|error {
+    string contentType = request.getContentType();
+    match request.getContentType() {
+        mime:APPLICATION_FORM_URLENCODED => {
+            return request.getQueryParams().toString();
+        }
+        _ => {
+            return check request.getTextPayload();
+        }
     }
 }
 

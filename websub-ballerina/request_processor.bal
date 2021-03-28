@@ -73,7 +73,7 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
 isolated function processEventNotification(http:Caller caller, http:Request request, 
                                            http:Response response, SubscriberService subscriberService,
                                            string secretKey) returns error? {
-    string payload = check request.getTextPayload();
+    string payload = check retrieveTextPayload(request);
     boolean isVerifiedContent = check verifyContent(request, secretKey, payload);
     if (!isVerifiedContent) {
         return;
@@ -112,7 +112,13 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
                 content: check request.getBinaryPayload()
             };  
         }
-        // todo include form-url-encoded
+        mime:APPLICATION_FORM_URLENCODED => {
+            message = {
+                headers: headers,
+                contentType: contentType,
+                content: request.getQueryParams()
+            }; 
+        }
         _ => {
             log:printError(string`Unrecognized content-type [${contentType}] found`);
         }
