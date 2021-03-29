@@ -20,17 +20,17 @@ import ballerina/http;
 listener http:Listener simpleHttpServiceListener = new (9191);
 
 var simpleHttpService = service object {
-        resource function get discovery(http:Caller caller, http:Request request) {
-            http:Response response = new;
-            response.addHeader("Link", "<http://127.0.0.1:9191/common/hub>; rel=\"hub\"");
-            response.addHeader("Link", "<https://sample.topic.com>; rel=\"self\"");
-            http:ListenerError? resp = caller->respond(response);
-        }
+    isolated resource function get discovery(http:Caller caller, http:Request request) {
+        http:Response response = new;
+        response.addHeader("Link", "<http://127.0.0.1:9191/common/hub>; rel=\"hub\"");
+        response.addHeader("Link", "<https://sample.topic.com>; rel=\"self\"");
+        http:ListenerError? resp = caller->respond(response);
+    }
 
-        resource function post hub(http:Caller caller, http:Request request) {
-            http:ListenerError? resp = caller->respond();
-        }
-    };
+    isolated resource function post hub(http:Caller caller, http:Request request) {
+        http:ListenerError? resp = caller->respond();
+    }
+};
 
 @test:BeforeSuite
 function beforeSuiteFunc() {

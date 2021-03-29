@@ -28,7 +28,7 @@ public client class DiscoveryService {
     # + resourceUrl - user provided resource-URL
     # + publisherClientConfig - {@code http:ClientConfiguration} if present to be used to
     #                           initialize underlying {@code http:Client}
-    public function init(string discoveryUrl, 
+    public isolated function init(string discoveryUrl, 
                          http:ClientConfiguration? publisherClientConfig) returns error? {
         self.resourceUrl = discoveryUrl;
         self.discoveryClientEp = check new (discoveryUrl, publisherClientConfig);
@@ -39,7 +39,7 @@ public client class DiscoveryService {
     # + expectedMediaTypes - The expected media types for the subscriber client
     # + expectedLanguageTypes - The expected language types for the subscriber client
     # + return - A `(hub, topic)` as a `(string, string)` if successful or else an `error` if not
-    remote function discoverResourceUrls(string?|string[] expectedMediaTypes, string?|string[] expectedLanguageTypes) 
+    remote isolated function discoverResourceUrls(string?|string[] expectedMediaTypes, string?|string[] expectedLanguageTypes) 
                                         returns @tainted [string, string]|error {    
         map<string|string[]> headers = {};
         if (expectedMediaTypes is string) {

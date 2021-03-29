@@ -21,26 +21,26 @@ listener Listener optionalTargetListener = new (9094);
 
 var optionalSubscriberTarget = @SubscriberServiceConfig { leaseSeconds: 36000, secret: "Kslk30SNF2AChs2" } 
                               service object {
-    remote function onEventNotification(ContentDistributionMessage event) 
+    isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
-        return {};
+        return ACKNOWLEDGEMENT;
     }
 };
 
-@test:AfterGroups { value:["optional-subscriber-target"] }
+@test:AfterGroups { value:["optionalSubscriberTarget"] }
 function afterOptionalTargetUrlTest() {
     checkpanic optionalTargetListener.gracefulStop();
 }
 
 @test:Config { 
-    groups: ["optional-subscriber-target"]
+    groups: ["optionalSubscriberTarget"]
 }
-function testOptionalTargetUrl() returns @tainted error? {
+function testOptionalTargetUrl() {
     do {
         check optionalTargetListener.attach(optionalSubscriberTarget);
         check optionalTargetListener.'start();
     } on fail error e {
-        test:assertFail("Could not start the subscriber-service without subscriber-target-url : " + e.message());
+        test:assertFail(string`Could not start the subscriber-service without subscriber-target-url : ${e.message()}`);
     }
 }
