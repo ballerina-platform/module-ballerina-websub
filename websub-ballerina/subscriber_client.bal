@@ -30,7 +30,7 @@ public client class SubscriptionClient {
     #
     # + url    - The URL at which the subscription should be changed
     # + config - The `http:ClientConfiguration` for the underlying client or `()`
-    public function init(string url, http:ClientConfiguration? config = ()) returns error? {
+    public isolated function init(string url, *http:ClientConfiguration config) returns error? {
         self.url = url;
         self.httpClient = check new (self.url, config);
         self.followRedirects = config?.followRedirects;
@@ -44,7 +44,7 @@ public client class SubscriptionClient {
     # + subscriptionRequest - The `SubscriptionChangeRequest` containing the subscription details
     # + return - The `SubscriptionChangeResponse` indicating subscription details if the request was successful
     #           or else an `error` if an error occurred with the subscription request
-    remote function subscribe(SubscriptionChangeRequest subscriptionRequest)
+    isolated remote function subscribe(SubscriptionChangeRequest subscriptionRequest)
         returns @tainted SubscriptionChangeResponse|error {
 
         http:Client httpClient = self.httpClient;
@@ -62,7 +62,7 @@ public client class SubscriptionClient {
     # + unsubscriptionRequest - The `SubscriptionChangeRequest` containing unsubscription details
     # + return - An unsubscription details if the request was successful or else an `error` if an error occurred
     #            with the unsubscription request
-    remote function unsubscribe(SubscriptionChangeRequest unsubscriptionRequest)
+    isolated remote function unsubscribe(SubscriptionChangeRequest unsubscriptionRequest)
         returns @tainted SubscriptionChangeResponse|error {
 
         http:Client httpClient = self.httpClient;
@@ -117,7 +117,7 @@ isolated function buildSubscriptionChangeRequest(@untainted string mode,
 # + httpClient - The underlying HTTP Client Endpoint
 # + return - The subscription/unsubscription details if the request was successful or else an `error`
 #            if an error occurred
-function processHubResponse(@untainted string hub, @untainted string mode,
+isolated function processHubResponse(@untainted string hub, @untainted string mode,
                             SubscriptionChangeRequest subscriptionChangeRequest,
                             http:Response|http:PayloadType|error response, http:Client httpClient,
                             int remainingRedirects) returns @tainted SubscriptionChangeResponse|error {
@@ -166,7 +166,7 @@ function processHubResponse(@untainted string hub, @untainted string mode,
 # + auth - The auth config to use at the hub (if specified)
 # + return - The subscription/unsubscription details if the request was successful or else an `error`
 #            if an error occurred
-function invokeClientConnectorOnRedirection(@untainted string hub, @untainted string mode,
+isolated function invokeClientConnectorOnRedirection(@untainted string hub, @untainted string mode,
                                             SubscriptionChangeRequest subscriptionChangeRequest,
                                             http:ClientAuthConfig? auth, int remainingRedirects)
     returns @tainted SubscriptionChangeResponse|error {
@@ -177,7 +177,7 @@ function invokeClientConnectorOnRedirection(@untainted string hub, @untainted st
     return unsubscribeWithRetries(hub, subscriptionChangeRequest, auth, remainingRedirects = remainingRedirects);
 }
 
-function subscribeWithRetries(string url, SubscriptionChangeRequest subscriptionRequest,
+isolated function subscribeWithRetries(string url, SubscriptionChangeRequest subscriptionRequest,
                               http:ClientAuthConfig? auth, int remainingRedirects = 0)
              returns @tainted SubscriptionChangeResponse| error {
     http:Client clientEndpoint = check new http:Client(url, { auth: auth });
@@ -187,7 +187,7 @@ function subscribeWithRetries(string url, SubscriptionChangeRequest subscription
                               remainingRedirects);
 }
 
-function unsubscribeWithRetries(string url, SubscriptionChangeRequest unsubscriptionRequest,
+isolated function unsubscribeWithRetries(string url, SubscriptionChangeRequest unsubscriptionRequest,
                                 http:ClientAuthConfig? auth, int remainingRedirects = 0)
              returns @tainted SubscriptionChangeResponse|error {
     http:Client clientEndpoint = check new http:Client(url, {

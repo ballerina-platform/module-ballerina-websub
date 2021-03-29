@@ -23,13 +23,15 @@ import ballerina/http;
 # + leaseSeconds - The period for which the subscription is expected to be active
 # + callback - The callback URL for subscriber-service
 # + secret - The secret to be used for authenticated content distribution
+# + appendServiceUrl - This flag notifies whether or not to append service-path to callback-url
 # + httpConfig - The configuration for the hub client used to interact with the discovered/specified hub
 # + discoveryConfig - HTTP client configurations for resource discovery
 public type SubscriberServiceConfiguration record {|
     string|[string, string] target?;
     int leaseSeconds?;
     string callback?;
-    string secret?;   
+    string secret?;
+    boolean appendServiceUrl = false;   
     http:ClientConfiguration httpConfig?;
     record {|
         string|string[] accept?;

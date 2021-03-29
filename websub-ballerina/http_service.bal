@@ -63,10 +63,12 @@ service class HttpService {
     isolated resource function post .(http:Caller caller, http:Request request) {
         http:Response response = new;
         response.statusCode = http:STATUS_ACCEPTED;
-
         if (self.isEventNotificationAvailable) {
             string secretKey = self.secretKey is () ? "" : <string>self.secretKey;
-            processEventNotification(caller, request, response, self.subscriberService, secretKey);
+            var result = processEventNotification(caller, request, response, self.subscriberService, secretKey);
+            if (result is error) {
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            }
         } else {
             response.statusCode = http:STATUS_NOT_IMPLEMENTED;
         }
@@ -84,16 +86,16 @@ service class HttpService {
 
         RequestQueryParams params = retrieveRequestQueryParams(request);
 
-        match params.hubMode {
+        match params?.hubMode {
             MODE_SUBSCRIBE | MODE_UNSUBSCRIBE => {
-                if (params.hubChallenge is () || params.hubTopic is ()) {
+                if (params?.hubChallenge is () || params?.hubTopic is ()) {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                 } else {
                     if (self.isSubscriptionVerificationAvailable) {
                         processSubscriptionVerification(caller, response, <@untainted> params, self.subscriberService);
                     } else {
                         response.statusCode = http:STATUS_OK;
-                        response.setTextPayload(<string>params.hubChallenge);
+                        response.setTextPayload(<string>params?.hubChallenge);
                     }
                 }
             }
@@ -102,12 +104,7 @@ service class HttpService {
                     processSubscriptionDenial(caller, response, <@untainted> params, self.subscriberService);
                 } else {
                     response.statusCode = http:STATUS_OK;
-                    Acknowledgement result = {
-                        body: {
-                            "message": "Subscription Denial Acknowledged"
-                        }
-                    };
-                    updateResponseBody(response, result["body"], result["headers"]);
+                    updateResponseBody(response, ACKNOWLEDGEMENT["body"], ACKNOWLEDGEMENT["headers"]);
                 }
             }
             _ => {

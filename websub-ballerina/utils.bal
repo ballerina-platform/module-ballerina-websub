@@ -19,47 +19,27 @@ import ballerina/regex;
 import ballerina/crypto;
 import ballerina/log;
 import ballerina/lang.'string as strings;
+import ballerina/random;
+import ballerina/mime;
 
-# Retrieves the `websub:SubscriberServiceConfig` annotation values
+# Generates a random-string of given length
 # 
-# + return - {@code websub:SubscriberServiceConfiguration} if present or `nil` if absent
-isolated function retrieveSubscriberServiceAnnotations(SubscriberService serviceType) returns SubscriberServiceConfiguration? {
-    typedesc<any> serviceTypedesc = typeof serviceType;
-    return serviceTypedesc.@SubscriberServiceConfig;
-}
-
-# Dynamically generates the call-back URL for subscriber-service
-# 
-# + servicePath - service path on which the service will be hosted
-# + config - {@code http:ListenerConfiguration} in use
-# + return - {@code string} contaning the generated URL
-isolated function retriveCallbackUrl(string[]|string servicePath, 
-                                     int port, http:ListenerConfiguration config) returns string {
-    string host = config.host;
-    string protocol = config.secureSocket is () ? "http" : "https";        
-    string concatenatedServicePath = "";
-        
-    if (servicePath is string) {
-        concatenatedServicePath += "/" + <string>servicePath;
-    } else {
-        foreach var pathSegment in <string[]>servicePath {
-            concatenatedServicePath += "/" + pathSegment;
+# + length - required length of the generated string
+# + return - generated random string value or `error` if any error occurred in the execution
+isolated function generateRandomString(int length) returns string | error {
+    int[] codePoints = [];
+    int leftLimit = 48; // numeral '0'
+    int rightLimit = 122; // letter 'z'
+    int iterator = 0;
+    while (iterator < length) {
+        int randomInt = check random:createIntInRange(leftLimit, rightLimit);
+        // character literals from 48 - 57 are numbers | 65 - 90 are capital letters | 97 - 122 are simple letters
+        if (randomInt <= 57 || randomInt >= 65) && (randomInt <= 90 || randomInt >= 97) {
+            codePoints.push(randomInt);
+            iterator += 1;
         }
     }
-
-    return protocol + "://" + host + ":" + port.toString() + concatenatedServicePath;
-}
-
-# Generates a unique URL segment for the subscriber service
-# 
-# + return - {@code string} containing the generated unique URL path segment
-isolated function generateUniqueUrlSegment() returns string {
-    var generatedString = generateRandomString(10);
-    if (generatedString is string) {
-        return generatedString;
-    } else {
-        return COMMON_SERVICE_PATH;
-    }
+    return strings:fromCodePointInts(codePoints);
 }
 
 # Generate the `websub:SubscriptionChangeRequest` from the configurations.
@@ -110,45 +90,53 @@ isolated function retrieveRequestHeaders(http:Request request) returns map<strin
 isolated function retrieveRequestQueryParams(http:Request request) returns RequestQueryParams {
     map<string[]> queryParams = request.getQueryParams();
 
-    string? hubMode = ();
-    if (queryParams.hasKey(HUB_MODE)) {
-        string[] hubModeValues = queryParams.get(HUB_MODE);
-        hubMode = hubModeValues.length() == 1 ? hubModeValues[0] : "";
+    string? hubMode = request.getQueryParamValue(HUB_MODE);
+    string? hubTopic = request.getQueryParamValue(HUB_TOPIC);
+    string? hubChallenge = request.getQueryParamValue(HUB_CHALLENGE);
+    string? hubLeaseSeconds = request.getQueryParamValue(HUB_LEASE_SECONDS);
+    string? hubReason = request.getQueryParamValue(HUB_REASON);
+
+    if (hubMode is string) {
+        if (hubTopic is string && hubChallenge is string) {
+            return {
+                hubMode: hubMode,
+                hubTopic: hubTopic,
+                hubChallenge: hubChallenge,
+                hubLeaseSeconds: hubLeaseSeconds
+            };
+        } else if (hubReason is string) {
+            return {
+                hubMode: hubMode,
+                hubReason: hubReason
+            };
+        } else {
+            return {};
+        }
+    } else {
+        return {};
     }
+}
 
-    string? hubTopic = ();
-    if (queryParams.hasKey(HUB_TOPIC)) {
-        string[] hubTopicValues = queryParams.get(HUB_TOPIC);
-        hubTopic = hubTopicValues.length() == 1 ? hubTopicValues[0] : "";
+# Retrieves request payload for content-verification
+# 
+# + request - original {@code http:Request} object
+# + return - {@code string} containg the text-representation of the payload or {@code error}
+isolated function retrieveTextPayload(http:Request request) returns string|error {
+    string contentType = request.getContentType();
+    match request.getContentType() {
+        mime:APPLICATION_FORM_URLENCODED => {
+            string[] queryParams = [];
+            foreach var ['key, values] in request.getQueryParams().entries() {
+                string concatenatedValue = strings:'join(",", ...values);
+                string query = string`${'key}=${concatenatedValue}`;
+                queryParams.push(query);
+            }
+            return strings:'join("&", ...queryParams);
+        }
+        _ => {
+            return check request.getTextPayload();
+        }
     }
-
-    string? hubChallenge = ();
-    if (queryParams.hasKey(HUB_CHALLENGE)) {
-        string[] hubChallengeValues = queryParams.get(HUB_CHALLENGE);
-        hubChallenge = hubChallengeValues.length() == 1 ? hubChallengeValues[0] : "";
-    }
-
-    string? hubLeaseSeconds = ();
-    if (queryParams.hasKey(HUB_LEASE_SECONDS)) { 
-        string[] hubLeaseSecondsValues =  queryParams.get(HUB_LEASE_SECONDS);
-        hubLeaseSeconds = hubLeaseSecondsValues.length() == 1 ? hubLeaseSecondsValues[0] : ();
-    }
-
-    string? hubReason = ();
-    if (queryParams.hasKey(HUB_REASON)) {
-        string[] hubReasonValues = queryParams.get(HUB_REASON);
-        hubReason = hubReasonValues.length() == 1 ? hubReasonValues[0] : "";
-    }
-
-    RequestQueryParams params = {
-        hubMode: hubMode,
-        hubTopic: hubTopic,
-        hubChallenge: hubChallenge,
-        hubLeaseSeconds: hubLeaseSeconds,
-        hubReason: hubReason
-    };
-
-    return params;
 }
 
 # Verifies the `http:Request` payload with the provided signature value.
@@ -168,9 +156,7 @@ isolated function verifyContent(http:Request request, string secret, string payl
                     string[] splitSignature = regex:split(<string>xHubSignature, "=");
                     string method = splitSignature[0];
                     string signature = regex:replaceAll(<string>xHubSignature, method + "=", "");
-                
                     byte[] generatedSignature = check retrieveContentHash(method, secret, payload);
-
                     return signature == generatedSignature.toBase16(); 
                 }          
         } else {
