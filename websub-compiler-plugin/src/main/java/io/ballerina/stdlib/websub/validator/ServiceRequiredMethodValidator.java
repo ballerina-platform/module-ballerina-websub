@@ -9,12 +9,13 @@ import io.ballerina.stdlib.websub.WebSubDiagnosticCodes;
 import io.ballerina.tools.diagnostics.Diagnostic;
 import io.ballerina.tools.diagnostics.DiagnosticFactory;
 import io.ballerina.tools.diagnostics.DiagnosticInfo;
-import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.ballerina.stdlib.websub.Constants.*;
+import static io.ballerina.stdlib.websub.Constants.ON_EVENT_NOTIFICATION;
+import static io.ballerina.stdlib.websub.Constants.ON_SUBSCRIPTION_VALIDATION_DENIED;
+import static io.ballerina.stdlib.websub.Constants.ON_SUBSCRIPTION_VERIFICATION;
 
 /**
  * {@code ServiceRequiredMethodValidator} validates whether all the
@@ -35,9 +36,9 @@ public class ServiceRequiredMethodValidator implements AnalysisTask<SyntaxNodeAn
                                 || functionName.equalsIgnoreCase(ON_EVENT_NOTIFICATION);
                     }).collect(Collectors.toList());
             if (declaredWebSubRelatedFunctions.isEmpty()) {
-                WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_100;
+                WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_103;
                 DiagnosticInfo diagnosticInfo = new DiagnosticInfo(
-                        errorCode.getCode(), errorCode.getDescription(), DiagnosticSeverity.INFO);
+                        errorCode.getCode(), errorCode.getDescription(), errorCode.getSeverity());
                 Diagnostic diagnostic = DiagnosticFactory
                         .createDiagnostic(diagnosticInfo, serviceNode.location());
                 context.reportDiagnostic(diagnostic);

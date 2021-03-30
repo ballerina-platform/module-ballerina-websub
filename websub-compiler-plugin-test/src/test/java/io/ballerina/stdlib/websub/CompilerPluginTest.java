@@ -25,7 +25,9 @@ import io.ballerina.projects.ProjectEnvironmentBuilder;
 import io.ballerina.projects.directory.BuildProject;
 import io.ballerina.projects.environment.Environment;
 import io.ballerina.projects.environment.EnvironmentBuilder;
+import io.ballerina.tools.diagnostics.Diagnostic;
 import io.ballerina.tools.diagnostics.DiagnosticInfo;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.PrintStream;
@@ -60,9 +62,6 @@ public class CompilerPluginTest {
         });
 
          System.out.println("Test case completed");
-//        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-//        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-//        Assert.assertEquals(diagnostic.diagnosticInfo().code(), "WEBSUB_101");
     }
 
     @Test
@@ -71,7 +70,6 @@ public class CompilerPluginTest {
         PackageCompilation compilation = currentPackage.getCompilation();
 
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        System.out.println("Found diagnostic-results ");
         diagnosticResult.diagnostics().forEach(d -> {
             DiagnosticInfo info = d.diagnosticInfo();
             String msg = String.format(
@@ -79,8 +77,17 @@ public class CompilerPluginTest {
                     info.code(), info.messageFormat());
             System.out.println(msg);
         });
+    }
 
-        System.out.println("Test case completed");
+    @Test
+    public void testCompilerPluginForRemoteMethodValidation() {
+        Package currentPackage = loadPackage("sample_3");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        System.out.println(diagnostic.diagnosticInfo().messageFormat());
+        Assert.assertEquals(diagnostic.diagnosticInfo().code(), "WEBSUB_102");
     }
 
     private Package loadPackage(String path) {

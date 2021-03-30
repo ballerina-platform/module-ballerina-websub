@@ -15,12 +15,13 @@ import io.ballerina.tools.text.LinePosition;
 
 import java.util.Optional;
 
+/**
+ * {@code ValidatorUtils} contains the utility methods required for validation tasks.
+ */
 public final class ValidatorUtils {
     public static boolean isWebSubService(SyntaxNodeAnalysisContext context) {
-        ServiceDeclarationNode serviceNode =
-                (ServiceDeclarationNode) context.node();
-        SeparatedNodeList<ExpressionNode> expressions =
-                serviceNode.expressions();
+        ServiceDeclarationNode serviceNode = (ServiceDeclarationNode) context.node();
+        SeparatedNodeList<ExpressionNode> expressions = serviceNode.expressions();
         Optional<TypeSymbol> moduleTypeDescriptor = expressions.stream()
                 .filter(e -> e.kind() == SyntaxKind.EXPLICIT_NEW_EXPRESSION ||
                         e.kind() == SyntaxKind.SIMPLE_NAME_REFERENCE)
@@ -47,4 +48,16 @@ public final class ValidatorUtils {
             return signature.contains(Constants.MODULE_NAME);
         }
     }
+
+//    public static boolean isWebSubServiceV2(SyntaxNodeAnalysisContext ctx) {
+//        ServiceDeclarationNode serviceNode = (ServiceDeclarationNode) ctx.node();
+//        Optional<Symbol> symbol = ctx.semanticModel().symbol(serviceNode);
+//        if (symbol.isPresent()) {
+//            ServiceDeclarationSymbol serviceDeclarationSymbol = (ServiceDeclarationSymbol) symbol.get();
+//            List<TypeSymbol> typeSymbols = serviceDeclarationSymbol.listenerTypes();
+//        } else {
+//            return false;
+//        }
+//        return false;
+//    }
 }
