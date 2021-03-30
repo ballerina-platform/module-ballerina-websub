@@ -39,7 +39,7 @@ public client class DiscoveryService {
     # + expectedMediaTypes - The expected media types for the subscriber client
     # + expectedLanguageTypes - The expected language types for the subscriber client
     # + return - A `(hub, topic)` as a `(string, string)` if successful or else an `error` if not
-    isolated remote function discoverResourceUrls(string?|string[] expectedMediaTypes, string?|string[] expectedLanguageTypes) 
+    remote isolated function discoverResourceUrls(string?|string[] expectedMediaTypes, string?|string[] expectedLanguageTypes) 
                                         returns @tainted [string, string]|error {    
         map<string|string[]> headers = {};
         if (expectedMediaTypes is string) {

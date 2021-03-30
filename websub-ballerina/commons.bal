@@ -93,7 +93,7 @@ public type SubscriptionVerification record {
 public type ContentDistributionMessage record {
     map<string|string[]>? headers = ();
     string? contentType = ();
-    json|xml|string|byte[] content;
+    map<string[]>|json|xml|string|byte[] content;
 };
 
 # Record representing the common-response to be returned.
@@ -151,10 +151,16 @@ public type SubscriptionChangeResponse record {|
 # + hubChallenge - value for the hub.challenge parameter
 # + hubLeaseSeconds - value for the hub.lease_seconds parameter
 # + hubReason - value for the hub.reason parameter
-public type RequestQueryParams record {|
-    string? hubMode;
-    string? hubTopic;
-    string? hubChallenge;
-    string? hubLeaseSeconds;
-    string? hubReason;
+type RequestQueryParams record {|
+    string hubMode?;
+    string hubTopic?;
+    string hubChallenge?;
+    string? hubLeaseSeconds = ();
+    string hubReason?;
 |};
+
+# Common Responses to be used in subscriber-service implementation
+public final readonly & Acknowledgement ACKNOWLEDGEMENT = {};
+public final readonly & SubscriptionVerificationSuccess SUBSCRIPTION_VERIFICATION_SUCCESS = {};
+public final SubscriptionVerificationError SUBSCRIPTION_VERIFICATION_ERROR = error SubscriptionVerificationError("Subscription verification failed");
+public final SubscriptionDeletedError SUBSCRIPTION_DELETED_ERROR = error SubscriptionDeletedError("Subscription deleted");
