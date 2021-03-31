@@ -12,10 +12,10 @@ public enum WebSubDiagnosticCodes {
             DiagnosticSeverity.ERROR),
     WEBSUB_102("WEBSUB_102", "websub:SubscriberService should only implement remote methods",
             DiagnosticSeverity.ERROR),
-    WEBSUB_103("WEBSUB_103", "websub:SubscriberService should implement 'onEventNotification'",
+    WEBSUB_103("WEBSUB_103", "websub:SubscriberService should implement onEventNotification method",
             DiagnosticSeverity.ERROR),
-    WEBSUB_104("WEBSUB_104", "`{0}` is not allowed in websub:SubscriberService declaration",
-               DiagnosticSeverity.ERROR);
+    WEBSUB_104("WEBSUB_104", "{0} method is not allowed in websub:SubscriberService declaration",
+            DiagnosticSeverity.ERROR);
 
     private String code;
     private String description;

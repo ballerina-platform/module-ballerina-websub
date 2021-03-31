@@ -1,7 +1,7 @@
 import ballerina/websub;
 import ballerina/log;
 
-listener websub:Listener simpleListener = new (10002);
+listener websub:Listener simpleListener = new (10004);
 
 @websub:SubscriberServiceConfig{}
 service /sample on simpleListener {

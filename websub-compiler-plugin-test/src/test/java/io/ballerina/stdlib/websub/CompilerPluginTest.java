@@ -69,7 +69,7 @@ public class CompilerPluginTest {
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
         Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_103");
         Assert.assertEquals(diagnostic.message(),
-                "websub:SubscriberService should implement 'onEventNotification'");
+                "websub:SubscriberService should implement onEventNotification method");
     }
 
     @Test
@@ -83,7 +83,7 @@ public class CompilerPluginTest {
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
         Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_104");
         Assert.assertEquals(diagnostic.message(),
-                "`onNewEvent` is not allowed in websub:SubscriberService declaration");
+                "onNewEvent method is not allowed in websub:SubscriberService declaration");
     }
 
     private Package loadPackage(String path) {
@@ -93,8 +93,7 @@ public class CompilerPluginTest {
     }
 
     private static ProjectEnvironmentBuilder getEnvironmentBuilder() {
-        Environment environment = EnvironmentBuilder.getBuilder()
-                                .setBallerinaHome(DISTRIBUTION_PATH).build();
+        Environment environment = EnvironmentBuilder.getBuilder().setBallerinaHome(DISTRIBUTION_PATH).build();
         return ProjectEnvironmentBuilder.getBuilder(environment);
     }
 }
