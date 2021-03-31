@@ -7,6 +7,7 @@ import io.ballerina.compiler.api.symbols.VariableSymbol;
 import io.ballerina.compiler.syntax.tree.ExpressionNode;
 import io.ballerina.compiler.syntax.tree.FunctionDefinitionNode;
 import io.ballerina.compiler.syntax.tree.NodeLocation;
+import io.ballerina.compiler.syntax.tree.RequiredParameterNode;
 import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
@@ -21,7 +22,9 @@ import io.ballerina.tools.diagnostics.DiagnosticInfo;
 import io.ballerina.tools.text.LinePosition;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,12 +34,27 @@ import java.util.stream.Collectors;
  */
 public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnalysisContext> {
     private static final List<String> allowedMethods;
+    private static final Map<String, List<String>> allowedParameterTypes;
+    private static final Map<String, List<String>> allowedReturnTypes;
 
     static {
         allowedMethods = Arrays.asList(
                 Constants.ON_SUBSCRIPTION_VALIDATION_DENIED,
                 Constants.ON_SUBSCRIPTION_VERIFICATION,
                 Constants.ON_EVENT_NOTIFICATION);
+        allowedParameterTypes = Map.of(
+                Constants.ON_SUBSCRIPTION_VALIDATION_DENIED,
+                Collections.singletonList(Constants.SUBSCRIPTION_DENIED_ERROR),
+                Constants.ON_SUBSCRIPTION_VERIFICATION,
+                Collections.singletonList(Constants.SUBSCRIPTION_VERIFICATION),
+                Constants.ON_EVENT_NOTIFICATION,
+                Collections.singletonList(Constants.CONTENT_DISTRIBUTION_MESSAGE)
+        );
+        allowedReturnTypes = Map.of(
+                Constants.ON_SUBSCRIPTION_VALIDATION_DENIED, Arrays.asList(""),
+                Constants.ON_SUBSCRIPTION_VERIFICATION, Arrays.asList(""),
+                Constants.ON_EVENT_NOTIFICATION, Arrays.asList("")
+        );
     }
 
     @Override
@@ -51,13 +69,13 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
             validateOnlyRemoteMethodsPresent(context, availableFunctionDeclarations);
             validateRequiredMethodsImplemented(context, availableFunctionDeclarations, serviceNode.location());
             validateNoAdditionalMethodsImplemented(context, availableFunctionDeclarations);
+            validateMethodParameters(context, availableFunctionDeclarations);
         }
     }
 
     private void validateOnlyRemoteMethodsPresent(SyntaxNodeAnalysisContext context,
                                                   List<FunctionDefinitionNode> availableFunctionDeclarations) {
-        availableFunctionDeclarations
-                .stream()
+        availableFunctionDeclarations.stream()
                 .filter(fd -> fd.qualifierList().stream().noneMatch(q -> q.kind() == SyntaxKind.REMOTE_KEYWORD))
                 .forEach(fd -> {
                     WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_102;
@@ -78,8 +96,7 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
 
     private void validateNoAdditionalMethodsImplemented(SyntaxNodeAnalysisContext context,
                                                         List<FunctionDefinitionNode> availableFunctionDeclarations) {
-        availableFunctionDeclarations
-                .stream()
+        availableFunctionDeclarations.stream()
                 .filter(fd -> !allowedMethods.contains(fd.functionName().toString()))
                 .forEach(fd -> {
                     String functionName = fd.functionName().toString();
@@ -88,10 +105,20 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                 });
     }
 
-//    private void validateMethodParameters(SyntaxNodeAnalysisContext context,
-//                                          List<FunctionDefinitionNode> availableFunctionDeclarations) {
-//
-//    }
+    private void validateMethodParameters(SyntaxNodeAnalysisContext context,
+                                          List<FunctionDefinitionNode> availableFunctionDeclarations) {
+        availableFunctionDeclarations.stream()
+                .filter(fd -> allowedMethods.contains(fd.functionName().toString()))
+                .forEach(fd -> {
+                    String functionName = fd.functionName().toString();
+                    List<String> allowedParams = allowedParameterTypes.get(functionName);
+                    List<String> invalidParameters = fd.functionSignature().parameters()
+                            .stream()
+                            .map(param -> ((RequiredParameterNode) param).typeName().toString())
+                            .filter(param -> !allowedParams.contains(param))
+                            .collect(Collectors.toList());
+                });
+    }
 
     private void updateContext(SyntaxNodeAnalysisContext context, WebSubDiagnosticCodes errorCode,
                                NodeLocation location, Object... args) {
