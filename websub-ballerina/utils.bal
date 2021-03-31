@@ -20,6 +20,8 @@ import ballerina/crypto;
 import ballerina/log;
 import ballerina/lang.'string as strings;
 import ballerina/random;
+import ballerina/url;
+import ballerina/io;
 import ballerina/mime;
 
 # Generates a random-string of given length
@@ -125,13 +127,16 @@ isolated function retrieveTextPayload(http:Request request) returns string|error
     string contentType = request.getContentType();
     match request.getContentType() {
         mime:APPLICATION_FORM_URLENCODED => {
-            string[] queryParams = [];
-            foreach var ['key, values] in request.getQueryParams().entries() {
-                string concatenatedValue = strings:'join(",", ...values);
-                string query = string`${'key}=${concatenatedValue}`;
-                queryParams.push(query);
+            map<string> retrievedFormParams = check request.getFormParams();
+            io:println("[URL ENCODED CONTENT RETRIEVED] ", retrievedFormParams.toString());
+            string[] formParams = [];
+            foreach var ['key, paramValue] in retrievedFormParams.entries() {
+                string decodedValue = check url:decode(paramValue, "UTF-8");
+                string query = string`${'key}=${decodedValue}`;
+                io:println("[QUERY] " + query);
+                formParams.push(query);
             }
-            return strings:'join("&", ...queryParams);
+            return strings:'join("&", ...formParams);
         }
         _ => {
             return check request.getTextPayload();

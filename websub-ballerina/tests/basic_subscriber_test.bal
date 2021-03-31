@@ -124,7 +124,8 @@ function testOnEventNotificationSuccessXml() returns @tainted error? {
 }
 function testOnEventNotificationSuccessForUrlEncoded() returns @tainted error? {
     http:Request request = new;
+    request.setTextPayload("param1=value1&param2=value2");
     check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
-    http:Response response = check httpClient->post("/?param1=value1&param2=value2", request);
+    http:Response response = check httpClient->post("/", request);
     test:assertEquals(response.statusCode, 202);
 }

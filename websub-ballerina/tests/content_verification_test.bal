@@ -88,8 +88,9 @@ function testOnEventNotificationSuccessForUrlEncodedForContentVerification() ret
     string payload = "param1=value1&param2=value2";
     byte[] payloadHash = check retrievePayloadSignature(hashKey, payload);
     request.setHeader("X-Hub-Signature", string`sha256=${payloadHash.toBase16()}`);
+    request.setTextPayload(payload);
     check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
-    http:Response response = check contentVerificationClient->post(string`/?${payload}`, request);
+    http:Response response = check contentVerificationClient->post("", request);
     test:assertEquals(response.statusCode, 202);
     test:assertTrue(urlEncodedContentVerified);
 }
