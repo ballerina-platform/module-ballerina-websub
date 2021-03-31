@@ -5,10 +5,10 @@ import io.ballerina.compiler.syntax.tree.SyntaxKind;
 import io.ballerina.compiler.syntax.tree.Token;
 import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
+import io.ballerina.stdlib.websub.WebSubDiagnosticCodes;
 import io.ballerina.tools.diagnostics.Diagnostic;
 import io.ballerina.tools.diagnostics.DiagnosticFactory;
 import io.ballerina.tools.diagnostics.DiagnosticInfo;
-import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 
 /**
  * {@code CheckPanicValidator} performs validations related to usage of `checkpanic` expression.
@@ -19,8 +19,9 @@ public class CheckPanicValidator implements AnalysisTask<SyntaxNodeAnalysisConte
         CheckExpressionNode checkExpressionNode = (CheckExpressionNode) context.node();
         Token token = checkExpressionNode.checkKeyword();
         if (token.kind() == SyntaxKind.CHECKPANIC_KEYWORD) {
+            WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_100;
             DiagnosticInfo info = new DiagnosticInfo(
-                    "WEBSUB_101", "checkpanic detected, use check", DiagnosticSeverity.WARNING);
+                    errorCode.getCode(), errorCode.getDescription(), errorCode.getSeverity());
             Diagnostic diagnostic = DiagnosticFactory.createDiagnostic(info, checkExpressionNode.location());
             context.reportDiagnostic(diagnostic);
         }

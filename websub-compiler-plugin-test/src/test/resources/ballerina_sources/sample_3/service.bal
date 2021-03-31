@@ -1,13 +1,22 @@
 import ballerina/websub;
 import ballerina/log;
 
-listener websub:Listener simpleListener = new (10002);
+listener websub:Listener simpleListener = new (10003);
 
 @websub:SubscriberServiceConfig{}
 service /sample on simpleListener {
-    function onEventNotification(websub:ContentDistributionMessage event)
-                        returns websub:Acknowledgement|websub:SubscriptionDeletedError? {
-        log:printInfo("onEventNotification invoked ", contentDistributionMessage = event);
-        return {};
+    isolated remote function onSubscriptionValidationDenied(websub:SubscriptionDeniedError msg) returns websub:Acknowledgement? {
+        log:printDebug("onSubscriptionValidationDenied invoked");
+        return websub:ACKNOWLEDGEMENT;
+    }
+
+    isolated remote function onSubscriptionVerification(websub:SubscriptionVerification msg)
+                        returns websub:SubscriptionVerificationSuccess|websub:SubscriptionVerificationError {
+        log:printDebug("onSubscriptionVerification invoked");
+        if (msg.hubTopic == "test1") {
+            return websub:SUBSCRIPTION_VERIFICATION_ERROR;
+        } else {
+            return websub:SUBSCRIPTION_VERIFICATION_SUCCESS;
+        }
     }
 }

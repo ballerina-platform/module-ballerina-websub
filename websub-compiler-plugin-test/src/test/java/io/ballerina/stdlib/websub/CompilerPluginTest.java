@@ -38,56 +38,52 @@ import java.nio.file.Paths;
  * This class includes tests for Ballerina Graphql compiler plugin.
  */
 public class CompilerPluginTest {
-    private static final Path RESOURCE_DIRECTORY = Paths.get(
-            "src", "test", "resources", "ballerina_sources")
-            .toAbsolutePath();
+    private static final Path RESOURCE_DIRECTORY = Paths
+            .get("src", "test", "resources", "ballerina_sources").toAbsolutePath();
     private static final PrintStream OUT = System.out;
-    private static final Path DISTRIBUTION_PATH = Paths.get(
-            "build", "target", "ballerina-distribution")
-            .toAbsolutePath();
-
-    @Test
-    public void testCompilerPlugin() {
-        Package currentPackage = loadPackage("sample_1");
-        PackageCompilation compilation = currentPackage.getCompilation();
-
-        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        System.out.println("Found diagnostic-results ");
-        diagnosticResult.diagnostics().forEach(d -> {
-            DiagnosticInfo info = d.diagnosticInfo();
-            String msg = String.format(
-                    "[SERVICE_DECL_WITH_NEW] Received Diagnostic [%s] with description [%s]",
-                    info.code(), info.messageFormat());
-                    System.out.println(msg);
-        });
-
-         System.out.println("Test case completed");
-    }
-
-    @Test
-    public void testCompilerPluginForNamedListener() {
-        Package currentPackage = loadPackage("sample_2");
-        PackageCompilation compilation = currentPackage.getCompilation();
-
-        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        diagnosticResult.diagnostics().forEach(d -> {
-            DiagnosticInfo info = d.diagnosticInfo();
-            String msg = String.format(
-                    "[SERVICE_DECL_WITH_LISTENER] Received Diagnostic [%s] with description [%s]",
-                    info.code(), info.messageFormat());
-            System.out.println(msg);
-        });
-    }
+    private static final Path DISTRIBUTION_PATH = Paths
+            .get("build", "target", "ballerina-distribution").toAbsolutePath();
 
     @Test
     public void testCompilerPluginForRemoteMethodValidation() {
+        Package currentPackage = loadPackage("sample_2");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
+        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_102");
+        Assert.assertEquals(diagnostic.message(),
+                "websub:SubscriberService should only implement remote methods");
+    }
+
+    @Test
+    public void testCompilerPluginForRequiredMethodValidation() {
         Package currentPackage = loadPackage("sample_3");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
-        System.out.println(diagnostic.diagnosticInfo().messageFormat());
-        Assert.assertEquals(diagnostic.diagnosticInfo().code(), "WEBSUB_102");
+        DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
+        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_103");
+        Assert.assertEquals(diagnostic.message(),
+                "websub:SubscriberService should implement 'onEventNotification'");
+    }
+
+    @Test
+    public void testCompilerPluginForNotAllowedMethods() {
+        Package currentPackage = loadPackage("sample_4");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
+        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_104");
+        Assert.assertEquals(diagnostic.message(),
+                "`onNewEvent` is not allowed in websub:SubscriberService declaration");
     }
 
     private Package loadPackage(String path) {
