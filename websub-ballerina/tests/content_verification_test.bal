@@ -100,16 +100,16 @@ isolated function retrievePayloadSignature(string 'key, string|xml|json|byte[] p
     if (payload is byte[]) {
         return crypto:hmacSha256(payload, keyArr);
     } else if (payload is string) {
-        byte[] inputArr = (<string>payload).toBytes();
+        byte[] inputArr = payload.toBytes();
         return crypto:hmacSha256(inputArr, keyArr);
     } else if (payload is xml) {
-        byte[] inputArr = (<xml>payload).toString().toBytes();
+        byte[] inputArr = payload.toString().toBytes();
         return crypto:hmacSha256(inputArr, keyArr);   
     } else if (payload is map<string>) {
-        byte[] inputArr = (<map<string>>payload).toString().toBytes();
+        byte[] inputArr = payload.toString().toBytes();
         return crypto:hmacSha256(inputArr, keyArr); 
     } else {
-        byte[] inputArr = (<json>payload).toJsonString().toBytes();
+        byte[] inputArr = payload.toJsonString().toBytes();
         return crypto:hmacSha256(inputArr, keyArr);
     }
 }

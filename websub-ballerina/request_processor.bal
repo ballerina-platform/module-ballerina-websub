@@ -74,7 +74,7 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
 isolated function processEventNotification(http:Caller caller, http:Request request, 
                                            http:Response response, SubscriberService subscriberService,
                                            string secretKey) returns error? {
-    string payload = check retrieveTextPayload(request);
+    string payload = check request.getTextPayload();
     boolean isVerifiedContent = check verifyContent(request, secretKey, payload);
     if (!isVerifiedContent) {
         return;
