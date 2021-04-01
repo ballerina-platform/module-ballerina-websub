@@ -42,7 +42,7 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
                         returns Acknowledgement|SubscriptionDeletedError? {
         match event.contentType {
             mime:APPLICATION_FORM_URLENCODED => {
-                map<string[]> content = <map<string[]>> event.content;
+                map<string> content = <map<string>> event.content;
                 log:printInfo("URL encoded content received ", content = content);
             }
             _ => {
@@ -114,7 +114,6 @@ function testOnEventNotificationSuccessXml() returns @tainted error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
     request.setPayload(payload);
-
     http:Response response = check httpClient->post("/", request);
     test:assertEquals(response.statusCode, 202);
 }
@@ -124,7 +123,8 @@ function testOnEventNotificationSuccessXml() returns @tainted error? {
 }
 function testOnEventNotificationSuccessForUrlEncoded() returns @tainted error? {
     http:Request request = new;
+    request.setTextPayload("param1=value1&param2=value2");
     check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
-    http:Response response = check httpClient->post("/?param1=value1&param2=value2", request);
+    http:Response response = check httpClient->post("", request);
     test:assertEquals(response.statusCode, 202);
 }
