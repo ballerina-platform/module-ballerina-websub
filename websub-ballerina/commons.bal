@@ -93,7 +93,7 @@ public type SubscriptionVerification record {
 public type ContentDistributionMessage record {
     map<string|string[]>? headers = ();
     string? contentType = ();
-    map<string>|json|xml|string|byte[] content;
+    map<string|string[]>|json|xml|string|byte[] content;
 };
 
 # Record representing the common-response to be returned.
