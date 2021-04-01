@@ -31,7 +31,7 @@ boolean xmlContentVerified = false;
 service /subscriber on new Listener(9098) {
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
-        log:printInfo("onEventNotification invoked ", contentDistributionMessage = event);
+        log:printInfo("[VERIFICATION] onEventNotification invoked ", contentDistributionMessage = event);
         match event.contentType {
             mime:APPLICATION_FORM_URLENCODED => {
                 urlEncodedContentVerified = true;
@@ -87,9 +87,10 @@ function testOnEventNotificationSuccessForUrlEncodedForContentVerification() ret
     http:Request request = new;
     string payload = "param1=value1&param2=value2";
     byte[] payloadHash = check retrievePayloadSignature(hashKey, payload);
+    request.setTextPayload(payload);
     request.setHeader("X-Hub-Signature", string`sha256=${payloadHash.toBase16()}`);
     check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
-    http:Response response = check contentVerificationClient->post(string`/?${payload}`, request);
+    http:Response response = check contentVerificationClient->post("", request);
     test:assertEquals(response.statusCode, 202);
     test:assertTrue(urlEncodedContentVerified);
 }

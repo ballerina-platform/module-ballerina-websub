@@ -17,6 +17,7 @@
 import ballerina/http;
 import ballerina/mime;
 import ballerina/log;
+import ballerina/url;
 
 # Porcesses the subscription / unsubscription intent verification requests from `hub`
 # 
@@ -113,10 +114,15 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
             };  
         }
         mime:APPLICATION_FORM_URLENCODED => {
+            map<string> formContent = check request.getFormParams();
+            map<string> decodedContent = {};
+            foreach var ['key, value] in formContent.entries() {
+                decodedContent['key] = check url:decode(value, "UTF-8");
+            }
             message = {
                 headers: headers,
                 contentType: contentType,
-                content: request.getQueryParams()
+                content: decodedContent
             }; 
         }
         _ => {

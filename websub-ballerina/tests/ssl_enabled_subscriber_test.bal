@@ -122,7 +122,8 @@ function testOnEventNotificationSuccessXmlWithSsl() returns @tainted error? {
 }
 function testOnEventNotificationSuccessForUrlEncodedWithSsl() returns @tainted error? {
     http:Request request = new;
+    request.setTextPayload("param1=value1&param2=value2");
     check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
-    http:Response response = check sslEnabledClient->post("/?param1=value1&param2=value2", request);
+    http:Response response = check sslEnabledClient->post("", request);
     test:assertEquals(response.statusCode, 202);
 }
