@@ -17,32 +17,29 @@
 import ballerina/log;
 import ballerina/test;
 import ballerina/http;
+import ballerina/mime;
 
 service class SimpleWebsubService {
     *SubscriberService;
-    remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
+    isolated remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         log:printDebug("onSubscriptionValidationDenied invoked");
-        Acknowledgement ack = {
-                  headers: {"header1": "value"},
-                  body: {"formparam1": "value1"}
-        };
-        return ack;
+        return ACKNOWLEDGEMENT;
     }
 
-    remote function onSubscriptionVerification(SubscriptionVerification msg)
-                        returns SubscriptionVerificationSuccess | SubscriptionVerificationError {
+    isolated remote function onSubscriptionVerification(SubscriptionVerification msg)
+                        returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
         log:printDebug("onSubscriptionVerification invoked");
         if (msg.hubTopic == "test1") {
-            return error SubscriptionVerificationError("Hub topic not supported");
+            return SUBSCRIPTION_VERIFICATION_ERROR;
         } else {
-            return {};
+            return SUBSCRIPTION_VERIFICATION_SUCCESS;
         }
       }
 
-    remote function onEventNotification(ContentDistributionMessage event) 
-                        returns Acknowledgement | SubscriptionDeletedError? {
+    isolated remote function onEventNotification(ContentDistributionMessage event) 
+                        returns Acknowledgement|SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
-        return {};
+        return ACKNOWLEDGEMENT;
     }
 }
 
@@ -90,7 +87,7 @@ function testOnIntentVerificationFailureWithManualConfigAttach() returns @tainte
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
     map<string> responseBody = decodeResponseBody(payload);
-    test:assertEquals(responseBody["reason"], "Hub topic not supported");
+    test:assertEquals(responseBody["reason"], "Subscription verification failed");
 }
 
 @test:Config {
@@ -113,5 +110,16 @@ function testOnEventNotificationSuccessXmlWithManualConfigAttach() returns @tain
     xml payload = xml `<body><action>publish</action></body>`;
     request.setPayload(payload);
     http:Response response = check manualConfigAttachClientEp->post("/", request);
+    test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["manualConfigAttach"]
+}
+function testOnEventNotificationSuccessForUrlEncodedWithManualConfigAttach() returns @tainted error? {
+    http:Request request = new;
+    request.setTextPayload("param1=value1&param2=value2");
+    check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
+    http:Response response = check manualConfigAttachClientEp->post("", request);
     test:assertEquals(response.statusCode, 202);
 }

@@ -25,19 +25,19 @@ const string HUB_FAILURE_URL = "http://127.0.0.1:9192/common/failed";
 const string COMMON_TOPIC = "https://sample.topic.com";
 
 service /common on new http:Listener(9192) {
-    resource function get discovery(http:Caller caller, http:Request request) {
+    isolated resource function get discovery(http:Caller caller, http:Request request) {
         http:Response response = new;
         response.addHeader("Link", "<http://127.0.0.1:9192/common/hub>; rel=\"hub\"");
         response.addHeader("Link", "<https://sample.topic.com>; rel=\"self\"");
-        var resp = caller->respond(response);
+        http:ListenerError? resp = caller->respond(response);
     }
 
-    resource function post hub(http:Caller caller, http:Request request) {
-        var resp = caller->respond();
+    isolated resource function post hub(http:Caller caller, http:Request request) {
+        http:ListenerError? resp = caller->respond();
     }
 }
 
-function getServiceConfig(string|[string, string] target) returns SubscriberServiceConfiguration {
+isolated function getServiceConfig(string|[string, string] target) returns SubscriberServiceConfiguration {
     return {
         target: target,
         leaseSeconds: 36000,
@@ -48,7 +48,7 @@ function getServiceConfig(string|[string, string] target) returns SubscriberServ
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-function testSubscriptionInitiationSuccessWithDiscoveryUrl() returns @tainted error? {
+isolated function testSubscriptionInitiationSuccessWithDiscoveryUrl() returns @tainted error? {
     SubscriberServiceConfiguration config = getServiceConfig(DISCOVERY_SUCCESS_URL);
     check initiateSubscription(config, CALLBACK);
 }
@@ -56,7 +56,7 @@ function testSubscriptionInitiationSuccessWithDiscoveryUrl() returns @tainted er
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-function testSubscriptionInitiationSuccessWithHubAndTopic() returns @tainted error? {
+isolated function testSubscriptionInitiationSuccessWithHubAndTopic() returns @tainted error? {
     SubscriberServiceConfiguration config = getServiceConfig([ HUB_SUCCESS_URL, COMMON_TOPIC ]);
     check initiateSubscription(config, CALLBACK);
 }
@@ -64,7 +64,7 @@ function testSubscriptionInitiationSuccessWithHubAndTopic() returns @tainted err
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @tainted error? {
+isolated function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @tainted error? {
     SubscriberServiceConfiguration config = getServiceConfig(DISCOVERY_FAILURE_URL);
     var response = initiateSubscription(config, CALLBACK);
     test:assertTrue(response is ResourceDiscoveryFailedError);
@@ -73,7 +73,7 @@ function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @tainted er
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-function testSubscriptionInitiationFailureWithHubAndTopic() returns @tainted error? {
+isolated function testSubscriptionInitiationFailureWithHubAndTopic() returns @tainted error? {
     SubscriberServiceConfiguration config = getServiceConfig([ HUB_FAILURE_URL, COMMON_TOPIC ]);
     var response = initiateSubscription(config, CALLBACK);
     test:assertTrue(response is SubscriptionInitiationFailedError);

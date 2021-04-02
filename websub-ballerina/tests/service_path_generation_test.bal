@@ -21,25 +21,25 @@ listener Listener pathGenerationListener = new (9092);
 
 var serviceWithPathGeneration = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, secret: "Kslk30SNF2AChs2" } 
                               service object {
-    remote function onEventNotification(ContentDistributionMessage event) 
+    isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
-        return {};
+        return ACKNOWLEDGEMENT;
     }
 };
 
-@test:AfterGroups { value:["service-path-generation"] }
+@test:AfterGroups { value:["servicePathGeneration"] }
 function afterPathGenerationTest() {
     checkpanic pathGenerationListener.gracefulStop();
 }
 
 @test:Config { 
-    groups: ["service-path-generation"]
+    groups: ["servicePathGeneration"]
 }
-function testServicePathGeneration() returns @tainted error? {
+function testServicePathGeneration() {
     do {
-        var attached = pathGenerationListener.attach(serviceWithPathGeneration);
+        check pathGenerationListener.attach(serviceWithPathGeneration);
     } on fail error e {
-        test:assertFail("Could not start the subscriber-service with service-path generation : " + e.message());
+        test:assertFail(string`Could not start the subscriber-service with service-path generation : ${e.message()}`);
     }
 }
