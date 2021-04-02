@@ -18,6 +18,7 @@ import ballerina/log;
 import ballerina/test;
 import ballerina/http;
 import ballerina/mime;
+import ballerina/io;
 
 ListenerConfiguration listenerConfigs = {
     secureSocket: {
@@ -49,7 +50,7 @@ service /subscriber on sslEnabledListener {
 
     isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
-        log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+        io:println("onEventNotification invoked ", event);
         return ACKNOWLEDGEMENT;
     }
 }
@@ -112,6 +113,26 @@ function testOnEventNotificationSuccessXmlWithSsl() returns @tainted error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
     request.setPayload(payload);
+
+    http:Response response = check sslEnabledClient->post("/", request);
+    test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["sslEnabledSubscriber"]
+}
+function testOnEventNotificationSuccessMimeWithSsl() returns @tainted error? {
+    http:Request request = new;
+    mime:Entity jsonBodyPart = new;
+    jsonBodyPart.setContentDisposition(getContentDispositionForFormData("json part"));
+    jsonBodyPart.setJson({"name": "Ballerina"});
+
+    mime:Entity textBodyPart = new;
+    textBodyPart.setContentDisposition(getContentDispositionForFormData("text part"));
+    textBodyPart.setText("Sample text");
+
+    mime:Entity[] payload = [jsonBodyPart, textBodyPart];
+    request.setBodyParts(payload);
 
     http:Response response = check sslEnabledClient->post("/", request);
     test:assertEquals(response.statusCode, 202);

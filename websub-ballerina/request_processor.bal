@@ -74,7 +74,8 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
 isolated function processEventNotification(http:Caller caller, http:Request request, 
                                            http:Response response, SubscriberService subscriberService,
                                            string secretKey) returns error? {
-    string payload = check request.getTextPayload();
+    var payloadType = request.getContentType();
+    string|mime:Entity[] payload = payloadType.includes("multipart") ? check request.getBodyParts() : check request.getTextPayload();
     boolean isVerifiedContent = check verifyContent(request, secretKey, payload);
     if (!isVerifiedContent) {
         return;
@@ -105,6 +106,13 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
                 contentType: contentType,
                 content: check request.getTextPayload()
             };              
+        }
+        mime:MULTIPART_FORM_DATA | mime:MULTIPART_MIXED | mime:MULTIPART_ALTERNATIVE => {
+            message = {
+                headers: headers,
+                contentType: contentType,
+                content: checkpanic request.getBodyParts()
+            };    
         }
         mime:APPLICATION_OCTET_STREAM => {
             message = {

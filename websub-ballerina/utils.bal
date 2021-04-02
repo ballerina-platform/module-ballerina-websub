@@ -20,6 +20,7 @@ import ballerina/crypto;
 import ballerina/log;
 import ballerina/lang.'string as strings;
 import ballerina/random;
+import ballerina/mime;
 
 # Generates a random-string of given length
 # 
@@ -122,7 +123,7 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
 # + secret - pre-shared client-secret value
 # + payload - {@code string} value of the request body
 # + return - `true` if the verification is successfull, else `false`
-isolated function verifyContent(http:Request request, string secret, string payload) returns boolean|error {
+isolated function verifyContent(http:Request request, string secret, string|mime:Entity[] payload) returns boolean|error {
     if (secret.trim().length() > 0) {
         if (request.hasHeader(X_HUB_SIGNATURE)) {
                 var xHubSignature = request.getHeader(X_HUB_SIGNATURE);
@@ -150,10 +151,21 @@ isolated function verifyContent(http:Request request, string secret, string payl
 # + key - pre-shared secret-key value
 # + payload - content to be hashed
 # + return - {@code byte[]} representing the `hMac`
-isolated function retrieveContentHash(string method, string key, string payload) returns byte[]|error {
+isolated function retrieveContentHash(string method, string key, string|mime:Entity[] payload) returns byte[]|error {
     byte[] keyArr = key.toBytes();
-    byte[] contentPayload = payload.toBytes();
+    byte[] contentPayload = [];
     byte[] hashedContent = [];
+
+    if (payload is mime:Entity[]) {
+        foreach mime:Entity entity in payload {
+            byte[] inputArr = entity.toString().toBytes();
+            foreach byte ele in inputArr {
+                contentPayload.push(ele);
+            }
+        }
+    } else {
+        contentPayload = payload.toBytes();
+    }
 
     match method {
         SHA1 => {

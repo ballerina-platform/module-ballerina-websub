@@ -43,16 +43,24 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
         match event.contentType {
             mime:APPLICATION_FORM_URLENCODED => {
                 map<string> content = <map<string>> event.content;
-                log:printInfo("URL encoded content received ", content = content);
+                //log:printInfo("URL encoded content received ", content = content);
             }
             _ => {
-                log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
+                //log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
             }
         }
         
         return ACKNOWLEDGEMENT;
     }
 };
+
+isolated function getContentDispositionForFormData(string partName)
+                                    returns mime:ContentDisposition {
+    mime:ContentDisposition contentDisposition = new;
+    contentDisposition.name = partName;
+    contentDisposition.disposition = "form-data";
+    return contentDisposition;
+}
 
 @test:BeforeGroups { value:["simpleSubscriber"] }
 function beforeSimpleSubscriberTest() {
@@ -114,6 +122,26 @@ function testOnEventNotificationSuccessXml() returns @tainted error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
     request.setPayload(payload);
+    http:Response response = check httpClient->post("/", request);
+    test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["simpleSubscriber"]
+}
+function testOnEventNotificationSuccessMime() returns @tainted error? {
+    http:Request request = new;
+    mime:Entity jsonBodyPart = new;
+    jsonBodyPart.setContentDisposition(getContentDispositionForFormData("json part"));
+    jsonBodyPart.setJson({"name": "Ballerina"});
+
+    mime:Entity textBodyPart = new;
+    textBodyPart.setContentDisposition(getContentDispositionForFormData("text part"));
+    textBodyPart.setText("Sample text");
+
+    mime:Entity[] payload = [jsonBodyPart, textBodyPart];
+    request.setPayload(payload);
+
     http:Response response = check httpClient->post("/", request);
     test:assertEquals(response.statusCode, 202);
 }

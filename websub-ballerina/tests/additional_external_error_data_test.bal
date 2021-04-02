@@ -18,6 +18,7 @@ import ballerina/log;
 import ballerina/http;
 import ballerina/regex;   
 import ballerina/test;
+import ballerina/io;
 
 listener Listener additionalErrorDetailsListener = new (9093);
 
@@ -39,7 +40,7 @@ var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http
 
     isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
-        log:printDebug("onEventNotification invoked: ", contentDistributionNotification = event);
+        io:println("onEventNotification invoked: ", event);
         return error SubscriptionDeletedError(
             "Subscriber wants to unsubscribe",
             headers = {"header1": "value"}, 

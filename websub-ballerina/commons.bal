@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/http;
+import ballerina/mime;
 
 # Intent verification request parameter 'hub.challenge' representing the challenge that needs to be echoed by
 # susbscribers to verify intent.
@@ -93,7 +94,7 @@ public type SubscriptionVerification record {
 public type ContentDistributionMessage record {
     map<string|string[]>? headers = ();
     string? contentType = ();
-    map<string|string[]>|json|xml|string|byte[] content;
+    map<string|string[]>|json|xml|string|byte[]|mime:Entity[] content;
 };
 
 # Record representing the common-response to be returned.

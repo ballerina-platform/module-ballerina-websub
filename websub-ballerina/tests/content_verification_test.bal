@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/log;
+//import ballerina/log;
 import ballerina/mime;
 import ballerina/http;
 import ballerina/crypto;
@@ -31,7 +31,7 @@ boolean xmlContentVerified = false;
 service /subscriber on new Listener(9098) {
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
-        log:printInfo("[VERIFICATION] onEventNotification invoked ", contentDistributionMessage = event);
+        //log:printInfo("[VERIFICATION] onEventNotification invoked ", contentDistributionMessage = event);
         match event.contentType {
             mime:APPLICATION_FORM_URLENCODED => {
                 urlEncodedContentVerified = true;
