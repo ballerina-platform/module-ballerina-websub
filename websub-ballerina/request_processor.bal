@@ -17,6 +17,7 @@
 import ballerina/http;
 import ballerina/mime;
 import ballerina/log;
+import ballerina/url;
 
 # Porcesses the subscription / unsubscription intent verification requests from `hub`
 # 
@@ -73,7 +74,7 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
 isolated function processEventNotification(http:Caller caller, http:Request request, 
                                            http:Response response, SubscriberService subscriberService,
                                            string secretKey) returns error? {
-    string payload = check retrieveTextPayload(request);
+    string payload = check request.getTextPayload();
     boolean isVerifiedContent = check verifyContent(request, secretKey, payload);
     if (!isVerifiedContent) {
         return;
@@ -113,10 +114,15 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
             };  
         }
         mime:APPLICATION_FORM_URLENCODED => {
+            map<string> formContent = check request.getFormParams();
+            map<string> decodedContent = {};
+            foreach var ['key, value] in formContent.entries() {
+                decodedContent['key] = check url:decode(value, "UTF-8");
+            }
             message = {
                 headers: headers,
                 contentType: contentType,
-                content: request.getQueryParams()
+                content: decodedContent
             }; 
         }
         _ => {
