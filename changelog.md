@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.0-alpha7] - 2021-04-02
 ### Added
-- [Add reusable WebSub common responses.](https://github.com/ballerina-platform/module-ballerina-websub/pull/159)
+- [Add reusable WebSub common responses.](https://github.com/ballerina-platform/ballerina-standard-library/issues/1183)
 
 ### Fixed
-- [Fix issue in url-encoded content retrieval.](https://github.com/ballerina-platform/module-ballerina-websub/pull/168)
+- [Fix issue in url-encoded content retrieval.](https://github.com/ballerina-platform/ballerina-standard-library/issues/1106)
