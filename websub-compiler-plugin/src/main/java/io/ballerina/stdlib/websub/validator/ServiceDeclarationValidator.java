@@ -74,6 +74,12 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                 validateAdditionalMethodImplemented(context, fd);
                 validateMethodParameters(context, fd);
             });
+//            List<ServiceDeclarationSymbol> serviceSymbols = context.semanticModel()
+//                    .moduleSymbols().stream()
+//                    .filter(e -> e.kind() == SymbolKind.SERVICE_DECLARATION)
+//                    .map(s -> (ServiceDeclarationSymbol) s)
+//                    .collect(Collectors.toList());
+
         }
     }
 
@@ -110,13 +116,34 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                                           FunctionDefinitionNode functionDefinition) {
         String functionName = functionDefinition.functionName().toString();
         if (allowedMethods.contains(functionName)) {
-//            List<String> allowedParams = allowedParameterTypes.get(functionName);
-            List<String> availableParams = functionDefinition.functionSignature().parameters()
+            List<List<String>> allowedParams = allowedParameterTypes
+                    .get(functionName)
                     .stream()
-                    .map(param -> ((RequiredParameterNode) param).typeName().toString())
-                    .collect(Collectors.toList());
-            String allParameters = String.join(",", availableParams);
+                    .map(param -> Arrays.stream(param.trim().split("\\|"))
+                            .map(String::trim).collect(Collectors.toList())
+                    ).collect(Collectors.toList());
+            functionDefinition
+                    .functionSignature().parameters()
+                    .stream()
+                    .map(param -> (RequiredParameterNode) param)
+                    .filter(param -> isParamsNotAllowed(allowedParams, param))
+                    .forEach(param -> {
+                        String paramType = param.typeName().toString();
+                        WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_105;
+                        updateContext(
+                                context, errorCode, functionDefinition.location(), paramType.trim(), functionName);
+                    });
         }
+    }
+
+    private boolean isParamsNotAllowed(List<List<String>> allowedParams, RequiredParameterNode param) {
+        String paramType = param.typeName().toString();
+        return Arrays
+                .stream(paramType.trim().split("\\|"))
+                .map(String::trim)
+                .anyMatch(paramsTypes ->
+                        allowedParams.stream().noneMatch(p -> p.contains(paramsTypes))
+                );
     }
 
     private void updateContext(SyntaxNodeAnalysisContext context, WebSubDiagnosticCodes errorCode,
@@ -130,29 +157,35 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
     private boolean isWebSubService(SyntaxNodeAnalysisContext context, ServiceDeclarationNode serviceNode) {
         SeparatedNodeList<ExpressionNode> expressions = serviceNode.expressions();
         Optional<TypeSymbol> moduleTypeDescriptor = expressions.stream()
-                .filter(e -> e.kind() == SyntaxKind.EXPLICIT_NEW_EXPRESSION ||
-                        e.kind() == SyntaxKind.SIMPLE_NAME_REFERENCE)
-                .map(e -> {
-                    if (e.kind() == SyntaxKind.EXPLICIT_NEW_EXPRESSION) {
-                        Document currentDocument = context.currentPackage().getDefaultModule()
-                                .document(context.documentId());
-                        LinePosition lineStart = e.lineRange().startLine();
-                        Symbol currentSymbol = context.semanticModel().symbol(currentDocument, lineStart).get();
-                        return ((TypeReferenceTypeSymbol) currentSymbol).typeDescriptor();
-                    } else {
-                        Document currentDocument = context.currentPackage().getDefaultModule()
-                                .document(context.documentId());
-                        LinePosition lineStart = e.lineRange().startLine();
-                        return ((VariableSymbol) context.semanticModel().symbol(currentDocument, lineStart).get())
-                                .typeDescriptor();
-                    }
-                }).findFirst();
+                .filter(this::isListenerAttachingExpression)
+                .map(e -> getTypeSymbol(context, e))
+                .findFirst();
         if (moduleTypeDescriptor.isEmpty()) {
             return false;
         } else {
             TypeSymbol moduleType = moduleTypeDescriptor.get();
             String signature = moduleType.signature();
             return signature.contains(Constants.MODULE_NAME);
+        }
+    }
+
+    private boolean isListenerAttachingExpression(ExpressionNode e) {
+        return e.kind() == SyntaxKind.EXPLICIT_NEW_EXPRESSION || e.kind() == SyntaxKind.SIMPLE_NAME_REFERENCE;
+    }
+
+    private TypeSymbol getTypeSymbol(SyntaxNodeAnalysisContext context, ExpressionNode e) {
+        if (e.kind() == SyntaxKind.EXPLICIT_NEW_EXPRESSION) {
+            Document currentDocument = context.currentPackage().getDefaultModule()
+                    .document(context.documentId());
+            LinePosition lineStart = e.lineRange().startLine();
+            Symbol currentSymbol = context.semanticModel().symbol(currentDocument, lineStart).get();
+            return ((TypeReferenceTypeSymbol) currentSymbol).typeDescriptor();
+        } else {
+            Document currentDocument = context.currentPackage().getDefaultModule()
+                    .document(context.documentId());
+            LinePosition lineStart = e.lineRange().startLine();
+            return ((VariableSymbol) context.semanticModel().symbol(currentDocument, lineStart).get())
+                    .typeDescriptor();
         }
     }
 }

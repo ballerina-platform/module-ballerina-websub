@@ -8,7 +8,7 @@ service /sample on simpleListener {
     remote function onEventNotification(websub:ContentDistributionMessage event)
                         returns websub:Acknowledgement|websub:SubscriptionDeletedError? {
         log:printInfo("onEventNotification invoked ", contentDistributionMessage = event);
-        return {};
+        return websub:ACKNOWLEDGEMENT;
     }
 
     remote function onNewEvent(map<string> params) returns websub:Acknowledgement {

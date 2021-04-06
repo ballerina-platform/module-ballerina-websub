@@ -16,7 +16,7 @@ public enum WebSubDiagnosticCodes {
             DiagnosticSeverity.ERROR),
     WEBSUB_104("WEBSUB_104", "{0} method is not allowed in websub:SubscriberService declaration",
             DiagnosticSeverity.ERROR),
-    WEBSUB_105("WEBSUB_105", "{0} method should take {1} as parameters",
+    WEBSUB_105("WEBSUB_105", "{0} type parameters not allowed for {1} method",
                DiagnosticSeverity.ERROR),
     WEBSUB_106("WEBSUB_106", "{0} method should return {1}",
             DiagnosticSeverity.ERROR);

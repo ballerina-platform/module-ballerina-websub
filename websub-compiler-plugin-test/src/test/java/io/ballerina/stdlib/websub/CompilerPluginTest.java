@@ -33,6 +33,7 @@ import org.testng.annotations.Test;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 
 /**
  * This class includes tests for Ballerina Graphql compiler plugin.
@@ -54,8 +55,8 @@ public class CompilerPluginTest {
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
         Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_102");
-        Assert.assertEquals(diagnostic.message(),
-                "websub:SubscriberService should only implement remote methods");
+        String expectedMessage = "websub:SubscriberService should only implement remote methods";
+        Assert.assertEquals(diagnostic.message(), expectedMessage);
     }
 
     @Test
@@ -68,8 +69,8 @@ public class CompilerPluginTest {
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
         Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_103");
-        Assert.assertEquals(diagnostic.message(),
-                "websub:SubscriberService should implement onEventNotification method");
+        String expectedMessage = "websub:SubscriberService should implement onEventNotification method";
+        Assert.assertEquals(diagnostic.message(), expectedMessage);
     }
 
     @Test
@@ -82,8 +83,38 @@ public class CompilerPluginTest {
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
         Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_104");
-        Assert.assertEquals(diagnostic.message(),
-                "onNewEvent method is not allowed in websub:SubscriberService declaration");
+        String expectedMessage = "onNewEvent method is not allowed in websub:SubscriberService declaration";
+        Assert.assertEquals(diagnostic.message(), expectedMessage);
+    }
+
+    @Test
+    public void testCompilerPluginForInvalidParameterTypesWithUnions() {
+        Package currentPackage = loadPackage("sample_5");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
+        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_105");
+        String expectedMsg = MessageFormat.format("{0} type parameters not allowed for {1} method",
+                "websub:ContentDistributionMessage|SecondaryMsgType", "onEventNotification");
+        Assert.assertEquals(diagnostic.message(), expectedMsg);
+    }
+
+    @Test
+    public void testCompilerPluginForInvalidParameterTypes() {
+        Package currentPackage = loadPackage("sample_6");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
+        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_105");
+        String expectedMsg = MessageFormat.format("{0} type parameters not allowed for {1} method",
+                "SimpleObj", "onEventNotification");
+        Assert.assertEquals(diagnostic.message(), expectedMsg);
     }
 
     private Package loadPackage(String path) {
