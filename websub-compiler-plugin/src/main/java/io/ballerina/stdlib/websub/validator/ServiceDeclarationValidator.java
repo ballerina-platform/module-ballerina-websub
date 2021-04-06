@@ -6,11 +6,13 @@ import io.ballerina.compiler.api.symbols.TypeSymbol;
 import io.ballerina.compiler.api.symbols.VariableSymbol;
 import io.ballerina.compiler.syntax.tree.ExpressionNode;
 import io.ballerina.compiler.syntax.tree.FunctionDefinitionNode;
+import io.ballerina.compiler.syntax.tree.NodeList;
 import io.ballerina.compiler.syntax.tree.NodeLocation;
 import io.ballerina.compiler.syntax.tree.RequiredParameterNode;
 import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
+import io.ballerina.compiler.syntax.tree.Token;
 import io.ballerina.projects.Document;
 import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
@@ -66,21 +68,13 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                     .filter(member -> member.kind() == SyntaxKind.OBJECT_METHOD_DEFINITION)
                     .map(member -> (FunctionDefinitionNode) member).collect(Collectors.toList());
 
-            validateOnlyRemoteMethodsPresent(context, availableFunctionDeclarations);
             validateRequiredMethodsImplemented(context, availableFunctionDeclarations, serviceNode.location());
-            validateNoAdditionalMethodsImplemented(context, availableFunctionDeclarations);
-            validateMethodParameters(context, availableFunctionDeclarations);
+            availableFunctionDeclarations.forEach(fd -> {
+                validateRemoteQualifier(context, fd);
+                validateAdditionalMethodImplemented(context, fd);
+                validateMethodParameters(context, fd);
+            });
         }
-    }
-
-    private void validateOnlyRemoteMethodsPresent(SyntaxNodeAnalysisContext context,
-                                                  List<FunctionDefinitionNode> availableFunctionDeclarations) {
-        availableFunctionDeclarations.stream()
-                .filter(fd -> fd.qualifierList().stream().noneMatch(q -> q.kind() == SyntaxKind.REMOTE_KEYWORD))
-                .forEach(fd -> {
-                    WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_102;
-                    updateContext(context, errorCode, fd.location());
-                });
     }
 
     private void validateRequiredMethodsImplemented(SyntaxNodeAnalysisContext context,
@@ -94,30 +88,35 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
         }
     }
 
-    private void validateNoAdditionalMethodsImplemented(SyntaxNodeAnalysisContext context,
-                                                        List<FunctionDefinitionNode> availableFunctionDeclarations) {
-        availableFunctionDeclarations.stream()
-                .filter(fd -> !allowedMethods.contains(fd.functionName().toString()))
-                .forEach(fd -> {
-                    String functionName = fd.functionName().toString();
-                    WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_104;
-                    updateContext(context, errorCode, fd.location(), functionName);
-                });
+    private void validateRemoteQualifier(SyntaxNodeAnalysisContext context,
+                                         FunctionDefinitionNode functionDefinition) {
+        NodeList<Token> qualifiers = functionDefinition.qualifierList();
+        if (qualifiers.stream().noneMatch(q -> q.kind() == SyntaxKind.REMOTE_KEYWORD)) {
+            WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_102;
+            updateContext(context, errorCode, functionDefinition.location());
+        }
+    }
+
+    private void validateAdditionalMethodImplemented(SyntaxNodeAnalysisContext context,
+                                                     FunctionDefinitionNode functionDefinition) {
+        String functionName = functionDefinition.functionName().toString();
+        if (!allowedMethods.contains(functionName)) {
+            WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_104;
+            updateContext(context, errorCode, functionDefinition.location(), functionName);
+        }
     }
 
     private void validateMethodParameters(SyntaxNodeAnalysisContext context,
-                                          List<FunctionDefinitionNode> availableFunctionDeclarations) {
-        availableFunctionDeclarations.stream()
-                .filter(fd -> allowedMethods.contains(fd.functionName().toString()))
-                .forEach(fd -> {
-                    String functionName = fd.functionName().toString();
-                    List<String> allowedParams = allowedParameterTypes.get(functionName);
-                    List<String> invalidParameters = fd.functionSignature().parameters()
-                            .stream()
-                            .map(param -> ((RequiredParameterNode) param).typeName().toString())
-                            .filter(param -> !allowedParams.contains(param))
-                            .collect(Collectors.toList());
-                });
+                                          FunctionDefinitionNode functionDefinition) {
+        String functionName = functionDefinition.functionName().toString();
+        if (allowedMethods.contains(functionName)) {
+//            List<String> allowedParams = allowedParameterTypes.get(functionName);
+            List<String> availableParams = functionDefinition.functionSignature().parameters()
+                    .stream()
+                    .map(param -> ((RequiredParameterNode) param).typeName().toString())
+                    .collect(Collectors.toList());
+            String allParameters = String.join(",", availableParams);
+        }
     }
 
     private void updateContext(SyntaxNodeAnalysisContext context, WebSubDiagnosticCodes errorCode,
