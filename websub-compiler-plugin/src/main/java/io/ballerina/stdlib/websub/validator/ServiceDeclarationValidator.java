@@ -6,9 +6,12 @@ import io.ballerina.compiler.api.symbols.TypeSymbol;
 import io.ballerina.compiler.api.symbols.VariableSymbol;
 import io.ballerina.compiler.syntax.tree.ExpressionNode;
 import io.ballerina.compiler.syntax.tree.FunctionDefinitionNode;
+import io.ballerina.compiler.syntax.tree.Node;
 import io.ballerina.compiler.syntax.tree.NodeList;
 import io.ballerina.compiler.syntax.tree.NodeLocation;
+import io.ballerina.compiler.syntax.tree.ParameterNode;
 import io.ballerina.compiler.syntax.tree.RequiredParameterNode;
+import io.ballerina.compiler.syntax.tree.ReturnTypeDescriptorNode;
 import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
@@ -38,9 +41,10 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
     private static final List<String> allowedMethods;
     private static final Map<String, List<String>> allowedParameterTypes;
     private static final Map<String, List<String>> allowedReturnTypes;
+    private static final List<String> methodsWithOptionalReturnTypes;
 
     static {
-        allowedMethods = Arrays.asList(
+        allowedMethods = List.of(
                 Constants.ON_SUBSCRIPTION_VALIDATION_DENIED,
                 Constants.ON_SUBSCRIPTION_VERIFICATION,
                 Constants.ON_EVENT_NOTIFICATION);
@@ -53,9 +57,16 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                 Collections.singletonList(Constants.CONTENT_DISTRIBUTION_MESSAGE)
         );
         allowedReturnTypes = Map.of(
-                Constants.ON_SUBSCRIPTION_VALIDATION_DENIED, Arrays.asList(""),
-                Constants.ON_SUBSCRIPTION_VERIFICATION, Arrays.asList(""),
-                Constants.ON_EVENT_NOTIFICATION, Arrays.asList("")
+                Constants.ON_SUBSCRIPTION_VALIDATION_DENIED,
+                Collections.singletonList(Constants.ACKNOWLEDGEMENT),
+                Constants.ON_SUBSCRIPTION_VERIFICATION,
+                List.of(Constants.SUBSCRIPTION_VERIFICATION_SUCCESS, Constants.SUBSCRIPTION_VERIFICATION_ERROR),
+                Constants.ON_EVENT_NOTIFICATION,
+                List.of(Constants.ACKNOWLEDGEMENT, Constants.SUBSCRIPTION_DELETED_ERROR)
+        );
+        methodsWithOptionalReturnTypes = List.of(
+                Constants.ON_SUBSCRIPTION_VALIDATION_DENIED,
+                Constants.ON_EVENT_NOTIFICATION
         );
     }
 
@@ -73,6 +84,7 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                 validateRemoteQualifier(context, fd);
                 validateAdditionalMethodImplemented(context, fd);
                 validateMethodParameters(context, fd);
+                validateMethodReturnTypes(context, fd);
             });
 //            List<ServiceDeclarationSymbol> serviceSymbols = context.semanticModel()
 //                    .moduleSymbols().stream()
@@ -116,27 +128,33 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                                           FunctionDefinitionNode functionDefinition) {
         String functionName = functionDefinition.functionName().toString();
         if (allowedMethods.contains(functionName)) {
-            List<List<String>> allowedParams = allowedParameterTypes
-                    .get(functionName)
-                    .stream()
+            List<String> allowedParameters = allowedParameterTypes.get(functionName);
+            List<List<String>> allowedParams = allowedParameters.stream()
                     .map(param -> Arrays.stream(param.trim().split("\\|"))
                             .map(String::trim).collect(Collectors.toList())
                     ).collect(Collectors.toList());
-            functionDefinition
-                    .functionSignature().parameters()
-                    .stream()
-                    .map(param -> (RequiredParameterNode) param)
-                    .filter(param -> isParamsNotAllowed(allowedParams, param))
-                    .forEach(param -> {
-                        String paramType = param.typeName().toString();
-                        WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_105;
-                        updateContext(
-                                context, errorCode, functionDefinition.location(), paramType.trim(), functionName);
-                    });
+            SeparatedNodeList<ParameterNode> availableParameters = functionDefinition.functionSignature().parameters();
+            if (availableParameters.size() >= 1) {
+                availableParameters
+                        .stream()
+                        .map(param -> (RequiredParameterNode) param)
+                        .filter(param -> isParamNotAllowed(allowedParams, param))
+                        .forEach(param -> {
+                            String paramType = param.typeName().toString();
+                            WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_105;
+                            updateContext(
+                                    context, errorCode, functionDefinition.location(), paramType.trim(), functionName);
+                        });
+            } else {
+                WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_106;
+                updateContext(
+                        context, errorCode, functionDefinition.location(), functionName,
+                        String.join("|", allowedParameters));
+            }
         }
     }
 
-    private boolean isParamsNotAllowed(List<List<String>> allowedParams, RequiredParameterNode param) {
+    private boolean isParamNotAllowed(List<List<String>> allowedParams, RequiredParameterNode param) {
         String paramType = param.typeName().toString();
         return Arrays
                 .stream(paramType.trim().split("\\|"))
@@ -144,6 +162,38 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                 .anyMatch(paramsTypes ->
                         allowedParams.stream().noneMatch(p -> p.contains(paramsTypes))
                 );
+    }
+
+    private void validateMethodReturnTypes(SyntaxNodeAnalysisContext context,
+                                           FunctionDefinitionNode functionDefinition) {
+        String functionName = functionDefinition.functionName().toString();
+        List<String> predefinedReturnTypes = allowedReturnTypes.get(functionName);
+        if (allowedMethods.contains(functionName)) {
+            Optional<ReturnTypeDescriptorNode> returnTypesOpt = functionDefinition.functionSignature().returnTypeDesc();
+            if (returnTypesOpt.isPresent()) {
+                ReturnTypeDescriptorNode returnTypeDescription = returnTypesOpt.get();
+                Node returnType = returnTypeDescription.type();
+                String returnTypeName = returnType.toString().trim();
+                List<String> availableReturnTypes = Arrays
+                        .stream(returnTypeName.replace(Constants.OPTIONAL, "").split("\\|"))
+                        .map(String::trim)
+                        .collect(Collectors.toList());
+                if (!predefinedReturnTypes.containsAll(availableReturnTypes)) {
+                    WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_107;
+                    updateContext(
+                            context, errorCode, functionDefinition.location(),
+                            returnTypeName, functionName);
+                }
+            } else {
+                boolean isReturnTypeOptional = methodsWithOptionalReturnTypes.contains(functionName);
+                if (!isReturnTypeOptional) {
+                    WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_108;
+                    updateContext(
+                            context, errorCode, functionDefinition.location(), functionName,
+                            String.join("|", predefinedReturnTypes));
+                }
+            }
+        }
     }
 
     private void updateContext(SyntaxNodeAnalysisContext context, WebSubDiagnosticCodes errorCode,

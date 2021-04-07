@@ -117,6 +117,53 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnostic.message(), expectedMsg);
     }
 
+    @Test
+    public void testCompilerPluginForNoParameterAvailable() {
+        Package currentPackage = loadPackage("sample_7");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
+        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_106");
+        String expectedMsg = MessageFormat.format("{0} method should have parameters of following {1} types",
+                "onEventNotification", "websub:ContentDistributionMessage");
+        Assert.assertEquals(diagnostic.message(), expectedMsg);
+    }
+
+    @Test
+    public void testCompilerPluginForInvalidReturnTypes() {
+        Package currentPackage = loadPackage("sample_8");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
+        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_107");
+        String expectedMsg = MessageFormat.format("{0} type is not allowed to be returned from {1} method",
+                "websub:Acknowledgement|websub:SubscriptionDeletedError|SpecialReturnType?",
+                "onEventNotification");
+        Assert.assertEquals(diagnostic.message(), expectedMsg);
+    }
+
+    @Test
+    public void testCompilerPluginForNoReturnType() {
+        Package currentPackage = loadPackage("sample_9");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
+        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
+        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_108");
+        String expectedMsg = MessageFormat.format("{0} method should return {1} types",
+                "onSubscriptionVerification",
+                "websub:SubscriptionVerificationSuccess|websub:SubscriptionVerificationError");
+        Assert.assertEquals(diagnostic.message(), expectedMsg);
+    }
+
     private Package loadPackage(String path) {
         Path projectDirPath = RESOURCE_DIRECTORY.resolve(path);
         BuildProject project = BuildProject.load(getEnvironmentBuilder(), projectDirPath);

@@ -18,8 +18,11 @@ public enum WebSubDiagnosticCodes {
             DiagnosticSeverity.ERROR),
     WEBSUB_105("WEBSUB_105", "{0} type parameters not allowed for {1} method",
                DiagnosticSeverity.ERROR),
-    WEBSUB_106("WEBSUB_106", "{0} method should return {1}",
-            DiagnosticSeverity.ERROR);
+    WEBSUB_106("WEBSUB_106", "{0} method should have parameters of following {1} types",
+            DiagnosticSeverity.ERROR),
+    WEBSUB_107("WEBSUB_107", "{0} type is not allowed to be returned from {1} method",
+            DiagnosticSeverity.ERROR),
+    WEBSUB_108("WEBSUB_108", "{0} method should return {1} types", DiagnosticSeverity.ERROR);
 
     private String code;
     private String description;

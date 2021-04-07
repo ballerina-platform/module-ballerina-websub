@@ -1,5 +1,4 @@
 import ballerina/websub;
-import ballerina/log;
 
 public type SecondaryMsgType record {
     websub:ContentDistributionMessage msg;
@@ -10,7 +9,6 @@ public type SecondaryMsgType record {
 service /sample on new websub:Listener(10005) {
     remote function onEventNotification(websub:ContentDistributionMessage|SecondaryMsgType event) 
                         returns websub:Acknowledgement|websub:SubscriptionDeletedError? {
-        log:printInfo("onEventNotification invoked ", contentDistributionMessage = event);
-        return {};
+        return websub:ACKNOWLEDGEMENT;
     }
 }
