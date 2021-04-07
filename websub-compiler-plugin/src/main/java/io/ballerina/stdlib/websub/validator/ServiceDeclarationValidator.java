@@ -1,6 +1,9 @@
 package io.ballerina.stdlib.websub.validator;
 
+import io.ballerina.compiler.api.symbols.AnnotationSymbol;
+import io.ballerina.compiler.api.symbols.ServiceDeclarationSymbol;
 import io.ballerina.compiler.api.symbols.Symbol;
+import io.ballerina.compiler.api.symbols.SymbolKind;
 import io.ballerina.compiler.api.symbols.TypeReferenceTypeSymbol;
 import io.ballerina.compiler.api.symbols.TypeSymbol;
 import io.ballerina.compiler.api.symbols.VariableSymbol;
@@ -74,11 +77,10 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
     public void perform(SyntaxNodeAnalysisContext context) {
         ServiceDeclarationNode serviceNode = (ServiceDeclarationNode) context.node();
         if (isWebSubService(context, serviceNode)) {
-
+            validateServiceAnnotation(context, serviceNode);
             List<FunctionDefinitionNode> availableFunctionDeclarations = serviceNode.members().stream()
                     .filter(member -> member.kind() == SyntaxKind.OBJECT_METHOD_DEFINITION)
                     .map(member -> (FunctionDefinitionNode) member).collect(Collectors.toList());
-
             validateRequiredMethodsImplemented(context, availableFunctionDeclarations, serviceNode.location());
             availableFunctionDeclarations.forEach(fd -> {
                 validateRemoteQualifier(context, fd);
@@ -86,12 +88,26 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                 validateMethodParameters(context, fd);
                 validateMethodReturnTypes(context, fd);
             });
-//            List<ServiceDeclarationSymbol> serviceSymbols = context.semanticModel()
-//                    .moduleSymbols().stream()
-//                    .filter(e -> e.kind() == SymbolKind.SERVICE_DECLARATION)
-//                    .map(s -> (ServiceDeclarationSymbol) s)
-//                    .collect(Collectors.toList());
+        }
+    }
 
+    private void validateServiceAnnotation(SyntaxNodeAnalysisContext context, ServiceDeclarationNode serviceNode) {
+        Optional<ServiceDeclarationSymbol> serviceDeclarationOptional = context.semanticModel().moduleSymbols()
+                .stream()
+                .filter(e -> e.kind() == SymbolKind.SERVICE_DECLARATION)
+                .map(s -> (ServiceDeclarationSymbol) s)
+                .findFirst();
+        if (serviceDeclarationOptional.isPresent()) {
+            ServiceDeclarationSymbol serviceDeclarationSymbol = serviceDeclarationOptional.get();
+            Optional<AnnotationSymbol> subscriberServiceAnnotationOptional = serviceDeclarationSymbol.annotations()
+                    .stream()
+                    .filter(annotationSymbol ->
+                            annotationSymbol.getName().orElse("").equals(Constants.SERVICE_ANNOTATION_NAME)
+                    ).findFirst();
+            if (subscriberServiceAnnotationOptional.isEmpty()) {
+                WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_101;
+                updateContext(context, errorCode, serviceNode.location());
+            }
         }
     }
 

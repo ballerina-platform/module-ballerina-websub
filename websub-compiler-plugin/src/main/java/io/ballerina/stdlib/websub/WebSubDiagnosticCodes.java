@@ -8,7 +8,8 @@ import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 public enum WebSubDiagnosticCodes {
     WEBSUB_100("WEBSUB_100", "checkpanic detected, use check",
             DiagnosticSeverity.WARNING),
-    WEBSUB_101("WEBSUB_101", "Could not find the required service annotations",
+    WEBSUB_101("WEBSUB_101",
+            "Subscriber service should be annotated with websub:SubscriberServiceConfig",
             DiagnosticSeverity.ERROR),
     WEBSUB_102("WEBSUB_102", "websub:SubscriberService should only implement remote methods",
             DiagnosticSeverity.ERROR),

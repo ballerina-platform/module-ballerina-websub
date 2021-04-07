@@ -5,6 +5,7 @@ package io.ballerina.stdlib.websub;
  */
 public interface Constants {
     public static final String MODULE_NAME = "websub";
+    public static final String SERVICE_ANNOTATION_NAME = "SubscriberServiceConfig";
 
     public static final String ON_SUBSCRIPTION_VALIDATION_DENIED = "onSubscriptionValidationDenied";
     public static final String ON_SUBSCRIPTION_VERIFICATION = "onSubscriptionVerification";
