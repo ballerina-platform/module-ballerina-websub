@@ -24,9 +24,6 @@ import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 import io.ballerina.stdlib.websub.Constants;
 import io.ballerina.stdlib.websub.WebSubDiagnosticCodes;
-import io.ballerina.tools.diagnostics.Diagnostic;
-import io.ballerina.tools.diagnostics.DiagnosticFactory;
-import io.ballerina.tools.diagnostics.DiagnosticInfo;
 import io.ballerina.tools.text.LinePosition;
 
 import java.util.Arrays;
@@ -35,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static io.ballerina.stdlib.websub.validator.ValidatorUtils.updateContext;
 
 /**
  * {@code ServiceDeclarationValidator} validates whether websub service declaration is complying to current websub
@@ -162,10 +161,12 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                                     context, errorCode, functionDefinition.location(), paramType.trim(), functionName);
                         });
             } else {
-                WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_106;
-                updateContext(
-                        context, errorCode, functionDefinition.location(), functionName,
-                        String.join("|", allowedParameters));
+                if (!allowedParameters.isEmpty()) {
+                    WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_106;
+                    updateContext(
+                            context, errorCode, functionDefinition.location(), functionName,
+                            String.join(",", allowedParameters));
+                }
             }
         }
     }
@@ -210,14 +211,6 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                 }
             }
         }
-    }
-
-    private void updateContext(SyntaxNodeAnalysisContext context, WebSubDiagnosticCodes errorCode,
-                               NodeLocation location, Object... args) {
-        DiagnosticInfo diagnosticInfo = new DiagnosticInfo(
-                errorCode.getCode(), errorCode.getDescription(), errorCode.getSeverity());
-        Diagnostic diagnostic = DiagnosticFactory.createDiagnostic(diagnosticInfo, location, args);
-        context.reportDiagnostic(diagnostic);
     }
 
     private boolean isWebSubService(SyntaxNodeAnalysisContext context, ServiceDeclarationNode serviceNode) {
