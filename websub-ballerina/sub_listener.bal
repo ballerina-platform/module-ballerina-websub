@@ -35,7 +35,6 @@ public class Listener {
         if (listenTo is int) {
             self.httpListener = check new(listenTo, config);
         } else {
-            log:printWarn("Provided `websub:ListenerConfiguration` will be overridden by the given http listener configurations");
             self.httpListener = listenTo;
         }
         self.listenerConfig = self.httpListener.getConfig();
