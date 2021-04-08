@@ -233,16 +233,12 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
     }
 
     private TypeSymbol getTypeSymbol(SyntaxNodeAnalysisContext context, ExpressionNode e) {
+        Document currentDocument = context.currentPackage().getDefaultModule().document(context.documentId());
+        LinePosition lineStart = e.lineRange().startLine();
         if (e.kind() == SyntaxKind.EXPLICIT_NEW_EXPRESSION) {
-            Document currentDocument = context.currentPackage().getDefaultModule()
-                    .document(context.documentId());
-            LinePosition lineStart = e.lineRange().startLine();
-            Symbol currentSymbol = context.semanticModel().symbol(currentDocument, lineStart).get();
-            return ((TypeReferenceTypeSymbol) currentSymbol).typeDescriptor();
+            return ((TypeReferenceTypeSymbol) context.semanticModel().symbol(currentDocument, lineStart).get())
+                    .typeDescriptor();
         } else {
-            Document currentDocument = context.currentPackage().getDefaultModule()
-                    .document(context.documentId());
-            LinePosition lineStart = e.lineRange().startLine();
             return ((VariableSymbol) context.semanticModel().symbol(currentDocument, lineStart).get())
                     .typeDescriptor();
         }

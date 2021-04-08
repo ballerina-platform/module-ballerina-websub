@@ -7,6 +7,9 @@ import io.ballerina.tools.diagnostics.Diagnostic;
 import io.ballerina.tools.diagnostics.DiagnosticFactory;
 import io.ballerina.tools.diagnostics.DiagnosticInfo;
 
+/**
+ * {@code ValidatorUtils} contains utility functions required for {@code websub:SubscriberService} validation.
+ */
 public final class ValidatorUtils {
     public static void updateContext(SyntaxNodeAnalysisContext context, WebSubDiagnosticCodes errorCode,
                                      NodeLocation location, Object... args) {

@@ -4,6 +4,7 @@ import io.ballerina.compiler.syntax.tree.SyntaxKind;
 import io.ballerina.projects.plugins.CodeAnalysisContext;
 import io.ballerina.projects.plugins.CodeAnalyzer;
 import io.ballerina.stdlib.websub.validator.CheckPanicValidator;
+import io.ballerina.stdlib.websub.validator.ListenerInitValidator;
 import io.ballerina.stdlib.websub.validator.ServiceDeclarationValidator;
 
 /**
@@ -12,8 +13,8 @@ import io.ballerina.stdlib.websub.validator.ServiceDeclarationValidator;
 public class WebSubCodeAnalyzer extends CodeAnalyzer {
     @Override
     public void init(CodeAnalysisContext codeAnalysisContext) {
-        codeAnalysisContext.addSyntaxNodeAnalysisTask(
-                new CheckPanicValidator(), SyntaxKind.CHECK_EXPRESSION);
+        codeAnalysisContext.addSyntaxNodeAnalysisTask(new CheckPanicValidator(), SyntaxKind.CHECK_EXPRESSION);
+        codeAnalysisContext.addSyntaxNodeAnalysisTask(new ListenerInitValidator(), SyntaxKind.FUNCTION_CALL);
         codeAnalysisContext.addSyntaxNodeAnalysisTask(
                 new ServiceDeclarationValidator(), SyntaxKind.SERVICE_DECLARATION);
     }
