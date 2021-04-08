@@ -201,7 +201,7 @@ public class CompilerPluginTest {
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
-        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_110");
+        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_109");
         String expectedMsg = "websub:Listener should only take either http:Listener or websub:ListenerConfiguration";
         Assert.assertEquals(diagnostic.message(), expectedMsg);
     }
@@ -215,7 +215,7 @@ public class CompilerPluginTest {
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
-        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_110");
+        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_109");
         String expectedMsg = "websub:Listener should only take either http:Listener or websub:ListenerConfiguration";
         Assert.assertEquals(diagnostic.message(), expectedMsg);
     }
