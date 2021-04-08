@@ -1,18 +1,16 @@
 package io.ballerina.stdlib.websub.validator;
 
 import io.ballerina.compiler.api.symbols.AnnotationSymbol;
-import io.ballerina.compiler.api.symbols.ModuleSymbol;
 import io.ballerina.compiler.api.symbols.ServiceDeclarationSymbol;
 import io.ballerina.compiler.api.symbols.Symbol;
-import io.ballerina.compiler.api.symbols.TypeDescKind;
-import io.ballerina.compiler.api.symbols.TypeReferenceTypeSymbol;
-import io.ballerina.compiler.api.symbols.TypeSymbol;
-import io.ballerina.compiler.api.symbols.UnionTypeSymbol;
+import io.ballerina.compiler.syntax.tree.FunctionArgumentNode;
 import io.ballerina.compiler.syntax.tree.FunctionDefinitionNode;
 import io.ballerina.compiler.syntax.tree.Node;
 import io.ballerina.compiler.syntax.tree.NodeList;
 import io.ballerina.compiler.syntax.tree.NodeLocation;
 import io.ballerina.compiler.syntax.tree.ParameterNode;
+import io.ballerina.compiler.syntax.tree.ParenthesizedArgList;
+import io.ballerina.compiler.syntax.tree.PositionalArgumentNode;
 import io.ballerina.compiler.syntax.tree.RequiredParameterNode;
 import io.ballerina.compiler.syntax.tree.ReturnTypeDescriptorNode;
 import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
@@ -23,6 +21,7 @@ import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 import io.ballerina.stdlib.websub.Constants;
 import io.ballerina.stdlib.websub.WebSubDiagnosticCodes;
+import io.ballerina.stdlib.websub.validator.visitor.ListenerInitiationExpressionVisitor;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -75,6 +74,9 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
         ServiceDeclarationNode serviceNode = (ServiceDeclarationNode) context.node();
         Optional<Symbol> serviceDeclarationOpt = context.semanticModel().symbol(serviceNode);
         if (serviceDeclarationOpt.isPresent()) {
+            ListenerInitiationExpressionVisitor visitor = new ListenerInitiationExpressionVisitor();
+            serviceNode.syntaxTree().rootNode().accept(visitor);
+            validateListenerArguments(context, visitor);
             ServiceDeclarationSymbol serviceDeclarationSymbol = (ServiceDeclarationSymbol) serviceDeclarationOpt.get();
             if (isWebSubService(serviceDeclarationSymbol)) {
                 validateServiceAnnotation(context, serviceNode, serviceDeclarationSymbol);
@@ -88,6 +90,42 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                     validateMethodParameters(context, fd);
                     validateMethodReturnTypes(context, fd);
                 });
+            }
+        }
+    }
+
+    private void validateListenerArguments(SyntaxNodeAnalysisContext context,
+                                           ListenerInitiationExpressionVisitor visitor) {
+        visitor.getExplicitNewExpressionNodes()
+                .forEach(explicitNewExpressionNode -> {
+                    SeparatedNodeList<FunctionArgumentNode> functionArgs = explicitNewExpressionNode
+                            .parenthesizedArgList().arguments();
+                    verifyListenerArgType(context, explicitNewExpressionNode.location(), functionArgs);
+                });
+
+        visitor.getImplicitNewExpressionNodes()
+                .forEach(implicitNewExpressionNode -> {
+                    Optional<ParenthesizedArgList> argListOpt = implicitNewExpressionNode.parenthesizedArgList();
+                    if (argListOpt.isPresent()) {
+                        SeparatedNodeList<FunctionArgumentNode> functionArgs = argListOpt.get().arguments();
+                        verifyListenerArgType(context, implicitNewExpressionNode.location(), functionArgs);
+                    }
+                });
+    }
+
+    private void verifyListenerArgType(SyntaxNodeAnalysisContext context, NodeLocation location,
+                                       SeparatedNodeList<FunctionArgumentNode> functionArgs) {
+        if (functionArgs.size() >= 2) {
+            PositionalArgumentNode firstArg = (PositionalArgumentNode) functionArgs.get(0);
+            PositionalArgumentNode secondArg = (PositionalArgumentNode) functionArgs.get(1);
+            SyntaxKind firstArgSyntaxKind = firstArg.expression().kind();
+            SyntaxKind secondArgSyntaxKind = secondArg.expression().kind();
+            if ((firstArgSyntaxKind == SyntaxKind.SIMPLE_NAME_REFERENCE
+                    || firstArgSyntaxKind == SyntaxKind.MAPPING_CONSTRUCTOR)
+                    && (secondArgSyntaxKind == SyntaxKind.SIMPLE_NAME_REFERENCE
+                    || secondArgSyntaxKind == SyntaxKind.MAPPING_CONSTRUCTOR)) {
+                WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_109;
+                updateContext(context, errorCode, location);
             }
         }
     }
@@ -209,31 +247,6 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
     }
 
     private boolean isWebSubService(ServiceDeclarationSymbol serviceDeclarationSymbol) {
-        return serviceDeclarationSymbol.listenerTypes().stream().anyMatch(this::isWebSubListener);
-    }
-
-    private boolean isWebSubListener(TypeSymbol listenerType) {
-        if (listenerType.typeKind() == TypeDescKind.UNION) {
-            return ((UnionTypeSymbol) listenerType).memberTypeDescriptors().stream()
-                    .filter(typeDescriptor -> typeDescriptor instanceof TypeReferenceTypeSymbol)
-                    .map(typeReferenceTypeSymbol -> (TypeReferenceTypeSymbol) typeReferenceTypeSymbol)
-                    .anyMatch(typeReferenceTypeSymbol ->
-                            typeReferenceTypeSymbol.getModule().isPresent()
-                                    && isWebSub(typeReferenceTypeSymbol.getModule().get()
-                    ));
-        }
-
-        if (listenerType.typeKind() == TypeDescKind.TYPE_REFERENCE) {
-            Optional<ModuleSymbol> moduleOpt = ((TypeReferenceTypeSymbol) listenerType).typeDescriptor().getModule();
-            return moduleOpt.isPresent() && isWebSub(moduleOpt.get());
-        }
-
-        return false;
-    }
-
-    private boolean isWebSub(ModuleSymbol moduleSymbol) {
-        Optional<String> moduleNameOpt = moduleSymbol.getName();
-        return moduleNameOpt.isPresent() && Constants.MODULE_NAME.equals(moduleNameOpt.get())
-                && Constants.ORG_NAME.equals(moduleSymbol.id().orgName());
+        return serviceDeclarationSymbol.listenerTypes().stream().anyMatch(ValidatorUtils::isWebSubListener);
     }
 }

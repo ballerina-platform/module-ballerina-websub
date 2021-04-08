@@ -14,8 +14,8 @@ public class WebSubCodeAnalyzer extends CodeAnalyzer {
     @Override
     public void init(CodeAnalysisContext codeAnalysisContext) {
         codeAnalysisContext.addSyntaxNodeAnalysisTask(new CheckPanicValidator(), SyntaxKind.CHECK_EXPRESSION);
-        codeAnalysisContext.addSyntaxNodeAnalysisTask(new ListenerInitValidator(), SyntaxKind.FUNCTION_CALL);
-        codeAnalysisContext.addSyntaxNodeAnalysisTask(
-                new ServiceDeclarationValidator(), SyntaxKind.SERVICE_DECLARATION);
+        codeAnalysisContext.addSyntaxNodeAnalysisTask(new ListenerInitValidator(), SyntaxKind.LISTENER_KEYWORD);
+        codeAnalysisContext.addSyntaxNodeAnalysisTask(new ServiceDeclarationValidator(),
+                SyntaxKind.SERVICE_DECLARATION);
     }
 }

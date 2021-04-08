@@ -8,7 +8,8 @@ import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
  */
 public class ListenerInitValidator implements AnalysisTask<SyntaxNodeAnalysisContext> {
     @Override
-    public void perform(SyntaxNodeAnalysisContext syntaxNodeAnalysisContext) {
+    public void perform(SyntaxNodeAnalysisContext context) {
+//        ListenerDeclarationNode serviceNode = (ListenerDeclarationNode) context.node();
 
     }
 }

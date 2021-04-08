@@ -23,7 +23,10 @@ public enum WebSubDiagnosticCodes {
             DiagnosticSeverity.ERROR),
     WEBSUB_107("WEBSUB_107", "{0} type is not allowed to be returned from {1} method",
             DiagnosticSeverity.ERROR),
-    WEBSUB_108("WEBSUB_108", "{0} method should return {1} types", DiagnosticSeverity.ERROR);
+    WEBSUB_108("WEBSUB_108", "{0} method should return {1} types", DiagnosticSeverity.ERROR),
+    WEBSUB_109("WEBSUB_109",
+            "websub:Listener should only take either http:Listener or websub:ListenerConfiguration",
+            DiagnosticSeverity.WARNING);
 
     private String code;
     private String description;

@@ -6,6 +6,7 @@ package io.ballerina.stdlib.websub;
 public interface Constants {
     String ORG_NAME = "ballerina";
     String MODULE_NAME = "websub";
+    String LISTENER_IDENTIFIER = "Listener";
     String SERVICE_ANNOTATION_NAME = "SubscriberServiceConfig";
 
     String ON_SUBSCRIPTION_VALIDATION_DENIED = "onSubscriptionValidationDenied";
