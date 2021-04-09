@@ -169,10 +169,11 @@ public class ServiceDeclarationValidator {
                         .map(param -> (RequiredParameterNode) param)
                         .filter(param -> {
                             Node paramTypeName = param.typeName();
-                            if (paramTypeName instanceof TypeReferenceTypeSymbol) {
-                                Optional<Symbol> symbol = context.semanticModel().symbol(paramTypeName);
-                                return symbol.isEmpty()
-                                        || isParamNotAllowed(allowedParams, (TypeReferenceTypeSymbol) symbol.get());
+                            Optional<Symbol> typeSymbolOpt = context.semanticModel().symbol(paramTypeName);
+                            if (typeSymbolOpt.isPresent()) {
+                                Symbol typeSymbol = typeSymbolOpt.get();
+                                return typeSymbol instanceof TypeReferenceTypeSymbol
+                                        && isParamNotAllowed(allowedParams, (TypeReferenceTypeSymbol) typeSymbol);
                             } else {
                                 return true;
                             }
