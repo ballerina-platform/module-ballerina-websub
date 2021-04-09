@@ -1,8 +1,11 @@
 package io.ballerina.stdlib.websub.validator;
 
 import io.ballerina.compiler.api.symbols.AnnotationSymbol;
+import io.ballerina.compiler.api.symbols.ModuleSymbol;
+import io.ballerina.compiler.api.symbols.ParameterSymbol;
 import io.ballerina.compiler.api.symbols.ServiceDeclarationSymbol;
 import io.ballerina.compiler.api.symbols.Symbol;
+import io.ballerina.compiler.api.symbols.TypeSymbol;
 import io.ballerina.compiler.syntax.tree.FunctionArgumentNode;
 import io.ballerina.compiler.syntax.tree.FunctionDefinitionNode;
 import io.ballerina.compiler.syntax.tree.Node;
@@ -11,7 +14,6 @@ import io.ballerina.compiler.syntax.tree.NodeLocation;
 import io.ballerina.compiler.syntax.tree.ParameterNode;
 import io.ballerina.compiler.syntax.tree.ParenthesizedArgList;
 import io.ballerina.compiler.syntax.tree.PositionalArgumentNode;
-import io.ballerina.compiler.syntax.tree.RequiredParameterNode;
 import io.ballerina.compiler.syntax.tree.ReturnTypeDescriptorNode;
 import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
@@ -185,10 +187,11 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
             if (availableParameters.size() >= 1) {
                 availableParameters
                         .stream()
-                        .map(param -> (RequiredParameterNode) param)
-                        .filter(param -> isParamNotAllowed(allowedParams, param))
+                        .map(param -> context.semanticModel().symbol(param))
+                        .filter(param -> param.isEmpty()
+                                || isParamNotAllowed(allowedParams, (ParameterSymbol) param.get()))
                         .forEach(param -> {
-                            String paramType = param.typeName().toString();
+                            String paramType = param.flatMap(Symbol::getName).orElse("");
                             WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_105;
                             updateContext(
                                     context, errorCode, functionDefinition.location(), paramType.trim(), functionName);
@@ -204,14 +207,18 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
         }
     }
 
-    private boolean isParamNotAllowed(List<List<String>> allowedParams, RequiredParameterNode param) {
-        String paramType = param.typeName().toString();
+    private boolean isParamNotAllowed(List<List<String>> allowedParams, ParameterSymbol param) {
+        TypeSymbol typeSymbol = param.typeDescriptor();
+        String moduleName = typeSymbol.getModule().flatMap(ModuleSymbol::getName).orElse("");
+        String paramType = typeSymbol.getName().orElse("");
         return Arrays
                 .stream(paramType.trim().split("\\|"))
                 .map(String::trim)
-                .anyMatch(paramsTypes ->
-                        allowedParams.stream().noneMatch(p -> p.contains(paramsTypes))
-                );
+                .anyMatch(paramsTypes -> {
+                    String qualifiedParamType = moduleName.isBlank() ? paramType :
+                            String.format("%s:%s", moduleName, paramType);
+                    return allowedParams.stream().noneMatch(p -> p.contains(qualifiedParamType));
+                });
     }
 
     private void validateMethodReturnTypes(SyntaxNodeAnalysisContext context,

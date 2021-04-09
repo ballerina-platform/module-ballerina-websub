@@ -28,13 +28,11 @@ public enum WebSubDiagnosticCodes {
             "websub:Listener should only take either http:Listener or websub:ListenerConfiguration",
             DiagnosticSeverity.WARNING);
 
-    private String code;
-    private String description;
-    private DiagnosticSeverity severity;
+    private final String code;
+    private final String description;
+    private final DiagnosticSeverity severity;
 
-    WebSubDiagnosticCodes(String code,
-                          String description,
-                          DiagnosticSeverity severity) {
+    WebSubDiagnosticCodes(String code, String description, DiagnosticSeverity severity) {
         this.code = code;
         this.description = description;
         this.severity = severity;

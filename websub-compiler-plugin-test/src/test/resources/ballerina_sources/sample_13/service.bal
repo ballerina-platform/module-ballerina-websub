@@ -1,7 +1,7 @@
 import ballerina/http;
 import ballerina/websub;
 
-listener http:Listener httpListener = new http:Listener(10012);
+listener http:Listener httpListener = new http:Listener(10013);
 websub:ListenerConfiguration listenerConfig = {
     secureSocket: {
         key: {
