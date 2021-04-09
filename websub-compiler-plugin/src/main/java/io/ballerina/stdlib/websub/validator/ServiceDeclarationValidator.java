@@ -19,7 +19,6 @@ import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
 import io.ballerina.compiler.syntax.tree.Token;
-import io.ballerina.compiler.syntax.tree.UnionTypeDescriptorNode;
 import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 import io.ballerina.stdlib.websub.Constants;
@@ -191,12 +190,12 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                         .map(param -> (RequiredParameterNode) param)
                         .filter(param -> {
                             Node paramTypeName = param.typeName();
-                            if (paramTypeName instanceof UnionTypeDescriptorNode) {
-                                return true;
-                            } else {
+                            if (paramTypeName instanceof TypeReferenceTypeSymbol) {
                                 Optional<Symbol> symbol = context.semanticModel().symbol(paramTypeName);
                                 return symbol.isEmpty()
                                         || isParamNotAllowed(allowedParams, (TypeReferenceTypeSymbol) symbol.get());
+                            } else {
+                                return true;
                             }
                         }).forEach(param -> {
                             String paramType = param.typeName().toString();
