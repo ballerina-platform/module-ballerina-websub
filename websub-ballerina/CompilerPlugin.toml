@@ -3,4 +3,4 @@ id = "websub-compiler-plugin"
 class = "io.ballerina.stdlib.websub.WebSubCompilerPlugin"
 
 [[dependency]]
-path = "../websub-compiler-plugin/build/libs/websub-compiler-plugin-1.2.0-alpha8-SNAPSHOT.jar"
+path = "../websub-compiler-plugin/build/libs/websub-compiler-plugin-@project.version@.jar"
