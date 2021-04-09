@@ -1,4 +1,4 @@
-package io.ballerina.stdlib.websub.validator;
+package io.ballerina.stdlib.websub.task;
 
 import io.ballerina.compiler.api.symbols.ModuleSymbol;
 import io.ballerina.compiler.api.symbols.TypeDescKind;
@@ -18,7 +18,7 @@ import java.util.Optional;
 /**
  * {@code ValidatorUtils} contains utility functions required for {@code websub:SubscriberService} validation.
  */
-public final class ValidatorUtils {
+public final class AnalyserUtils {
     public static void updateContext(SyntaxNodeAnalysisContext context, WebSubDiagnosticCodes errorCode,
                                      NodeLocation location, Object... args) {
         DiagnosticInfo diagnosticInfo = new DiagnosticInfo(
@@ -48,7 +48,7 @@ public final class ValidatorUtils {
 
     public static boolean isWebSub(ModuleSymbol moduleSymbol) {
         Optional<String> moduleNameOpt = moduleSymbol.getName();
-        return moduleNameOpt.isPresent() && Constants.MODULE_NAME.equals(moduleNameOpt.get())
-                && Constants.ORG_NAME.equals(moduleSymbol.id().orgName());
+        return moduleNameOpt.isPresent() && Constants.PACKAGE_NAME.equals(moduleNameOpt.get())
+                && Constants.PACKAGE_ORG.equals(moduleSymbol.id().orgName());
     }
 }

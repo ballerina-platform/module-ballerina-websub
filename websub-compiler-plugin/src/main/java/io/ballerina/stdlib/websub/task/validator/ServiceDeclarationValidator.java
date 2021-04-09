@@ -1,4 +1,4 @@
-package io.ballerina.stdlib.websub.validator;
+package io.ballerina.stdlib.websub.task.validator;
 
 import io.ballerina.compiler.api.symbols.AnnotationSymbol;
 import io.ballerina.compiler.api.symbols.ModuleSymbol;
@@ -19,11 +19,10 @@ import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
 import io.ballerina.compiler.syntax.tree.Token;
-import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 import io.ballerina.stdlib.websub.Constants;
 import io.ballerina.stdlib.websub.WebSubDiagnosticCodes;
-import io.ballerina.stdlib.websub.validator.visitor.ListenerInitiationExpressionVisitor;
+import io.ballerina.stdlib.websub.task.visitor.ListenerInitiationExpressionVisitor;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,13 +31,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static io.ballerina.stdlib.websub.validator.ValidatorUtils.updateContext;
+import static io.ballerina.stdlib.websub.task.AnalyserUtils.updateContext;
 
 /**
  * {@code ServiceDeclarationValidator} validates whether websub service declaration is complying to current websub
  * package implementation.
  */
-public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnalysisContext> {
+public class ServiceDeclarationValidator {
+    private static final ServiceDeclarationValidator INSTANCE = new ServiceDeclarationValidator();
     private static final List<String> allowedMethods;
     private static final Map<String, List<String>> allowedParameterTypes;
     private static final Map<String, List<String>> allowedReturnTypes;
@@ -71,33 +71,12 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
         );
     }
 
-    @Override
-    public void perform(SyntaxNodeAnalysisContext context) {
-        ServiceDeclarationNode serviceNode = (ServiceDeclarationNode) context.node();
-        Optional<Symbol> serviceDeclarationOpt = context.semanticModel().symbol(serviceNode);
-        if (serviceDeclarationOpt.isPresent()) {
-            ListenerInitiationExpressionVisitor visitor = new ListenerInitiationExpressionVisitor();
-            serviceNode.syntaxTree().rootNode().accept(visitor);
-            validateListenerArguments(context, visitor);
-            ServiceDeclarationSymbol serviceDeclarationSymbol = (ServiceDeclarationSymbol) serviceDeclarationOpt.get();
-            if (isWebSubService(serviceDeclarationSymbol)) {
-                validateServiceAnnotation(context, serviceNode, serviceDeclarationSymbol);
-                List<FunctionDefinitionNode> availableFunctionDeclarations = serviceNode.members().stream()
-                        .filter(member -> member.kind() == SyntaxKind.OBJECT_METHOD_DEFINITION)
-                        .map(member -> (FunctionDefinitionNode) member).collect(Collectors.toList());
-                validateRequiredMethodsImplemented(context, availableFunctionDeclarations, serviceNode.location());
-                availableFunctionDeclarations.forEach(fd -> {
-                    validateRemoteQualifier(context, fd);
-                    validateAdditionalMethodImplemented(context, fd);
-                    validateMethodParameters(context, fd);
-                    validateMethodReturnTypes(context, fd);
-                });
-            }
-        }
+    public static ServiceDeclarationValidator getInstance() {
+        return INSTANCE;
     }
 
-    private void validateListenerArguments(SyntaxNodeAnalysisContext context,
-                                           ListenerInitiationExpressionVisitor visitor) {
+    public void validateListenerArguments(SyntaxNodeAnalysisContext context,
+                                          ListenerInitiationExpressionVisitor visitor) {
         visitor.getExplicitNewExpressionNodes()
                 .forEach(explicitNewExpressionNode -> {
                     SeparatedNodeList<FunctionArgumentNode> functionArgs = explicitNewExpressionNode
@@ -132,8 +111,8 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
         }
     }
 
-    private void validateServiceAnnotation(SyntaxNodeAnalysisContext context, ServiceDeclarationNode serviceNode,
-                                           ServiceDeclarationSymbol serviceDeclarationSymbol) {
+    public void validateServiceAnnotation(SyntaxNodeAnalysisContext context, ServiceDeclarationNode serviceNode,
+                                          ServiceDeclarationSymbol serviceDeclarationSymbol) {
         Optional<AnnotationSymbol> subscriberServiceAnnotationOptional = serviceDeclarationSymbol.annotations()
                 .stream()
                 .filter(annotationSymbol ->
@@ -145,7 +124,7 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
         }
     }
 
-    private void validateRequiredMethodsImplemented(SyntaxNodeAnalysisContext context,
+    public void validateRequiredMethodsImplemented(SyntaxNodeAnalysisContext context,
                                                     List<FunctionDefinitionNode> availableFunctionDeclarations,
                                                     NodeLocation location) {
         boolean isRequiredMethodNotAvailable = availableFunctionDeclarations.stream()
@@ -156,7 +135,7 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
         }
     }
 
-    private void validateRemoteQualifier(SyntaxNodeAnalysisContext context,
+    public void validateRemoteQualifier(SyntaxNodeAnalysisContext context,
                                          FunctionDefinitionNode functionDefinition) {
         NodeList<Token> qualifiers = functionDefinition.qualifierList();
         if (qualifiers.stream().noneMatch(q -> q.kind() == SyntaxKind.REMOTE_KEYWORD)) {
@@ -165,7 +144,7 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
         }
     }
 
-    private void validateAdditionalMethodImplemented(SyntaxNodeAnalysisContext context,
+    public void validateAdditionalMethodImplemented(SyntaxNodeAnalysisContext context,
                                                      FunctionDefinitionNode functionDefinition) {
         String functionName = functionDefinition.functionName().toString();
         if (!allowedMethods.contains(functionName)) {
@@ -174,7 +153,7 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
         }
     }
 
-    private void validateMethodParameters(SyntaxNodeAnalysisContext context,
+    public void validateMethodParameters(SyntaxNodeAnalysisContext context,
                                           FunctionDefinitionNode functionDefinition) {
         String functionName = functionDefinition.functionName().toString();
         if (allowedMethods.contains(functionName)) {
@@ -198,11 +177,11 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                                 return true;
                             }
                         }).forEach(param -> {
-                            String paramType = param.typeName().toString();
-                            WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_105;
-                            updateContext(
-                                    context, errorCode, functionDefinition.location(), paramType.trim(), functionName);
-                        });
+                    String paramType = param.typeName().toString();
+                    WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_105;
+                    updateContext(
+                            context, errorCode, functionDefinition.location(), paramType.trim(), functionName);
+                });
             } else {
                 if (!allowedParameters.isEmpty()) {
                     WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_106;
@@ -227,7 +206,7 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                 });
     }
 
-    private void validateMethodReturnTypes(SyntaxNodeAnalysisContext context,
+    public void validateMethodReturnTypes(SyntaxNodeAnalysisContext context,
                                            FunctionDefinitionNode functionDefinition) {
         String functionName = functionDefinition.functionName().toString();
         List<String> predefinedReturnTypes = allowedReturnTypes.get(functionName);
@@ -257,9 +236,5 @@ public class ServiceDeclarationValidator implements AnalysisTask<SyntaxNodeAnaly
                 }
             }
         }
-    }
-
-    private boolean isWebSubService(ServiceDeclarationSymbol serviceDeclarationSymbol) {
-        return serviceDeclarationSymbol.listenerTypes().stream().anyMatch(ValidatorUtils::isWebSubListener);
     }
 }

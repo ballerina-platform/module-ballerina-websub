@@ -4,8 +4,9 @@ package io.ballerina.stdlib.websub;
  * {@code Constants} contains the public constants to be used.
  */
 public interface Constants {
-    String ORG_NAME = "ballerina";
-    String MODULE_NAME = "websub";
+    String PACKAGE_ORG = "ballerina";
+    String PACKAGE_NAME = "websub";
+
     String LISTENER_IDENTIFIER = "Listener";
     String SERVICE_ANNOTATION_NAME = "SubscriberServiceConfig";
 

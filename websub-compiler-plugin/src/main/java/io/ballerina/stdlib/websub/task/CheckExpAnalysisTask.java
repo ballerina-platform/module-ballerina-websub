@@ -1,4 +1,4 @@
-package io.ballerina.stdlib.websub.validator;
+package io.ballerina.stdlib.websub.task;
 
 import io.ballerina.compiler.syntax.tree.CheckExpressionNode;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
@@ -13,7 +13,7 @@ import io.ballerina.tools.diagnostics.DiagnosticInfo;
 /**
  * {@code CheckPanicValidator} performs validations related to usage of `checkpanic` expression.
  */
-public class CheckPanicValidator implements AnalysisTask<SyntaxNodeAnalysisContext> {
+public class CheckExpAnalysisTask implements AnalysisTask<SyntaxNodeAnalysisContext> {
     @Override
     public void perform(SyntaxNodeAnalysisContext context) {
         CheckExpressionNode checkExpressionNode = (CheckExpressionNode) context.node();
