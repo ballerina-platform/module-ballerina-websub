@@ -1,128 +1,128 @@
 [package]
 org = "ballerina"
 name = "websub"
-version = "@toml.version@"
+version = "1.2.0-alpha8"
 
 [[platform.java11.dependency]]
-path = "../websub-native/build/libs/websub-native-@project.version@.jar"
+path = "../websub-native/build/libs/websub-native-1.2.0-alpha8-SNAPSHOT.jar"
 groupId = "ballerina"
 artifactId = "web-sub"
-version = "@project.version@"
+version = "1.2.0-alpha8-SNAPSHOT"
 
 
 [[platform.java11.dependency]]
-path = "./lib/http-native-@http.native.version@.jar"
+path = "./lib/http-native-1.1.0-alpha8-SNAPSHOT.jar"
 groupId = "org.ballerinalang"
 artifactId = "http-native"
-version = "@http.native.version@"
+version = "1.1.0-alpha8-SNAPSHOT"
 
 
 [[platform.java11.dependency]]
-path = "./lib/netty-common-@netty.version@.jar"
+path = "./lib/netty-common-4.1.50.Final.jar"
 groupId = "io.netty"
 artifactId = "netty-common"
-version = "@netty.version@"
+version = "4.1.50.Final"
 
 
 [[platform.java11.dependency]]
-path = "./lib/netty-buffer-@netty.version@.jar"
+path = "./lib/netty-buffer-4.1.50.Final.jar"
 groupId = "io.netty"
 artifactId = "netty-buffer"
-version = "@netty.version@"
+version = "4.1.50.Final"
 
 
 [[platform.java11.dependency]]
-path = "./lib/netty-transport-@netty.version@.jar"
+path = "./lib/netty-transport-4.1.50.Final.jar"
 groupId = "io.netty"
 artifactId = "netty-transport"
-version = "@netty.version@"
+version = "4.1.50.Final"
 
 
 [[platform.java11.dependency]]
-path = "./lib/netty-resolver-@netty.version@.jar"
+path = "./lib/netty-resolver-4.1.50.Final.jar"
 groupId = "io.netty"
 artifactId = "netty-resolver"
-version = "@netty.version@"
+version = "4.1.50.Final"
 
 
 [[platform.java11.dependency]]
-path = "./lib/netty-handler-@netty.version@.jar"
+path = "./lib/netty-handler-4.1.50.Final.jar"
 groupId = "io.netty"
 artifactId = "netty-handler"
-version = "@netty.version@"
+version = "4.1.50.Final"
 
 
 [[platform.java11.dependency]]
-path = "./lib/netty-codec-http-@netty.version@.jar"
+path = "./lib/netty-codec-http-4.1.50.Final.jar"
 groupId = "io.netty"
 artifactId = "netty-codec-http"
-version = "@netty.version@"
+version = "4.1.50.Final"
 
 
 [[platform.java11.dependency]]
-path = "./lib/netty-codec-@netty.version@.jar"
+path = "./lib/netty-codec-4.1.50.Final.jar"
 groupId = "io.netty"
 artifactId = "netty-codec"
-version = "@netty.version@"
+version = "4.1.50.Final"
 
 
 [[platform.java11.dependency]]
-path = "./lib/netty-handler-proxy-@netty.version@.jar"
+path = "./lib/netty-handler-proxy-4.1.50.Final.jar"
 groupId = "io.netty"
 artifactId = "netty-handler-proxy"
-version = "@netty.version@"
+version = "4.1.50.Final"
 
 
 [[platform.java11.dependency]]
-path = "./lib/netty-codec-http2-@netty.version@.jar"
+path = "./lib/netty-codec-http2-4.1.50.Final.jar"
 groupId = "io.netty"
 artifactId = "netty-codec-http2"
-version = "@netty.version@"
+version = "4.1.50.Final"
 
 
 [[platform.java11.dependency]]
-path = "./lib/commons-pool-@wso2commonspool.version@.jar"
+path = "./lib/commons-pool-1.5.6.wso2v1.jar"
 groupId = "commons-pool.wso2"
 artifactId = "commons-pool"
-version = "@wso2commonspool.version@"
+version = "1.5.6.wso2v1"
 
 
 [[platform.java11.dependency]]
-path = "./lib/snakeyaml-@wso2snakeyaml.version@.jar"
+path = "./lib/snakeyaml-1.26.0.wso2v1.jar"
 groupId = "org.wso2.orbit.org.yaml"
 artifactId = "snakeyaml"
-version = "@wso2snakeyaml.version@"
+version = "1.26.0.wso2v1"
 
 
 [[platform.java11.dependency]]
-path = "./lib/bcprov-jdk15on-@bouncycastle.version@.jar"
+path = "./lib/bcprov-jdk15on-1.61.jar"
 groupId = "org.bouncycastle"
 artifactId = "bcprov-jdk15on"
-version = "@bouncycastle.version@"
+version = "1.61"
 
 
 [[platform.java11.dependency]]
-path = "./lib/bcpkix-jdk15on-@bouncycastle.version@.jar"
+path = "./lib/bcpkix-jdk15on-1.61.jar"
 groupId = "org.bouncycastle"
 artifactId = "bcpkix-jdk15on"
-version = "@bouncycastle.version@"
+version = "1.61"
 
 
 [[platform.java11.dependency]]
-path = "./lib/netty-tcnative-boringssl-static-@nettytcnative.version@.jar"
+path = "./lib/netty-tcnative-boringssl-static-2.0.31.Final.jar"
 groupId = "io.netty"
 artifactId = "netty-tcnative-boringssl-static"
-version = "@nettytcnative.version@"
+version = "2.0.31.Final"
 
 [[platform.java11.dependency]]
-path = "./lib/org.wso2.carbon.metrics.core-@wso2carbonmetrics.version@.jar"
+path = "./lib/org.wso2.carbon.metrics.core-2.3.7.jar"
 groupId = "org.wso2.carbon.metrics"
 artifactId = "org.wso2.carbon.metrics.core"
-version = "@wso2carbonmetrics.version@"
+version = "2.3.7"
 
 
 [[platform.java11.dependency]]
-path = "./lib/guava-@guava.version@.jar"
+path = "./lib/guava-23.0.jar"
 groupId = "com.google.guava"
 artifactId = "guava"
-version = "@guava.version@"
+version = "23.0"
