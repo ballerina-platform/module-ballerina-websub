@@ -115,12 +115,13 @@ isolated function buildSubscriptionChangeRequest(@untainted string mode,
 # + subscriptionChangeRequest - The sent subscription change request
 # + response - The `http:Response` or an error received upon sending a request to the hub
 # + httpClient - The underlying HTTP Client Endpoint
+# + remainingRedirects - available redirects for the current subscription
 # + return - The subscription/unsubscription details if the request was successful or else an `error`
 #            if an error occurred
-isolated function processHubResponse(@untainted string hub, @untainted string mode,
-                            SubscriptionChangeRequest subscriptionChangeRequest,
-                            http:Response|http:PayloadType|error response, http:Client httpClient,
-                            int remainingRedirects) returns @tainted SubscriptionChangeResponse|error {
+isolated function processHubResponse(@untainted string hub, @untainted string mode, 
+                                     SubscriptionChangeRequest subscriptionChangeRequest,
+                                     http:Response|http:PayloadType|error response, http:Client httpClient, 
+                                     int remainingRedirects) returns @tainted SubscriptionChangeResponse|error {
 
     string topic = subscriptionChangeRequest.topic;
     if (response is error) {
@@ -164,11 +165,12 @@ isolated function processHubResponse(@untainted string hub, @untainted string mo
 # + mode - Whether the request is for subscription or unsubscription
 # + subscriptionChangeRequest - The request containing the subscription/unsubscription details
 # + auth - The auth config to use at the hub (if specified)
+# + remainingRedirects - available redirects for the current subscription
 # + return - The subscription/unsubscription details if the request was successful or else an `error`
 #            if an error occurred
-isolated function invokeClientConnectorOnRedirection(@untainted string hub, @untainted string mode,
-                                            SubscriptionChangeRequest subscriptionChangeRequest,
-                                            http:ClientAuthConfig? auth, int remainingRedirects)
+isolated function invokeClientConnectorOnRedirection(@untainted string hub, @untainted string mode, 
+                                                     SubscriptionChangeRequest subscriptionChangeRequest, 
+                                                     http:ClientAuthConfig? auth, int remainingRedirects)
     returns @tainted SubscriptionChangeResponse|error {
 
     if (mode == MODE_SUBSCRIBE) {
