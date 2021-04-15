@@ -46,6 +46,14 @@ public class CompilerPluginTest {
             .get("build", "target", "ballerina-distribution").toAbsolutePath();
 
     @Test
+    public void testValidServiceDeclaration() {
+        Package currentPackage = loadPackage("sample_1");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+    }
+
+    @Test
     public void testCompilerPluginForRemoteMethodValidation() {
         Package currentPackage = loadPackage("sample_2");
         PackageCompilation compilation = currentPackage.getCompilation();
@@ -143,7 +151,7 @@ public class CompilerPluginTest {
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
         Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_107");
         String expectedMsg = MessageFormat.format("{0} type is not allowed to be returned from {1} method",
-                "websub:Acknowledgement|websub:SubscriptionDeletedError|SpecialReturnType?",
+                "websub:Acknowledgement|websub:SubscriptionDeletedError|sample_8:SpecialReturnType?",
                 "onEventNotification");
         Assert.assertEquals(diagnostic.message(), expectedMsg);
     }
@@ -218,6 +226,14 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_109");
         String expectedMsg = "websub:Listener should only take either http:Listener or websub:ListenerConfiguration";
         Assert.assertEquals(diagnostic.message(), expectedMsg);
+    }
+
+    @Test
+    public void testValidServiceDeclarationWithAliases() {
+        Package currentPackage = loadPackage("sample_14");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
     }
 
     private Package loadPackage(String path) {
