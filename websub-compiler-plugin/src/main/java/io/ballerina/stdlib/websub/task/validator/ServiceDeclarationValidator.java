@@ -1,5 +1,6 @@
 package io.ballerina.stdlib.websub.task.validator;
 
+import io.ballerina.compiler.api.ModuleID;
 import io.ballerina.compiler.api.symbols.AnnotationSymbol;
 import io.ballerina.compiler.api.symbols.FunctionSymbol;
 import io.ballerina.compiler.api.symbols.FunctionTypeSymbol;
@@ -9,6 +10,7 @@ import io.ballerina.compiler.api.symbols.Qualifier;
 import io.ballerina.compiler.api.symbols.ServiceDeclarationSymbol;
 import io.ballerina.compiler.api.symbols.TypeDescKind;
 import io.ballerina.compiler.api.symbols.TypeSymbol;
+import io.ballerina.compiler.api.symbols.UnionTypeSymbol;
 import io.ballerina.compiler.syntax.tree.FunctionArgumentNode;
 import io.ballerina.compiler.syntax.tree.FunctionDefinitionNode;
 import io.ballerina.compiler.syntax.tree.Node;
@@ -195,8 +197,8 @@ public class ServiceDeclarationValidator {
                     }
                 } else {
                     Optional<String> errorMsg = params.stream()
-                            .filter(p -> isParamNotAllowed(allowedParams, p, ""))
-                            .map(this::getInvalidTypeDescription)
+                            .filter(p -> isParamNotAllowed(allowedParams, p.typeDescriptor()))
+                            .map(e -> getInvalidTypeDescription(e.typeDescriptor()))
                             .reduce(String::join);
                     if (errorMsg.isPresent()) {
                         String message = errorMsg.get();
@@ -214,41 +216,56 @@ public class ServiceDeclarationValidator {
         }
     }
 
-    private String getInvalidTypeDescription(ParameterSymbol p) {
-        TypeSymbol paramType = p.typeDescriptor();
+    private String getInvalidTypeDescription(TypeSymbol paramType) {
         TypeDescKind paramKind = paramType.typeKind();
         if (TypeDescKind.TYPE_REFERENCE.equals(paramKind)) {
             String moduleName = paramType.getModule().flatMap(ModuleSymbol::getName).orElse("");
             String type = paramType.getName().orElse("");
-            return moduleName.isBlank() ? type : String.format("%s:%s", moduleName, type);
+            return getQualifiedType(type, moduleName);
         } else if (TypeDescKind.UNION.equals(paramKind)) {
-            return "";
+            return ((UnionTypeSymbol) paramType)
+                    .memberTypeDescriptors().stream()
+                    .map(this::getInvalidTypeDescription)
+                    .reduce((a, b) -> String.join("|", a, b)).orElse("");
         } else if (TypeDescKind.ERROR.equals(paramKind)) {
-            return "";
+            String signature = paramType.signature();
+            Optional<ModuleID> moduleIdOpt = paramType.getModule().map(ModuleSymbol::id);
+            String moduleId = moduleIdOpt.map(ModuleID::toString).orElse("");
+            String type = signature.replace(moduleId, "").replace(":", "");
+            String moduleName = moduleIdOpt.map(ModuleID::modulePrefix).orElse("");
+            return getQualifiedType(type, moduleName);
         } else {
             return paramType.getName().orElse("");
         }
     }
 
-    private boolean isParamNotAllowed(List<List<String>> allowedParams, ParameterSymbol param, String paramTypeName) {
-        TypeSymbol paramTypeDescriptor = param.typeDescriptor();
+    private boolean isParamNotAllowed(List<List<String>> allowedParams, TypeSymbol paramTypeDescriptor) {
         TypeDescKind typeKind = paramTypeDescriptor.typeKind();
         if (TypeDescKind.UNION.equals(typeKind)) {
-            return true;
+            return ((UnionTypeSymbol) paramTypeDescriptor)
+                    .memberTypeDescriptors().stream()
+                    .map(e -> isParamNotAllowed(allowedParams, e))
+                    .reduce(false, (a , b) -> a || b);
         } else if (TypeDescKind.TYPE_REFERENCE.equals(typeKind)) {
             String moduleName = paramTypeDescriptor.getModule().flatMap(ModuleSymbol::getName).orElse("");
             String paramType = paramTypeDescriptor.getName().orElse("");
-            String qualifiedParamType = moduleName.isBlank() ? paramType :
-                    String.format("%s:%s", moduleName, paramType);
+            String qualifiedParamType = getQualifiedType(paramType, moduleName);
             return allowedParams.stream().noneMatch(p -> p.contains(qualifiedParamType));
         } else if (TypeDescKind.ERROR.equals(typeKind)) {
-            String moduleName = paramTypeDescriptor.getModule().flatMap(ModuleSymbol::getName).orElse("");
-            String qualifiedParamType = moduleName.isBlank() ? paramTypeName :
-                    String.format("%s:%s", moduleName, paramTypeName);
+            String signature = paramTypeDescriptor.signature();
+            Optional<ModuleID> moduleIdOpt = paramTypeDescriptor.getModule().map(ModuleSymbol::id);
+            String moduleId = moduleIdOpt.map(ModuleID::toString).orElse("");
+            String paramType = signature.replace(moduleId, "").replace(":", "");
+            String moduleName = moduleIdOpt.map(ModuleID::modulePrefix).orElse("");
+            String qualifiedParamType = getQualifiedType(paramType, moduleName);
             return allowedParams.stream().noneMatch(p -> p.contains(qualifiedParamType));
         } else {
             return true;
         }
+    }
+
+    private String getQualifiedType(String paramType, String moduleName) {
+        return moduleName.isBlank() ? paramType : String.format("%s:%s", moduleName, paramType);
     }
 
     private void validateMethodReturnTypes(SyntaxNodeAnalysisContext context,
