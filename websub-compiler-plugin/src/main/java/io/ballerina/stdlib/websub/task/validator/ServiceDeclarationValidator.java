@@ -5,11 +5,13 @@ import io.ballerina.compiler.api.symbols.FunctionSymbol;
 import io.ballerina.compiler.api.symbols.FunctionTypeSymbol;
 import io.ballerina.compiler.api.symbols.ModuleSymbol;
 import io.ballerina.compiler.api.symbols.ParameterSymbol;
+import io.ballerina.compiler.api.symbols.Qualifier;
 import io.ballerina.compiler.api.symbols.ServiceDeclarationSymbol;
+import io.ballerina.compiler.api.symbols.TypeDescKind;
+import io.ballerina.compiler.api.symbols.TypeSymbol;
 import io.ballerina.compiler.syntax.tree.FunctionArgumentNode;
 import io.ballerina.compiler.syntax.tree.FunctionDefinitionNode;
 import io.ballerina.compiler.syntax.tree.Node;
-import io.ballerina.compiler.syntax.tree.NodeList;
 import io.ballerina.compiler.syntax.tree.NodeLocation;
 import io.ballerina.compiler.syntax.tree.ParenthesizedArgList;
 import io.ballerina.compiler.syntax.tree.PositionalArgumentNode;
@@ -17,7 +19,6 @@ import io.ballerina.compiler.syntax.tree.ReturnTypeDescriptorNode;
 import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
-import io.ballerina.compiler.syntax.tree.Token;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 import io.ballerina.stdlib.websub.Constants;
 import io.ballerina.stdlib.websub.WebSubDiagnosticCodes;
@@ -75,8 +76,8 @@ public class ServiceDeclarationValidator {
     }
 
     public void validate(SyntaxNodeAnalysisContext context, ServiceDeclarationNode serviceNode,
-                          ListenerInitiationExpressionVisitor visitor,
-                          ServiceDeclarationSymbol serviceDeclarationSymbol) {
+                         ListenerInitiationExpressionVisitor visitor,
+                         ServiceDeclarationSymbol serviceDeclarationSymbol) {
         validateListenerArguments(context, visitor);
         validateServiceAnnotation(context, serviceNode, serviceDeclarationSymbol);
         List<FunctionDefinitionNode> availableFunctionDeclarations = serviceNode.members().stream()
@@ -86,8 +87,9 @@ public class ServiceDeclarationValidator {
                 context, availableFunctionDeclarations, serviceNode.location());
         availableFunctionDeclarations.forEach(fd -> {
             context.semanticModel().symbol(fd).ifPresent(fs -> {
-                validateRemoteQualifier(context, fd);
-                validateAdditionalMethodImplemented(context, fd);
+                NodeLocation location = fd.location();
+                validateRemoteQualifier(context, (FunctionSymbol) fs, location);
+                validateAdditionalMethodImplemented(context, fd, location);
                 validateMethodParameters(context, fd, (FunctionSymbol) fs);
                 validateMethodReturnTypes(context, fd);
             });
@@ -154,26 +156,26 @@ public class ServiceDeclarationValidator {
         }
     }
 
-    private void validateRemoteQualifier(SyntaxNodeAnalysisContext context,
-                                         FunctionDefinitionNode functionDefinition) {
-        NodeList<Token> qualifiers = functionDefinition.qualifierList();
-        if (qualifiers.stream().noneMatch(q -> q.kind() == SyntaxKind.REMOTE_KEYWORD)) {
+    private void validateRemoteQualifier(SyntaxNodeAnalysisContext context, FunctionSymbol functionSymbol,
+                                         NodeLocation location) {
+        boolean containsRemoteQualifier = functionSymbol.qualifiers().contains(Qualifier.REMOTE);
+        if (!containsRemoteQualifier) {
             WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_102;
-            updateContext(context, errorCode, functionDefinition.location());
+            updateContext(context, errorCode, location);
         }
     }
 
     private void validateAdditionalMethodImplemented(SyntaxNodeAnalysisContext context,
-                                                     FunctionDefinitionNode functionDefinition) {
+                                                     FunctionDefinitionNode functionDefinition, NodeLocation location) {
         String functionName = functionDefinition.functionName().toString();
         if (!allowedMethods.contains(functionName)) {
             WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_104;
-            updateContext(context, errorCode, functionDefinition.location(), functionName);
+            updateContext(context, errorCode, location, functionName);
         }
     }
 
     private void validateMethodParameters(SyntaxNodeAnalysisContext context, FunctionDefinitionNode functionDefinition,
-                                         FunctionSymbol functionSymbol) {
+                                          FunctionSymbol functionSymbol) {
         String functionName = functionDefinition.functionName().toString();
         if (allowedMethods.contains(functionName)) {
             List<String> allowedParameters = allowedParameterTypes.get(functionName);
@@ -184,16 +186,24 @@ public class ServiceDeclarationValidator {
             FunctionTypeSymbol typeSymbol = functionSymbol.typeDescriptor();
             Optional<List<ParameterSymbol>> paramOpt = typeSymbol.params();
             if (paramOpt.isPresent()) {
-                paramOpt.get().stream()
-                        .filter(p -> isParamNotAllowed(allowedParams, p))
-                        .forEach(p -> {
-                            String moduleName = p.getModule().flatMap(ModuleSymbol::getName).orElse("");
-                            String paramName = p.getName().orElse("");
-                            String paramType = String.format("%s:%s", moduleName, paramName);
-                            WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_105;
-                            updateContext(context, errorCode, functionDefinition.location(), paramType.trim(),
-                                    functionName);
-                        });
+                List<ParameterSymbol> params = paramOpt.get();
+                if (params.isEmpty()) {
+                    if (!allowedParameters.isEmpty()) {
+                        WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_106;
+                        updateContext(context, errorCode, functionDefinition.location(), functionName,
+                                String.join("", allowedParameters));
+                    }
+                } else {
+                    Optional<String> errorMsg = params.stream()
+                            .filter(p -> isParamNotAllowed(allowedParams, p, ""))
+                            .map(this::getInvalidTypeDescription)
+                            .reduce(String::join);
+                    if (errorMsg.isPresent()) {
+                        String message = errorMsg.get();
+                        WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_105;
+                        updateContext(context, errorCode, functionDefinition.location(), message, functionName);
+                    }
+                }
             } else {
                 if (!allowedParameters.isEmpty()) {
                     WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_106;
@@ -204,17 +214,41 @@ public class ServiceDeclarationValidator {
         }
     }
 
-    private boolean isParamNotAllowed(List<List<String>> allowedParams, ParameterSymbol param) {
-        String moduleName = param.getModule().flatMap(ModuleSymbol::getName).orElse("");
-        String paramType = param.getName().orElse("");
-        return Arrays
-                .stream(paramType.trim().split("\\|"))
-                .map(String::trim)
-                .anyMatch(paramsTypes -> {
-                    String qualifiedParamType = moduleName.isBlank() ? paramType :
-                            String.format("%s:%s", moduleName, paramType);
-                    return allowedParams.stream().noneMatch(p -> p.contains(qualifiedParamType));
-                });
+    private String getInvalidTypeDescription(ParameterSymbol p) {
+        TypeSymbol paramType = p.typeDescriptor();
+        TypeDescKind paramKind = paramType.typeKind();
+        if (TypeDescKind.TYPE_REFERENCE.equals(paramKind)) {
+            String moduleName = paramType.getModule().flatMap(ModuleSymbol::getName).orElse("");
+            String type = paramType.getName().orElse("");
+            return moduleName.isBlank() ? type : String.format("%s:%s", moduleName, type);
+        } else if (TypeDescKind.UNION.equals(paramKind)) {
+            return "";
+        } else if (TypeDescKind.ERROR.equals(paramKind)) {
+            return "";
+        } else {
+            return paramType.getName().orElse("");
+        }
+    }
+
+    private boolean isParamNotAllowed(List<List<String>> allowedParams, ParameterSymbol param, String paramTypeName) {
+        TypeSymbol paramTypeDescriptor = param.typeDescriptor();
+        TypeDescKind typeKind = paramTypeDescriptor.typeKind();
+        if (TypeDescKind.UNION.equals(typeKind)) {
+            return true;
+        } else if (TypeDescKind.TYPE_REFERENCE.equals(typeKind)) {
+            String moduleName = paramTypeDescriptor.getModule().flatMap(ModuleSymbol::getName).orElse("");
+            String paramType = paramTypeDescriptor.getName().orElse("");
+            String qualifiedParamType = moduleName.isBlank() ? paramType :
+                    String.format("%s:%s", moduleName, paramType);
+            return allowedParams.stream().noneMatch(p -> p.contains(qualifiedParamType));
+        } else if (TypeDescKind.ERROR.equals(typeKind)) {
+            String moduleName = paramTypeDescriptor.getModule().flatMap(ModuleSymbol::getName).orElse("");
+            String qualifiedParamType = moduleName.isBlank() ? paramTypeName :
+                    String.format("%s:%s", moduleName, paramTypeName);
+            return allowedParams.stream().noneMatch(p -> p.contains(qualifiedParamType));
+        } else {
+            return true;
+        }
     }
 
     private void validateMethodReturnTypes(SyntaxNodeAnalysisContext context,
