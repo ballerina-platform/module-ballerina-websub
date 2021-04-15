@@ -36,7 +36,7 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 
 /**
- * This class includes tests for Ballerina Graphql compiler plugin.
+ * This class includes tests for Ballerina WebSub compiler plugin.
  */
 public class CompilerPluginTest {
     private static final Path RESOURCE_DIRECTORY = Paths
