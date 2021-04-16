@@ -22,8 +22,7 @@ description = 'Ballerina - Websub Ballerina Generator'
 def packageName = "websub"
 def packageOrg = "ballerina"
 def platform = "java11"
-def snapshotVersion = "-SNAPSHOT"
-def tomlVersion = project.version.replace("${snapshotVersion}", "")
+def tomlVersion = stripBallerinaExtensionVersion("${project.version}")
 def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
 def ballerinaDependencyFile = new File("$project.projectDir/Dependencies.toml")
 def ballerinaCompilerPluginFile = new File("$project.projectDir/CompilerPlugin.toml")
@@ -37,6 +36,20 @@ def originalCompilerPlugin = ballerinaCompilerPluginFile.text
 def distributionBinPath = distributionPath + "/bin"
 def originalConfig = ballerinaConfigFile.text
 def testCoverageParam = "--code-coverage --includes=io.ballerina.stdlib.websub.*:ballerina.*"
+
+def stripBallerinaExtensionVersion(String extVersion) {
+    if (extVersion.matches(project.ext.timestampedVersionRegex)) {
+        def splitVersion = extVersion.split('-');
+        if (splitVersion.length > 3) {
+            def strippedValues = splitVersion[0..-4]
+            return strippedValues.join('-')
+        } else {
+            return extVersion
+        }
+    } else {
+        return extVersion.replace("${project.ext.snapshotVersion}", "")
+    }
+}
 
 configurations {
     jbalTools
@@ -200,19 +213,19 @@ task copyToLib(type: Copy) {
 
 task updateTomlFiles {
     doLast {
-        def stdlibDependentHttpVersion = project.stdlibHttpVersion.replace("${snapshotVersion}", "")
-        def stdlibDependentMimeVersion = project.stdlibMimeVersion.replace("${snapshotVersion}", "")
-        def stdlibDependentAuthVersion = project.stdlibAuthVersion.replace("${snapshotVersion}", "")
-        def stdlibDependentCacheVersion = project.stdlibCacheVersion.replace("${snapshotVersion}", "")
-        def stdlibDependentCryptoVersion = project.stdlibCryptoVersion.replace("${snapshotVersion}", "")
-        def stdlibDependentUrlVersion = project.stdlibUrlVersion.replace("${snapshotVersion}", "")
-        def stdlibDependentLogVersion = project.stdlibLogVersion.replace("${snapshotVersion}", "")
-        def stdlibDependentTimeVersion = project.stdlibTimeVersion.replace("${snapshotVersion}", "")
-        def stdlibDependentOsVersion = project.stdlibOsVersion.replace("${snapshotVersion}", "")
-        def stdlibDependentIoVersion = project.stdlibIoVersion.replace("${snapshotVersion}", "")
-        def stdlibDependentRegexVersion = project.stdlibRegexVersion.replace("${snapshotVersion}", "")
-        def stdlibDependentUuidVersion = project.stdlibUuidVersion.replace("${snapshotVersion}", "")
-        def stdlibDependentRandomVersion = project.stdlibRandomVersion.replace("${snapshotVersion}", "")
+        def stdlibDependentHttpVersion = stripBallerinaExtensionVersion(project.stdlibHttpVersion)
+        def stdlibDependentMimeVersion = stripBallerinaExtensionVersion(project.stdlibMimeVersion)
+        def stdlibDependentAuthVersion = stripBallerinaExtensionVersion(project.stdlibAuthVersion)
+        def stdlibDependentCacheVersion = stripBallerinaExtensionVersion(project.stdlibCacheVersion)
+        def stdlibDependentCryptoVersion = stripBallerinaExtensionVersion(project.stdlibCryptoVersion)
+        def stdlibDependentUrlVersion = stripBallerinaExtensionVersion(project.stdlibUrlVersion)
+        def stdlibDependentLogVersion = stripBallerinaExtensionVersion(project.stdlibLogVersion)
+        def stdlibDependentTimeVersion = stripBallerinaExtensionVersion(project.stdlibTimeVersion)
+        def stdlibDependentOsVersion = stripBallerinaExtensionVersion(project.stdlibOsVersion)
+        def stdlibDependentIoVersion = stripBallerinaExtensionVersion(project.stdlibIoVersion)
+        def stdlibDependentRegexVersion = stripBallerinaExtensionVersion(project.stdlibRegexVersion)
+        def stdlibDependentUuidVersion = stripBallerinaExtensionVersion(project.stdlibUuidVersion)
+        def stdlibDependentRandomVersion = stripBallerinaExtensionVersion(project.stdlibRandomVersion)
 
         def newConfig = ballerinaConfigFile.text.replace("@project.version@", project.version)
         newConfig = newConfig.replace("@toml.version@", tomlVersion)
