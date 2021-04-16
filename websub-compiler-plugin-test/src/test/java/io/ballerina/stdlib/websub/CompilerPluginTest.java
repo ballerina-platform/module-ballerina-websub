@@ -61,10 +61,10 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_102;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
-        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_102");
-        String expectedMessage = "websub:SubscriberService should only implement remote methods";
-        Assert.assertEquals(diagnostic.message(), expectedMessage);
+        Assert.assertEquals(diagnosticInfo.code(), expectedCode.getCode());
+        Assert.assertEquals(diagnostic.message(), expectedCode.getDescription());
     }
 
     @Test
@@ -75,10 +75,10 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_103;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
-        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_103");
-        String expectedMessage = "websub:SubscriberService should implement onEventNotification method";
-        Assert.assertEquals(diagnostic.message(), expectedMessage);
+        Assert.assertEquals(diagnosticInfo.code(), expectedCode.getCode());
+        Assert.assertEquals(diagnostic.message(), expectedCode.getDescription());
     }
 
     @Test
@@ -89,9 +89,10 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_104;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
-        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_104");
-        String expectedMessage = "onNewEvent method is not allowed in websub:SubscriberService declaration";
+        Assert.assertEquals(diagnosticInfo.code(), expectedCode.getCode());
+        String expectedMessage = MessageFormat.format(expectedCode.getDescription(), "onNewEvent");
         Assert.assertEquals(diagnostic.message(), expectedMessage);
     }
 
@@ -103,9 +104,10 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_105;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
-        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_105");
-        String expectedMsg = MessageFormat.format("{0} type parameters not allowed for {1} method",
+        Assert.assertEquals(diagnosticInfo.code(), expectedCode.getCode());
+        String expectedMsg = MessageFormat.format(expectedCode.getDescription(),
                 "websub:ContentDistributionMessage|sample_5:SecondaryMsgType", "onEventNotification");
         Assert.assertEquals(diagnostic.message(), expectedMsg);
     }
@@ -118,9 +120,10 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_105;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
-        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_105");
-        String expectedMsg = MessageFormat.format("{0} type parameters not allowed for {1} method",
+        Assert.assertEquals(diagnosticInfo.code(), expectedCode.getCode());
+        String expectedMsg = MessageFormat.format(expectedCode.getDescription(),
                 "sample_6:SimpleObj", "onEventNotification");
         Assert.assertEquals(diagnostic.message(), expectedMsg);
     }
@@ -133,9 +136,10 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_106;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
-        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_106");
-        String expectedMsg = MessageFormat.format("{0} method should have parameters of following {1} types",
+        Assert.assertEquals(diagnosticInfo.code(), expectedCode.getCode());
+        String expectedMsg = MessageFormat.format(expectedCode.getDescription(),
                 "onEventNotification", "websub:ContentDistributionMessage");
         Assert.assertEquals(diagnostic.message(), expectedMsg);
     }
@@ -148,9 +152,10 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_107;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
-        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_107");
-        String expectedMsg = MessageFormat.format("{0} type is not allowed to be returned from {1} method",
+        Assert.assertEquals(diagnosticInfo.code(), expectedCode.getCode());
+        String expectedMsg = MessageFormat.format(expectedCode.getDescription(),
                 "websub:Acknowledgement|websub:SubscriptionDeletedError|sample_8:SpecialReturnType?",
                 "onEventNotification");
         Assert.assertEquals(diagnostic.message(), expectedMsg);
@@ -164,9 +169,10 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_108;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
-        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_108");
-        String expectedMsg = MessageFormat.format("{0} method should return {1} types",
+        Assert.assertEquals(diagnosticInfo.code(), expectedCode.getCode());
+        String expectedMsg = MessageFormat.format(expectedCode.getDescription(),
                 "onSubscriptionVerification",
                 "websub:SubscriptionVerificationSuccess|websub:SubscriptionVerificationError");
         Assert.assertEquals(diagnostic.message(), expectedMsg);
@@ -180,10 +186,10 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_101;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
-        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_101");
-        String expectedMsg = "Subscriber service should be annotated with websub:SubscriberServiceConfig";
-        Assert.assertEquals(diagnostic.message(), expectedMsg);
+        Assert.assertEquals(diagnosticInfo.code(), expectedCode.getCode());
+        Assert.assertEquals(diagnostic.message(), expectedCode.getDescription());
     }
 
     @Test
@@ -194,10 +200,10 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_101;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
-        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_101");
-        String expectedMsg = "Subscriber service should be annotated with websub:SubscriberServiceConfig";
-        Assert.assertEquals(diagnostic.message(), expectedMsg);
+        Assert.assertEquals(diagnosticInfo.code(), expectedCode.getCode());
+        Assert.assertEquals(diagnostic.message(), expectedCode.getDescription());
     }
 
     @Test
@@ -208,10 +214,10 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_109;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
-        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_109");
-        String expectedMsg = "websub:Listener should only take either http:Listener or websub:ListenerConfiguration";
-        Assert.assertEquals(diagnostic.message(), expectedMsg);
+        Assert.assertEquals(diagnosticInfo.code(), expectedCode.getCode());
+        Assert.assertEquals(diagnostic.message(), expectedCode.getDescription());
     }
 
     @Test
@@ -222,10 +228,10 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
         Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
+        WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_109;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
-        Assert.assertEquals(diagnosticInfo.code(), "WEBSUB_109");
-        String expectedMsg = "websub:Listener should only take either http:Listener or websub:ListenerConfiguration";
-        Assert.assertEquals(diagnostic.message(), expectedMsg);
+        Assert.assertEquals(diagnosticInfo.code(), expectedCode.getCode());
+        Assert.assertEquals(diagnostic.message(), expectedCode.getDescription());
     }
 
     @Test
