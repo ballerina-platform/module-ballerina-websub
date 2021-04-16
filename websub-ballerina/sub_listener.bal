@@ -35,7 +35,6 @@ public class Listener {
         if (listenTo is int) {
             self.httpListener = check new(listenTo, config);
         } else {
-            log:printWarn("Provided `websub:ListenerConfiguration` will be overridden by the given http listener configurations");
             self.httpListener = listenTo;
         }
         self.listenerConfig = self.httpListener.getConfig();
@@ -97,7 +96,7 @@ public class Listener {
         check self.httpListener.attach(<HttpService> self.httpService, servicePath);        
             
     }
-
+    
     # Detaches the provided Service from the Listener.
     #
     # + s - The service to be detached
@@ -140,6 +139,7 @@ public class Listener {
 
 # Retrieves the `websub:SubscriberServiceConfig` annotation values
 # 
+# + serviceType - current service type
 # + return - {@code websub:SubscriberServiceConfiguration} if present or `nil` if absent
 isolated function retrieveSubscriberServiceAnnotations(SubscriberService serviceType) returns SubscriberServiceConfiguration? {
     typedesc<any> serviceTypedesc = typeof serviceType;
@@ -194,6 +194,7 @@ isolated function retrieveCallbackUrl(string? providedCallback, boolean appendSe
 # Dynamically generates the call-back URL for subscriber-service
 # 
 # + servicePath - service path on which the service will be hosted
+# + port - current listener port
 # + config - {@code http:ListenerConfiguration} in use
 # + return - {@code string} contaning the generated URL
 isolated function generateCallbackUrl(string[]|string servicePath, 
@@ -233,6 +234,7 @@ isolated function isLoggingGeneratedCallback(string? providedCallback, string[]|
 #
 # + serviceConfig - {@code SubscriberServiceConfiguration} subscriber-service
 #                   related configurations
+# + callbackUrl - subscriber callback URL
 # + return - An `error`, if an error occurred during the subscription-initiation
 isolated function initiateSubscription(SubscriberServiceConfiguration serviceConfig, string callbackUrl) returns error? {
     string|[string, string]? target = serviceConfig?.target;

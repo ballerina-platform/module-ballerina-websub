@@ -1,0 +1,7 @@
+[package]
+org = "websub_test"
+name = "sample_5"
+version = "0.1.0"
+
+[build-options]
+observabilityIncluded = true

@@ -25,12 +25,14 @@ def platform = "java11"
 def tomlVersion = stripBallerinaExtensionVersion("${project.version}")
 def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
 def ballerinaDependencyFile = new File("$project.projectDir/Dependencies.toml")
+def ballerinaCompilerPluginFile = new File("$project.projectDir/CompilerPlugin.toml")
 def artifactBallerinaDocs = file("$project.projectDir/build/docs_parent/")
 def artifactCacheParent = file("$project.projectDir/build/cache_parent/")
 def artifactLibParent = file("$project.projectDir/build/lib_parent/")
 def ballerinaCentralAccessToken = System.getenv('BALLERINA_CENTRAL_ACCESS_TOKEN')
 def distributionPath =  project.projectDir.absolutePath + "/build/target/extracted-distributions/jballerina-tools-zip/jballerina-tools-${ballerinaLangVersion}"
 def originalDependencies = ballerinaDependencyFile.text
+def originalCompilerPlugin = ballerinaCompilerPluginFile.text
 def distributionBinPath = distributionPath + "/bin"
 def originalConfig = ballerinaConfigFile.text
 def testCoverageParam = "--code-coverage --includes=io.ballerina.stdlib.websub.*:ballerina.*"
@@ -55,9 +57,6 @@ configurations {
 }
 
 dependencies {
-    jbalTools ("org.ballerinalang:jballerina-tools:${ballerinaLangVersion}") {
-        transitive = false
-    }
     compile project(":${packageName}-native")
     compile group: 'org.ballerinalang', name: 'toml-parser', version: "${ballerinaTomlParserVersion}"
     
@@ -212,7 +211,7 @@ task copyToLib(type: Copy) {
     from configurations.externalJars
 }
 
-task updateTomlFile {
+task updateTomlFiles {
     doLast {
         def stdlibDependentHttpVersion = stripBallerinaExtensionVersion(project.stdlibHttpVersion)
         def stdlibDependentMimeVersion = stripBallerinaExtensionVersion(project.stdlibMimeVersion)
@@ -257,13 +256,17 @@ task updateTomlFile {
         newDependencyConfig = newDependencyConfig.replace("@stdlib.uuid.version@", stdlibDependentUuidVersion)
         newDependencyConfig = newDependencyConfig.replace("@stdlib.random.version@", stdlibDependentRandomVersion)
         ballerinaDependencyFile.text = newDependencyConfig
+
+        def newPluginConfig = ballerinaCompilerPluginFile.text.replace("@project.version@", project.version)
+        ballerinaCompilerPluginFile.text = newPluginConfig
     }
 }
 
-task revertTomlFile {
+task revertTomlFiles {
     doLast {
         ballerinaConfigFile.text = originalConfig
         ballerinaDependencyFile.text = originalDependencies
+        ballerinaCompilerPluginFile.text = originalCompilerPlugin
     }
 }
 
@@ -380,24 +383,27 @@ publishing {
 unpackJballerinaTools.dependsOn copyToLib
 unpackStdLibs.dependsOn unpackJballerinaTools
 copyStdlibs.dependsOn unpackStdLibs
-updateTomlFile.dependsOn copyStdlibs
+updateTomlFiles.dependsOn copyStdlibs
 
 ballerinaTest.dependsOn ":${packageName}-native:build"
-ballerinaTest.dependsOn updateTomlFile
+ballerinaTest.dependsOn ":${packageName}-compiler-plugin:build"
+ballerinaTest.dependsOn updateTomlFiles
 ballerinaTest.dependsOn initializeVariables
-ballerinaTest.finalizedBy revertTomlFile
+ballerinaTest.finalizedBy revertTomlFiles
 test.dependsOn ballerinaTest
 
 ballerinaBuild.dependsOn test
 ballerinaBuild.dependsOn ":${packageName}-native:build"
-ballerinaBuild.dependsOn updateTomlFile
+ballerinaTest.dependsOn ":${packageName}-compiler-plugin:build"
+ballerinaBuild.dependsOn updateTomlFiles
 ballerinaBuild.dependsOn initializeVariables
-ballerinaBuild.finalizedBy revertTomlFile
+ballerinaBuild.finalizedBy revertTomlFiles
 build.dependsOn ballerinaBuild
 
 ballerinaPublish.dependsOn ":${packageName}-native:build"
+ballerinaPublish.dependsOn ":${packageName}-compiler-plugin:build"
 ballerinaPublish.dependsOn ballerinaBuild
-ballerinaPublish.dependsOn updateTomlFile
+ballerinaPublish.dependsOn updateTomlFiles
 ballerinaPublish.dependsOn initializeVariables
-ballerinaPublish.finalizedBy revertTomlFile
+ballerinaPublish.finalizedBy revertTomlFiles
 publish.dependsOn ballerinaPublish
