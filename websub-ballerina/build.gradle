@@ -400,7 +400,7 @@ copyStdlibs.dependsOn unpackStdLibs
 updateTomlFiles.dependsOn copyStdlibs
 
 ballerinaBuild.dependsOn ":${packageName}-native:build"
- ballerinaBuild.dependsOn ":${packageName}-compiler-plugin:build"
+ballerinaBuild.dependsOn ":${packageName}-compiler-plugin:build"
 ballerinaBuild.dependsOn updateTomlFiles
 ballerinaBuild.dependsOn initializeVariables
 ballerinaBuild.finalizedBy revertTomlFiles
