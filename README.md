@@ -35,16 +35,38 @@ This repository only contains the source code for the package.
 Execute the commands below to build from source.
 
 1. To build the package:
-        
+```        
         ./gradlew clean build
+```
 
-1. To build the package without the tests:
-
+2. To build the package without the tests:
+```
         ./gradlew clean build -x test
+```
 
-1. To debug the package tests:
+3. To debug the package tests:
 
         ./gradlew clean build -Pdebug=<port>
+
+4. To run a group of tests
+    ```
+    ./gradlew clean test -Pgroups=<test_group_names>
+    ```
+
+5. To debug with Ballerina language:
+    ```
+    ./gradlew clean build -PbalJavaDebug=<port>
+    ```
+
+6. Publish the generated artifacts to the local Ballerina central repository:
+    ```
+    ./gradlew clean build -PpublishToLocalCentral=true
+    ```
+
+7. Publish the generated artifacts to the Ballerina central repository:
+    ```
+    ./gradlew clean build -PpublishToCentral=true
+    ```
 
 ## Contributing to Ballerina
 
