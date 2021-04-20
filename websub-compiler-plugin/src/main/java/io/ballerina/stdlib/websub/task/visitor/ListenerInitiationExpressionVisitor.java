@@ -20,6 +20,7 @@ package io.ballerina.stdlib.websub.task.visitor;
 
 import io.ballerina.compiler.api.ModuleID;
 import io.ballerina.compiler.api.symbols.ModuleSymbol;
+import io.ballerina.compiler.api.symbols.ObjectTypeSymbol;
 import io.ballerina.compiler.api.symbols.Symbol;
 import io.ballerina.compiler.api.symbols.TypeDescKind;
 import io.ballerina.compiler.api.symbols.TypeReferenceTypeSymbol;
@@ -61,17 +62,12 @@ public class ListenerInitiationExpressionVisitor extends NodeVisitor {
                 Optional<Symbol> parentSymbolOpt = context.semanticModel().symbol(parentType);
                 if (parentSymbolOpt.isPresent() && parentSymbolOpt.get() instanceof TypeReferenceTypeSymbol) {
                     TypeSymbol typeSymbol = ((TypeReferenceTypeSymbol) parentSymbolOpt.get()).typeDescriptor();
-                    if (typeSymbol.typeKind() == TypeDescKind.UNION) {
-                        Optional<TypeSymbol> refSymbolOpt = ((UnionTypeSymbol) typeSymbol).memberTypeDescriptors()
-                                .stream().filter(e -> e.typeKind() == TypeDescKind.TYPE_REFERENCE).findFirst();
-                        if (refSymbolOpt.isPresent()) {
-                            TypeReferenceTypeSymbol refSymbol = (TypeReferenceTypeSymbol) refSymbolOpt.get();
-                            TypeSymbol typeDescriptor = refSymbol.typeDescriptor();
-                            Optional<ModuleID> moduleId = typeDescriptor.getModule().map(ModuleSymbol::id);
-                            String identifier = typeDescriptor.getName().orElse("");
-                            if (moduleId.isPresent() && isWebSubListener(moduleId.get(), identifier)) {
-                                implicitNewExpressionNodes.add(node);
-                            }
+                    if (typeSymbol.typeKind() == TypeDescKind.OBJECT) {
+                        ObjectTypeSymbol objectSymbol = (ObjectTypeSymbol) typeSymbol;
+                        Optional<ModuleID> moduleId = objectSymbol.getModule().map(ModuleSymbol::id);
+                        String identifier = objectSymbol.getName().orElse("");
+                        if (moduleId.isPresent() && isWebSubListener(moduleId.get(), identifier)) {
+                            implicitNewExpressionNodes.add(node);
                         }
                     }
                 }
