@@ -44,10 +44,10 @@ public class ServiceAnalysisTask implements AnalysisTask<SyntaxNodeAnalysisConte
         ServiceDeclarationNode serviceNode = (ServiceDeclarationNode) context.node();
         Optional<Symbol> serviceDeclarationOpt = context.semanticModel().symbol(serviceNode);
         if (serviceDeclarationOpt.isPresent()) {
-            ListenerInitiationExpressionVisitor visitor = new ListenerInitiationExpressionVisitor(context);
-            serviceNode.syntaxTree().rootNode().accept(visitor);
             ServiceDeclarationSymbol serviceDeclarationSymbol = (ServiceDeclarationSymbol) serviceDeclarationOpt.get();
             if (isWebSubService(serviceDeclarationSymbol)) {
+                ListenerInitiationExpressionVisitor visitor = new ListenerInitiationExpressionVisitor(context);
+                serviceNode.syntaxTree().rootNode().accept(visitor);
                 this.validator.validate(context, serviceNode, visitor, serviceDeclarationSymbol);
             }
         }
