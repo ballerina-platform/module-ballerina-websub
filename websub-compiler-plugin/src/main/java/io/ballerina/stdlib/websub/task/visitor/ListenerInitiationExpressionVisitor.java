@@ -30,6 +30,7 @@ import io.ballerina.compiler.syntax.tree.NodeVisitor;
 import io.ballerina.compiler.syntax.tree.QualifiedNameReferenceNode;
 import io.ballerina.compiler.syntax.tree.TypeDescriptorNode;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
+import io.ballerina.stdlib.websub.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +81,8 @@ public class ListenerInitiationExpressionVisitor extends NodeVisitor {
                 if (refSymbolOpt.isPresent()) {
                     TypeReferenceTypeSymbol refSymbol = (TypeReferenceTypeSymbol) refSymbolOpt.get();
                     TypeSymbol typeDescriptor = refSymbol.typeDescriptor();
-                    if (isWebSubListener(typeDescriptor)) {
+                    String identifier = typeDescriptor.getName().orElse("");
+                    if (Constants.LISTENER_IDENTIFIER.equals(identifier) && isWebSubListener(typeDescriptor)) {
                         explicitNewExpressionNodes.add(node);
                     }
                 }
