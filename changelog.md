@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multipart content retrieval on event-notification.
 - Subscriber resubscription event.
 
-## [1.2.0-alpha8] - 2021-04-16
+## [1.2.0-alpha8] - 2021-04-22
 ### Added
 - [Add compiler plugin to validate wesub:SubscriberService.](https://github.com/ballerina-platform/ballerina-standard-library/issues/1099)
 
