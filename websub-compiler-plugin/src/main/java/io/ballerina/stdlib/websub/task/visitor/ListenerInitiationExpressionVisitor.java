@@ -19,10 +19,8 @@
 package io.ballerina.stdlib.websub.task.visitor;
 
 import io.ballerina.compiler.api.symbols.Symbol;
-import io.ballerina.compiler.api.symbols.TypeDescKind;
 import io.ballerina.compiler.api.symbols.TypeReferenceTypeSymbol;
 import io.ballerina.compiler.api.symbols.TypeSymbol;
-import io.ballerina.compiler.api.symbols.UnionTypeSymbol;
 import io.ballerina.compiler.syntax.tree.ExplicitNewExpressionNode;
 import io.ballerina.compiler.syntax.tree.ImplicitNewExpressionNode;
 import io.ballerina.compiler.syntax.tree.ListenerDeclarationNode;
@@ -74,18 +72,10 @@ public class ListenerInitiationExpressionVisitor extends NodeVisitor {
         QualifiedNameReferenceNode nameRef = (QualifiedNameReferenceNode) node.typeDescriptor();
         Optional<Symbol> symbolOpt = context.semanticModel().symbol(nameRef);
         if (symbolOpt.isPresent() && symbolOpt.get() instanceof TypeReferenceTypeSymbol) {
-            TypeSymbol typeSymbol = ((TypeReferenceTypeSymbol) symbolOpt.get()).typeDescriptor();
-            if (typeSymbol.typeKind() == TypeDescKind.UNION) {
-                Optional<TypeSymbol> refSymbolOpt = ((UnionTypeSymbol) typeSymbol).memberTypeDescriptors()
-                        .stream().filter(e -> e.typeKind() == TypeDescKind.TYPE_REFERENCE).findFirst();
-                if (refSymbolOpt.isPresent()) {
-                    TypeReferenceTypeSymbol refSymbol = (TypeReferenceTypeSymbol) refSymbolOpt.get();
-                    TypeSymbol typeDescriptor = refSymbol.typeDescriptor();
-                    String identifier = typeDescriptor.getName().orElse("");
-                    if (Constants.LISTENER_IDENTIFIER.equals(identifier) && isWebSubListener(typeDescriptor)) {
-                        explicitNewExpressionNodes.add(node);
-                    }
-                }
+            TypeSymbol typeDescriptor = ((TypeReferenceTypeSymbol) symbolOpt.get()).typeDescriptor();
+            String identifier = typeDescriptor.getName().orElse("");
+            if (Constants.LISTENER_IDENTIFIER.equals(identifier) && isWebSubListener(typeDescriptor)) {
+                explicitNewExpressionNodes.add(node);
             }
         }
     }
