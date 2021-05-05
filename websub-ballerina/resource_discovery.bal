@@ -28,10 +28,13 @@ public client class DiscoveryService {
     # + resourceUrl - user provided resource-URL
     # + publisherClientConfig - {@code http:ClientConfiguration} if present to be used to
     #                           initialize underlying {@code http:Client}
-    public isolated function init(string discoveryUrl, 
-                         http:ClientConfiguration? publisherClientConfig) returns error? {
+    public isolated function init(string discoveryUrl, http:ClientConfiguration? publisherClientConfig) returns error? {
         self.resourceUrl = discoveryUrl;
-        self.discoveryClientEp = check new (discoveryUrl, publisherClientConfig);
+        if (publisherClientConfig is http:ClientConfiguration) {
+            self.discoveryClientEp = check new (discoveryUrl, publisherClientConfig);
+        } else {
+            self.discoveryClientEp = check new (discoveryUrl);
+        }
     }
 
     # Discovers the hub and topic URLs defined by a resource URL.
