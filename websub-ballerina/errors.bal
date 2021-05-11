@@ -32,5 +32,5 @@ public type SubscriptionVerificationError distinct Error;
 # Represents a subscription denied error.
 public type SubscriptionDeniedError distinct Error;
 
-# Represents the subscription-delete action from the subscriber
+# Represents the subscription-delete action from the `subscriber`.
 public type SubscriptionDeletedError distinct Error;

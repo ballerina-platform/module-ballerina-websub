@@ -21,10 +21,13 @@ import ballerina/log;
 import ballerina/lang.'string as strings;
 import ballerina/random;
 
-# Generates a random-string of given length
+# Generates a random-string of given length.
+# ```ballerina
+# string randomString = check generateRandomString(10);
+# ```
 # 
 # + length - required length of the generated string
-# + return - generated random string value or `error` if any error occurred in the execution
+# + return - generated random `string` value or `error` if any error occurred in the execution
 isolated function generateRandomString(int length) returns string | error {
     int[] codePoints = [];
     int leftLimit = 48; // numeral '0'
@@ -41,12 +44,15 @@ isolated function generateRandomString(int length) returns string | error {
     return strings:fromCodePointInts(codePoints);
 }
 
-# Generate the `websub:SubscriptionChangeRequest` from the configurations.
+# Generates the `websub:SubscriptionChangeRequest` from the configurations.
+# ```ballerina
+# SubscriptionChangeRequest subscriptionRequest = retrieveSubscriptionRequest("https://sample.topic.com", "https://sample.callback/subscriber", config);
+# ```
 # 
-# + topicUrl - `topic` to which subscriber want to subscribe
+# + topicUrl - The `topic` to which subscriber want to subscribe
 # + callback - Subscriber callback URL to be used by the `hub`
-# + config - user defined subscriber-service configurations
-# + return - {@code websub:SubscriptionChangeRequest} from the configurations provided
+# + config - User defined subscriber-service configurations
+# + return - Generated `websub:SubscriptionChangeRequest` from the provided configurations
 isolated function retrieveSubscriptionRequest(string topicUrl, string callback, 
                                               SubscriberServiceConfiguration config) returns SubscriptionChangeRequest {        
     SubscriptionChangeRequest request = { topic: topicUrl, callback: callback };
@@ -64,10 +70,13 @@ isolated function retrieveSubscriptionRequest(string topicUrl, string callback,
     return request;
 }
 
-# Retrieve the request-headers from the `http:Request`.
+# Retrieves the request-headers from the `http:Request`.
+# ```ballerina
+# map<string|string[]> availableHeaders = retrieveRequestHeaders(httpRequest);
+# ```
 # 
-# + request - {@code http:Request} to be processed
-# + return - {@code map<string|string[]>} containing the header values
+# + request - Original `http:Request` object
+# + return - Header values found in the provided `http:Request`
 isolated function retrieveRequestHeaders(http:Request request) returns map<string|string[]> {
     string[] headerNames = request.getHeaderNames();
     map<string|string[]> headers = {};
@@ -82,10 +91,13 @@ isolated function retrieveRequestHeaders(http:Request request) returns map<strin
     return headers;
 }
 
-# Retrieve request query parameters.
+# Retrieves request query parameters.
+# ```ballerina
+# websub:RequestQueryParams queryParams = retrieveRequestQueryParams(httpRequest);
+# ```
 # 
-# + request - {@code http:Request} to be processed
-# + return - {@code websub:RequestQueryParams} containing the query parameter values
+# + request - Original `http:Request` object
+# + return - `websub:RequestQueryParams` instance containing the query parameter values
 isolated function retrieveRequestQueryParams(http:Request request) returns RequestQueryParams {
     map<string[]> queryParams = request.getQueryParams();
 
@@ -117,10 +129,13 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
 }
 
 # Verifies the `http:Request` payload with the provided signature value.
+# ```ballerina
+# boolean isVerified = check verifyContent(httpRequest, secretKey, requestPayload);
+# ```
 # 
-# + request - current {@code http:Request}
-# + secret - pre-shared client-secret value
-# + payload - {@code string} value of the request body
+# + request - Original `http:Request` object
+# + secret - Pre shared subscriber secret key
+# + payload - Request payload
 # + return - `true` if the verification is successfull, else `false`
 isolated function verifyContent(http:Request request, string secret, string payload) returns boolean|error {
     if (secret.trim().length() > 0) {
@@ -144,12 +159,15 @@ isolated function verifyContent(http:Request request, string secret, string payl
     }
 }
 
-# Generates HMac value for the paload depending on the provided algorithm.
+# Generates HMAC value for the paload depending on the provided algorithm.
+# ```ballerina
+# byte[] hMacSignature = check retrieveContentHash("SHA1", secretKey, requestPayload);
+# ```
 # 
-# + method - `HMac` algorithm to be used
-# + key - pre-shared secret-key value
-# + payload - content to be hashed
-# + return - {@code byte[]} representing the `hMac`
+# + method - `HMAC` algorithm to be used
+# + key - Pre shared subscriber secret key
+# + payload - Request payload to be hashed
+# + return - Calculated HMAC value if successfull or else `error`
 isolated function retrieveContentHash(string method, string key, string payload) returns byte[]|error {
     byte[] keyArr = key.toBytes();
     byte[] contentPayload = payload.toBytes();
@@ -176,12 +194,15 @@ isolated function retrieveContentHash(string method, string key, string payload)
     }
 }
 
-# Updates `http:Response` body with provided parameters.
+# Updates `http:Response` body with provided additional parameters.
+# ```ballerina
+# updateResponseBody(httpResponse, messageBody, additionalHeaders);
+# ```
 # 
-# + response - {@code http:Response} to be updated
-# + messageBody - content for the response body
-# + headers - additional header-parameters to included in the response
-# + reason - reason for action execution failure / success
+# + response - Original `http:Response` object
+# + messageBody - Content for the response body
+# + headers - Additional header-parameters to included in the response
+# + reason - Optional reason parameter for action execution failure
 isolated function updateResponseBody(http:Response response, anydata? messageBody, 
                                      map<string|string[]>? headers, string? reason = ()) {
     string payload = reason is () ? "" : "reason=" + reason;
@@ -209,17 +230,23 @@ isolated function updateResponseBody(http:Response response, anydata? messageBod
     }
 }
 
-# Respond to the received `http:Request`.
+# Responds to the received `http:Request`.
+# ```ballerina
+# respondToRequest(httpCaller, httpResponse);
+# ```
 # 
-# + caller - {@code http:Caller} which intiate the request
-# + response - {@code http:Response} to be sent to the caller
+# + caller - The `http:Caller` reference for the current request
+# + response - Updated `http:Response`
 isolated function respondToRequest(http:Caller caller, http:Response response) {
     http:ListenerError? responseError = caller->respond(response);
 }
 
-# Checks whether response is successfull 
+# Checks whether response is successfull.
+# ```ballerina
+# boolean isSuccessfull = isSuccessStatusCode(404);
+# ```
 # 
-# + statusCode - statusCode found in the {@code http:Response}
+# + statusCode - Received HTTP status code
 # + return - `true` if the `statusCode` is between 200 to 300, else false
 isolated function isSuccessStatusCode(int statusCode) returns boolean {
     return (200 <= statusCode && statusCode < 300);

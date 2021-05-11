@@ -19,12 +19,15 @@ import ballerina/mime;
 import ballerina/log;
 import ballerina/url;
 
-# Porcesses the subscription / unsubscription intent verification requests from `hub`
+# Processes the subscription / unsubscription intent verification requests recieved from `hub`.
+# ```ballerina
+# processSubscriptionVerification(httpCaller, httpResponse, queryParams, 'service);
+# ```
 # 
-# + caller - {@code http:Caller} reference
-# + response - {@code http:Response} to be returned to the caller
-# + params - query parameters retrieved from the {@code http:Request}
-# + subscriberService - service to be invoked via native method
+# + caller - The `http:Caller` reference for the current request
+# + response - The `http:Response` which should be returned 
+# + params - Query parameters retrieved from the `http:Request`
+# + subscriberService - Current `websub:SubscriberService`
 isolated function processSubscriptionVerification(http:Caller caller, http:Response response, 
                                                   RequestQueryParams params, SubscriberService subscriberService) {
     SubscriptionVerification message = {
@@ -45,12 +48,15 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
     }
 }
 
-# Porcesses the subscription / unsubscription denial requests from `hub`
+# Processes the subscription / unsubscription denial requests from `hub`.
+# ```ballerina
+# processSubscriptionDenial(httpCaller, httpResponse, queryParams, 'service);
+# ```
 # 
-# + caller - {@code http:Caller} reference
-# + response - {@code http:Response} to be returned to the caller
-# + params - query parameters retrieved from the {@code http:Request}
-# + subscriberService - service to be invoked via native method
+# + caller - The `http:Caller` reference for the current request
+# + response - The `http:Response` which should be returned 
+# + params - Query parameters retrieved from the `http:Request`
+# + subscriberService - Current `websub:SubscriberService`
 isolated function processSubscriptionDenial(http:Caller caller, http:Response response,
                                             RequestQueryParams params, SubscriberService subscriberService) {
     var reason = params?.hubReason is () ? "" : <string>params?.hubReason;
@@ -63,14 +69,17 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
     updateResponseBody(response, result["body"], result["headers"]);
 }
 
-# Porcesses the content distribution requests from `hub`
+# Processes the content distribution requests from `hub`.
+# ```ballerina
+# check processEventNotification(httpCaller, httpRequest, httpResponse, queryParams, 'service, serviceKey);
+# ```
 # 
-# + caller - {@code http:Caller} reference
-# + request - original HTTP request
-# + response - {@code http:Response} to be returned to the caller
-# + subscriberService - service to be invoked via native method
-# + secretKey - pre-shared client-secret value
-# + return - {@code error} is there is an execution exception or else {@code nil}
+# + caller - The `http:Caller` reference for the current request
+# + request - Original `http:Request`
+# + response - The `http:Response` which should be returned 
+# + subscriberService - Current `websub:SubscriberService`
+# + secretKey - The `secretKey` value to be used to verify content distribution message
+# + return - `error` if there is any exception in execution or else `()`
 isolated function processEventNotification(http:Caller caller, http:Request request, 
                                            http:Response response, SubscriberService subscriberService,
                                            string secretKey) returns error? {

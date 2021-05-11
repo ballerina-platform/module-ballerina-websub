@@ -23,11 +23,13 @@ public client class DiscoveryService {
     private string resourceUrl;
     private http:Client discoveryClientEp;
 
-    # Invoked during the initialization of a `websub:DiscoveryService`
-    #
-    # + resourceUrl - user provided resource-URL
-    # + publisherClientConfig - {@code http:ClientConfiguration} if present to be used to
-    #                           initialize underlying {@code http:Client}
+    # Initiliazes `websub:DiscoveryService` endpoint.
+    # ```ballerina
+    # websub:DiscoveryService discoveryServiceEp = check new ("https://sample.discovery.com");
+    # ```
+    # 
+    # + resourceUrl - User provided resource-URL
+    # + publisherClientConfig - Optional `http:ClientConfiguration` to be used in underlying `http:Client`
     public isolated function init(string discoveryUrl, http:ClientConfiguration? publisherClientConfig) returns error? {
         self.resourceUrl = discoveryUrl;
         if (publisherClientConfig is http:ClientConfiguration) {
@@ -38,7 +40,10 @@ public client class DiscoveryService {
     }
 
     # Discovers the hub and topic URLs defined by a resource URL.
-    #
+    # ```ballerina
+    # [string, string] discoveryDetails = check discoveryServiceEp->discoverResourceUrls(expectedMediaTypes, expectedLanguageTypes);
+    # ```
+    # 
     # + expectedMediaTypes - The expected media types for the subscriber client
     # + expectedLanguageTypes - The expected language types for the subscriber client
     # + return - A `(hub, topic)` as a `(string, string)` if successful or else an `error` if not
@@ -89,9 +94,12 @@ public client class DiscoveryService {
 }
 
 # Retrieves hub and topic URLs from the `http:response` from a publisher to a discovery request.
-#
-# + response - An `http:Response` received
-# + return - A `(topic, hubs)` if parsing and extraction is successful or else an `error` if not
+# ```ballerina
+# [string, string[]] topicAndHubDetails = check extractTopicAndHubUrls(httpResponse);
+# ```
+# 
+# + response - Received `http:Response` instance
+# + return - Typle `(topic, hubs)` if parsing and extraction is successful or else an `error`
 isolated function extractTopicAndHubUrls(http:Response response) returns @tainted [string, string[]]|error {
     string[] linkHeaders = [];
     if (response.hasHeader("Link")) {

@@ -26,11 +26,13 @@ public class Listener {
     private int port;
     private HttpService? httpService;
 
-    # Invoked during the initialization of a `websub:Listener`. Either an `http:Listener` or a port number must be
-    # provided to initialize the listener.
+    # Initiliazes `websub:Listener` instance.
+    # ```ballerina
+    # listener websub:Listener websubListenerEp = check new (9090);
+    # ```
     #
-    # + listenTo - An `http:Listener` or a port number to listen for the service
-    # + config - `websub:ListenerConfiguration` to be provided to underlying HTTP Listener
+    # + listenTo - Port number or a `http:Listener` instance
+    # + config - Custom `websub:ListenerConfiguration` to be provided to underlying HTTP Listener
     public isolated function init(int|http:Listener listenTo, *ListenerConfiguration config) returns error? {
         if (listenTo is int) {
             self.httpListener = check new(listenTo, config);
@@ -44,11 +46,14 @@ public class Listener {
         self.callbackUrl = ();
     }
 
-    # Attaches the provided Service to the Listener.
-    #
+    # Attaches the provided `websub:SubscriberService` to the `websub:Listener`.
+    # ```ballerina
+    # check websubListenerEp.attach('service, "/subscriber");
+    # ```
+    # 
     # + subscriberService - The `websub:SubscriberService` object to attach
     # + name - The path of the Service to be hosted
-    # + return - An `error`, if an error occurred during the service attaching process
+    # + return - An `error`, if an error occurred during the service attaching process or else `()`
     public isolated function attach(SubscriberService subscriberService, string[]|string? name = ()) returns error? {
         if (self.listenerConfig.secureSocket is ()) {
             log:printWarn("HTTPS is recommended but using HTTP");
@@ -71,12 +76,18 @@ public class Listener {
         }
     }
 
-    # Setup the provided Service with given configurations and attaches it to the listener
-    #
+    # Attaches the provided Service to the `websub:Listener` with custom `websub:SubscriberServiceConfiguration`.
+    # ```ballerina
+    # check websubListenerEp.attachWithConfig('service, {
+    #    target: "http://0.0.0.0:9191/common/discovery",
+    #    leaseSeconds: 36000
+    # }, "/subscriber");
+    # ```
+    # 
     # + subscriberService - The `websub:SubscriberService` object to attach
-    # + configuration - `SubscriberServiceConfiguration` which should be incorporated into the provided Service 
+    # + configuration - Custom `websub:SubscriberServiceConfiguration` which should be incorporated into the provided Service 
     # + name - The path of the Service to be hosted
-    # + return - An `error`, if an error occurred during the service attaching process
+    # + return - An `error`, if an error occurred during the service attaching process or else `()`
     public isolated function attachWithConfig(SubscriberService subscriberService, SubscriberServiceConfiguration configuration, string[]|string? name = ()) returns error? {
         if (self.listenerConfig.secureSocket is ()) {
             log:printWarn("HTTPS is recommended but using HTTP");
@@ -97,17 +108,23 @@ public class Listener {
             
     }
     
-    # Detaches the provided Service from the Listener.
-    #
-    # + s - The service to be detached
-    # + return - An `error`, if an error occurred during the service detaching process
+    # Detaches the provided `websub:SubscriberService` from the `websub:Listener`.
+    # ```ballerina
+    # check websubListenerEp.detach('service);
+    # ```
+    # 
+    # + s - The `websub:SubscriberService` object to be detached
+    # + return - An `error`, if an error occurred during the service detaching process or else `()`
     public isolated function detach(SubscriberService s) returns error? {
         check self.httpListener.detach(<HttpService> self.httpService);
     }
 
-    # Starts the attached Service.
-    #
-    # + return - An `error`, if an error occurred during the listener starting process
+    # Starts the registered service programmatically..
+    # ```ballerina
+    # check websubListenerEp.'start();
+    # ```
+    # 
+    # + return - An `error`, if an error occurred during the listener starting process or else `()`
     public isolated function 'start() returns error? {
         check self.httpListener.'start();
 
@@ -122,34 +139,46 @@ public class Listener {
         }
     }
 
-    # Gracefully stops the hub listener. Already accepted requests will be served before the connection closure.
-    #
-    # + return - An `error`, if an error occurred during the listener stopping process
+    # Stops the service listener gracefully. Already-accepted requests will be served before connection closure.
+    # ```ballerina
+    # check websubListenerEp.gracefulStop();
+    # ```
+    # 
+    # + return - An `error`, if an error occurred during the listener stopping process or else `()`
     public isolated function gracefulStop() returns error? {
         return self.httpListener.gracefulStop();
     }
 
-    # Stops the service listener immediately. It is not implemented yet.
-    #
-    # + return - An `error`, if an error occurred during the listener stopping process
+    # Stops the service listener immediately.
+    # ```ballerina
+    # check websubListenerEp.immediateStop();
+    # ```
+    # 
+    # + return - An `error`, if an error occurred during the listener stopping process or else `()`
     public isolated function immediateStop() returns error? {
         return self.httpListener.immediateStop();
     }
 }
 
 # Retrieves the `websub:SubscriberServiceConfig` annotation values
+# ```ballerina
+# websub:SubscriberServiceConfiguration? config = retrieveSubscriberServiceAnnotations('service);
+# ```
 # 
-# + serviceType - current service type
-# + return - {@code websub:SubscriberServiceConfiguration} if present or `nil` if absent
+# + serviceType - Current `websub:SubscriberService` object
+# + return - Provided `websub:SubscriberServiceConfiguration` or else `()`
 isolated function retrieveSubscriberServiceAnnotations(SubscriberService serviceType) returns SubscriberServiceConfiguration? {
     typedesc<any> serviceTypedesc = typeof serviceType;
     return serviceTypedesc.@SubscriberServiceConfig;
 }
 
-# Retrieves the service-path for the HTTP Service
+# Retrieves the service-path for the HTTP Service.
+# ```ballerina
+# string[]|string servicePath = retrieveServicePath("/subscriber");
+# ```
 # 
-# + name - user provided service path
-# + return - {@code string} or {@code string[]} value for service path
+# + name - User provided service path
+# + return - Value for the service path as `string[]` or `string`
 isolated function retrieveServicePath(string[]|string? name) returns string[]|string {
     if (name is ()) {
         return generateUniqueUrlSegment();
@@ -164,9 +193,12 @@ isolated function retrieveServicePath(string[]|string? name) returns string[]|st
     }
 }
 
-# Generates a unique URL segment for the subscriber service
+# Generates a unique URL segment for the HTTP Service.
+# ```ballerina
+# string urlSegment = generateUniqueUrlSegment();
+# ```
 # 
-# + return - {@code string} containing the generated unique URL path segment
+# + return - Generated service path
 isolated function generateUniqueUrlSegment() returns string {
     var generatedString = generateRandomString(10);
     if (generatedString is string) {
@@ -176,6 +208,17 @@ isolated function generateUniqueUrlSegment() returns string {
     }
 }
 
+# Retrieves callback URL which should be provided in subscription request.
+# ```ballerina
+# string callback = retrieveCallbackUrl("https://callback.com", true, "/subscriber", 9090, {});
+# ```
+# 
+# + providedCallback - Optional user provided callback URL
+# + appendServicePath - Flag representing whether to append service path to callback URL
+# + servicePath - Current service path
+# + port - Listener port for underlying `http:Listener`
+# + config - Provided `http:ListenerConfiguration` for underlying `http:Listener`
+# + return - Callback URL which should be used in subscription request
 isolated function retrieveCallbackUrl(string? providedCallback, boolean appendServicePath, 
                                       string[]|string servicePath, int port, 
                                       http:ListenerConfiguration config) returns string {
@@ -191,12 +234,15 @@ isolated function retrieveCallbackUrl(string? providedCallback, boolean appendSe
     }
 }
 
-# Dynamically generates the call-back URL for subscriber-service
+# Dynamically generates the callback URL which should be provided in subscription request.
+# ```ballerina
+# string generatedCallback = generateCallbackUrl("/subscriber", 9090, {});
+# ```
 # 
-# + servicePath - service path on which the service will be hosted
-# + port - current listener port
-# + config - {@code http:ListenerConfiguration} in use
-# + return - {@code string} contaning the generated URL
+# + servicePath - Current service path
+# + port - Listener port for underlying `http:Listener`
+# + config - Provided `http:ListenerConfiguration` for underlying `http:Listener`
+# + return - Generated callback URL
 isolated function generateCallbackUrl(string[]|string servicePath, 
                                      int port, http:ListenerConfiguration config) returns string {
     string host = config.host;
@@ -205,10 +251,13 @@ isolated function generateCallbackUrl(string[]|string servicePath,
     return string`${protocol}://${host}:${port.toString()}${completeSevicePath}`;
 }
 
-# Retrieved the complete service path
+# Retrieves the complete service path.
+# ```ballerina
+# string completeServicePath = retrieveCompleteServicePath(["subscriber", "hub1"]);
+# ```
 # 
-# + servicePath - user provided service path which could be {@code string} or {@code string[]}
-# + return - concatenated complete service path
+# + servicePath - User provided service path
+# + return - Concatenated complete service path
 isolated function retrieveCompleteServicePath(string[]|string servicePath) returns string {
     string concatenatedServicePath = "";
     if (servicePath is string) {
@@ -221,21 +270,26 @@ isolated function retrieveCompleteServicePath(string[]|string servicePath) retur
     return concatenatedServicePath;
 }
 
-# Identifies whether or not to log callback URL
+# Identifies whether or not to log callback URL.
+# ```ballerina
+# boolean shouldLogCallback = isLoggingGeneratedCallback("https://callback.com", ["subscriber", "hub1"]);
+# ```
 # 
-# + providedCallback - user provided callback URL
+# + providedCallback - Optional user provided callback URL
 # + servicePath - user provided service path
-# + return - 'true' if the user provided callback is nil and service path is nil or 'false' otherwise
+# + return - 'true' if the user provided callback is `()` and service path is `()` or else 'false'
 isolated function isLoggingGeneratedCallback(string? providedCallback, string[]|string? servicePath) returns boolean {
     return providedCallback is () && (servicePath is () || (servicePath is string[] && (<string[]>servicePath).length() == 0));
 }
 
-# Initiate the subscription to the `topic` in the mentioned `hub`
-#
-# + serviceConfig - {@code SubscriberServiceConfiguration} subscriber-service
-#                   related configurations
-# + callbackUrl - subscriber callback URL
-# + return - An `error`, if an error occurred during the subscription-initiation
+# Initiates the subscription to the `topic` in the mentioned `hub`.
+# ```ballerina
+# check initiateSubscription(serviceConfig, "https://callback.url/subscriber");
+# ```
+# 
+# + serviceConfig - User provided `websub:SubscriberServiceConfiguration`
+# + callbackUrl - Subscriber callback URL
+# + return - An `error`, if an error occurred during the subscription-initiation or else `()`
 isolated function initiateSubscription(SubscriberServiceConfiguration serviceConfig, string callbackUrl) returns error? {
     string|[string, string]? target = serviceConfig?.target;
         
@@ -273,11 +327,14 @@ isolated function initiateSubscription(SubscriberServiceConfiguration serviceCon
     }
 }
 
-# Initialize a subscriber-client with provided configurations
+# Initializes a subscriber-client with provided configurations.
+# ```ballerina
+# websub:SubscriptionClient subscriptionClientEp = check getSubscriberClient("https://sample.hub.com", clientConfig);
+# ```
 # 
 # + hubUrl - URL of the hub to which subscriber is going to subscribe
-# + config - Nillable {@code http:ClientConfiguration} for underlying {@code http:Client}
-# + return - {@code SubscriptionClient} or error
+# + config - Optional `http:ClientConfiguration` to be provided to underlying `http:Client`
+# + return - Initilized `websub:SubscriptionClient` or else `error`
 isolated function getSubscriberClient(string hubUrl, http:ClientConfiguration? config) returns SubscriptionClient|error {
     if (config is http:ClientConfiguration) {
         return check new SubscriptionClient(hubUrl, config); 
