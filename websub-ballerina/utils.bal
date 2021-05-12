@@ -46,7 +46,7 @@ isolated function generateRandomString(int length) returns string | error {
 
 # Generates the `websub:SubscriptionChangeRequest` from the configurations.
 # ```ballerina
-# SubscriptionChangeRequest subscriptionRequest = retrieveSubscriptionRequest("https://sample.topic.com", "https://sample.callback/subscriber", config);
+# websub:SubscriptionChangeRequest subscriptionRequest = retrieveSubscriptionRequest("https://sample.topic.com", "https://sample.callback/subscriber", config);
 # ```
 # 
 # + topicUrl - The `topic` to which subscriber want to subscribe
