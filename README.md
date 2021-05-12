@@ -11,7 +11,9 @@ The WebSub package is one of the standard library packages of the <a target="_bl
 
 This package provides the capability to easily implement a WebSub compliant **Subscriber Service**.
 
- For more information, go to [The WebSub Module](https://ballerina.io/learn/api-docs/ballerina/websub/index.html).
+For more information, go to [The WebSub Module](https://ballerina.io/learn/api-docs/ballerina/websub/index.html).
+
+For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/learn/by-example/).
 ## Issues and Projects
 
 Issues and Projects tabs are disabled for this repository as this is part of the Ballerina Standard Library. To report bugs, request new features, start new discussions, view project boards, etc. please visit Ballerina Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library).
