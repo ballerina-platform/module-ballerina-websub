@@ -48,16 +48,16 @@ var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http
 };
 
 @test:BeforeGroups { value:["service-with-additional-details"] }
-function beforeAdditionalErrorDetailsService() {
-    checkpanic additionalErrorDetailsListener.attach(serviceWithAdditionalErrorDetails, "subscriber");
+function beforeAdditionalErrorDetailsService() returns @tainted error? {
+    check additionalErrorDetailsListener.attach(serviceWithAdditionalErrorDetails, "subscriber");
 }
 
 @test:AfterGroups { value:["service-with-additional-details"] }
-function afterAdditionalErrorDetailsService() {
-    checkpanic additionalErrorDetailsListener.gracefulStop();
+function afterAdditionalErrorDetailsService() returns @tainted error? {
+    check additionalErrorDetailsListener.gracefulStop();
 }
 
-http:Client subscriberServiceErrorDetailsClientEp = checkpanic new("http://localhost:9093/subscriber");
+http:Client subscriberServiceErrorDetailsClientEp = check new("http://localhost:9093/subscriber");
 
 @test:Config { 
     groups: ["service-with-additional-details"]
@@ -89,8 +89,8 @@ isolated function decodeResponseBody(string payload) returns map<string> {
     map<string> body = {};
     if (payload.length() > 0) {
         string[] splittedPayload = regex:split(payload, "&");
-        foreach var bodyPart in splittedPayload {
-            var responseComponent =  regex:split(bodyPart, "=");
+        foreach string bodyPart in splittedPayload {
+            string[] responseComponent =  regex:split(bodyPart, "=");
             if (responseComponent.length() == 2) {
                 body[responseComponent[0]] = responseComponent[1];
             }

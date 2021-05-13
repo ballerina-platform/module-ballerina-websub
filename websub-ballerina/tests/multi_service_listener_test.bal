@@ -69,8 +69,8 @@ service /subscriberTwo on multiServiceListener {
     }
 }
 
-http:Client clientForServiceOne = checkpanic new("http://localhost:9096/subscriberOne");
-http:Client clientForServiceTwo = checkpanic new("http://localhost:9096/subscriberTwo");
+http:Client clientForServiceOne = check new("http://localhost:9096/subscriberOne");
+http:Client clientForServiceTwo = check new("http://localhost:9096/subscriberTwo");
 
 @test:Config { 
     groups: ["multiServiceListener"]

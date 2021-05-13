@@ -30,16 +30,16 @@ var serviceWithDefaultImpl = @SubscriberServiceConfig { target: "http://0.0.0.0:
 };
 
 @test:BeforeGroups { value:["defaultMethodImpl"] }
-function beforeGroupTwo() {
-    checkpanic serviceWithDefaultImplListener.attach(serviceWithDefaultImpl, "subscriber");
+function beforeGroupTwo() returns @tainted error? {
+    check serviceWithDefaultImplListener.attach(serviceWithDefaultImpl, "subscriber");
 }
 
 @test:AfterGroups { value:["defaultMethodImpl"] }
-function afterGroupTwo() {
-    checkpanic serviceWithDefaultImplListener.gracefulStop();
+function afterGroupTwo() returns @tainted error? {
+    check serviceWithDefaultImplListener.gracefulStop();
 }
 
-http:Client serviceWithDefaultImplClientEp = checkpanic new("http://localhost:9091/subscriber");
+http:Client serviceWithDefaultImplClientEp = check new("http://localhost:9091/subscriber");
 
 @test:Config { 
     groups: ["defaultMethodImpl"]

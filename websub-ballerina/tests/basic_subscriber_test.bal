@@ -55,16 +55,16 @@ var simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0
 };
 
 @test:BeforeGroups { value:["simpleSubscriber"] }
-function beforeSimpleSubscriberTest() {
-    checkpanic basicSubscriberListener.attach(simpleSubscriberService, "subscriber");
+function beforeSimpleSubscriberTest() returns @tainted error? {
+    check basicSubscriberListener.attach(simpleSubscriberService, "subscriber");
 }
 
 @test:AfterGroups { value:["simpleSubscriber"] }
-function afterSimpleSubscriberTest() {
-    checkpanic basicSubscriberListener.gracefulStop();
+function afterSimpleSubscriberTest() returns @tainted error? {
+    check basicSubscriberListener.gracefulStop();
 }
 
-http:Client httpClient = checkpanic new("http://localhost:9090/subscriber");
+http:Client httpClient = check new("http://localhost:9090/subscriber");
 
 @test:Config { 
     groups: ["simpleSubscriber"]

@@ -47,20 +47,20 @@ listener Listener manualConfigAttachListener = new (9097);
 SimpleWebsubService simpleSubscriberServiceInstace = new;
 
 @test:BeforeGroups { value:["manualConfigAttach"] }
-function beforeManualConfigAttachTest() {
+function beforeManualConfigAttachTest() returns @tainted error? {
     SubscriberServiceConfiguration config = {
         target: "http://0.0.0.0:9191/common/discovery",
         leaseSeconds: 36000
     };
-    checkpanic manualConfigAttachListener.attachWithConfig(simpleSubscriberServiceInstace, config, "subscriber");
+    check manualConfigAttachListener.attachWithConfig(simpleSubscriberServiceInstace, config, "subscriber");
 }
 
 @test:AfterGroups { value:["manualConfigAttach"] }
-function afterManualConfigAttachTest() {
-    checkpanic manualConfigAttachListener.gracefulStop();
+function afterManualConfigAttachTest() returns @tainted error? {
+    check manualConfigAttachListener.gracefulStop();
 }
 
-http:Client manualConfigAttachClientEp = checkpanic new("http://localhost:9097/subscriber");
+http:Client manualConfigAttachClientEp = check new("http://localhost:9097/subscriber");
 
 @test:Config { 
     groups: ["manualConfigAttach"]

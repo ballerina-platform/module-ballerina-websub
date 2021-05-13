@@ -33,11 +33,11 @@ var simpleHttpService = service object {
 };
 
 @test:BeforeSuite
-function beforeSuiteFunc() {
-    checkpanic simpleHttpServiceListener.attach(simpleHttpService, "/common");
+function beforeSuiteFunc() returns @tainted error? {
+    check simpleHttpServiceListener.attach(simpleHttpService, "/common");
 }
 
 @test:AfterSuite { }
-function afterSuiteFunc() {
-    checkpanic simpleHttpServiceListener.gracefulStop();
+function afterSuiteFunc() returns @tainted error? {
+    check simpleHttpServiceListener.gracefulStop();
 }

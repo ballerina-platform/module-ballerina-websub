@@ -62,7 +62,7 @@ http:ClientConfiguration httpsConfig = {
         }
     }
 };
-http:Client sslEnabledClient = checkpanic new("https://localhost:9095/subscriber", httpsConfig);
+http:Client sslEnabledClient = check new("https://localhost:9095/subscriber", httpsConfig);
 
 @test:Config { 
     groups: ["sslEnabledSubscriber"]

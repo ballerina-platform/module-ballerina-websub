@@ -55,7 +55,7 @@ isolated function testContentHashForSha512() returns @tainted error? {
     groups: ["contentHashRetrieval"]
 }
 isolated function testContentHashError() returns @tainted error? {
-    var hashedContent = retrieveContentHash("xyz", HASH_KEY, "This is sample content");
+    byte[]|error hashedContent = retrieveContentHash("xyz", HASH_KEY, "This is sample content");
     string expectedErrorMsg = "Unrecognized hashning-method [xyz] found";
     if (hashedContent is error) {
         test:assertEquals(hashedContent.message(), expectedErrorMsg);
@@ -76,7 +76,7 @@ var validSubscriberServiceDeclaration = @SubscriberServiceConfig { target: "http
     groups: ["serviceAnnotationRetrieval"]
 }
 function testSubscriberServiceAnnotationRetrievalSuccess() returns @tainted error? {
-    var configuration = retrieveSubscriberServiceAnnotations(validSubscriberServiceDeclaration);
+    SubscriberServiceConfiguration? configuration = retrieveSubscriberServiceAnnotations(validSubscriberServiceDeclaration);
     test:assertTrue(configuration is SubscriberServiceConfiguration, "service annotation retrieval failed for valid service declaration");
 }
 
@@ -91,7 +91,7 @@ var invalidSubscriberServiceDeclaration = service object {
     groups: ["serviceAnnotationRetrieval"]
 }
 function testSubscriberServiceAnnotationRetrievalFailure() returns @tainted error? {
-    var configuration = retrieveSubscriberServiceAnnotations(invalidSubscriberServiceDeclaration);
+    SubscriberServiceConfiguration? configuration = retrieveSubscriberServiceAnnotations(invalidSubscriberServiceDeclaration);
     test:assertTrue(configuration is (), "service annotation retrieval success for invalid service declaration");
 }
 
@@ -99,7 +99,7 @@ function testSubscriberServiceAnnotationRetrievalFailure() returns @tainted erro
     groups: ["servicePathRetrieval"]
 }
 isolated function testServicePathRetrievalForString() returns @tainted error? {
-    var servicePath = retrieveServicePath("subscriber");
+    string[]|string servicePath = retrieveServicePath("subscriber");
     test:assertTrue(servicePath is string, "Service path retrieval failed for 'string'");
 }
 
@@ -107,7 +107,7 @@ isolated function testServicePathRetrievalForString() returns @tainted error? {
     groups: ["servicePathRetrieval"]
 }
 isolated function testServicePathRetrievalForStringArray() returns @tainted error? {
-    var servicePath = retrieveServicePath(["subscriber", "foo", "bar"]);
+    string[]|string servicePath = retrieveServicePath(["subscriber", "foo", "bar"]);
     test:assertTrue(servicePath is string[], "Service path retrieval failed for 'string array'");
 }
 
@@ -115,7 +115,7 @@ isolated function testServicePathRetrievalForStringArray() returns @tainted erro
     groups: ["servicePathRetrieval"]
 }
 isolated function testServicePathRetrievalForEmptyServicePath() returns @tainted error? {
-    var servicePath = retrieveServicePath(());
+    string[]|string servicePath = retrieveServicePath(());
     test:assertTrue(servicePath is string, "Service path retrieval failed for 'empty service path'");
 }
 

@@ -29,18 +29,14 @@ var optionalSubscriberTarget = @SubscriberServiceConfig { leaseSeconds: 36000, s
 };
 
 @test:AfterGroups { value:["optionalSubscriberTarget"] }
-function afterOptionalTargetUrlTest() {
-    checkpanic optionalTargetListener.gracefulStop();
+function afterOptionalTargetUrlTest() returns @tainted error? {
+    check optionalTargetListener.gracefulStop();
 }
 
 @test:Config { 
     groups: ["optionalSubscriberTarget"]
 }
-function testOptionalTargetUrl() {
-    do {
-        check optionalTargetListener.attach(optionalSubscriberTarget);
-        check optionalTargetListener.'start();
-    } on fail error e {
-        test:assertFail(string`Could not start the subscriber-service without subscriber-target-url : ${e.message()}`);
-    }
+function testOptionalTargetUrl() returns @tainted error? {
+    check optionalTargetListener.attach(optionalSubscriberTarget);
+    check optionalTargetListener.'start();
 }
