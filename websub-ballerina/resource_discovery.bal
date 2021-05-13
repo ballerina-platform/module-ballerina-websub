@@ -99,7 +99,7 @@ public client class DiscoveryService {
 # ```
 # 
 # + response - Received `http:Response` instance
-# + return - Typle `(topic, hubs)` if parsing and extraction is successful or else an `error`
+# + return - Tuple `(topic, hubs)` if parsing and extraction is successful or else an `error`
 isolated function extractTopicAndHubUrls(http:Response response) returns @tainted [string, string[]]|error {
     string[] linkHeaders = [];
     if (response.hasHeader("Link")) {

@@ -1,10 +1,13 @@
-## Package Overview
+## Module Overview
 
-This package contains an implementation of the W3C [**WebSub**](https://www.w3.org/TR/websub/) recommendation, which facilitates a push-based content delivery/notification mechanism between publishers and subscribers.
+This module provides an implementation for WebSub Subscriber Service.
 
-This implementation supports introducing WebSub Subscriber, A party interested in receiving update notifications for particular topics.
+[**WebSub**](https://www.w3.org/TR/websub/) is a common mechanism for communication between publisher of any kind of Web content and their subscribers, based on HTTP web hooks. Subscription requests are relayed through hubs, which validate and verify the request. Hubs then distribute new and updated content to subscribers when it becomes available. WebSub was previously known as PubSubHubbub.
+
+A WebSub Subscriber is an implementation that discovers the `hub` and `topic URL` given a `resource URL`, subscribes to updates at the hub, and accepts content distribution requests from the `hub`.
 
 ### Basic flow with WebSub
+
 1. The subscriber discovers from the publisher, the topic it needs to subscribe to and the hub(s) that deliver notifications on updates of the topic.
 
 2. The subscriber sends a subscription request to one or more discovered hub(s) specifying the discovered topic along 
@@ -22,50 +25,68 @@ verification
 
 5. The hub delivers the identified content to the subscribers of the topic.
 
-### Features
+#### Subscribing
 
-#### Subscriber
-
-This package allows introducing a WebSub Subscriber Service with `onSubscriptionVerification`, which accepts HTTP GET requests for intent verification, `onSubscriptionValidationDenied` which accepts subscription denied response from hub and `onEventNotification`, which accepts HTTP POST requests for notifications. The WebSub Subscriber Service provides the following capabilities:
- - When the service is started a subscription request is sent for a hub/topic combination, either specified as annotations or discovered based on the resource URL specified as an annotation.
- - If `onSubscriptionVerification` is not specified, intent verification will be done automatically against the topic specified as an annotation or discovered based on the resource URL specified as an annotation.
- - If `onSubscriptionValidationDenied` is not specified, subscriber service will respond to the incoming request automatically.
- - If `target` is not specified the initial subscription will not happen on service startup.
- - If a `secret` is specified for the subscription, signature validation will be done for authenticated content distribution.
-
-    ```ballerina
-    websub:ListenerConfiguration listenerConfigs = {
-        secureSocket: {
-            key: {
-                certFile: "../resource/path/to/public.crt",
-                keyFile: "../resource/path/to/private.key"
-            }
-        }
-    };
-
-    listener websub:Listener sslEnabledListener = new(9095, listenerConfigs);
-
-    @websub:SubscriberServiceConfig {
-        target: ["<HUB_URL>", "<TOPIC_URL>"], 
-        leaseSeconds: 36000,
-        secret: "<SECRET>"
-    } 
-    service /subscriber on sslEnabledListener {
-        remote function onSubscriptionValidationDenied(websub:SubscriptionDeniedError msg) returns websub:Acknowledgement? {
-            // implement subscription validation denied logic here
-            return websub:ACKNOWLEDGEMENT;
-        }
-
-        remote function onSubscriptionVerification(websub:SubscriptionVerification msg)
-                        returns websub:SubscriptionVerificationSuccess|websub:SubscriptionVerificationError {
-            // implement subscription intent verification logic here
-            return websub:SUBSCRIPTION_VERIFICATION_SUCCESS;
-        }
-
-        remote function onEventNotification(websub:ContentDistributionMessage event) 
-                        returns websub:Acknowledgement|websub:SubscriptionDeletedError? {
-            // implement on event notification logic here
-            return websub:ACKNOWLEDGEMENT;
-        }
+WebSub Subscriber provides mechanism to subscribe in a `hub` to a given `topic URL`. 
+```ballerina
+@websub:SubscriberServiceConfig {
+    target: ["<HUB_URL>", "<TOPIC_URL>"], 
+    leaseSeconds: 36000
+} 
+service /subscriber on new websub:Listener(9090) {
+    remote function onSubscriptionValidationDenied(websub:SubscriptionDeniedError msg) returns websub:Acknowledgement? {
+        // implement subscription validation denied logic here
+        return websub:ACKNOWLEDGEMENT;
     }
-    ```
+
+    remote function onSubscriptionVerification(websub:SubscriptionVerification msg)
+                        returns websub:SubscriptionVerificationSuccess|websub:SubscriptionVerificationError {
+        // implement subscription intent verification logic here
+        return websub:SUBSCRIPTION_VERIFICATION_SUCCESS;
+    }
+
+    remote function onEventNotification(websub:ContentDistributionMessage event) 
+                        returns websub:Acknowledgement|websub:SubscriptionDeletedError? {
+        // implement on event notification logic here
+        return websub:ACKNOWLEDGEMENT;
+    }
+}
+```
+
+#### Resource Discovery
+
+WebSub Subscriber also provides the mechanism to discover `hub` and `topic URL` resources dynamically via provided `resource URL` and initiate subscription.
+```ballerina
+@websub:SubscriberServiceConfig {
+    target: "RESOURCE_URL", 
+    leaseSeconds: 36000
+} 
+service /subscriber on new websub:Listener(9090) {
+    remote function onEventNotification(websub:ContentDistributionMessage event) 
+                        returns websub:Acknowledgement|websub:SubscriptionDeletedError? {
+        // implement on event notification logic here
+        return websub:ACKNOWLEDGEMENT;
+    }
+
+    // other remote methods are optional to be implemented
+}
+```
+
+#### Dynamic URI generation
+
+Service path for a WebSub Subscriber is optional. WebSub Subscriber service has the capability to generate service path dyanmically.
+```ballerina
+@websub:SubscriberServiceConfig {
+    target: "RESOURCE_URL", 
+    leaseSeconds: 36000
+} 
+service on new websub:Listener(9090) {
+    remote function onEventNotification(websub:ContentDistributionMessage event) 
+                        returns websub:Acknowledgement|websub:SubscriptionDeletedError? {
+        // implement on event notification logic here
+        return websub:ACKNOWLEDGEMENT;
+    }
+
+    // other remote methods are optional to be implemented
+}
+```
