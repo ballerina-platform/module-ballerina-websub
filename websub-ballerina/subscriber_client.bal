@@ -127,7 +127,7 @@ isolated function buildSubscriptionChangeRequest(@untainted string mode,
 # + hub - The `hub` to which the subscription/unsubscription request was sent
 # + mode - Mode of subscription (subscribe/unsubscribe)
 # + subscriptionChangeRequest - The request containing the subscription/unsubscription details
-# + response - Original response received from the `hub` as `http:Response`,`http:PayloadType' or an `error`
+# + response - Original response received from the `hub` as `http:Response`,`http:PayloadType', or an `error`
 # + httpClient - The underlying `http:Client` endpoint
 # + remainingRedirects - Available redirects for the current subscription
 # + return - `websub:SubscriptionChangeResponse` if the requested subscription action is successfull or else `error`

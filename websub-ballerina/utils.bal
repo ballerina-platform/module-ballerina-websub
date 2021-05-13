@@ -28,7 +28,7 @@ import ballerina/random;
 # 
 # + length - required length of the generated string
 # + return - generated random `string` value or `error` if any error occurred in the execution
-isolated function generateRandomString(int length) returns string | error {
+isolated function generateRandomString(int length) returns string|error {
     int[] codePoints = [];
     int leftLimit = 48; // numeral '0'
     int rightLimit = 122; // letter 'z'

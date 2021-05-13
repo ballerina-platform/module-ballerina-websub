@@ -1,4 +1,4 @@
-## Module Overview
+## Overview
 
 This module provides an implementation for WebSub Subscriber Service.
 
