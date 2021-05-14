@@ -26,7 +26,7 @@ service class HttpService {
     private boolean isSubscriptionVerificationAvailable = false;
     private boolean isEventNotificationAvailable = false;
 
-    # Initiliazes `websub:HttpService` endpoint.
+    # Initializes `websub:HttpService` endpoint.
     # ```ballerina
     # websub:HttpService httpServiceEp = check new ('service, "sercretKey1");
     # ```
