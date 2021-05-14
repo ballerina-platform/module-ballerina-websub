@@ -4,7 +4,7 @@ This module provides an implementation for WebSub Subscriber Service.
 
 [**WebSub**](https://www.w3.org/TR/websub/) is a common mechanism for communication between publishers of any kind of Web content and their subscribers, based on HTTP webhooks. Subscription requests are relayed through hubs, which validate and verify the request. Hubs then distribute new and updated content to subscribers when it becomes available. WebSub was previously known as PubSubHubbub.
 
-A WebSub Subscriber is an implementation that discovers the `hub` and `topic URL` given a `resource URL`, subscribes to updates at the hub, and accepts content distribution requests from the `hub`.
+[**WebSub Subscriber**](https://www.w3.org/TR/websub/#subscriber) is an implementation that discovers the `hub` and `topic URL` given a `resource URL`, subscribes to updates at the hub, and accepts content distribution requests from the `hub`.
 
 ### Basic flow with WebSub
 
