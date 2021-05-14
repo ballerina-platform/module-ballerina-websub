@@ -27,7 +27,7 @@ verification
 
 #### Subscribing
 
-WebSub Subscriber provides mechanism to subscribe in a `hub` to a given `topic URL`. 
+* WebSub Subscriber provides mechanism to subscribe in a `hub` to a given `topic URL`. 
 ```ballerina
 @websub:SubscriberServiceConfig {
     target: ["<HUB_URL>", "<TOPIC_URL>"], 
@@ -55,7 +55,7 @@ service /subscriber on new websub:Listener(9090) {
 
 #### Resource Discovery
 
-WebSub Subscriber also provides the mechanism to discover `hub` and `topic URL` resources dynamically via provided `resource URL` and initiate subscription.
+* WebSub Subscriber also provides the mechanism to discover `hub` and `topic URL` resources dynamically via provided `resource URL` and initiate subscription.
 ```ballerina
 @websub:SubscriberServiceConfig {
     target: "RESOURCE_URL", 
@@ -72,13 +72,41 @@ service /subscriber on new websub:Listener(9090) {
 }
 ```
 
-#### Dynamic URI generation
+#### Dynamic URI Generation
 
-Service path for a WebSub Subscriber is optional. WebSub Subscriber service has the capability to generate service path dyanmically.
+* Service path for a WebSub Subscriber is optional. WebSub Subscriber service has the capability to generate service path dyanmically.
 ```ballerina
 @websub:SubscriberServiceConfig {
     target: "RESOURCE_URL", 
     leaseSeconds: 36000
+} 
+service on new websub:Listener(9090) {
+    remote function onEventNotification(websub:ContentDistributionMessage event) 
+                        returns websub:Acknowledgement|websub:SubscriptionDeletedError? {
+        // implement on event notification logic here
+        return websub:ACKNOWLEDGEMENT;
+    }
+
+    // other remote methods are optional to be implemented
+}
+```
+
+#### Running Subscriber Service Locally
+
+* [**nGrok**](https://ngrok.com/) is a TCP Tunneling software which is used to expose services running locally to the public network.
+* If you want to run the subscriber service in your local machine you could use **nGrok** to expose it to public network.
+* First [download and install](https://ngrok.com/download) **nGrok**.
+* Run following command to expose local port `9090` to public network via `HTTPS` (related documentation could be found [here](https://ngrok.com/docs#http-bind-tls)).
+```bash
+ngrok http -bind-tls=true 9090
+```
+* Extract the public URL provided by **nGrok** and provide it as the callback URL for subscriber service.
+```ballerina
+@websub:SubscriberServiceConfig {
+    target: "RESOURCE_URL", 
+    leaseSeconds: 36000,
+    callback: "<NGROK_PUBLIC_URL>",
+    appendServiceUrl: true
 } 
 service on new websub:Listener(9090) {
     remote function onEventNotification(websub:ContentDistributionMessage event) 
