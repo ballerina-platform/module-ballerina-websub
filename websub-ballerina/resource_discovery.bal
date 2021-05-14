@@ -32,7 +32,7 @@ public client class DiscoveryService {
     # + publisherClientConfig - Optional `http:ClientConfiguration` to be used in underlying `http:Client`
     public isolated function init(string discoveryUrl, http:ClientConfiguration? publisherClientConfig) returns error? {
         self.resourceUrl = discoveryUrl;
-        if (publisherClientConfig is http:ClientConfiguration) {
+        if publisherClientConfig is http:ClientConfiguration {
             self.discoveryClientEp = check new (discoveryUrl, publisherClientConfig);
         } else {
             self.discoveryClientEp = check new (discoveryUrl);
@@ -50,11 +50,11 @@ public client class DiscoveryService {
     remote isolated function discoverResourceUrls(string?|string[] expectedMediaTypes, string?|string[] expectedLanguageTypes) 
                                         returns @tainted [string, string]|error {    
         map<string|string[]> headers = {};
-        if (expectedMediaTypes is string) {
+        if expectedMediaTypes is string {
             headers[ACCEPT_HEADER] = expectedMediaTypes;
         }
     
-        if (expectedMediaTypes is string[]) {
+        if expectedMediaTypes is string[] {
             string acceptMeadiaTypesString = expectedMediaTypes[0];
             foreach int expectedMediaTypeIndex in 1 ... (expectedMediaTypes.length() - 1) {
                 acceptMeadiaTypesString = acceptMeadiaTypesString.concat(", ", expectedMediaTypes[expectedMediaTypeIndex]);
@@ -62,11 +62,11 @@ public client class DiscoveryService {
             headers[ACCEPT_HEADER] = acceptMeadiaTypesString;
         }
     
-        if (expectedLanguageTypes is string) {
+        if expectedLanguageTypes is string {
             headers[ACCEPT_LANGUAGE_HEADER] = expectedLanguageTypes;
         }
     
-        if (expectedLanguageTypes is string[]) {
+        if expectedLanguageTypes is string[] {
             string acceptLanguageTypesString = expectedLanguageTypes[0];
             foreach int expectedLanguageTypeIndex in 1 ... (expectedLanguageTypes.length() - 1) {
                 acceptLanguageTypesString = acceptLanguageTypesString.concat(", ", expectedLanguageTypes[expectedLanguageTypeIndex]);
@@ -76,9 +76,9 @@ public client class DiscoveryService {
 
         var discoveryResponse = self.discoveryClientEp->get("", headers);
 
-        if (discoveryResponse is http:Response) {
+        if discoveryResponse is http:Response {
             var topicAndHubs = extractTopicAndHubUrls(discoveryResponse);
-            if (topicAndHubs is [string, string[]]) {
+            if topicAndHubs is [string, string[]] {
                 string topic = "";
                 string[] hubs = [];
                 [topic, hubs] = topicAndHubs;
@@ -102,15 +102,15 @@ public client class DiscoveryService {
 # + return - Tuple `(topic, hubs)` if parsing and extraction is successful or else an `error`
 isolated function extractTopicAndHubUrls(http:Response response) returns @tainted [string, string[]]|error {
     string[] linkHeaders = [];
-    if (response.hasHeader("Link")) {
+    if response.hasHeader("Link") {
         linkHeaders = check response.getHeaders("Link");
     }
     
-    if (response.statusCode == http:STATUS_NOT_ACCEPTABLE) {
+    if response.statusCode == http:STATUS_NOT_ACCEPTABLE {
         return error ResourceDiscoveryFailedError("Content negotiation failed.Accept and/or Accept-Language headers mismatch");
     }
     
-    if (linkHeaders.length() == 0) {
+    if linkHeaders.length() == 0 {
         return error ResourceDiscoveryFailedError("Link header unavailable in discovery response");
     }
 
@@ -118,7 +118,7 @@ isolated function extractTopicAndHubUrls(http:Response response) returns @tainte
     string[] hubs = [];
     string topic = "";
     string[] linkHeaderConstituents = [];
-    if (linkHeaders.length() == 1) {
+    if linkHeaders.length() == 1 {
         linkHeaderConstituents = regex:split(linkHeaders[0], ",");
     } else {
         linkHeaderConstituents = linkHeaders;
@@ -126,15 +126,15 @@ isolated function extractTopicAndHubUrls(http:Response response) returns @tainte
 
     foreach var link in linkHeaderConstituents {
         string[] linkConstituents = regex:split(link, ";");
-        if (linkConstituents[1] != "") {
+        if linkConstituents[1] != "" {
             string url = linkConstituents[0].trim();
             url = regex:replaceAll(url, "<", "");
             url = regex:replaceAll(url, ">", "");
-            if (strings:includes(linkConstituents[1], "rel=\"hub\"")) {
+            if strings:includes(linkConstituents[1], "rel=\"hub\"") {
                 hubs[hubIndex] = url;
                 hubIndex += 1;
-            } else if (strings:includes(linkConstituents[1], "rel=\"self\"")) {
-                if (topic != "") {
+            } else if strings:includes(linkConstituents[1], "rel=\"self\"") {
+                if topic != "" {
                     return error ResourceDiscoveryFailedError("Link Header contains > 1 self URLs");
                 } else {
                     topic = url;
@@ -143,7 +143,7 @@ isolated function extractTopicAndHubUrls(http:Response response) returns @tainte
         }
     }
 
-    if (hubs.length() > 0 && topic != "") {
+    if hubs.length() > 0 && topic != "" {
         return [topic, hubs];
     }
     return error ResourceDiscoveryFailedError("Hub and/or Topic URL(s) not identified in link header of discovery response");

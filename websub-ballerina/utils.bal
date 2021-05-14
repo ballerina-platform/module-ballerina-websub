@@ -57,13 +57,13 @@ isolated function retrieveSubscriptionRequest(string topicUrl, string callback,
                                               SubscriberServiceConfiguration config) returns SubscriptionChangeRequest {        
     SubscriptionChangeRequest request = { topic: topicUrl, callback: callback };
         
-    var leaseSeconds = config?.leaseSeconds;
-    if (leaseSeconds is int) {
+    int? leaseSeconds = config?.leaseSeconds;
+    if leaseSeconds is int {
         request.leaseSeconds = leaseSeconds;
     }
 
-    var secret = config?.secret;
-    if (secret is string) {
+    string? secret = config?.secret;
+    if secret is string {
         request.secret = secret;
     }
 
@@ -83,7 +83,7 @@ isolated function retrieveRequestHeaders(http:Request request) returns map<strin
 
     foreach var headerName in headerNames {
         http:HeaderNotFoundError | string[] headerValue = request.getHeaders(headerName);
-        if (headerValue is string[]) {
+        if headerValue is string[] {
             headers[headerName] = headerValue;
         }
     }
@@ -107,15 +107,15 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
     string? hubLeaseSeconds = request.getQueryParamValue(HUB_LEASE_SECONDS);
     string? hubReason = request.getQueryParamValue(HUB_REASON);
 
-    if (hubMode is string) {
-        if (hubTopic is string && hubChallenge is string) {
+    if hubMode is string {
+        if hubTopic is string && hubChallenge is string {
             return {
                 hubMode: hubMode,
                 hubTopic: hubTopic,
                 hubChallenge: hubChallenge,
                 hubLeaseSeconds: hubLeaseSeconds
             };
-        } else if (hubReason is string) {
+        } else if hubReason is string {
             return {
                 hubMode: hubMode,
                 hubReason: hubReason
@@ -138,11 +138,10 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
 # + payload - Request payload
 # + return - `true` if the verification is successfull, else `false`
 isolated function verifyContent(http:Request request, string secret, string payload) returns boolean|error {
-    if (secret.trim().length() > 0) {
-        if (request.hasHeader(X_HUB_SIGNATURE)) {
+    if secret.trim().length() > 0 {
+        if request.hasHeader(X_HUB_SIGNATURE) {
                 var xHubSignature = request.getHeader(X_HUB_SIGNATURE);
-                
-                if (xHubSignature is http:HeaderNotFoundError || xHubSignature.trim().length() == 0) {
+                if xHubSignature is http:HeaderNotFoundError || xHubSignature.trim().length() == 0 {
                     return false;
                 } else {
                     string[] splitSignature = regex:split(<string>xHubSignature, "=");
@@ -206,7 +205,7 @@ isolated function retrieveContentHash(string method, string key, string payload)
 isolated function updateResponseBody(http:Response response, anydata? messageBody, 
                                      map<string|string[]>? headers, string? reason = ()) {
     string payload = reason is () ? "" : "reason=" + reason;
-    if (messageBody is map<string> && messageBody.length() > 0) {
+    if messageBody is map<string> && messageBody.length() > 0 {
         string[] messageParams = [];
         payload += "&";
         foreach var ['key, value] in messageBody.entries() {
@@ -217,9 +216,9 @@ isolated function updateResponseBody(http:Response response, anydata? messageBod
 
     response.setTextPayload(payload);
     response.setHeader("Content-type","application/x-www-form-urlencoded");
-    if (headers is map<string|string[]>) {
+    if headers is map<string|string[]> {
         foreach var [header, value] in headers.entries() {
-            if (value is string) {
+            if value is string {
                 response.setHeader(header, value);
             } else {
                 foreach var valueElement in value {

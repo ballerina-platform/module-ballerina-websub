@@ -64,10 +64,10 @@ service class HttpService {
     isolated resource function post .(http:Caller caller, http:Request request) {
         http:Response response = new;
         response.statusCode = http:STATUS_ACCEPTED;
-        if (self.isEventNotificationAvailable) {
+        if self.isEventNotificationAvailable {
             string secretKey = self.secretKey is () ? "" : <string>self.secretKey;
             var result = processEventNotification(caller, request, response, self.subscriberService, secretKey);
-            if (result is error) {
+            if result is error {
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
             }
         } else {
@@ -89,10 +89,10 @@ service class HttpService {
 
         match params?.hubMode {
             MODE_SUBSCRIBE | MODE_UNSUBSCRIBE => {
-                if (params?.hubChallenge is () || params?.hubTopic is ()) {
+                if params?.hubChallenge is () || params?.hubTopic is () {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                 } else {
-                    if (self.isSubscriptionVerificationAvailable) {
+                    if self.isSubscriptionVerificationAvailable {
                         processSubscriptionVerification(caller, response, <@untainted> params, self.subscriberService);
                     } else {
                         response.statusCode = http:STATUS_OK;
@@ -101,7 +101,7 @@ service class HttpService {
                 }
             }
             MODE_DENIED => {
-                if (self.isSubscriptionValidationDeniedAvailable) {
+                if self.isSubscriptionValidationDeniedAvailable {
                     processSubscriptionDenial(caller, response, <@untainted> params, self.subscriberService);
                 } else {
                     response.statusCode = http:STATUS_OK;

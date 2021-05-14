@@ -96,18 +96,18 @@ isolated function buildSubscriptionChangeRequest(@untainted string mode,
 
     string callback = subscriptionChangeRequest.callback;
     var encodedCallback = url:encode(callback, "UTF-8");
-    if (encodedCallback is string) {
+    if encodedCallback is string {
         callback = encodedCallback;
     }
 
     string body = HUB_MODE + "=" + mode
         + "&" + HUB_TOPIC + "=" + subscriptionChangeRequest.topic
         + "&" + HUB_CALLBACK + "=" + callback;
-    if (mode == MODE_SUBSCRIBE) {
-        if (subscriptionChangeRequest.secret.trim() != "") {
+    if mode == MODE_SUBSCRIBE {
+        if subscriptionChangeRequest.secret.trim() != "" {
             body = body + "&" + HUB_SECRET + "=" + subscriptionChangeRequest.secret;
         }
-        if (subscriptionChangeRequest.leaseSeconds != 0) {
+        if subscriptionChangeRequest.leaseSeconds != 0 {
             body = body + "&" + HUB_LEASE_SECONDS + "=" + subscriptionChangeRequest.leaseSeconds.toString();
         }
     }
@@ -137,14 +137,14 @@ isolated function processHubResponse(@untainted string hub, @untainted string mo
                                      int remainingRedirects) returns @tainted SubscriptionChangeResponse|error {
 
     string topic = subscriptionChangeRequest.topic;
-    if (response is error) {
+    if response is error {
         return error SubscriptionInitiationFailedError("Error occurred for request: Mode[" + mode+ "] at Hub[" + hub + "] - " + response.message());
     } else {
         http:Response hubResponse = <http:Response> response;
         int responseStatusCode = hubResponse.statusCode;
-        if (responseStatusCode == http:STATUS_TEMPORARY_REDIRECT
-                || responseStatusCode == http:STATUS_PERMANENT_REDIRECT) {
-            if (remainingRedirects > 0) {
+        if responseStatusCode == http:STATUS_TEMPORARY_REDIRECT
+                || responseStatusCode == http:STATUS_PERMANENT_REDIRECT {
+            if remainingRedirects > 0 {
                 string redirected_hub = check hubResponse.getHeader("Location");
                 return invokeClientConnectorOnRedirection(redirected_hub, mode, subscriptionChangeRequest,
                                                             httpClient.config.auth, remainingRedirects - 1);
@@ -152,17 +152,17 @@ isolated function processHubResponse(@untainted string hub, @untainted string mo
             return error SubscriptionInitiationFailedError("Redirection response received for subscription change request made with " +
                                "followRedirects disabled or after maxCount exceeded: Hub [" + hub + "], Topic [" +
                                subscriptionChangeRequest.topic + "]");
-        } else if (!isSuccessStatusCode(responseStatusCode)) {
+        } else if !isSuccessStatusCode(responseStatusCode) {
             var responsePayload = hubResponse.getTextPayload();
             string errorMessage = "Error in request: Mode[" + mode + "] at Hub[" + hub + "]";
-            if (responsePayload is string) {
+            if responsePayload is string {
                 errorMessage = errorMessage + " - " + responsePayload;
             } else {
                 errorMessage = errorMessage + " - Error occurred identifying cause: " + responsePayload.message();
             }
             return error SubscriptionInitiationFailedError(errorMessage);
         } else {
-            if (responseStatusCode != http:STATUS_ACCEPTED) {
+            if responseStatusCode != http:STATUS_ACCEPTED {
                 log:printWarn(string`Subscription request considered successful for non 202 status code: ${responseStatusCode.toString()}`);
             }
             SubscriptionChangeResponse subscriptionChangeResponse = {hub:hub, topic:topic, response:hubResponse};
@@ -190,7 +190,7 @@ isolated function invokeClientConnectorOnRedirection(@untainted string hub, @unt
                                                      http:ClientAuthConfig? auth, int remainingRedirects)
     returns @tainted SubscriptionChangeResponse|error {
 
-    if (mode == MODE_SUBSCRIBE) {
+    if mode == MODE_SUBSCRIBE {
         return subscribeWithRetries(hub, subscriptionChangeRequest, auth, remainingRedirects = remainingRedirects);
     }
     return unsubscribeWithRetries(hub, subscriptionChangeRequest, auth, remainingRedirects = remainingRedirects);
@@ -252,8 +252,8 @@ isolated function unsubscribeWithRetries(string url, SubscriptionChangeRequest u
 # + followRedirects - Optional user provided `http:FollowRedirects` configuration
 # + return - Maximum number of redirects allowed for subscription/unsubscripton request
 isolated function getRedirectionMaxCount(http:FollowRedirects? followRedirects) returns int {
-    if (followRedirects is http:FollowRedirects) {
-        if (followRedirects.enabled) {
+    if followRedirects is http:FollowRedirects {
+        if followRedirects.enabled {
             return followRedirects.maxCount;
         }
     }

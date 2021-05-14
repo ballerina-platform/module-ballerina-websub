@@ -38,7 +38,7 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
     };
 
     SubscriptionVerificationSuccess|SubscriptionVerificationError result = callOnSubscriptionVerificationMethod(subscriberService, message);
-    if (result is SubscriptionVerificationError) {
+    if result is SubscriptionVerificationError {
         response.statusCode = http:STATUS_NOT_FOUND;
         var errorDetails = result.detail();
         updateResponseBody(response, errorDetails["body"], errorDetails["headers"], result.message());
@@ -62,7 +62,7 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
     var reason = params?.hubReason is () ? "" : <string>params?.hubReason;
     SubscriptionDeniedError subscriptionDeniedMessage = error SubscriptionDeniedError(reason);
     Acknowledgement? result = callOnSubscriptionDeniedMethod(subscriberService, subscriptionDeniedMessage);
-    if (result is ()) {
+    if result is () {
         result = ACKNOWLEDGEMENT;
     }
     response.statusCode = http:STATUS_OK;
@@ -85,7 +85,7 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
                                            string secretKey) returns error? {
     string payload = check request.getTextPayload();
     boolean isVerifiedContent = check verifyContent(request, secretKey, payload);
-    if (!isVerifiedContent) {
+    if !isVerifiedContent {
         return;
     }
                                                
@@ -139,14 +139,14 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
         }
     }
 
-    if (message is ()) {
+    if message is () {
         response.statusCode = http:STATUS_BAD_REQUEST;
         return;
     } else {
         Acknowledgement|SubscriptionDeletedError? result = callOnEventNotificationMethod(subscriberService, message);
-        if (result is Acknowledgement) {
+        if result is Acknowledgement {
             updateResponseBody(response, result["body"], result["headers"]);
-        } else if (result is SubscriptionDeletedError) {
+        } else if result is SubscriptionDeletedError {
             response.statusCode = http:STATUS_GONE;
             var errorDetails = result.detail();
             updateResponseBody(response, errorDetails["body"], errorDetails["headers"], result.message());
