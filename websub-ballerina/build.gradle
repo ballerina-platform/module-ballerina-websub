@@ -35,7 +35,7 @@ def originalDependencies = ballerinaDependencyFile.text
 def originalCompilerPlugin = ballerinaCompilerPluginFile.text
 def distributionBinPath = distributionPath + "/bin"
 def originalConfig = ballerinaConfigFile.text
-def testCoverageParam = "--code-coverage --includes=io.ballerina.stdlib.websub.*:ballerina.*"
+def testCoverageParam = "--code-coverage --jacoco-xml --includes=io.ballerina.stdlib.websub.*:ballerina.websub.*"
 
 def stripBallerinaExtensionVersion(String extVersion) {
     if (extVersion.matches(project.ext.timestampedVersionRegex)) {
