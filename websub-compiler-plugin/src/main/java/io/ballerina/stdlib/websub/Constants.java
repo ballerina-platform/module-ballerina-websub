@@ -39,6 +39,7 @@ public interface Constants {
     String SUBSCRIPTION_VERIFICATION_SUCCESS = "websub:SubscriptionVerificationSuccess";
     String SUBSCRIPTION_VERIFICATION_ERROR = "websub:SubscriptionVerificationError";
     String SUBSCRIPTION_DELETED_ERROR = "websub:SubscriptionDeletedError";
+    String ERROR = "annotations:error";
 
     String OPTIONAL = "?";
 }
