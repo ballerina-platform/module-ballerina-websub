@@ -24,7 +24,6 @@ import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 import io.ballerina.stdlib.websub.task.validator.ServiceDeclarationValidator;
-import io.ballerina.stdlib.websub.task.visitor.ListenerInitiationExpressionVisitor;
 
 import java.util.Optional;
 
@@ -46,9 +45,7 @@ public class ServiceAnalysisTask implements AnalysisTask<SyntaxNodeAnalysisConte
         if (serviceDeclarationOpt.isPresent()) {
             ServiceDeclarationSymbol serviceDeclarationSymbol = (ServiceDeclarationSymbol) serviceDeclarationOpt.get();
             if (isWebSubService(serviceDeclarationSymbol)) {
-                ListenerInitiationExpressionVisitor visitor = new ListenerInitiationExpressionVisitor(context);
-                serviceNode.syntaxTree().rootNode().accept(visitor);
-                this.validator.validate(context, serviceNode, visitor, serviceDeclarationSymbol);
+                this.validator.validate(context, serviceNode, serviceDeclarationSymbol);
             }
         }
     }
