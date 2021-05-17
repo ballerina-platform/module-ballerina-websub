@@ -17,12 +17,12 @@
 # The WebSub service type
 public type SubscriberService service object {
 
-//  remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement?;
+//  remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement|error?;
 
 //  remote function onSubscriptionVerification(SubscriptionVerification msg)
-//                    returns SubscriptionVerificationSuccess|SubscriptionVerificationError;
+//                    returns SubscriptionVerificationSuccess|SubscriptionVerificationError|error;
 
 //  remote function onEventNotification(ContentDistributionMessage event) 
-//                   returns Acknowledgement|SubscriptionDeletedError?;
+//                   returns Acknowledgement|SubscriptionDeletedError|error?;
 
 };

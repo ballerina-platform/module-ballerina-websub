@@ -34,7 +34,7 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
         hubLeaseSeconds: params?.hubLeaseSeconds
     };
 
-    SubscriptionVerificationSuccess|SubscriptionVerificationError result = callOnSubscriptionVerificationMethod(subscriberService, message);
+    SubscriptionVerificationSuccess|SubscriptionVerificationError|error result = callOnSubscriptionVerificationMethod(subscriberService, message);
     if (result is SubscriptionVerificationError) {
         response.statusCode = http:STATUS_NOT_FOUND;
         var errorDetails = result.detail();
@@ -55,12 +55,13 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
                                             RequestQueryParams params, SubscriberService subscriberService) {
     var reason = params?.hubReason is () ? "" : <string>params?.hubReason;
     SubscriptionDeniedError subscriptionDeniedMessage = error SubscriptionDeniedError(reason);
-    Acknowledgement? result = callOnSubscriptionDeniedMethod(subscriberService, subscriptionDeniedMessage);
-    if (result is ()) {
-        result = ACKNOWLEDGEMENT;
-    }
+    Acknowledgement|error? result = callOnSubscriptionDeniedMethod(subscriberService, subscriptionDeniedMessage);
     response.statusCode = http:STATUS_OK;
-    updateResponseBody(response, result["body"], result["headers"]);
+    if (result is () || result is error) {
+        updateResponseBody(response, ACKNOWLEDGEMENT["body"], ACKNOWLEDGEMENT["headers"]);
+    } else {
+        updateResponseBody(response, result["body"], result["headers"]);
+    }
 }
 
 # Porcesses the content distribution requests from `hub`
@@ -134,13 +135,15 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
         response.statusCode = http:STATUS_BAD_REQUEST;
         return;
     } else {
-        Acknowledgement|SubscriptionDeletedError? result = callOnEventNotificationMethod(subscriberService, message);
+        Acknowledgement|SubscriptionDeletedError|error? result = callOnEventNotificationMethod(subscriberService, message);
         if (result is Acknowledgement) {
             updateResponseBody(response, result["body"], result["headers"]);
         } else if (result is SubscriptionDeletedError) {
             response.statusCode = http:STATUS_GONE;
             var errorDetails = result.detail();
             updateResponseBody(response, errorDetails["body"], errorDetails["headers"], result.message());
+        } else {
+            updateResponseBody(response, ACKNOWLEDGEMENT["body"], ACKNOWLEDGEMENT["headers"]); 
         }
         return;
     }
