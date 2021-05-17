@@ -258,6 +258,22 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
     }
 
+    @Test
+    public void testErrorReturnTypesWithEventNotification() {
+        Package currentPackage = loadPackage("sample_17");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+    }
+
+    @Test
+    public void testErrorReturnTypesWithAllMethods() {
+        Package currentPackage = loadPackage("sample_18");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+    }
+
     private Package loadPackage(String path) {
         Path projectDirPath = RESOURCE_DIRECTORY.resolve(path);
         BuildProject project = BuildProject.load(getEnvironmentBuilder(), projectDirPath);

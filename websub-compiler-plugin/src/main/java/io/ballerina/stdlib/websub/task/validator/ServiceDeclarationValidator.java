@@ -241,7 +241,11 @@ public class ServiceDeclarationValidator {
             String paramType = signature.replace(moduleId, "").replace(":", "");
             String moduleName = moduleIdOpt.map(ModuleID::modulePrefix).orElse("");
             String qualifiedParamType = getQualifiedType(paramType, moduleName);
-            return !allowedReturnTypes.contains(qualifiedParamType);
+            if (Constants.ERROR.equals(qualifiedParamType)) {
+                return false;
+            } else {
+                return !allowedReturnTypes.contains(qualifiedParamType);
+            }
         } else if (TypeDescKind.NIL.equals(typeKind)) {
             return !nilableReturnTypeAllowed;
         } else {
