@@ -39,6 +39,9 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
         response.statusCode = http:STATUS_NOT_FOUND;
         var errorDetails = result.detail();
         updateResponseBody(response, errorDetails["body"], errorDetails["headers"], result.message());
+    } else if (result is error) {
+        response.statusCode = http:STATUS_NOT_FOUND;
+        updateResponseBody(response, (), ());
     } else {
         response.statusCode = http:STATUS_OK;
         response.setTextPayload(<string>params?.hubChallenge);
