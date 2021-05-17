@@ -29,20 +29,13 @@ import io.ballerina.compiler.api.symbols.ServiceDeclarationSymbol;
 import io.ballerina.compiler.api.symbols.TypeDescKind;
 import io.ballerina.compiler.api.symbols.TypeSymbol;
 import io.ballerina.compiler.api.symbols.UnionTypeSymbol;
-import io.ballerina.compiler.syntax.tree.FunctionArgumentNode;
 import io.ballerina.compiler.syntax.tree.FunctionDefinitionNode;
-import io.ballerina.compiler.syntax.tree.NamedArgumentNode;
 import io.ballerina.compiler.syntax.tree.NodeLocation;
-import io.ballerina.compiler.syntax.tree.ParenthesizedArgList;
-import io.ballerina.compiler.syntax.tree.PositionalArgumentNode;
-import io.ballerina.compiler.syntax.tree.RestArgumentNode;
-import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 import io.ballerina.stdlib.websub.Constants;
 import io.ballerina.stdlib.websub.WebSubDiagnosticCodes;
-import io.ballerina.stdlib.websub.task.visitor.ListenerInitiationExpressionVisitor;
 
 import java.util.Collections;
 import java.util.List;
@@ -98,9 +91,7 @@ public class ServiceDeclarationValidator {
     }
 
     public void validate(SyntaxNodeAnalysisContext context, ServiceDeclarationNode serviceNode,
-                         ListenerInitiationExpressionVisitor visitor,
                          ServiceDeclarationSymbol serviceDeclarationSymbol) {
-        validateListenerArguments(context, visitor);
         validateServiceAnnotation(context, serviceNode, serviceDeclarationSymbol);
         List<FunctionDefinitionNode> availableFunctionDeclarations = serviceNode.members().stream()
                 .filter(member -> member.kind() == SyntaxKind.OBJECT_METHOD_DEFINITION)
@@ -116,56 +107,6 @@ public class ServiceDeclarationValidator {
                 validateMethodReturnTypes(context, fd, ((FunctionSymbol) fs).typeDescriptor());
             });
         });
-    }
-
-    private void validateListenerArguments(SyntaxNodeAnalysisContext context,
-                                          ListenerInitiationExpressionVisitor visitor) {
-        visitor.getExplicitNewExpressionNodes()
-                .forEach(explicitNewExpressionNode -> {
-                    SeparatedNodeList<FunctionArgumentNode> functionArgs = explicitNewExpressionNode
-                            .parenthesizedArgList().arguments();
-                    verifyListenerArgType(context, explicitNewExpressionNode.location(), functionArgs);
-                });
-
-        visitor.getImplicitNewExpressionNodes()
-                .forEach(implicitNewExpressionNode -> {
-                    Optional<ParenthesizedArgList> argListOpt = implicitNewExpressionNode.parenthesizedArgList();
-                    if (argListOpt.isPresent()) {
-                        SeparatedNodeList<FunctionArgumentNode> functionArgs = argListOpt.get().arguments();
-                        verifyListenerArgType(context, implicitNewExpressionNode.location(), functionArgs);
-                    }
-                });
-    }
-
-    private void verifyListenerArgType(SyntaxNodeAnalysisContext context, NodeLocation location,
-                                       SeparatedNodeList<FunctionArgumentNode> functionArgs) {
-        if (functionArgs.size() >= 2) {
-            Optional<SyntaxKind> firstArgSyntaxKindOpt = getArgSyntaxKind(functionArgs.get(0));
-            Optional<SyntaxKind> secondArgSyntaxKindOpt = getArgSyntaxKind(functionArgs.get(1));
-            if (firstArgSyntaxKindOpt.isPresent() && secondArgSyntaxKindOpt.isPresent()) {
-                SyntaxKind firstArgSyntaxKind = firstArgSyntaxKindOpt.get();
-                SyntaxKind secondArgSyntaxKind = secondArgSyntaxKindOpt.get();
-                if ((firstArgSyntaxKind == SyntaxKind.SIMPLE_NAME_REFERENCE
-                        || firstArgSyntaxKind == SyntaxKind.MAPPING_CONSTRUCTOR)
-                        && (secondArgSyntaxKind == SyntaxKind.SIMPLE_NAME_REFERENCE
-                        || secondArgSyntaxKind == SyntaxKind.MAPPING_CONSTRUCTOR)) {
-                    WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_109;
-                    updateContext(context, errorCode, location);
-                }
-            }
-        }
-    }
-
-    private Optional<SyntaxKind> getArgSyntaxKind(FunctionArgumentNode argument) {
-        SyntaxKind syntaxKind = null;
-        if (argument instanceof PositionalArgumentNode) {
-            syntaxKind = ((PositionalArgumentNode) argument).expression().kind();
-        } else if (argument instanceof NamedArgumentNode) {
-            syntaxKind = ((NamedArgumentNode) argument).expression().kind();
-        } else if (argument instanceof RestArgumentNode) {
-            syntaxKind = ((RestArgumentNode) argument).expression().kind();
-        }
-        return Optional.ofNullable(syntaxKind);
     }
 
     private void validateServiceAnnotation(SyntaxNodeAnalysisContext context, ServiceDeclarationNode serviceNode,

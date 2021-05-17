@@ -14,13 +14,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/http;
 import ballerina/websub;
 
-@http:ServiceConfig {
+listener websub:Listener simpleListener = new (10001);
+
+@websub:SubscriberServiceConfig{}
+service /sample1 on new websub:Listener(10001) {
+    remote function onEventNotification(websub:ContentDistributionMessage event) 
+                        returns websub:Acknowledgement|websub:SubscriptionDeletedError? {
+        return websub:ACKNOWLEDGEMENT;
+    }
 }
-service /sample on new websub:Listener(100010) {
-    remote function onEventNotification(websub:ContentDistributionMessage event) returns websub:Acknowledgement? {
-        return;
+
+@websub:SubscriberServiceConfig{}
+service /sample2 on new websub:Listener(10001) {
+    remote function onEventNotification(websub:ContentDistributionMessage event) 
+                        returns websub:Acknowledgement|websub:SubscriptionDeletedError? {
+        return websub:ACKNOWLEDGEMENT;
     }
 }

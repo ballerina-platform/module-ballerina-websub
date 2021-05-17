@@ -22,7 +22,10 @@ import io.ballerina.compiler.syntax.tree.SyntaxKind;
 import io.ballerina.projects.plugins.CodeAnalysisContext;
 import io.ballerina.projects.plugins.CodeAnalyzer;
 import io.ballerina.stdlib.websub.task.CheckExpAnalysisTask;
+import io.ballerina.stdlib.websub.task.ListenerInitAnalysisTask;
 import io.ballerina.stdlib.websub.task.ServiceAnalysisTask;
+
+import java.util.List;
 
 /**
  * {@code WebSubCodeAnalyzer} handles syntax analysis for WebSub Services.
@@ -31,6 +34,8 @@ public class WebSubCodeAnalyzer extends CodeAnalyzer {
     @Override
     public void init(CodeAnalysisContext codeAnalysisContext) {
         codeAnalysisContext.addSyntaxNodeAnalysisTask(new CheckExpAnalysisTask(), SyntaxKind.CHECK_EXPRESSION);
+        codeAnalysisContext.addSyntaxNodeAnalysisTask(new ListenerInitAnalysisTask(),
+                List.of(SyntaxKind.IMPLICIT_NEW_EXPRESSION, SyntaxKind.EXPLICIT_NEW_EXPRESSION));
         codeAnalysisContext.addSyntaxNodeAnalysisTask(new ServiceAnalysisTask(),
                 SyntaxKind.SERVICE_DECLARATION);
     }
