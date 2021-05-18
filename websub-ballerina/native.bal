@@ -17,16 +17,16 @@
 import ballerina/jballerina.java;
 
 isolated function callOnSubscriptionVerificationMethod(SubscriberService subscriberService, SubscriptionVerification msg) 
-                                returns SubscriptionVerificationSuccess | SubscriptionVerificationError = @java:Method {
+                                returns SubscriptionVerificationSuccess|SubscriptionVerificationError|error = @java:Method {
     'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
 } external;
 
 isolated function callOnSubscriptionDeniedMethod(SubscriberService subscriberService, SubscriptionDeniedError msg) 
-                                returns Acknowledgement? = @java:Method {
+                                returns Acknowledgement|error? = @java:Method {
     'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
 } external;
 
 isolated function callOnEventNotificationMethod(SubscriberService subscriberService, ContentDistributionMessage msg) 
-                                returns Acknowledgement | SubscriptionDeletedError? = @java:Method {
+                                returns Acknowledgement|SubscriptionDeletedError|error? = @java:Method {
     'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
 } external;
