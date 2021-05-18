@@ -1,0 +1,1 @@
+{"ballerina/websub:0.1.0:SubscriptionChangeRequest":{"topic":"string","callback":"string","secret":"string","leaseSeconds":"int"}}
