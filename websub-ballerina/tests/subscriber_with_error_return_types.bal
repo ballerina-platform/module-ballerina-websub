@@ -47,7 +47,7 @@ function afterSubscriberWithErrorReturnsTest() returns @tainted error? {
     check errorReturnsSubscriberListener.gracefulStop();
 }
 
-http:Client SubscriberWithErrorReturnsClientEp = check new("http://localhost:9090/subscriber");
+http:Client SubscriberWithErrorReturnsClientEp = check new("http://localhost:9099/subscriber");
 
 @test:Config { 
     groups: ["subscriberWithErrorReturns"]
@@ -62,8 +62,8 @@ function testOnSubscriptionValidationWithErrorReturnType() returns @tainted erro
  }
 function testOnIntentVerificationSuccessWithErrorReturnType() returns @tainted error? {
     http:Response response = check SubscriberWithErrorReturnsClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234");
-    test:assertEquals(response.statusCode, 200);
-    test:assertEquals(response.getTextPayload(), "1234");
+    test:assertEquals(response.statusCode, 404);
+    test:assertEquals(response.getTextPayload(), "reason=Error occured while processing request");
 }
 
 @test:Config {
