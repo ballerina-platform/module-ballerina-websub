@@ -49,7 +49,7 @@ public client class SubscriptionClient {
 
         http:Client httpClient = self.httpClient;
         http:Request builtSubscriptionRequest = buildSubscriptionChangeRequest(MODE_SUBSCRIBE, subscriptionRequest);
-        http:Response response = check httpClient->post("", builtSubscriptionRequest, targetType = http:Response);
+        http:Response response = check httpClient->post("", builtSubscriptionRequest);
         int redirectCount = getRedirectionMaxCount(self.followRedirects);
         return processHubResponse(self.url, MODE_SUBSCRIBE, subscriptionRequest, response, httpClient,
                                   redirectCount);
@@ -67,7 +67,7 @@ public client class SubscriptionClient {
 
         http:Client httpClient = self.httpClient;
         http:Request builtUnsubscriptionRequest = buildSubscriptionChangeRequest(MODE_UNSUBSCRIBE, unsubscriptionRequest);
-        http:Response response = check httpClient->post("", builtUnsubscriptionRequest, targetType = http:Response);
+        http:Response response = check httpClient->post("", builtUnsubscriptionRequest);
         int redirectCount = getRedirectionMaxCount(self.followRedirects);
         return processHubResponse(self.url, MODE_UNSUBSCRIBE, unsubscriptionRequest, response, httpClient,
                                   redirectCount);
@@ -184,7 +184,7 @@ isolated function subscribeWithRetries(string url, SubscriptionChangeRequest sub
              returns @tainted SubscriptionChangeResponse| error {
     http:Client clientEndpoint = check new http:Client(url, { auth: auth });
     http:Request builtSubscriptionRequest = buildSubscriptionChangeRequest(MODE_SUBSCRIBE, subscriptionRequest);
-    http:Response response = check clientEndpoint->post("", builtSubscriptionRequest, targetType = http:Response);
+    http:Response response = check clientEndpoint->post("", builtSubscriptionRequest);
     return processHubResponse(url, MODE_SUBSCRIBE, subscriptionRequest, response, clientEndpoint,
                               remainingRedirects);
 }
@@ -196,7 +196,7 @@ isolated function unsubscribeWithRetries(string url, SubscriptionChangeRequest u
         auth: auth
     });
     http:Request builtSubscriptionRequest = buildSubscriptionChangeRequest(MODE_UNSUBSCRIBE, unsubscriptionRequest);
-    http:Response response = check clientEndpoint->post("", builtSubscriptionRequest, targetType = http:Response);
+    http:Response response = check clientEndpoint->post("", builtSubscriptionRequest);
     return processHubResponse(url, MODE_UNSUBSCRIBE, unsubscriptionRequest, response, clientEndpoint,
                               remainingRedirects);
 }
