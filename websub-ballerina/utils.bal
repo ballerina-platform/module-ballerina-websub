@@ -21,7 +21,7 @@ import ballerina/log;
 import ballerina/lang.'string as strings;
 import ballerina/random;
 
-# Generates a random-string of given length.
+# Generates a random string of the given length.
 # ```ballerina
 # string randomString = check generateRandomString(10);
 # ```
