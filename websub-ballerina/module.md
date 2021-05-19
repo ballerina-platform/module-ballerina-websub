@@ -118,3 +118,40 @@ service on new websub:Listener(9090) {
     // other remote methods are optional to be implemented
 }
 ```
+
+# Returning Errors from Remote Methods
+
+* Remote functions in `websub:SubscriberService` can return `error` type.
+```ballerina
+@websub:SubscriberServiceConfig {
+    target: "RESOURCE_URL", 
+    leaseSeconds: 36000,
+    callback: "<NGROK_PUBLIC_URL>",
+    appendServiceUrl: true
+} 
+service on new websub:Listener(9090) {
+    remote function onEventNotification(websub:ContentDistributionMessage event) 
+                        returns websub:Acknowledgement|websub:SubscriptionDeletedError|error? {
+        boolean isValidRequest = check validateRequest(event);
+        if isValidRequest {
+            // implement on event notification logic here
+            return websub:ACKNOWLEDGEMENT;
+        }
+    
+    }
+
+    // other remote methods are optional to be implemented
+}
+
+function validateRequest(websub:ContentDistributionMessage event) returns boolean|error {
+    // validation logic 
+}
+```
+
+* For each remote method `error` return has a different meaning. Following table depicts the meaning inferred from `error` returned from all available remote methods.
+
+| Method        | Interpreted meaning for Error Return |
+| ----------- | ---------------- |
+| onSubscriptionValidationDenied | Successfull acknowledgement|
+| onSubscriptionVerification | Subscription verification failure|
+| onEventNotification | Successfull acknowledgement|
