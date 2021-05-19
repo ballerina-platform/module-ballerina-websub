@@ -21,11 +21,14 @@ import ballerina/log;
 import ballerina/lang.'string as strings;
 import ballerina/random;
 
-# Generates a random-string of given length
+# Generates a random string of the given length.
+# ```ballerina
+# string randomString = check generateRandomString(10);
+# ```
 # 
 # + length - required length of the generated string
-# + return - generated random string value or `error` if any error occurred in the execution
-isolated function generateRandomString(int length) returns string | error {
+# + return - generated random `string` value or an `error` if any error occurred in the execution
+isolated function generateRandomString(int length) returns string|error {
     int[] codePoints = [];
     int leftLimit = 48; // numeral '0'
     int rightLimit = 122; // letter 'z'
@@ -41,40 +44,46 @@ isolated function generateRandomString(int length) returns string | error {
     return strings:fromCodePointInts(codePoints);
 }
 
-# Generate the `websub:SubscriptionChangeRequest` from the configurations.
+# Generates the `websub:SubscriptionChangeRequest` from the configurations.
+# ```ballerina
+# websub:SubscriptionChangeRequest subscriptionRequest = retrieveSubscriptionRequest("https://sample.topic.com", "https://sample.callback/subscriber", config);
+# ```
 # 
-# + topicUrl - `topic` to which subscriber want to subscribe
+# + topicUrl - The `topic` to which the subscriber wants to subscribe
 # + callback - Subscriber callback URL to be used by the `hub`
-# + config - user defined subscriber-service configurations
-# + return - {@code websub:SubscriptionChangeRequest} from the configurations provided
+# + config - User-defined subscriber service configurations
+# + return - Generated `websub:SubscriptionChangeRequest` from the provided configurations
 isolated function retrieveSubscriptionRequest(string topicUrl, string callback, 
                                               SubscriberServiceConfiguration config) returns SubscriptionChangeRequest {        
     SubscriptionChangeRequest request = { topic: topicUrl, callback: callback };
         
-    var leaseSeconds = config?.leaseSeconds;
-    if (leaseSeconds is int) {
+    int? leaseSeconds = config?.leaseSeconds;
+    if leaseSeconds is int {
         request.leaseSeconds = leaseSeconds;
     }
 
-    var secret = config?.secret;
-    if (secret is string) {
+    string? secret = config?.secret;
+    if secret is string {
         request.secret = secret;
     }
 
     return request;
 }
 
-# Retrieve the request-headers from the `http:Request`.
+# Retrieves the request-headers from the `http:Request`.
+# ```ballerina
+# map<string|string[]> availableHeaders = retrieveRequestHeaders(httpRequest);
+# ```
 # 
-# + request - {@code http:Request} to be processed
-# + return - {@code map<string|string[]>} containing the header values
+# + request - Original `http:Request` object
+# + return - Header values found in the provided `http:Request`
 isolated function retrieveRequestHeaders(http:Request request) returns map<string|string[]> {
     string[] headerNames = request.getHeaderNames();
     map<string|string[]> headers = {};
 
     foreach var headerName in headerNames {
         http:HeaderNotFoundError | string[] headerValue = request.getHeaders(headerName);
-        if (headerValue is string[]) {
+        if headerValue is string[] {
             headers[headerName] = headerValue;
         }
     }
@@ -82,10 +91,13 @@ isolated function retrieveRequestHeaders(http:Request request) returns map<strin
     return headers;
 }
 
-# Retrieve request query parameters.
+# Retrieves the request query parameters.
+# ```ballerina
+# websub:RequestQueryParams queryParams = retrieveRequestQueryParams(httpRequest);
+# ```
 # 
-# + request - {@code http:Request} to be processed
-# + return - {@code websub:RequestQueryParams} containing the query parameter values
+# + request - Original `http:Request` object
+# + return - The `websub:RequestQueryParams` instance containing the query parameter values
 isolated function retrieveRequestQueryParams(http:Request request) returns RequestQueryParams {
     map<string[]> queryParams = request.getQueryParams();
 
@@ -95,15 +107,15 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
     string? hubLeaseSeconds = request.getQueryParamValue(HUB_LEASE_SECONDS);
     string? hubReason = request.getQueryParamValue(HUB_REASON);
 
-    if (hubMode is string) {
-        if (hubTopic is string && hubChallenge is string) {
+    if hubMode is string {
+        if hubTopic is string && hubChallenge is string {
             return {
                 hubMode: hubMode,
                 hubTopic: hubTopic,
                 hubChallenge: hubChallenge,
                 hubLeaseSeconds: hubLeaseSeconds
             };
-        } else if (hubReason is string) {
+        } else if hubReason is string {
             return {
                 hubMode: hubMode,
                 hubReason: hubReason
@@ -117,17 +129,19 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
 }
 
 # Verifies the `http:Request` payload with the provided signature value.
+# ```ballerina
+# boolean isVerified = check verifyContent(httpRequest, secretKey, requestPayload);
+# ```
 # 
-# + request - current {@code http:Request}
-# + secret - pre-shared client-secret value
-# + payload - {@code string} value of the request body
-# + return - `true` if the verification is successfull, else `false`
+# + request - Original `http:Request` object
+# + secret - Pre-shared subscriber secret key
+# + payload - Request payload
+# + return - `true` if the verification is successful or else `false`
 isolated function verifyContent(http:Request request, string secret, string payload) returns boolean|error {
-    if (secret.trim().length() > 0) {
-        if (request.hasHeader(X_HUB_SIGNATURE)) {
+    if secret.trim().length() > 0 {
+        if request.hasHeader(X_HUB_SIGNATURE) {
                 var xHubSignature = request.getHeader(X_HUB_SIGNATURE);
-                
-                if (xHubSignature is http:HeaderNotFoundError || xHubSignature.trim().length() == 0) {
+                if xHubSignature is http:HeaderNotFoundError || xHubSignature.trim().length() == 0 {
                     return false;
                 } else {
                     string[] splitSignature = regex:split(<string>xHubSignature, "=");
@@ -144,12 +158,15 @@ isolated function verifyContent(http:Request request, string secret, string payl
     }
 }
 
-# Generates HMac value for the paload depending on the provided algorithm.
+# Generates the HMAC value for the payload depending on the provided algorithm.
+# ```ballerina
+# byte[] hMacSignature = check retrieveContentHash("SHA1", secretKey, requestPayload);
+# ```
 # 
-# + method - `HMac` algorithm to be used
-# + key - pre-shared secret-key value
-# + payload - content to be hashed
-# + return - {@code byte[]} representing the `hMac`
+# + method - `HMAC` algorithm to be used
+# + key - Pre-shared subscriber secret key
+# + payload - Request payload to be hashed
+# + return - Calculated HMAC value if successfull or else an `error`
 isolated function retrieveContentHash(string method, string key, string payload) returns byte[]|error {
     byte[] keyArr = key.toBytes();
     byte[] contentPayload = payload.toBytes();
@@ -176,16 +193,19 @@ isolated function retrieveContentHash(string method, string key, string payload)
     }
 }
 
-# Updates `http:Response` body with provided parameters.
+# Updates the `http:Response` body with the provided additional parameters.
+# ```ballerina
+# updateResponseBody(httpResponse, messageBody, additionalHeaders);
+# ```
 # 
-# + response - {@code http:Response} to be updated
-# + messageBody - content for the response body
-# + headers - additional header-parameters to included in the response
-# + reason - reason for action execution failure / success
+# + response - Original `http:Response` object
+# + messageBody - Content for the response body
+# + headers - Additional header parameters to be included in the response
+# + reason - Optional reason parameter for the action execution failure
 isolated function updateResponseBody(http:Response response, anydata? messageBody, 
                                      map<string|string[]>? headers, string? reason = ()) {
     string payload = reason is () ? "" : "reason=" + reason;
-    if (messageBody is map<string> && messageBody.length() > 0) {
+    if messageBody is map<string> && messageBody.length() > 0 {
         string[] messageParams = [];
         payload += "&";
         foreach var ['key, value] in messageBody.entries() {
@@ -196,9 +216,9 @@ isolated function updateResponseBody(http:Response response, anydata? messageBod
 
     response.setTextPayload(payload);
     response.setHeader("Content-type","application/x-www-form-urlencoded");
-    if (headers is map<string|string[]>) {
+    if headers is map<string|string[]> {
         foreach var [header, value] in headers.entries() {
-            if (value is string) {
+            if value is string {
                 response.setHeader(header, value);
             } else {
                 foreach var valueElement in value {
@@ -209,18 +229,24 @@ isolated function updateResponseBody(http:Response response, anydata? messageBod
     }
 }
 
-# Respond to the received `http:Request`.
+# Responds to the received `http:Request`.
+# ```ballerina
+# respondToRequest(httpCaller, httpResponse);
+# ```
 # 
-# + caller - {@code http:Caller} which intiate the request
-# + response - {@code http:Response} to be sent to the caller
+# + caller - The `http:Caller` reference for the current request
+# + response - Updated `http:Response`
 isolated function respondToRequest(http:Caller caller, http:Response response) {
     http:ListenerError? responseError = caller->respond(response);
 }
 
-# Checks whether response is successfull 
+# Checks whether the response is successful.
+# ```ballerina
+# boolean isSuccessfull = isSuccessStatusCode(404);
+# ```
 # 
-# + statusCode - statusCode found in the {@code http:Response}
-# + return - `true` if the `statusCode` is between 200 to 300, else false
+# + statusCode - Received HTTP status code
+# + return - `true` if the `statusCode` is between 200 to 300 or else `false`
 isolated function isSuccessStatusCode(int statusCode) returns boolean {
     return (200 <= statusCode && statusCode < 300);
 }

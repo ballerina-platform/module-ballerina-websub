@@ -18,7 +18,7 @@ import ballerina/http;
 import ballerina/log;
 import ballerina/jballerina.java;
 
-# Represent underlying HTTP Service on top of which the Subscriber-Serivice runs.
+# Represents an underlying HTTP Service.
 service class HttpService {
     private SubscriberService subscriberService;
     private string? secretKey;
@@ -26,12 +26,14 @@ service class HttpService {
     private boolean isSubscriptionVerificationAvailable = false;
     private boolean isEventNotificationAvailable = false;
 
-    # Invoked during the initialization of a `websub:HttpService`
-    #
-    # + subscriberService - {@code websub:SubscriberService} provided service
-    # + serviceConfig - {@code SubscriberServiceConfiguration} subscriber-service
-    #                   related configurations
-    # + callback - {@code string} dynamically generated callback-url
+    # Initializes `websub:HttpService` endpoint.
+    # ```ballerina
+    # websub:HttpService httpServiceEp = check new ('service, "sercretKey1");
+    # ```
+    # 
+    # + subscriberService - The current `websub:SubscriberService` instance
+    # + callback - Optional `secretKey` value to be used in the content distribution verification
+    # + return - The `websub:HttpService` or an `error` if the initialization failed
     isolated function init(SubscriberService subscriberService, string? secretKey) returns error? {
         self.subscriberService = subscriberService;
         self.secretKey = secretKey;
@@ -56,17 +58,17 @@ service class HttpService {
         }
     }
 
-    # Resource-Method handling the HTTP POST requests
+    # Receives HTTP POST requests.
     # 
-    # + caller - {@code http:Caller} reference
-    # + request - {@code http:Request} reference
+    # + caller - The `http:Caller` reference for the current request
+    # + request - Received `http:Request` instance
     isolated resource function post .(http:Caller caller, http:Request request) {
         http:Response response = new;
         response.statusCode = http:STATUS_ACCEPTED;
-        if (self.isEventNotificationAvailable) {
+        if self.isEventNotificationAvailable {
             string secretKey = self.secretKey is () ? "" : <string>self.secretKey;
             var result = processEventNotification(caller, request, response, self.subscriberService, secretKey);
-            if (result is error) {
+            if result is error {
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
             }
         } else {
@@ -76,10 +78,10 @@ service class HttpService {
         respondToRequest(caller, response);
     }
 
-    # Resource-Method handling the HTTP GET requests
+    # Receives HTTP GET requests.
     # 
-    # + caller - {@code http:Caller} reference
-    # + request - {@code http:Request} reference
+    # + caller - The `http:Caller` reference for the current request
+    # + request - Received `http:Request` instance
     isolated resource function get .(http:Caller caller, http:Request request) {
         http:Response response = new;
         response.statusCode = http:STATUS_OK;
@@ -88,10 +90,10 @@ service class HttpService {
 
         match params?.hubMode {
             MODE_SUBSCRIBE | MODE_UNSUBSCRIBE => {
-                if (params?.hubChallenge is () || params?.hubTopic is ()) {
+                if params?.hubChallenge is () || params?.hubTopic is () {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                 } else {
-                    if (self.isSubscriptionVerificationAvailable) {
+                    if self.isSubscriptionVerificationAvailable {
                         processSubscriptionVerification(caller, response, <@untainted> params, self.subscriberService);
                     } else {
                         response.statusCode = http:STATUS_OK;
@@ -100,7 +102,7 @@ service class HttpService {
                 }
             }
             MODE_DENIED => {
-                if (self.isSubscriptionValidationDeniedAvailable) {
+                if self.isSubscriptionValidationDeniedAvailable {
                     processSubscriptionDenial(caller, response, <@untainted> params, self.subscriberService);
                 } else {
                     response.statusCode = http:STATUS_OK;
@@ -118,10 +120,10 @@ service class HttpService {
     }
 }
 
-# Invoke native method to retrive implemented method names in the subscriber service
+# Retrives the names of the implemented methods in the `websub:SubscriberService` instance.
 # 
-# + subscriberService - current subscriber-service
-# + return - {@code string[]} containing the method-names in current implementation
+# + subscriberService - Current `websub:SubscriberService` instance
+# + return - All the methods implemented in the `websub:SubscriberService` as a `string[]`
 isolated function getServiceMethodNames(SubscriberService subscriberService) returns string[] = @java:Method {
     'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
 } external;

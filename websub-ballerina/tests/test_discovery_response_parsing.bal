@@ -94,7 +94,7 @@ isolated function testTopicAndMultipleHubsAsMultipleLinkHeaders() returns @taint
 isolated function testMissingTopicWithSingleLinkHeader() returns @tainted error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\", <" + TOPIC_ONE + ">; rel=\"not_self\"");
-    var results = extractTopicAndHubUrls(response);
+    [string, string[]]|error results = extractTopicAndHubUrls(response);
     if (results is error) {
         string expectedErrMsg = "Hub and/or Topic URL(s) not identified in link header of discovery response";
         test:assertEquals(results.message(), expectedErrMsg, msg = "invalid error message on unavailable topic");
@@ -110,7 +110,7 @@ isolated function testMissingTopicWithMultipleLinkHeaders() returns @tainted err
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"not_self\"");
-    var results = extractTopicAndHubUrls(response);
+    [string, string[]]|error results = extractTopicAndHubUrls(response);
     if (results is error) {
         string expectedErrMsg = "Hub and/or Topic URL(s) not identified in link header of discovery response";
         test:assertEquals(results.message(), expectedErrMsg, msg = "invalid error message on unavailable topic");
@@ -125,7 +125,7 @@ isolated function testMissingTopicWithMultipleLinkHeaders() returns @tainted err
 isolated function testMissingHubWithSingleLinkHeader() returns @tainted error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\", <" + TOPIC_ONE + ">; rel=\"self\"");
-    var results = extractTopicAndHubUrls(response);
+    [string, string[]]|error results = extractTopicAndHubUrls(response);
     if (results is error) {
         string expectedErrMsg = "Hub and/or Topic URL(s) not identified in link header of discovery response";
         test:assertEquals(results.message(), expectedErrMsg, msg = "invalid error message on unavailable topic");
@@ -141,7 +141,7 @@ isolated function testMissingHubWithMultipleLinkHeaders() returns @tainted error
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"self\"");
-    var results = extractTopicAndHubUrls(response);
+    [string, string[]]|error results = extractTopicAndHubUrls(response);
     if (results is error) {
         string expectedErrMsg = "Hub and/or Topic URL(s) not identified in link header of discovery response";
         test:assertEquals(results.message(), expectedErrMsg, msg = "invalid error message on unavailable topic");
@@ -155,7 +155,7 @@ isolated function testMissingHubWithMultipleLinkHeaders() returns @tainted error
 }
 isolated function testMissingLinkHeader() returns @tainted error? {
     http:Response response = new;
-    var results = extractTopicAndHubUrls(response);
+    [string, string[]]|error results = extractTopicAndHubUrls(response);
     if (results is error) {
         string expectedErrMsg = "Link header unavailable in discovery response";
         test:assertEquals(results.message(), expectedErrMsg, msg = "invalid error message on unavailable link headers(s)");
@@ -171,7 +171,7 @@ isolated function testSingleLinkHeaderWithMultipleTopics() returns @tainted erro
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\", <" + TOPIC_ONE + ">; rel=\"self\", <" +
             HUB_TWO + ">; rel=\"self\"");
-    var results = extractTopicAndHubUrls(response);
+    [string, string[]]|error results = extractTopicAndHubUrls(response);
     if (results is error) {
         string expectedErrMsg = "Link Header contains > 1 self URLs";
         test:assertEquals(results.message(), expectedErrMsg, msg = "invalid error message on > 1 topics");
@@ -188,7 +188,7 @@ isolated function testMultipleLinkHeadersWithMultipleTopics() returns @tainted e
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"self\"");
     response.addHeader("Link", "<" + HUB_TWO + ">; rel=\"self\"");
-    var results = extractTopicAndHubUrls(response);
+    [string, string[]]|error results = extractTopicAndHubUrls(response);
     if (results is error) {
         string expectedErrMsg = "Link Header contains > 1 self URLs";
         test:assertEquals(results.message(), expectedErrMsg, msg = "invalid error message on > 1 topics");

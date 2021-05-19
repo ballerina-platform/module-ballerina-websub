@@ -19,12 +19,15 @@ import ballerina/mime;
 import ballerina/log;
 import ballerina/url;
 
-# Porcesses the subscription / unsubscription intent verification requests from `hub`
+# Processes the subscription/unsubscription intent verification requests received from the `hub`.
+# ```ballerina
+# processSubscriptionVerification(httpCaller, httpResponse, queryParams, 'service);
+# ```
 # 
-# + caller - {@code http:Caller} reference
-# + response - {@code http:Response} to be returned to the caller
-# + params - query parameters retrieved from the {@code http:Request}
-# + subscriberService - service to be invoked via native method
+# + caller - The `http:Caller` reference for the current request
+# + response - The `http:Response`, which should be returned 
+# + params - Query parameters retrieved from the `http:Request`
+# + subscriberService - Current `websub:SubscriberService`
 isolated function processSubscriptionVerification(http:Caller caller, http:Response response, 
                                                   RequestQueryParams params, SubscriberService subscriberService) {
     SubscriptionVerification message = {
@@ -35,11 +38,11 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
     };
 
     SubscriptionVerificationSuccess|SubscriptionVerificationError|error result = callOnSubscriptionVerificationMethod(subscriberService, message);
-    if (result is SubscriptionVerificationError) {
+    if result is SubscriptionVerificationError {
         response.statusCode = http:STATUS_NOT_FOUND;
         var errorDetails = result.detail();
         updateResponseBody(response, errorDetails["body"], errorDetails["headers"], result.message());
-    } else if (result is error) {
+    } else if result is error {
         response.statusCode = http:STATUS_NOT_FOUND;
         updateResponseBody(response, (), (), result.message());
     } else {
@@ -48,39 +51,45 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
     }
 }
 
-# Porcesses the subscription / unsubscription denial requests from `hub`
+# Processes the subscription/unsubscription denial requests from the `hub`.
+# ```ballerina
+# processSubscriptionDenial(httpCaller, httpResponse, queryParams, 'service);
+# ```
 # 
-# + caller - {@code http:Caller} reference
-# + response - {@code http:Response} to be returned to the caller
-# + params - query parameters retrieved from the {@code http:Request}
-# + subscriberService - service to be invoked via native method
+# + caller - The `http:Caller` reference for the current request
+# + response - The `http:Response`, which should be returned 
+# + params - Query parameters retrieved from the `http:Request`
+# + subscriberService - Current `websub:SubscriberService`
 isolated function processSubscriptionDenial(http:Caller caller, http:Response response,
                                             RequestQueryParams params, SubscriberService subscriberService) {
     var reason = params?.hubReason is () ? "" : <string>params?.hubReason;
     SubscriptionDeniedError subscriptionDeniedMessage = error SubscriptionDeniedError(reason);
     Acknowledgement|error? result = callOnSubscriptionDeniedMethod(subscriberService, subscriptionDeniedMessage);
     response.statusCode = http:STATUS_OK;
-    if (result is () || result is error) {
+    if result is () || result is error {
         updateResponseBody(response, ACKNOWLEDGEMENT["body"], ACKNOWLEDGEMENT["headers"]);
     } else {
         updateResponseBody(response, result["body"], result["headers"]);
     }
 }
 
-# Porcesses the content distribution requests from `hub`
+# Processes the content distribution requests from the `hub`.
+# ```ballerina
+# check processEventNotification(httpCaller, httpRequest, httpResponse, queryParams, 'service, serviceKey);
+# ```
 # 
-# + caller - {@code http:Caller} reference
-# + request - original HTTP request
-# + response - {@code http:Response} to be returned to the caller
-# + subscriberService - service to be invoked via native method
-# + secretKey - pre-shared client-secret value
-# + return - {@code error} is there is an execution exception or else {@code nil}
+# + caller - The `http:Caller` reference for the current request
+# + request - The original `http:Request`
+# + response - The `http:Response`, which should be returned 
+# + subscriberService - Current `websub:SubscriberService`
+# + secretKey - The `secretKey` value to be used to verify the content distribution message
+# + return - An `error` if there is any exception in the execution or else `()`
 isolated function processEventNotification(http:Caller caller, http:Request request, 
                                            http:Response response, SubscriberService subscriberService,
                                            string secretKey) returns error? {
     string payload = check request.getTextPayload();
     boolean isVerifiedContent = check verifyContent(request, secretKey, payload);
-    if (!isVerifiedContent) {
+    if !isVerifiedContent {
         return;
     }
                                                
@@ -134,14 +143,14 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
         }
     }
 
-    if (message is ()) {
+    if message is () {
         response.statusCode = http:STATUS_BAD_REQUEST;
         return;
     } else {
         Acknowledgement|SubscriptionDeletedError|error? result = callOnEventNotificationMethod(subscriberService, message);
-        if (result is Acknowledgement) {
+        if result is Acknowledgement {
             updateResponseBody(response, result["body"], result["headers"]);
-        } else if (result is SubscriptionDeletedError) {
+        } else if result is SubscriptionDeletedError {
             response.statusCode = http:STATUS_GONE;
             var errorDetails = result.detail();
             updateResponseBody(response, errorDetails["body"], errorDetails["headers"], result.message());

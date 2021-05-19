@@ -49,7 +49,7 @@ service /subscriber on new Listener(9098) {
     }
 }
 
-http:Client contentVerificationClient = checkpanic new("http://localhost:9098/subscriber");
+http:Client contentVerificationClient = check new("http://localhost:9098/subscriber");
 
 @test:Config {
     groups: ["contentVerification"]
