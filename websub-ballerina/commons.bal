@@ -17,55 +17,55 @@
 import ballerina/http;
 
 # Intent verification request parameter 'hub.challenge' representing the challenge that needs to be echoed by
-# `subscriber` to verify intent.
+# `subscriber` to verify the intent.
 const string HUB_CHALLENGE = "hub.challenge";
 
-# Parameter `hub.mode` representing the mode of the request from hub to subscriber or subscriber to hub.
+# The `hub.mode` parameter representing the mode of the request from the hub to subscriber or subscriber to hub.
 const string HUB_MODE = "hub.mode";
 
 # Subscription change or intent verification request parameter 'hub.topic'' representing the topic relevant to the for
 # which the request is initiated.
 const string HUB_TOPIC = "hub.topic";
 
-# Subscription change request parameter 'hub.callback' representing the callback to which notification should happen.
+# The 'hub.callback'  subscription change request parameter representing the callback to which the notification should happen.
 const string HUB_CALLBACK = "hub.callback";
 
-# Subscription request parameter 'hub.lease_seconds' representing the period for which the subscription is expected to be active.
+# The 'hub.lease_seconds' subscription request parameter  representing the period for which the subscription is expected to be active.
 const string HUB_LEASE_SECONDS = "hub.lease_seconds";
 
-# Subscription denied request parameter 'hub.reason' represents the reason for subscription-denial.
+# The 'hub.reason' subscription denied request parameter represents the reason for the subscription denial.
 # This is an optional parameter
 const string HUB_REASON = "hub.reason";
 
-# Subscription parameter 'hub.secret' representing the secret key to use for authenticated content distribution.
+# The 'hub.secret' subscription parameter representing the secret key to use for authenticated content distribution.
 const string HUB_SECRET = "hub.secret";
 
-# The `hub.mode` value indicating "subscribe" mode, used by a hub to notify a subscription verification.
+# The `hub.mode` value indicating the `subscribe` mode used by a hub to notify a subscription verification.
 const string MODE_SUBSCRIBE = "subscribe";
 
-# The `hub.mode` value indicating "unsubscribe" mode, used by a hub to notify an unsubscription verification.
+# The `hub.mode` value indicating the `unsubscribe` mode used by a hub to notify an unsubscription verification.
 const string MODE_UNSUBSCRIBE = "unsubscribe";
 
-# The `hub.mode` value indicating "denied" mode, used by a hub to notify a subscription denial.
+# The `hub.mode` value indicating the `denied` mode used by a hub to notify a subscription denial.
 const string MODE_DENIED = "denied";
 
-# HTTP `Accept` Header name used to include `Accept` header value manually to `HTTP Request`.
+# The HTTP `Accept` Header name used to include the `Accept` header value manually to the `HTTP Request`.
 const string ACCEPT_HEADER = "Accept";
 
-# HTTP `Accept-Language` Header name used to include `Accept-Language` header value manually to `HTTP Request`.
+# The HTTP `Accept-Language` Header name used to include the `Accept-Language` header value manually to the `HTTP Request`.
 const string ACCEPT_LANGUAGE_HEADER = "Accept-Language";
 
-# HTTP `Content-Type` Header Name, used to include `Content-Type` header value manually to `HTTP Request`.
+# The HTTP `Content-Type` Header Name used to include the `Content-Type` header value manually to the `HTTP Request`.
 const string CONTENT_TYPE = "Content-Type";
 
-# HTTP `X-Hub-Signature` Header Name, used to include `X-Hub-Signature` header value manually to `HTTP Request`,
-# value of this `HTTP Header` is used by subscriber to verify whether the content is published by a valid hub.
+# The HTTP `X-Hub-Signature` Header Name used to include the `X-Hub-Signature` header value manually to the `HTTP Request`.
+# The value of this `HTTP Header` is used by the subscriber to verify whether the content is published by a valid hub.
 const string X_HUB_SIGNATURE = "X-Hub-Signature";
 
-# Common service-path to be used if the path-generation failed.
+# The common service path to be used if the path generation failed.
 const string COMMON_SERVICE_PATH = "subscriber";
 
-# HMAC Algorithms used for content verification.
+# The HMAC Algorithms used for content verification.
 const string SHA1 = "sha1";
 const string SHA_256 = "sha256";
 const string SHA_384 = "sha384";
@@ -86,9 +86,9 @@ public type SubscriptionVerification record {
 
 # Record representing the content-distribution request.
 # 
-# + headers - Request headers retrieve from the original `HTTP Request`
+# + headers - Request headers retrieved from the original `HTTP Request`
 # + contentType - Content-type header value of the original `HTTP Request`
-# + content - Received content
+# + content - The received content
 public type ContentDistributionMessage record {
     map<string|string[]>? headers = ();
     string? contentType = ();
@@ -97,8 +97,8 @@ public type ContentDistributionMessage record {
 
 # Record representing the common-response to be returned.
 # 
-# + headers - Additional headers to be included in `http:Response`
-# + body - Content to be included in `http:Response` body
+# + headers - Additional headers to be included in the `http:Response`
+# + body - Content to be included in the `http:Response` body
 type CommonResponse record {|
     map<string|string[]> headers?;
     map<string> body?;
@@ -109,7 +109,7 @@ public type SubscriptionVerificationSuccess record {
     *CommonResponse;
 };
 
-# Record representing the subscription-denial / content-distribution acknowledgement.
+# Record representing the subscription-denial/content-distribution acknowledgement.
 public type Acknowledgement record {
     *CommonResponse;
 };
@@ -143,7 +143,7 @@ public type SubscriptionChangeResponse record {|
     http:Response response;
 |};
 
-# Record representing the query-parameters retrieved from the `HTTP Request`.
+# Record representing the query parameters retrieved from the `HTTP Request`.
 # 
 # + hubMode - Value for the `hub.mode` parameter
 # + hubTopic - Value for the `hub.topic` parameter
@@ -158,7 +158,7 @@ type RequestQueryParams record {|
     string hubReason?;
 |};
 
-# Common Responses to be used in subscriber-service implementation.
+# Common Responses to be used in the subscriber-service implementation.
 public final readonly & Acknowledgement ACKNOWLEDGEMENT = {};
 public final readonly & SubscriptionVerificationSuccess SUBSCRIPTION_VERIFICATION_SUCCESS = {};
 public final SubscriptionVerificationError SUBSCRIPTION_VERIFICATION_ERROR = error SubscriptionVerificationError("Subscription verification failed");

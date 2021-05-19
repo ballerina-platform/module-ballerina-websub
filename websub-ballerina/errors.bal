@@ -29,7 +29,7 @@ public type SubscriptionInitiationFailedError distinct Error;
 # Represents a subscription-verificatation error.
 public type SubscriptionVerificationError distinct Error;
 
-# Represents a subscription denied error.
+# Represents a subscription-denied error.
 public type SubscriptionDeniedError distinct Error;
 
 # Represents the subscription-delete action from the `subscriber`.

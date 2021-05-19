@@ -23,13 +23,13 @@ public client class DiscoveryService {
     private string resourceUrl;
     private http:Client discoveryClientEp;
 
-    # Initiliazes `websub:DiscoveryService` endpoint.
+    # Initiliazes the `websub:DiscoveryService` endpoint.
     # ```ballerina
     # websub:DiscoveryService discoveryServiceEp = check new ("https://sample.discovery.com");
     # ```
     # 
-    # + resourceUrl - User provided resource-URL
-    # + publisherClientConfig - Optional `http:ClientConfiguration` to be used in underlying `http:Client`
+    # + resourceUrl - User-provided resource URL
+    # + publisherClientConfig - Optional `http:ClientConfiguration` to be used in the underlying `http:Client`
     public isolated function init(string discoveryUrl, http:ClientConfiguration? publisherClientConfig) returns error? {
         self.resourceUrl = discoveryUrl;
         if publisherClientConfig is http:ClientConfiguration {
@@ -39,7 +39,7 @@ public client class DiscoveryService {
         }
     }
 
-    # Discovers the hub and topic URLs defined by a resource URL.
+    # Discovers the URLs of the hub and topic defined by a resource URL.
     # ```ballerina
     # [string, string] discoveryDetails = check discoveryServiceEp->discoverResourceUrls(expectedMediaTypes, expectedLanguageTypes);
     # ```
@@ -93,7 +93,7 @@ public client class DiscoveryService {
     }
 }
 
-# Retrieves hub and topic URLs from the `http:response` from a publisher to a discovery request.
+# Retrieves the hub and topic URLs from the `http:response` (from a publisher) for a discovery request.
 # ```ballerina
 # [string, string[]] topicAndHubDetails = check extractTopicAndHubUrls(httpResponse);
 # ```

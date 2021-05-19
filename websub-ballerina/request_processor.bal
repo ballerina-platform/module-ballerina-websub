@@ -19,13 +19,13 @@ import ballerina/mime;
 import ballerina/log;
 import ballerina/url;
 
-# Processes the subscription / unsubscription intent verification requests recieved from `hub`.
+# Processes the subscription/unsubscription intent verification requests received from the `hub`.
 # ```ballerina
 # processSubscriptionVerification(httpCaller, httpResponse, queryParams, 'service);
 # ```
 # 
 # + caller - The `http:Caller` reference for the current request
-# + response - The `http:Response` which should be returned 
+# + response - The `http:Response`, which should be returned 
 # + params - Query parameters retrieved from the `http:Request`
 # + subscriberService - Current `websub:SubscriberService`
 isolated function processSubscriptionVerification(http:Caller caller, http:Response response, 
@@ -51,13 +51,13 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
     }
 }
 
-# Processes the subscription / unsubscription denial requests from `hub`.
+# Processes the subscription/unsubscription denial requests from the `hub`.
 # ```ballerina
 # processSubscriptionDenial(httpCaller, httpResponse, queryParams, 'service);
 # ```
 # 
 # + caller - The `http:Caller` reference for the current request
-# + response - The `http:Response` which should be returned 
+# + response - The `http:Response`, which should be returned 
 # + params - Query parameters retrieved from the `http:Request`
 # + subscriberService - Current `websub:SubscriberService`
 isolated function processSubscriptionDenial(http:Caller caller, http:Response response,
@@ -73,17 +73,17 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
     }
 }
 
-# Processes the content distribution requests from `hub`.
+# Processes the content distribution requests from the `hub`.
 # ```ballerina
 # check processEventNotification(httpCaller, httpRequest, httpResponse, queryParams, 'service, serviceKey);
 # ```
 # 
 # + caller - The `http:Caller` reference for the current request
-# + request - Original `http:Request`
-# + response - The `http:Response` which should be returned 
+# + request - The original `http:Request`
+# + response - The `http:Response`, which should be returned 
 # + subscriberService - Current `websub:SubscriberService`
-# + secretKey - The `secretKey` value to be used to verify content distribution message
-# + return - `error` if there is any exception in execution or else `()`
+# + secretKey - The `secretKey` value to be used to verify the content distribution message
+# + return - An `error` if there is any exception in the execution or else `()`
 isolated function processEventNotification(http:Caller caller, http:Request request, 
                                            http:Response response, SubscriberService subscriberService,
                                            string secretKey) returns error? {

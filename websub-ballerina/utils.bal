@@ -27,7 +27,7 @@ import ballerina/random;
 # ```
 # 
 # + length - required length of the generated string
-# + return - generated random `string` value or `error` if any error occurred in the execution
+# + return - generated random `string` value or an `error` if any error occurred in the execution
 isolated function generateRandomString(int length) returns string|error {
     int[] codePoints = [];
     int leftLimit = 48; // numeral '0'
@@ -49,9 +49,9 @@ isolated function generateRandomString(int length) returns string|error {
 # websub:SubscriptionChangeRequest subscriptionRequest = retrieveSubscriptionRequest("https://sample.topic.com", "https://sample.callback/subscriber", config);
 # ```
 # 
-# + topicUrl - The `topic` to which subscriber want to subscribe
+# + topicUrl - The `topic` to which the subscriber wants to subscribe
 # + callback - Subscriber callback URL to be used by the `hub`
-# + config - User defined subscriber-service configurations
+# + config - User-defined subscriber service configurations
 # + return - Generated `websub:SubscriptionChangeRequest` from the provided configurations
 isolated function retrieveSubscriptionRequest(string topicUrl, string callback, 
                                               SubscriberServiceConfiguration config) returns SubscriptionChangeRequest {        
@@ -91,13 +91,13 @@ isolated function retrieveRequestHeaders(http:Request request) returns map<strin
     return headers;
 }
 
-# Retrieves request query parameters.
+# Retrieves the request query parameters.
 # ```ballerina
 # websub:RequestQueryParams queryParams = retrieveRequestQueryParams(httpRequest);
 # ```
 # 
 # + request - Original `http:Request` object
-# + return - `websub:RequestQueryParams` instance containing the query parameter values
+# + return - The `websub:RequestQueryParams` instance containing the query parameter values
 isolated function retrieveRequestQueryParams(http:Request request) returns RequestQueryParams {
     map<string[]> queryParams = request.getQueryParams();
 
@@ -134,9 +134,9 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
 # ```
 # 
 # + request - Original `http:Request` object
-# + secret - Pre shared subscriber secret key
+# + secret - Pre-shared subscriber secret key
 # + payload - Request payload
-# + return - `true` if the verification is successfull, else `false`
+# + return - `true` if the verification is successful or else `false`
 isolated function verifyContent(http:Request request, string secret, string payload) returns boolean|error {
     if secret.trim().length() > 0 {
         if request.hasHeader(X_HUB_SIGNATURE) {
@@ -158,15 +158,15 @@ isolated function verifyContent(http:Request request, string secret, string payl
     }
 }
 
-# Generates HMAC value for the paload depending on the provided algorithm.
+# Generates the HMAC value for the payload depending on the provided algorithm.
 # ```ballerina
 # byte[] hMacSignature = check retrieveContentHash("SHA1", secretKey, requestPayload);
 # ```
 # 
 # + method - `HMAC` algorithm to be used
-# + key - Pre shared subscriber secret key
+# + key - Pre-shared subscriber secret key
 # + payload - Request payload to be hashed
-# + return - Calculated HMAC value if successfull or else `error`
+# + return - Calculated HMAC value if successfull or else an `error`
 isolated function retrieveContentHash(string method, string key, string payload) returns byte[]|error {
     byte[] keyArr = key.toBytes();
     byte[] contentPayload = payload.toBytes();
@@ -193,15 +193,15 @@ isolated function retrieveContentHash(string method, string key, string payload)
     }
 }
 
-# Updates `http:Response` body with provided additional parameters.
+# Updates the `http:Response` body with the provided additional parameters.
 # ```ballerina
 # updateResponseBody(httpResponse, messageBody, additionalHeaders);
 # ```
 # 
 # + response - Original `http:Response` object
 # + messageBody - Content for the response body
-# + headers - Additional header-parameters to included in the response
-# + reason - Optional reason parameter for action execution failure
+# + headers - Additional header parameters to be included in the response
+# + reason - Optional reason parameter for the action execution failure
 isolated function updateResponseBody(http:Response response, anydata? messageBody, 
                                      map<string|string[]>? headers, string? reason = ()) {
     string payload = reason is () ? "" : "reason=" + reason;
@@ -240,13 +240,13 @@ isolated function respondToRequest(http:Caller caller, http:Response response) {
     http:ListenerError? responseError = caller->respond(response);
 }
 
-# Checks whether response is successfull.
+# Checks whether the response is successful.
 # ```ballerina
 # boolean isSuccessfull = isSuccessStatusCode(404);
 # ```
 # 
 # + statusCode - Received HTTP status code
-# + return - `true` if the `statusCode` is between 200 to 300, else false
+# + return - `true` if the `statusCode` is between 200 to 300 or else `false`
 isolated function isSuccessStatusCode(int statusCode) returns boolean {
     return (200 <= statusCode && statusCode < 300);
 }

@@ -18,7 +18,7 @@ import ballerina/http;
 import ballerina/log;
 import ballerina/jballerina.java;
 
-# Represent underlying HTTP Service.
+# Represents an underlying HTTP Service.
 service class HttpService {
     private SubscriberService subscriberService;
     private string? secretKey;
@@ -31,8 +31,8 @@ service class HttpService {
     # websub:HttpService httpServiceEp = check new ('service, "sercretKey1");
     # ```
     # 
-    # + subscriberService - Current `websub:SubscriberService` instance
-    # + callback - Optional `secretKey` value to be used in content distribution verification
+    # + subscriberService - The current `websub:SubscriberService` instance
+    # + callback - Optional `secretKey` value to be used in the content distribution verification
     isolated function init(SubscriberService subscriberService, string? secretKey) returns error? {
         self.subscriberService = subscriberService;
         self.secretKey = secretKey;
@@ -119,10 +119,10 @@ service class HttpService {
     }
 }
 
-# Retrives names of implemented methods in `websub:SubscriberService` instance.
+# Retrives the names of the implemented methods in the `websub:SubscriberService` instance.
 # 
 # + subscriberService - Current `websub:SubscriberService` instance
-# + return - All the methods implemented in `websub:SubscriberService` as a `string[]`
+# + return - All the methods implemented in the `websub:SubscriberService` as a `string[]`
 isolated function getServiceMethodNames(SubscriberService subscriberService) returns string[] = @java:Method {
     'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
 } external;

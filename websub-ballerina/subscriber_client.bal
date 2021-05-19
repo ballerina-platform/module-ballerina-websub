@@ -44,8 +44,8 @@ public client class SubscriptionClient {
     # websub:SubscriptionChangeResponse response = check websubHubClientEP->subscribe(subscriptionRequest);
     # ```
     #
-    # + subscriptionRequest - The request payload containing subscription details
-    # + return - The `websub:SubscriptionChangeResponse` indicating subscription initiation was successful
+    # + subscriptionRequest - The request payload containing the subscription details
+    # + return - The `websub:SubscriptionChangeResponse` indicating that the subscription initiation was successful
     #            or else an `error`
     isolated remote function subscribe(SubscriptionChangeRequest subscriptionRequest)
         returns @tainted SubscriptionChangeResponse|error {
@@ -62,8 +62,8 @@ public client class SubscriptionClient {
     # ```ballerina
     # websub:SubscriptionChangeResponse response = check websubHubClientEP->unsubscribe(subscriptionRequest);
     # ```
-    # + unsubscriptionRequest - The request payload containing unsubscription details
-    # + return - The `websub:SubscriptionChangeResponse` indicating unsubscription initiation was successful
+    # + unsubscriptionRequest - The request payload containing the unsubscription details
+    # + return - The `websub:SubscriptionChangeResponse` indicating that the unsubscription initiation was successful
     #            or else an `error`
     isolated remote function unsubscribe(SubscriptionChangeRequest unsubscriptionRequest)
         returns @tainted SubscriptionChangeResponse|error {
@@ -78,7 +78,7 @@ public client class SubscriptionClient {
 
 }
 
-# Generates `http:Request` with provided `websub:subscriptionChangeRequest`.
+# Generates an `http:Request` with the provided `websub:subscriptionChangeRequest`.
 # ```ballerina
 # http:Request subscriptionRequest = buildSubscriptionChangeRequest("subscribe", { 
 #           topic: "https://sample.topic.com", 
@@ -87,8 +87,8 @@ public client class SubscriptionClient {
 # ```
 # 
 # + mode - Mode of subscription (subscribe/unsubscribe)
-# + subscriptionChangeRequest - The request payload containing subscription/unsubscription details
-# + return - A `http:Request` to be sent to the hub to subscribe/unsubscribe
+# + subscriptionChangeRequest - The request payload containing the subscription/unsubscription details
+# + return - An `http:Request` to be sent to the hub to subscribe/unsubscribe
 isolated function buildSubscriptionChangeRequest(@untainted string mode, 
                                                  SubscriptionChangeRequest subscriptionChangeRequest) 
                                                 returns (http:Request) {
@@ -130,7 +130,7 @@ isolated function buildSubscriptionChangeRequest(@untainted string mode,
 # + response - Original response received from the `hub` as `http:Response`,`http:PayloadType', or an `error`
 # + httpClient - The underlying `http:Client` endpoint
 # + remainingRedirects - Available redirects for the current subscription
-# + return - `websub:SubscriptionChangeResponse` if the requested subscription action is successfull or else `error`
+# + return - The `websub:SubscriptionChangeResponse` if the requested subscription action is successfull or else an `error`
 isolated function processHubResponse(@untainted string hub, @untainted string mode, 
                                      SubscriptionChangeRequest subscriptionChangeRequest,
                                      http:Response|http:PayloadType|error response, http:Client httpClient, 
@@ -184,7 +184,7 @@ isolated function processHubResponse(@untainted string hub, @untainted string mo
 # + subscriptionChangeRequest - The request containing the subscription/unsubscription details
 # + auth - The auth config to use at the `hub` (if specified)
 # + remainingRedirects - Available redirects for the current subscription
-# + return - `websub:SubscriptionChangeResponse` if the request was successful or else an `error`
+# + return - The `websub:SubscriptionChangeResponse` if the request was successful or else an `error`
 isolated function invokeClientConnectorOnRedirection(@untainted string hub, @untainted string mode, 
                                                      SubscriptionChangeRequest subscriptionChangeRequest, 
                                                      http:ClientAuthConfig? auth, int remainingRedirects)
@@ -196,7 +196,7 @@ isolated function invokeClientConnectorOnRedirection(@untainted string hub, @unt
     return unsubscribeWithRetries(hub, subscriptionChangeRequest, auth, remainingRedirects = remainingRedirects);
 }
 
-# Sends subscription request with retries.
+# Sends the subscription request with retries.
 # ```ballerina
 # websub:SubscriptionChangeResponse subscriptionResponse = subscribeWithRetries("https://sample.hub.com", { 
 #           topic: "https://sample.topic.com", 
@@ -208,7 +208,7 @@ isolated function invokeClientConnectorOnRedirection(@untainted string hub, @unt
 # + subscriptionRequest - The request containing the subscription details
 # + auth - The auth config to use at the `hub` (if specified)
 # + remainingRedirects - Available redirects for the current subscription
-# + return - `websub:SubscriptionChangeResponse` if the request was successful or else an `error`
+# + return - The `websub:SubscriptionChangeResponse` if the request was successful or else an `error`
 isolated function subscribeWithRetries(string url, SubscriptionChangeRequest subscriptionRequest,
                                        http:ClientAuthConfig? auth, int remainingRedirects = 0)
              returns @tainted SubscriptionChangeResponse| error {
@@ -219,7 +219,7 @@ isolated function subscribeWithRetries(string url, SubscriptionChangeRequest sub
                               remainingRedirects);
 }
 
-# Sends unsubscription request with retries.
+# Sends the unsubscription request with retries.
 # ```ballerina
 # websub:SubscriptionChangeResponse subscriptionResponse = unsubscribeWithRetries("https://sample.hub.com", { 
 #           topic: "https://sample.topic.com", 
@@ -244,13 +244,13 @@ isolated function unsubscribeWithRetries(string url, SubscriptionChangeRequest u
                               remainingRedirects);
 }
 
-# Retrieves maximum redirects allowed for a subscription/unsubscripton request.
+# Retrieves the maximum redirects allowed for a subscription/unsubscripton request.
 # ```ballerina
 # int maxRedirects = getRedirectionMaxCount({});
 # ```
 # 
-# + followRedirects - Optional user provided `http:FollowRedirects` configuration
-# + return - Maximum number of redirects allowed for subscription/unsubscripton request
+# + followRedirects - Optional user-provided `http:FollowRedirects` configuration
+# + return - Maximum number of redirects allowed for the subscription/unsubscripton request
 isolated function getRedirectionMaxCount(http:FollowRedirects? followRedirects) returns int {
     if followRedirects is http:FollowRedirects {
         if followRedirects.enabled {
