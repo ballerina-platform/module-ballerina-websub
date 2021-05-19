@@ -16,7 +16,7 @@
 
 import ballerina/http;
 
-# Intent verification request parameter 'hub.challenge' representing the challenge that needs to be echoed by
+# The 'hub.challenge' representing the challenge value in intent verification request that needs to be echoed by
 # `subscriber` to verify the intent.
 const string HUB_CHALLENGE = "hub.challenge";
 
