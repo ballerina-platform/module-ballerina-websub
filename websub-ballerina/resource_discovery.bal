@@ -69,7 +69,7 @@ public client class DiscoveryService {
             headers[ACCEPT_LANGUAGE_HEADER] = acceptLanguageTypesString;
         }
 
-        http:Response|error discoveryResponse = self.discoveryClientEp->get("", headers, targetType = http:Response);
+        http:Response|error discoveryResponse = self.discoveryClientEp->get("", headers);
         if (discoveryResponse is http:Response) {
             var topicAndHubs = extractTopicAndHubUrls(discoveryResponse);
             if (topicAndHubs is [string, string[]]) {
