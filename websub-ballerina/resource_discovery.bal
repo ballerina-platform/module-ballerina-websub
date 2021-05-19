@@ -30,6 +30,7 @@ public client class DiscoveryService {
     # 
     # + resourceUrl - User-provided resource URL
     # + publisherClientConfig - Optional `http:ClientConfiguration` to be used in the underlying `http:Client`
+    # + return - The `websub:DiscoveryService` or an `error` if the initialization failed
     public isolated function init(string discoveryUrl, http:ClientConfiguration? publisherClientConfig) returns error? {
         self.resourceUrl = discoveryUrl;
         if publisherClientConfig is http:ClientConfiguration {

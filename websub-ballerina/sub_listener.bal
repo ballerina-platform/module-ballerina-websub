@@ -33,6 +33,7 @@ public class Listener {
     #
     # + listenTo - Port number or a `http:Listener` instance
     # + config - Custom `websub:ListenerConfiguration` to be provided to underlying HTTP Listener
+    # + return - The `websub:Listener` or an `error` if the initialization failed
     public isolated function init(int|http:Listener listenTo, *ListenerConfiguration config) returns error? {
         if listenTo is int {
             self.httpListener = check new(listenTo, config);

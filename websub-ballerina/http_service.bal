@@ -33,6 +33,7 @@ service class HttpService {
     # 
     # + subscriberService - The current `websub:SubscriberService` instance
     # + callback - Optional `secretKey` value to be used in the content distribution verification
+    # + return - The `websub:HttpService` or an `error` if the initialization failed
     isolated function init(SubscriberService subscriberService, string? secretKey) returns error? {
         self.subscriberService = subscriberService;
         self.secretKey = secretKey;

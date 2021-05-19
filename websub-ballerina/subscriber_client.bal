@@ -33,6 +33,7 @@ public client class SubscriptionClient {
     # 
     # + url    - The URL at which the subscription should be changed
     # + config - Optional `http:ClientConfiguration` for the underlying client
+    # + return - The `websub:SubscriptionClient` or an `error` if the initialization failed
     public isolated function init(string url, *http:ClientConfiguration config) returns error? {
         self.url = url;
         self.httpClient = check new (self.url, config);
