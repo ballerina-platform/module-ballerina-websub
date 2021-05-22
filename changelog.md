@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.0-beta.1] - 2021-05-06
 
+### Changed
+- [Make HTTP Service Class Isolated in WebSub](https://github.com/ballerina-platform/ballerina-standard-library/issues/1389)
+
 ### Fixed
 - [Fix the listener initialization with inline configs compiler plugin error](https://github.com/ballerina-platform/ballerina-standard-library/issues/1304)
 
