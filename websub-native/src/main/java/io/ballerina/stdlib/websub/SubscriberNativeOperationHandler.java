@@ -49,21 +49,24 @@ public class SubscriberNativeOperationHandler {
         return ValueCreator.createArrayValue(methodNamesList.toArray(BString[]::new));
     }
 
-    public static Object callOnSubscriptionVerificationMethod(Environment env, BObject bSubscriberService, 
+    public static Object callOnSubscriptionVerificationMethod(Environment env, BObject handlerObj,
                                                               BMap<BString, Object> message) {
-        return invokeRemoteFunction(env, bSubscriberService, message, 
-                                    "callOnSubscriptionVerificationMethod", "onSubscriptionVerification");
+        BObject bSubscriberService = (BObject) handlerObj.getNativeData("WEBSUB_SERVICE_OBJECT");
+        return invokeRemoteFunction(env, bSubscriberService, message,
+                "callOnSubscriptionVerificationMethod", "onSubscriptionVerification");
     }   
 
-    public static Object callOnSubscriptionDeniedMethod(Environment env, BObject bSubscriberService, BError message) {
-        return invokeRemoteFunction(env, bSubscriberService, message, 
-                                    "callOnSubscriptionDeniedMethod", "onSubscriptionValidationDenied"); 
+    public static Object callOnSubscriptionDeniedMethod(Environment env, BObject handlerObj, BError message) {
+        BObject bSubscriberService = (BObject) handlerObj.getNativeData("WEBSUB_SERVICE_OBJECT");
+        return invokeRemoteFunction(env, bSubscriberService, message,
+                "callOnSubscriptionDeniedMethod", "onSubscriptionValidationDenied");
     }
 
-    public static Object callOnEventNotificationMethod(Environment env, BObject bSubscriberService, 
+    public static Object callOnEventNotificationMethod(Environment env, BObject handlerObj,
                                                        BMap<BString, Object> message) {
-        return invokeRemoteFunction(env, bSubscriberService, message, 
-                                    "callOnEventNotificationMethod", "onEventNotification"); 
+        BObject bSubscriberService = (BObject) handlerObj.getNativeData("WEBSUB_SERVICE_OBJECT");
+        return invokeRemoteFunction(env, bSubscriberService, message,
+                "callOnEventNotificationMethod", "onEventNotification");
     }
 
     private static Object invokeRemoteFunction(Environment env, BObject bSubscriberService, Object message,

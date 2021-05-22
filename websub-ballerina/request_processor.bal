@@ -19,6 +19,9 @@ import ballerina/mime;
 import ballerina/log;
 import ballerina/url;
 
+isolated class RequestHandler {
+}
+
 # Processes the subscription/unsubscription intent verification requests received from the `hub`.
 # ```ballerina
 # processSubscriptionVerification(httpCaller, httpResponse, queryParams, 'service);
@@ -29,7 +32,7 @@ import ballerina/url;
 # + params - Query parameters retrieved from the `http:Request`
 # + subscriberService - Current `websub:SubscriberService`
 isolated function processSubscriptionVerification(http:Caller caller, http:Response response, 
-                                                  RequestQueryParams params, SubscriberService subscriberService) {
+                                                  RequestQueryParams params, RequestHandler subscriberService) {
     SubscriptionVerification message = {
         hubMode: <string>params?.hubMode,
         hubTopic: <string>params?.hubTopic,
@@ -61,7 +64,7 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
 # + params - Query parameters retrieved from the `http:Request`
 # + subscriberService - Current `websub:SubscriberService`
 isolated function processSubscriptionDenial(http:Caller caller, http:Response response,
-                                            RequestQueryParams params, SubscriberService subscriberService) {
+                                            RequestQueryParams params, RequestHandler subscriberService) {
     var reason = params?.hubReason is () ? "" : <string>params?.hubReason;
     SubscriptionDeniedError subscriptionDeniedMessage = error SubscriptionDeniedError(reason);
     Acknowledgement|error? result = callOnSubscriptionDeniedMethod(subscriberService, subscriptionDeniedMessage);
@@ -85,7 +88,7 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
 # + secretKey - The `secretKey` value to be used to verify the content distribution message
 # + return - An `error` if there is any exception in the execution or else `()`
 isolated function processEventNotification(http:Caller caller, http:Request request, 
-                                           http:Response response, SubscriberService subscriberService,
+                                           http:Response response, RequestHandler subscriberService,
                                            string secretKey) returns error? {
     string payload = check request.getTextPayload();
     boolean isVerifiedContent = check verifyContent(request, secretKey, payload);

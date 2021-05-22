@@ -16,17 +16,21 @@
 
 import ballerina/jballerina.java;
 
-isolated function callOnSubscriptionVerificationMethod(SubscriberService subscriberService, SubscriptionVerification msg) 
+isolated function attachService(SubscriberService serviceObj, RequestHandler handlerObj) = @java:Method {
+    'class: "io.ballerina.stdlib.websub.RequestHandler"
+} external;
+
+isolated function callOnSubscriptionVerificationMethod(RequestHandler handlerObj, SubscriptionVerification msg) 
                                 returns SubscriptionVerificationSuccess|SubscriptionVerificationError|error = @java:Method {
     'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
 } external;
 
-isolated function callOnSubscriptionDeniedMethod(SubscriberService subscriberService, SubscriptionDeniedError msg) 
+isolated function callOnSubscriptionDeniedMethod(RequestHandler handlerObj, SubscriptionDeniedError msg) 
                                 returns Acknowledgement|error? = @java:Method {
     'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
 } external;
 
-isolated function callOnEventNotificationMethod(SubscriberService subscriberService, ContentDistributionMessage msg) 
+isolated function callOnEventNotificationMethod(RequestHandler handlerObj, ContentDistributionMessage msg) 
                                 returns Acknowledgement|SubscriptionDeletedError|error? = @java:Method {
     'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
 } external;
