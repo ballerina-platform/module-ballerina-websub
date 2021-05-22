@@ -19,6 +19,7 @@ import ballerina/mime;
 import ballerina/log;
 import ballerina/url;
 
+# Wrapper class used to execute sevice methods.
 isolated class RequestHandler {
 }
 
