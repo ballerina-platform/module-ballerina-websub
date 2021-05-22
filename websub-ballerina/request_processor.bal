@@ -25,7 +25,7 @@ isolated class RequestHandler {
 
 # Processes the subscription/unsubscription intent verification requests received from the `hub`.
 # ```ballerina
-# processSubscriptionVerification(httpCaller, httpResponse, queryParams, 'service);
+# processSubscriptionVerification(httpCaller, httpResponse, queryParams, handler);
 # ```
 # 
 # + caller - The `http:Caller` reference for the current request
@@ -57,7 +57,7 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
 
 # Processes the subscription/unsubscription denial requests from the `hub`.
 # ```ballerina
-# processSubscriptionDenial(httpCaller, httpResponse, queryParams, 'service);
+# processSubscriptionDenial(httpCaller, httpResponse, queryParams, handler);
 # ```
 # 
 # + caller - The `http:Caller` reference for the current request
@@ -79,7 +79,7 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
 
 # Processes the content distribution requests from the `hub`.
 # ```ballerina
-# check processEventNotification(httpCaller, httpRequest, httpResponse, queryParams, 'service, serviceKey);
+# check processEventNotification(httpCaller, httpRequest, httpResponse, queryParams, handler, serviceKey);
 # ```
 # 
 # + caller - The `http:Caller` reference for the current request

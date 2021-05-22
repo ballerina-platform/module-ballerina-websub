@@ -117,7 +117,7 @@ public class Listener {
     
     # Detaches the provided `websub:SubscriberService` from the `websub:Listener`.
     # ```ballerina
-    # check websubListenerEp.detach('service);
+    # check websubListenerEp.detach(handler);
     # ```
     # 
     # + s - The `websub:SubscriberService` object to be detached

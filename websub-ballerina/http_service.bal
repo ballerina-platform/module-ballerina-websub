@@ -27,7 +27,7 @@ isolated service class HttpService {
 
     # Initializes `websub:HttpService` endpoint.
     # ```ballerina
-    # websub:HttpService httpServiceEp = check new ('service, "sercretKey1");
+    # websub:HttpService httpServiceEp = check new (handler, "sercretKey1");
     # ```
     # 
     # + handler - The `websub:RequestHandler` instance which used as a wrapper to execute service methods
