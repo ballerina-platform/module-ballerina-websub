@@ -22,15 +22,15 @@ isolated function attachService(SubscriberService serviceObj, RequestHandler han
 
 isolated function callOnSubscriptionVerificationMethod(RequestHandler handlerObj, SubscriptionVerification msg) 
                                 returns SubscriptionVerificationSuccess|SubscriptionVerificationError|error = @java:Method {
-    'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
+    'class: "io.ballerina.stdlib.websub.RequestHandler"
 } external;
 
 isolated function callOnSubscriptionDeniedMethod(RequestHandler handlerObj, SubscriptionDeniedError msg) 
                                 returns Acknowledgement|error? = @java:Method {
-    'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
+    'class: "io.ballerina.stdlib.websub.RequestHandler"
 } external;
 
 isolated function callOnEventNotificationMethod(RequestHandler handlerObj, ContentDistributionMessage msg) 
                                 returns Acknowledgement|SubscriptionDeletedError|error? = @java:Method {
-    'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
+    'class: "io.ballerina.stdlib.websub.RequestHandler"
 } external;

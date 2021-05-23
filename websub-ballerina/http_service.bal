@@ -117,5 +117,5 @@ isolated function isMethodAvailable(string methodName, string[] methods) returns
 # + subscriberService - Current `websub:SubscriberService` instance
 # + return - All the methods implemented in the `websub:SubscriberService` as a `string[]`
 isolated function getServiceMethodNames(SubscriberService subscriberService) returns string[] = @java:Method {
-    'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
+    'class: "io.ballerina.stdlib.websub.RequestHandler"
 } external;
