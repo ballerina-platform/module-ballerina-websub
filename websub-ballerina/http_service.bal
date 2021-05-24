@@ -103,7 +103,7 @@ isolated service class HttpService {
     }
 }
 
-# Retrieved whether particular remote method is available.
+# Retrieves whether the particular remote method is available.
 # 
 # + methodName - Name of the required method
 # + methods - All available methods
