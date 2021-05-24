@@ -18,51 +18,30 @@ import ballerina/jballerina.java;
 
 # Wrapper class used to execute sevice methods.
 isolated class RequestHandler {
-    private final handle ref;
-
     isolated function init(SubscriberService serviceObj) returns error? {
-        self.ref = newRequestHandler(serviceObj);
+        externInit(self, serviceObj);
     }
 
-    isolated function getServiceMethodNames() returns string[] {
-        return getServiceMethodNames(self.ref);
-    }
+    isolated function getServiceMethodNames() returns string[] = @java:Method {
+        'class: "io.ballerina.stdlib.websub.RequestHandler"
+    } external;
 
-    isolated function callOnSubscriptionVerificationMethod(SubscriptionVerification msg) 
-                                returns SubscriptionVerificationSuccess|SubscriptionVerificationError|error {
-        return callOnSubscriptionVerificationMethod(self.ref, msg);
-    }
+    isolated function callOnSubscriptionVerificationMethod(SubscriptionVerification msg)
+                                    returns SubscriptionVerificationSuccess|SubscriptionVerificationError|error = @java:Method {
+        'class: "io.ballerina.stdlib.websub.RequestHandler"
+    } external;
 
-    isolated function callOnSubscriptionDeniedMethod(SubscriptionDeniedError msg) 
-                                returns Acknowledgement|error? {
-        return callOnSubscriptionDeniedMethod(self.ref, msg);
-    }
+    isolated function callOnSubscriptionDeniedMethod(SubscriptionDeniedError msg)
+                                    returns Acknowledgement|error? = @java:Method {
+        'class: "io.ballerina.stdlib.websub.RequestHandler"
+    } external;
 
-    isolated function callOnEventNotificationMethod(ContentDistributionMessage msg) 
-                                returns Acknowledgement|SubscriptionDeletedError|error? {
-        return callOnEventNotificationMethod(self.ref, msg);
-    }
+    isolated function callOnEventNotificationMethod(ContentDistributionMessage msg)
+                                    returns Acknowledgement|SubscriptionDeletedError|error? = @java:Method {
+        'class: "io.ballerina.stdlib.websub.RequestHandler"
+    } external;
 }
 
-isolated function newRequestHandler(SubscriberService serviceObj) returns handle = @java:Constructor {
-    'class: "io.ballerina.stdlib.websub.RequestHandler"
-} external;
-
-isolated function getServiceMethodNames(handle reference) returns string[] = @java:Method {
-    'class: "io.ballerina.stdlib.websub.RequestHandler"
-} external;
-
-isolated function callOnSubscriptionVerificationMethod(handle reference, SubscriptionVerification msg) 
-                                returns SubscriptionVerificationSuccess|SubscriptionVerificationError|error = @java:Method {
-    'class: "io.ballerina.stdlib.websub.RequestHandler"
-} external;
-
-isolated function callOnSubscriptionDeniedMethod(handle reference, SubscriptionDeniedError msg) 
-                                returns Acknowledgement|error? = @java:Method {
-    'class: "io.ballerina.stdlib.websub.RequestHandler"
-} external;
-
-isolated function callOnEventNotificationMethod(handle reference, ContentDistributionMessage msg) 
-                                returns Acknowledgement|SubscriptionDeletedError|error? = @java:Method {
+isolated function externInit(RequestHandler handler, SubscriberService serviceObj) = @java:Method {
     'class: "io.ballerina.stdlib.websub.RequestHandler"
 } external;

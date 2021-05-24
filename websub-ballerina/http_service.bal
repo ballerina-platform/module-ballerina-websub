@@ -32,9 +32,10 @@ isolated service class HttpService {
     # + handler - The `websub:RequestHandler` instance which used as a wrapper to execute service methods
     # + callback - Optional `secretKey` value to be used in the content distribution verification
     # + return - The `websub:HttpService` or an `error` if the initialization failed
-    isolated function init(RequestHandler handler, string? secretKey, string[] methodNames) returns error? {
+    isolated function init(RequestHandler handler, string? secretKey) returns error? {
         self.handler = handler;
         self.secretKey = secretKey;
+        string[] methodNames = handler.getServiceMethodNames();
         self.isSubscriptionValidationDeniedAvailable = isMethodAvailable("onSubscriptionValidationDenied", methodNames);
         self.isSubscriptionVerificationAvailable = isMethodAvailable("onSubscriptionVerification", methodNames);
         self.isEventNotificationAvailable = isMethodAvailable("onEventNotification", methodNames);
