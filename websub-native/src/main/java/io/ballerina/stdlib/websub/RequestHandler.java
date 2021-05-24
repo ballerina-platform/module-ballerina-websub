@@ -23,35 +23,32 @@ import static io.ballerina.runtime.api.utils.StringUtils.fromString;
  * {@code RequestHandler} is a wrapper object used for service method execution.
  */
 public class RequestHandler {
-    public static void attachService(BObject serviceObj, BObject handlerObj) {
-        handlerObj.addNativeData("WEBSUB_SERVICE_OBJECT", serviceObj);
+    private final BObject serviceObj;
+
+    public RequestHandler(BObject serviceObj) {
+        this.serviceObj = serviceObj;
     }
 
-    public static BArray getServiceMethodNames(BObject bSubscriberService) {
+    public BArray getServiceMethodNames() {
         ArrayList<BString> methodNamesList = new ArrayList<>();
-        for (MethodType method : bSubscriberService.getType().getMethods()) {
+        for (MethodType method : this.serviceObj.getType().getMethods()) {
             methodNamesList.add(StringUtils.fromString(method.getName()));
         }
         return ValueCreator.createArrayValue(methodNamesList.toArray(BString[]::new));
     }
 
-    public static Object callOnSubscriptionVerificationMethod(Environment env, BObject handlerObj,
-                                                              BMap<BString, Object> message) {
-        BObject bSubscriberService = (BObject) handlerObj.getNativeData("WEBSUB_SERVICE_OBJECT");
-        return invokeRemoteFunction(env, bSubscriberService, message,
+    public Object callOnSubscriptionVerificationMethod(Environment env, BMap<BString, Object> message) {
+        return invokeRemoteFunction(env, this.serviceObj, message,
                 "callOnSubscriptionVerificationMethod", "onSubscriptionVerification");
     }
 
-    public static Object callOnSubscriptionDeniedMethod(Environment env, BObject handlerObj, BError message) {
-        BObject bSubscriberService = (BObject) handlerObj.getNativeData("WEBSUB_SERVICE_OBJECT");
-        return invokeRemoteFunction(env, bSubscriberService, message,
+    public Object callOnSubscriptionDeniedMethod(Environment env, BError message) {
+        return invokeRemoteFunction(env, this.serviceObj, message,
                 "callOnSubscriptionDeniedMethod", "onSubscriptionValidationDenied");
     }
 
-    public static Object callOnEventNotificationMethod(Environment env, BObject handlerObj,
-                                                       BMap<BString, Object> message) {
-        BObject bSubscriberService = (BObject) handlerObj.getNativeData("WEBSUB_SERVICE_OBJECT");
-        return invokeRemoteFunction(env, bSubscriberService, message,
+    public Object callOnEventNotificationMethod(Environment env, BMap<BString, Object> message) {
+        return invokeRemoteFunction(env, this.serviceObj, message,
                 "callOnEventNotificationMethod", "onEventNotification");
     }
 

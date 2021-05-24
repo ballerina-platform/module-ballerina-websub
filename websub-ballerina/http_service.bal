@@ -15,7 +15,6 @@
 // under the License.
 
 import ballerina/http;
-import ballerina/jballerina.java;
 
 # Represents an underlying HTTP Service.
 isolated service class HttpService {
@@ -111,11 +110,3 @@ isolated service class HttpService {
 isolated function isMethodAvailable(string methodName, string[] methods) returns boolean {
     return methods.indexOf(methodName) is int;
 }
-
-# Retrives the names of the implemented methods in the `websub:SubscriberService` instance.
-# 
-# + subscriberService - Current `websub:SubscriberService` instance
-# + return - All the methods implemented in the `websub:SubscriberService` as a `string[]`
-isolated function getServiceMethodNames(SubscriberService subscriberService) returns string[] = @java:Method {
-    'class: "io.ballerina.stdlib.websub.RequestHandler"
-} external;

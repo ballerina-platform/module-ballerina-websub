@@ -19,10 +19,6 @@ import ballerina/mime;
 import ballerina/log;
 import ballerina/url;
 
-# Wrapper class used to execute sevice methods.
-isolated class RequestHandler {
-}
-
 # Processes the subscription/unsubscription intent verification requests received from the `hub`.
 # ```ballerina
 # processSubscriptionVerification(httpCaller, httpResponse, queryParams, handler);
@@ -41,7 +37,7 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
         hubLeaseSeconds: params?.hubLeaseSeconds
     };
 
-    SubscriptionVerificationSuccess|SubscriptionVerificationError|error result = callOnSubscriptionVerificationMethod(handlerObj, message);
+    SubscriptionVerificationSuccess|SubscriptionVerificationError|error result = handlerObj.callOnSubscriptionVerificationMethod(message);
     if result is SubscriptionVerificationError {
         response.statusCode = http:STATUS_NOT_FOUND;
         var errorDetails = result.detail();
@@ -68,7 +64,7 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
                                             RequestQueryParams params, RequestHandler handlerObj) {
     var reason = params?.hubReason is () ? "" : <string>params?.hubReason;
     SubscriptionDeniedError subscriptionDeniedMessage = error SubscriptionDeniedError(reason);
-    Acknowledgement|error? result = callOnSubscriptionDeniedMethod(handlerObj, subscriptionDeniedMessage);
+    Acknowledgement|error? result = handlerObj.callOnSubscriptionDeniedMethod(subscriptionDeniedMessage);
     response.statusCode = http:STATUS_OK;
     if result is () || result is error {
         updateResponseBody(response, ACKNOWLEDGEMENT["body"], ACKNOWLEDGEMENT["headers"]);
@@ -151,7 +147,7 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
         response.statusCode = http:STATUS_BAD_REQUEST;
         return;
     } else {
-        Acknowledgement|SubscriptionDeletedError|error? result = callOnEventNotificationMethod(handlerObj, message);
+        Acknowledgement|SubscriptionDeletedError|error? result = handlerObj.callOnEventNotificationMethod(message);
         if result is Acknowledgement {
             updateResponseBody(response, result["body"], result["headers"]);
         } else if result is SubscriptionDeletedError {
