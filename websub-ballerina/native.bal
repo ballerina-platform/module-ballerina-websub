@@ -16,17 +16,31 @@
 
 import ballerina/jballerina.java;
 
-isolated function callOnSubscriptionVerificationMethod(SubscriberService subscriberService, SubscriptionVerification msg) 
-                                returns SubscriptionVerificationSuccess|SubscriptionVerificationError|error = @java:Method {
-    'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
-} external;
+isolated class HttpToWebsubAdaptor {
+    isolated function init(SubscriberService serviceObj) returns error? {
+        externInit(self, serviceObj);
+    }
 
-isolated function callOnSubscriptionDeniedMethod(SubscriberService subscriberService, SubscriptionDeniedError msg) 
-                                returns Acknowledgement|error? = @java:Method {
-    'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
-} external;
+    isolated function getServiceMethodNames() returns string[] = @java:Method {
+        'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"
+    } external;
 
-isolated function callOnEventNotificationMethod(SubscriberService subscriberService, ContentDistributionMessage msg) 
-                                returns Acknowledgement|SubscriptionDeletedError|error? = @java:Method {
-    'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
+    isolated function callOnSubscriptionVerificationMethod(SubscriptionVerification msg)
+                                    returns SubscriptionVerificationSuccess|SubscriptionVerificationError|error = @java:Method {
+        'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"
+    } external;
+
+    isolated function callOnSubscriptionDeniedMethod(SubscriptionDeniedError msg)
+                                    returns Acknowledgement|error? = @java:Method {
+        'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"
+    } external;
+
+    isolated function callOnEventNotificationMethod(ContentDistributionMessage msg)
+                                    returns Acknowledgement|SubscriptionDeletedError|error? = @java:Method {
+        'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"
+    } external;
+}
+
+isolated function externInit(HttpToWebsubAdaptor adaptor, SubscriberService serviceObj) = @java:Method {
+    'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"
 } external;

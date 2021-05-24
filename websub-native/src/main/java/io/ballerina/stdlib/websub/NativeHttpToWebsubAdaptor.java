@@ -15,6 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package io.ballerina.stdlib.websub;
 
 import io.ballerina.runtime.api.Environment;
@@ -37,41 +38,50 @@ import java.util.ArrayList;
 import static io.ballerina.runtime.api.utils.StringUtils.fromString;
 
 /**
- * {@code SubscriberNativeOperationHandler} handles the native method execution.
+ * {@code NativeHttpToWebsubAdaptor} is a wrapper object used for service method execution.
  */
-public class SubscriberNativeOperationHandler {
+public class NativeHttpToWebsubAdaptor {
+    public static final String SERVICE_OBJECT = "WEBSUB_SERVICE_OBJECT";
 
-    public static BArray getServiceMethodNames(BObject bSubscriberService) {
+    public static void externInit(BObject adaptor, BObject service) {
+        adaptor.addNativeData(SERVICE_OBJECT, service);
+    }
+
+    public static BArray getServiceMethodNames(BObject adaptor) {
+        BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
         ArrayList<BString> methodNamesList = new ArrayList<>();
-        for (MethodType method : bSubscriberService.getType().getMethods()) {
+        for (MethodType method : serviceObj.getType().getMethods()) {
             methodNamesList.add(StringUtils.fromString(method.getName()));
         }
         return ValueCreator.createArrayValue(methodNamesList.toArray(BString[]::new));
     }
 
-    public static Object callOnSubscriptionVerificationMethod(Environment env, BObject bSubscriberService, 
+    public static Object callOnSubscriptionVerificationMethod(Environment env, BObject adaptor,
                                                               BMap<BString, Object> message) {
-        return invokeRemoteFunction(env, bSubscriberService, message, 
-                                    "callOnSubscriptionVerificationMethod", "onSubscriptionVerification");
-    }   
-
-    public static Object callOnSubscriptionDeniedMethod(Environment env, BObject bSubscriberService, BError message) {
-        return invokeRemoteFunction(env, bSubscriberService, message, 
-                                    "callOnSubscriptionDeniedMethod", "onSubscriptionValidationDenied"); 
+        BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
+        return invokeRemoteFunction(env, serviceObj, message,
+                "callOnSubscriptionVerificationMethod", "onSubscriptionVerification");
     }
 
-    public static Object callOnEventNotificationMethod(Environment env, BObject bSubscriberService, 
+    public static Object callOnSubscriptionDeniedMethod(Environment env, BObject adaptor, BError message) {
+        BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
+        return invokeRemoteFunction(env, serviceObj, message,
+                "callOnSubscriptionDeniedMethod", "onSubscriptionValidationDenied");
+    }
+
+    public static Object callOnEventNotificationMethod(Environment env, BObject adaptor,
                                                        BMap<BString, Object> message) {
-        return invokeRemoteFunction(env, bSubscriberService, message, 
-                                    "callOnEventNotificationMethod", "onEventNotification"); 
+        BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
+        return invokeRemoteFunction(env, serviceObj, message,
+                "callOnEventNotificationMethod", "onEventNotification");
     }
 
     private static Object invokeRemoteFunction(Environment env, BObject bSubscriberService, Object message,
                                                String parentFunctionName, String remoteFunctionName) {
         Future balFuture = env.markAsync();
         Module module = ModuleUtils.getModule();
-        StrandMetadata metadata = new StrandMetadata(module.getOrg(), module.getName(), module.getVersion(), 
-                                                    parentFunctionName);
+        StrandMetadata metadata = new StrandMetadata(module.getOrg(), module.getName(), module.getVersion(),
+                parentFunctionName);
         Object[] args = new Object[]{message, true};
         env.getRuntime().invokeMethodAsync(bSubscriberService, remoteFunctionName, null, metadata, new Callback() {
             @Override
@@ -82,8 +92,8 @@ public class SubscriberNativeOperationHandler {
             @Override
             public void notifyFailure(BError bError) {
                 BString errorMessage = fromString("service method invocation failed: " + bError.getErrorMessage());
-                BError invocationError = ErrorCreator.createError(module, "ServiceExecutionError", 
-                                                    errorMessage, bError, null);
+                BError invocationError = ErrorCreator.createError(module, "ServiceExecutionError",
+                        errorMessage, bError, null);
                 balFuture.complete(invocationError);
             }
         }, args);

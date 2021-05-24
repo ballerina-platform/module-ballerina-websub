@@ -15,47 +15,30 @@
 // under the License.
 
 import ballerina/http;
-import ballerina/log;
-import ballerina/jballerina.java;
 
 # Represents an underlying HTTP Service.
-service class HttpService {
-    private SubscriberService subscriberService;
-    private string? secretKey;
-    private boolean isSubscriptionValidationDeniedAvailable = false;
-    private boolean isSubscriptionVerificationAvailable = false;
-    private boolean isEventNotificationAvailable = false;
+isolated service class HttpService {
+    private final HttpToWebsubAdaptor adaptor;
+    private final string? secretKey;
+    private final boolean isSubscriptionValidationDeniedAvailable;
+    private final boolean isSubscriptionVerificationAvailable;
+    private final boolean isEventNotificationAvailable;
 
     # Initializes `websub:HttpService` endpoint.
     # ```ballerina
-    # websub:HttpService httpServiceEp = check new ('service, "sercretKey1");
+    # websub:HttpService httpServiceEp = check new (adaptor, "sercretKey1");
     # ```
     # 
-    # + subscriberService - The current `websub:SubscriberService` instance
+    # + adaptor - The `websub:HttpToWebsubAdaptor` instance which used as a wrapper to execute service methods
     # + callback - Optional `secretKey` value to be used in the content distribution verification
     # + return - The `websub:HttpService` or an `error` if the initialization failed
-    isolated function init(SubscriberService subscriberService, string? secretKey) returns error? {
-        self.subscriberService = subscriberService;
+    isolated function init(HttpToWebsubAdaptor adaptor, string? secretKey) returns error? {
+        self.adaptor = adaptor;
         self.secretKey = secretKey;
-        
-        string[] methodNames = getServiceMethodNames(subscriberService);
-        
-        foreach var methodName in methodNames {
-            match methodName {
-                "onSubscriptionValidationDenied" => {
-                    self.isSubscriptionValidationDeniedAvailable = true;
-                }
-                "onSubscriptionVerification" => {
-                    self.isSubscriptionVerificationAvailable = true;
-                }
-                "onEventNotification" => {
-                    self.isEventNotificationAvailable = true;
-                }
-                _ => {
-                    log:printError(string`Unrecognized method [${methodName}] found in the implementation`);
-                }
-            }
-        }
+        string[] methodNames = adaptor.getServiceMethodNames();
+        self.isSubscriptionValidationDeniedAvailable = isMethodAvailable("onSubscriptionValidationDenied", methodNames);
+        self.isSubscriptionVerificationAvailable = isMethodAvailable("onSubscriptionVerification", methodNames);
+        self.isEventNotificationAvailable = isMethodAvailable("onEventNotification", methodNames);
     }
 
     # Receives HTTP POST requests.
@@ -67,7 +50,7 @@ service class HttpService {
         response.statusCode = http:STATUS_ACCEPTED;
         if self.isEventNotificationAvailable {
             string secretKey = self.secretKey is () ? "" : <string>self.secretKey;
-            var result = processEventNotification(caller, request, response, self.subscriberService, secretKey);
+            error? result = processEventNotification(caller, request, response, self.adaptor, secretKey);
             if result is error {
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
             }
@@ -94,7 +77,7 @@ service class HttpService {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                 } else {
                     if self.isSubscriptionVerificationAvailable {
-                        processSubscriptionVerification(caller, response, <@untainted> params, self.subscriberService);
+                        processSubscriptionVerification(caller, response, <@untainted> params, self.adaptor);
                     } else {
                         response.statusCode = http:STATUS_OK;
                         response.setTextPayload(<string>params?.hubChallenge);
@@ -103,7 +86,7 @@ service class HttpService {
             }
             MODE_DENIED => {
                 if self.isSubscriptionValidationDeniedAvailable {
-                    processSubscriptionDenial(caller, response, <@untainted> params, self.subscriberService);
+                    processSubscriptionDenial(caller, response, <@untainted> params, self.adaptor);
                 } else {
                     response.statusCode = http:STATUS_OK;
                     updateResponseBody(response, ACKNOWLEDGEMENT["body"], ACKNOWLEDGEMENT["headers"]);
@@ -120,10 +103,11 @@ service class HttpService {
     }
 }
 
-# Retrives the names of the implemented methods in the `websub:SubscriberService` instance.
+# Retrieves whether the particular remote method is available.
 # 
-# + subscriberService - Current `websub:SubscriberService` instance
-# + return - All the methods implemented in the `websub:SubscriberService` as a `string[]`
-isolated function getServiceMethodNames(SubscriberService subscriberService) returns string[] = @java:Method {
-    'class: "io.ballerina.stdlib.websub.SubscriberNativeOperationHandler"
-} external;
+# + methodName - Name of the required method
+# + methods - All available methods
+# + return - `true` if method available or else `false`
+isolated function isMethodAvailable(string methodName, string[] methods) returns boolean {
+    return methods.indexOf(methodName) is int;
+}
