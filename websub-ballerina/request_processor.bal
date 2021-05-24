@@ -27,9 +27,9 @@ import ballerina/url;
 # + caller - The `http:Caller` reference for the current request
 # + response - The `http:Response`, which should be returned 
 # + params - Query parameters retrieved from the `http:Request`
-# + handlerObj - Current `websub:RequestHandler` instance
+# + handlerObj - Current `websub:HttpToWebsubAdaptor` instance
 isolated function processSubscriptionVerification(http:Caller caller, http:Response response, 
-                                                  RequestQueryParams params, RequestHandler handlerObj) {
+                                                  RequestQueryParams params, HttpToWebsubAdaptor handlerObj) {
     SubscriptionVerification message = {
         hubMode: <string>params?.hubMode,
         hubTopic: <string>params?.hubTopic,
@@ -59,9 +59,9 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
 # + caller - The `http:Caller` reference for the current request
 # + response - The `http:Response`, which should be returned 
 # + params - Query parameters retrieved from the `http:Request`
-# + handlerObj - Current `websub:RequestHandler` instance
+# + handlerObj - Current `websub:HttpToWebsubAdaptor` instance
 isolated function processSubscriptionDenial(http:Caller caller, http:Response response,
-                                            RequestQueryParams params, RequestHandler handlerObj) {
+                                            RequestQueryParams params, HttpToWebsubAdaptor handlerObj) {
     var reason = params?.hubReason is () ? "" : <string>params?.hubReason;
     SubscriptionDeniedError subscriptionDeniedMessage = error SubscriptionDeniedError(reason);
     Acknowledgement|error? result = handlerObj.callOnSubscriptionDeniedMethod(subscriptionDeniedMessage);
@@ -81,11 +81,11 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
 # + caller - The `http:Caller` reference for the current request
 # + request - The original `http:Request`
 # + response - The `http:Response`, which should be returned 
-# + handlerObj - Current `websub:RequestHandler` instance
+# + handlerObj - Current `websub:HttpToWebsubAdaptor` instance
 # + secretKey - The `secretKey` value to be used to verify the content distribution message
 # + return - An `error` if there is any exception in the execution or else `()`
 isolated function processEventNotification(http:Caller caller, http:Request request, 
-                                           http:Response response, RequestHandler handlerObj,
+                                           http:Response response, HttpToWebsubAdaptor handlerObj,
                                            string secretKey) returns error? {
     string payload = check request.getTextPayload();
     boolean isVerifiedContent = check verifyContent(request, secretKey, payload);

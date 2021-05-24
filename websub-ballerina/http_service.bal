@@ -18,7 +18,7 @@ import ballerina/http;
 
 # Represents an underlying HTTP Service.
 isolated service class HttpService {
-    private final RequestHandler handler;
+    private final HttpToWebsubAdaptor handler;
     private final string? secretKey;
     private final boolean isSubscriptionValidationDeniedAvailable;
     private final boolean isSubscriptionVerificationAvailable;
@@ -29,10 +29,10 @@ isolated service class HttpService {
     # websub:HttpService httpServiceEp = check new (handler, "sercretKey1");
     # ```
     # 
-    # + handler - The `websub:RequestHandler` instance which used as a wrapper to execute service methods
+    # + handler - The `websub:HttpToWebsubAdaptor` instance which used as a wrapper to execute service methods
     # + callback - Optional `secretKey` value to be used in the content distribution verification
     # + return - The `websub:HttpService` or an `error` if the initialization failed
-    isolated function init(RequestHandler handler, string? secretKey) returns error? {
+    isolated function init(HttpToWebsubAdaptor handler, string? secretKey) returns error? {
         self.handler = handler;
         self.secretKey = secretKey;
         string[] methodNames = handler.getServiceMethodNames();

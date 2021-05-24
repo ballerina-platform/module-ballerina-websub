@@ -39,7 +39,7 @@ public class RequestHandler {
     }
 
     public static Object callOnSubscriptionVerificationMethod(Environment env, BObject handler,
-                                                       BMap<BString, Object> message) {
+                                                              BMap<BString, Object> message) {
         BObject serviceObj = (BObject) handler.getNativeData(SERVICE_OBJECT);
         return invokeRemoteFunction(env, serviceObj, message,
                 "callOnSubscriptionVerificationMethod", "onSubscriptionVerification");

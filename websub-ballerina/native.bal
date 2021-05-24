@@ -17,7 +17,7 @@
 import ballerina/jballerina.java;
 
 # Wrapper class used to execute sevice methods.
-isolated class RequestHandler {
+isolated class HttpToWebsubAdaptor {
     isolated function init(SubscriberService serviceObj) returns error? {
         externInit(self, serviceObj);
     }
@@ -42,6 +42,6 @@ isolated class RequestHandler {
     } external;
 }
 
-isolated function externInit(RequestHandler handler, SubscriberService serviceObj) = @java:Method {
+isolated function externInit(HttpToWebsubAdaptor handler, SubscriberService serviceObj) = @java:Method {
     'class: "io.ballerina.stdlib.websub.RequestHandler"
 } external;
