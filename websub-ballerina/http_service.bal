@@ -18,7 +18,7 @@ import ballerina/http;
 
 # Represents an underlying HTTP Service.
 isolated service class HttpService {
-    private final HttpToWebsubAdaptor httpToWebSubAdaptor;
+    private final HttpToWebsubAdaptor adaptor;
     private final string? secretKey;
     private final boolean isSubscriptionValidationDeniedAvailable;
     private final boolean isSubscriptionVerificationAvailable;
@@ -26,16 +26,16 @@ isolated service class HttpService {
 
     # Initializes `websub:HttpService` endpoint.
     # ```ballerina
-    # websub:HttpService httpServiceEp = check new (handler, "sercretKey1");
+    # websub:HttpService httpServiceEp = check new (adaptor, "sercretKey1");
     # ```
     # 
-    # + httpToWebSubAdaptor - The `websub:HttpToWebsubAdaptor` instance which used as a wrapper to execute service methods
+    # + adaptor - The `websub:HttpToWebsubAdaptor` instance which used as a wrapper to execute service methods
     # + callback - Optional `secretKey` value to be used in the content distribution verification
     # + return - The `websub:HttpService` or an `error` if the initialization failed
-    isolated function init(HttpToWebsubAdaptor httpToWebSubAdaptor, string? secretKey) returns error? {
-        self.httpToWebSubAdaptor = httpToWebSubAdaptor;
+    isolated function init(HttpToWebsubAdaptor adaptor, string? secretKey) returns error? {
+        self.adaptor = adaptor;
         self.secretKey = secretKey;
-        string[] methodNames = httpToWebSubAdaptor.getServiceMethodNames();
+        string[] methodNames = adaptor.getServiceMethodNames();
         self.isSubscriptionValidationDeniedAvailable = isMethodAvailable("onSubscriptionValidationDenied", methodNames);
         self.isSubscriptionVerificationAvailable = isMethodAvailable("onSubscriptionVerification", methodNames);
         self.isEventNotificationAvailable = isMethodAvailable("onEventNotification", methodNames);
@@ -50,7 +50,7 @@ isolated service class HttpService {
         response.statusCode = http:STATUS_ACCEPTED;
         if self.isEventNotificationAvailable {
             string secretKey = self.secretKey is () ? "" : <string>self.secretKey;
-            error? result = processEventNotification(caller, request, response, self.httpToWebSubAdaptor, secretKey);
+            error? result = processEventNotification(caller, request, response, self.adaptor, secretKey);
             if result is error {
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
             }
@@ -77,7 +77,7 @@ isolated service class HttpService {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                 } else {
                     if self.isSubscriptionVerificationAvailable {
-                        processSubscriptionVerification(caller, response, <@untainted> params, self.httpToWebSubAdaptor);
+                        processSubscriptionVerification(caller, response, <@untainted> params, self.adaptor);
                     } else {
                         response.statusCode = http:STATUS_OK;
                         response.setTextPayload(<string>params?.hubChallenge);
@@ -86,7 +86,7 @@ isolated service class HttpService {
             }
             MODE_DENIED => {
                 if self.isSubscriptionValidationDeniedAvailable {
-                    processSubscriptionDenial(caller, response, <@untainted> params, self.httpToWebSubAdaptor);
+                    processSubscriptionDenial(caller, response, <@untainted> params, self.adaptor);
                 } else {
                     response.statusCode = http:STATUS_OK;
                     updateResponseBody(response, ACKNOWLEDGEMENT["body"], ACKNOWLEDGEMENT["headers"]);

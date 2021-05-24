@@ -38,17 +38,17 @@ import java.util.ArrayList;
 import static io.ballerina.runtime.api.utils.StringUtils.fromString;
 
 /**
- * {@code RequestHandler} is a wrapper object used for service method execution.
+ * {@code NativeHttpToWebsubAdaptor} is a wrapper object used for service method execution.
  */
 public class NativeHttpToWebsubAdaptor {
     public static final String SERVICE_OBJECT = "WEBSUB_SERVICE_OBJECT";
 
-    public static void externInit(BObject handler, BObject service) {
-        handler.addNativeData(SERVICE_OBJECT, service);
+    public static void externInit(BObject adaptor, BObject service) {
+        adaptor.addNativeData(SERVICE_OBJECT, service);
     }
 
-    public static BArray getServiceMethodNames(BObject handler) {
-        BObject serviceObj = (BObject) handler.getNativeData(SERVICE_OBJECT);
+    public static BArray getServiceMethodNames(BObject adaptor) {
+        BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
         ArrayList<BString> methodNamesList = new ArrayList<>();
         for (MethodType method : serviceObj.getType().getMethods()) {
             methodNamesList.add(StringUtils.fromString(method.getName()));
@@ -56,22 +56,22 @@ public class NativeHttpToWebsubAdaptor {
         return ValueCreator.createArrayValue(methodNamesList.toArray(BString[]::new));
     }
 
-    public static Object callOnSubscriptionVerificationMethod(Environment env, BObject handler,
+    public static Object callOnSubscriptionVerificationMethod(Environment env, BObject adaptor,
                                                               BMap<BString, Object> message) {
-        BObject serviceObj = (BObject) handler.getNativeData(SERVICE_OBJECT);
+        BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
         return invokeRemoteFunction(env, serviceObj, message,
                 "callOnSubscriptionVerificationMethod", "onSubscriptionVerification");
     }
 
-    public static Object callOnSubscriptionDeniedMethod(Environment env, BObject handler, BError message) {
-        BObject serviceObj = (BObject) handler.getNativeData(SERVICE_OBJECT);
+    public static Object callOnSubscriptionDeniedMethod(Environment env, BObject adaptor, BError message) {
+        BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
         return invokeRemoteFunction(env, serviceObj, message,
                 "callOnSubscriptionDeniedMethod", "onSubscriptionValidationDenied");
     }
 
-    public static Object callOnEventNotificationMethod(Environment env, BObject handler,
+    public static Object callOnEventNotificationMethod(Environment env, BObject adaptor,
                                                        BMap<BString, Object> message) {
-        BObject serviceObj = (BObject) handler.getNativeData(SERVICE_OBJECT);
+        BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
         return invokeRemoteFunction(env, serviceObj, message,
                 "callOnEventNotificationMethod", "onEventNotification");
     }
