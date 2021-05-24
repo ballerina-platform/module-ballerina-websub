@@ -21,7 +21,7 @@ import ballerina/url;
 
 # Processes the subscription/unsubscription intent verification requests received from the `hub`.
 # ```ballerina
-# processSubscriptionVerification(httpCaller, httpResponse, queryParams, handler);
+# processSubscriptionVerification(httpCaller, httpResponse, queryParams, adaptor);
 # ```
 # 
 # + caller - The `http:Caller` reference for the current request
@@ -53,7 +53,7 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
 
 # Processes the subscription/unsubscription denial requests from the `hub`.
 # ```ballerina
-# processSubscriptionDenial(httpCaller, httpResponse, queryParams, handler);
+# processSubscriptionDenial(httpCaller, httpResponse, queryParams, adaptor);
 # ```
 # 
 # + caller - The `http:Caller` reference for the current request
@@ -75,7 +75,7 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
 
 # Processes the content distribution requests from the `hub`.
 # ```ballerina
-# check processEventNotification(httpCaller, httpRequest, httpResponse, queryParams, handler, serviceKey);
+# check processEventNotification(httpCaller, httpRequest, httpResponse, queryParams, adaptor, serviceKey);
 # ```
 # 
 # + caller - The `http:Caller` reference for the current request

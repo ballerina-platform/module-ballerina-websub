@@ -41,6 +41,6 @@ isolated class HttpToWebsubAdaptor {
     } external;
 }
 
-isolated function externInit(HttpToWebsubAdaptor handler, SubscriberService serviceObj) = @java:Method {
+isolated function externInit(HttpToWebsubAdaptor adaptor, SubscriberService serviceObj) = @java:Method {
     'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"
 } external;
