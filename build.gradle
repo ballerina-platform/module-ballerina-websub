@@ -31,7 +31,6 @@ ext.nettyTcnativeVersion = project.nettyTcnativeVersion
 ext.wso2CommonsPoolVersion = project.wso2CommonsPoolVersion
 ext.wso2SnakeYamlVersion = project.wso2SnakeYamlVersion
 ext.bouncycastleVersion = project.bouncycastleVersion
-ext.guavaVersion = project.guavaVersion
 ext.wso2CarbonMetricsVersion = project.wso2CarbonMetricsVersion
 ext.stdlibHttpVersion = project.stdlibHttpVersion
 ext.stdlibMimeVersion = project.stdlibMimeVersion

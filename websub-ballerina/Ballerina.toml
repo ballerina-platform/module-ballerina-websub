@@ -119,10 +119,3 @@ path = "./lib/org.wso2.carbon.metrics.core-@wso2carbonmetrics.version@.jar"
 groupId = "org.wso2.carbon.metrics"
 artifactId = "org.wso2.carbon.metrics.core"
 version = "@wso2carbonmetrics.version@"
-
-
-[[platform.java11.dependency]]
-path = "./lib/guava-@guava.version@.jar"
-groupId = "com.google.guava"
-artifactId = "guava"
-version = "@guava.version@"
