@@ -76,6 +76,6 @@ isolated function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @t
 isolated function testSubscriptionInitiationFailureWithHubAndTopic() returns @tainted error? {
     SubscriberServiceConfiguration config = getServiceConfig([ HUB_FAILURE_URL, COMMON_TOPIC ]);
     var response = initiateSubscription(config, CALLBACK);
-    test:assertTrue(response is SubscriptionInitiationFailedError);
+    test:assertTrue(response is SubscriptionInitiationError);
 }
 
