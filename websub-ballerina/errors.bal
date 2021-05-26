@@ -24,7 +24,7 @@ public type ListenerError distinct Error;
 public type ResourceDiscoveryFailedError distinct Error;
 
 # Represents a subscription-initiation failed error.
-public type SubscriptionInitiationFailedError distinct Error;
+public type SubscriptionInitiationError distinct Error;
 
 # Represents a subscription-verificatation error.
 public type SubscriptionVerificationError distinct Error;
