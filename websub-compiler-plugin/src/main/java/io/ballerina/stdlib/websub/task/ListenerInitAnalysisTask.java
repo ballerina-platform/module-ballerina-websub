@@ -30,7 +30,6 @@ import io.ballerina.compiler.syntax.tree.Node;
 import io.ballerina.compiler.syntax.tree.NodeLocation;
 import io.ballerina.compiler.syntax.tree.ParenthesizedArgList;
 import io.ballerina.compiler.syntax.tree.PositionalArgumentNode;
-import io.ballerina.compiler.syntax.tree.QualifiedNameReferenceNode;
 import io.ballerina.compiler.syntax.tree.RestArgumentNode;
 import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
@@ -55,8 +54,7 @@ public class ListenerInitAnalysisTask implements AnalysisTask<SyntaxNodeAnalysis
         SyntaxKind nodeSyntaxKind = node.kind();
         if (nodeSyntaxKind == SyntaxKind.EXPLICIT_NEW_EXPRESSION) {
             ExplicitNewExpressionNode expressionNode = (ExplicitNewExpressionNode) node;
-            QualifiedNameReferenceNode nameRef = (QualifiedNameReferenceNode) expressionNode.typeDescriptor();
-            Optional<Symbol> symbolOpt = context.semanticModel().symbol(nameRef);
+            Optional<Symbol> symbolOpt = context.semanticModel().symbol(expressionNode.typeDescriptor());
             if (symbolOpt.isPresent() && symbolOpt.get() instanceof TypeReferenceTypeSymbol) {
                 TypeSymbol typeDescriptor = ((TypeReferenceTypeSymbol) symbolOpt.get()).typeDescriptor();
                 String identifier = typeDescriptor.getName().orElse("");
@@ -72,8 +70,7 @@ public class ListenerInitAnalysisTask implements AnalysisTask<SyntaxNodeAnalysis
                 ListenerDeclarationNode parentNode = (ListenerDeclarationNode) expressionNode.parent();
                 Optional<TypeDescriptorNode> parentTypeOpt = parentNode.typeDescriptor();
                 if (parentTypeOpt.isPresent()) {
-                    QualifiedNameReferenceNode parentType = (QualifiedNameReferenceNode) parentTypeOpt.get();
-                    Optional<Symbol> parentSymbolOpt = context.semanticModel().symbol(parentType);
+                    Optional<Symbol> parentSymbolOpt = context.semanticModel().symbol(parentTypeOpt.get());
                     if (parentSymbolOpt.isPresent() && parentSymbolOpt.get() instanceof TypeReferenceTypeSymbol) {
                         TypeSymbol typeSymbol = ((TypeReferenceTypeSymbol) parentSymbolOpt.get()).typeDescriptor();
                         if (isWebSubListener(typeSymbol)) {
