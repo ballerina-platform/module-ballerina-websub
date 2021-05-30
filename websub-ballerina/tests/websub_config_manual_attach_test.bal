@@ -19,7 +19,7 @@ import ballerina/test;
 import ballerina/http;
 import ballerina/mime;
 
-service class SimpleWebsubService {
+isolated service class SimpleWebsubService {
     *SubscriberService;
     isolated remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         log:printDebug("onSubscriptionValidationDenied invoked");
