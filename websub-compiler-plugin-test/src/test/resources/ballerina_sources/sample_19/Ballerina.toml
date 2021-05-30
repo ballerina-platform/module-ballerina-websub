@@ -1,0 +1,13 @@
+[package]
+org = "websub_test"
+name = "sample_19"
+version = "0.0.1-SNAPSHOT"
+
+[build-options]
+observabilityIncluded = true
+
+[[platform.java11.dependency]]
+path = "./webhook-native-0.0.1-SNAPSHOT.jar"
+groupId = "io.ballerinax.webhook"
+artifactId = "webhook-native"
+version = "0.0.1-SNAPSHOT"
