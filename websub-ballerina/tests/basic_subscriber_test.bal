@@ -64,7 +64,7 @@ function afterSimpleSubscriberTest() returns @tainted error? {
     check basicSubscriberListener.gracefulStop();
 }
 
-http:Client httpClient = check new("http://localhost:9090/subscriber");
+http:Client httpClient = check new ("http://localhost:9090/subscriber");
 
 @test:Config { 
     groups: ["simpleSubscriber"]
@@ -86,12 +86,16 @@ function testOnIntentVerificationSuccess() returns @tainted error? {
 @test:Config { 
     groups: ["simpleSubscriber"]
 }
-function testOnIntentVerificationFailure() returns @tainted error? {
-    http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
-    test:assertEquals(response.statusCode, 404);
-    string payload = check response.getTextPayload();
-    map<string> responseBody = decodeResponseBody(payload);
-    test:assertEquals(responseBody["reason"], "Subscription verification failed");
+function testOnIntentVerificationFailure() {
+    http:Response|error response = httpClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
+    if (response is http:ClientRequestError) {
+        test:assertEquals(response.detail().statusCode, 404, msg = "Found unexpected output");
+        string payload = <string> response.detail().body;
+        map<string> responseBody = decodeResponseBody(payload);
+        test:assertEquals(responseBody["reason"], "Subscription verification failed");
+    } else {
+        test:assertFail("Found unexpected output");
+    }
 }
 
 @test:Config {

@@ -60,10 +60,16 @@ function testOnSubscriptionValidationWithErrorReturnType() returns @tainted erro
 @test:Config {
     groups: ["subscriberWithErrorReturns"]
  }
-function testOnIntentVerificationSuccessWithErrorReturnType() returns @tainted error? {
-    http:Response response = check SubscriberWithErrorReturnsClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234");
-    test:assertEquals(response.statusCode, 404);
-    test:assertEquals(response.getTextPayload(), "reason=Error occured while processing request");
+function testOnIntentVerificationSuccessWithErrorReturnType() {
+    http:Response|error response = SubscriberWithErrorReturnsClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234");
+    if (response is http:ClientRequestError) {
+        test:assertEquals(response.detail().statusCode, 404, msg = "Found unexpected output");
+        string payload = <string> response.detail().body;
+        map<string> responseBody = decodeResponseBody(payload);
+        test:assertEquals(responseBody["reason"], "Error occured while processing request");
+    } else {
+        test:assertFail("Found unexpected output");
+    }
 }
 
 @test:Config {
