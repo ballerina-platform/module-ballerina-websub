@@ -87,8 +87,14 @@ public client class DiscoveryService {
                 return topicAndHubs;
             }
         } else {
+            string message = "";
+            if (discoveryResponse is http:ApplicationResponseError) {
+                message = <string> discoveryResponse.detail().body;
+            } else {
+                message = discoveryResponse.message();
+            }            
             return error ResourceDiscoveryFailedError("Error occurred with WebSub discovery for Resource URL [" + self.resourceUrl + "]: " +
-                            (<error>discoveryResponse).message());
+                            message);
         }                                       
     }
 }
@@ -104,10 +110,6 @@ isolated function extractTopicAndHubUrls(http:Response response) returns @tainte
     string[] linkHeaders = [];
     if response.hasHeader("Link") {
         linkHeaders = check response.getHeaders("Link");
-    }
-    
-    if response.statusCode == http:STATUS_NOT_ACCEPTABLE {
-        return error ResourceDiscoveryFailedError("Content negotiation failed.Accept and/or Accept-Language headers mismatch");
     }
     
     if linkHeaders.length() == 0 {
