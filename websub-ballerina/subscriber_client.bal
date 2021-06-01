@@ -124,7 +124,7 @@ isolated function buildSubscriptionChangeRequest(@untainted string mode,
 # + hub - The `hub` to which the subscription/unsubscription request was sent
 # + mode - Mode of subscription (subscribe/unsubscribe)
 # + subscriptionChangeRequest - The request containing the subscription/unsubscription details
-# + response - Original response received from the `hub` as `http:Response`,`http:PayloadType', or an `error`
+# + response - Original response received from the `hub` as `http:Response`,`http:PayloadType`, or an `error`
 # + return - The `websub:SubscriptionChangeResponse` if the requested subscription action is successfull or else an `error`
 isolated function processHubResponse(@untainted string hub, @untainted string mode, 
                                      SubscriptionChangeRequest subscriptionChangeRequest,
@@ -132,13 +132,7 @@ isolated function processHubResponse(@untainted string hub, @untainted string mo
 
     string topic = subscriptionChangeRequest.topic;
     if response is error {
-        string message = "";
-        if (response is http:ApplicationResponseError) {
-            message = <string> response.detail().body;
-        } else {
-            message = response.message();
-        }
-        return error SubscriptionInitiationError("Error occurred for request: Mode[" + mode+ "] at Hub[" + hub + "] - " + message);
+        return error SubscriptionInitiationError("Error occurred for request: Mode[" + mode+ "] at Hub[" + hub + "] - " + response.message());
     } else {
         http:Response hubResponse = <http:Response> response;
         int responseStatusCode = hubResponse.statusCode;
@@ -147,6 +141,15 @@ isolated function processHubResponse(@untainted string hub, @untainted string mo
             return error SubscriptionInitiationError("Redirection response received for subscription change request made with " +
                                "followRedirects disabled or after maxCount exceeded: Hub [" + hub + "], Topic [" +
                                subscriptionChangeRequest.topic + "]");
+        } else if !isSuccessStatusCode(responseStatusCode) {
+            var responsePayload = hubResponse.getTextPayload();
+            string errorMessage = "Error in request: Mode[" + mode + "] at Hub[" + hub + "]";
+            if responsePayload is string {
+                errorMessage = errorMessage + " - " + responsePayload;
+            } else {
+                errorMessage = errorMessage + " - Error occurred identifying cause: " + responsePayload.message();
+            }
+            return error SubscriptionInitiationError(errorMessage);
         } else {
             if responseStatusCode != http:STATUS_ACCEPTED {
                 log:printWarn(string`Subscription request considered successful for non 202 status code: ${responseStatusCode.toString()}`);
