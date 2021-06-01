@@ -91,31 +91,23 @@ function testOnSubscriptionValidationWithServiceTwo() returns @tainted error? {
 @test:Config { 
     groups: ["multiServiceListener"]
 }
-function testOnIntentVerificationFailureServiceOne() {
-    http:Response|error response = clientForServiceOne->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
-    if (response is http:ClientRequestError) {
-        test:assertEquals(response.detail().statusCode, 404, msg = "Found unexpected output");
-        string payload = <string> response.detail().body;
-        map<string> responseBody = decodeResponseBody(payload);
-        test:assertEquals(responseBody["reason"], "Subscription verification failed");
-    } else {
-        test:assertFail("Found unexpected output");
-    }
+function testOnIntentVerificationFailureServiceOne() returns @tainted error? {
+    http:Response response = check clientForServiceOne->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
+    test:assertEquals(response.statusCode, 404);
+    string payload = check response.getTextPayload();
+    map<string> responseBody = decodeResponseBody(payload);
+    test:assertEquals(responseBody["reason"], "Subscription verification failed");
 }
 
 @test:Config { 
     groups: ["multiServiceListener"]
 }
-function testOnIntentVerificationFailureServiceTwo() {
-    http:Response|error response = clientForServiceTwo->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
-    if (response is http:ClientRequestError) {
-        test:assertEquals(response.detail().statusCode, 404, msg = "Found unexpected output");
-        string payload = <string> response.detail().body;
-        map<string> responseBody = decodeResponseBody(payload);
-        test:assertEquals(responseBody["reason"], "Subscription verification failed");
-    } else {
-        test:assertFail("Found unexpected output");
-    }
+function testOnIntentVerificationFailureServiceTwo() returns @tainted error? {
+    http:Response response = check clientForServiceTwo->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
+    test:assertEquals(response.statusCode, 404);
+    string payload = check response.getTextPayload();
+    map<string> responseBody = decodeResponseBody(payload);
+    test:assertEquals(responseBody["reason"], "Subscription verification failed");
 }
 
 @test:Config {

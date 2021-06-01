@@ -62,35 +62,27 @@ http:Client subscriberServiceErrorDetailsClientEp = check new ("http://localhost
 @test:Config { 
     groups: ["service-with-additional-details"]
 }
-function testOnIntentVerificationFailedErrorDetails() {
-    http:Response|error response = subscriberServiceErrorDetailsClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
-    if (response is http:ClientRequestError) {
-        test:assertEquals(response.detail().statusCode, 404, msg = "Found unexpected output");
-        string payload = <string> response.detail().body;
-        map<string> responseBody = decodeResponseBody(payload);
-        test:assertEquals(responseBody["message"], "Hub topic not supported");
-    } else {
-        test:assertFail("Found unexpected output");
-    }
-    
+function testOnIntentVerificationFailedErrorDetails() returns @tainted error? {
+    http:Response response = check subscriberServiceErrorDetailsClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
+    test:assertEquals(response.statusCode, 404);
+    string payload = check response.getTextPayload();
+    map<string> responseBody = decodeResponseBody(payload);
+    test:assertEquals(responseBody["message"], "Hub topic not supported");
 }
 
 @test:Config { 
     groups: ["service-with-additional-details"]
 }
-function testOnEventNotificationFailedErrorDetails() {
+function testOnEventNotificationFailedErrorDetails() returns @tainted error? {
     http:Request request = new;
     xml requestPayload = xml `<body><action>publish</action></body>`;
     request.setPayload(requestPayload);
-    http:Response|error response = subscriberServiceErrorDetailsClientEp->post("/", request);
-    if (response is http:ClientRequestError) {
-        test:assertEquals(response.detail().statusCode, 410, msg = "Found unexpected output");
-        string payload = <string> response.detail().body;
-        map<string> responseBody = decodeResponseBody(payload);
-        test:assertEquals(responseBody["message"], "Unsubscribing from the topic");
-    } else {
-        test:assertFail("Found unexpected output");
-    }
+
+    http:Response response = check subscriberServiceErrorDetailsClientEp->post("/", request);
+    test:assertEquals(response.statusCode, 410);
+    string payload = check response.getTextPayload();
+    map<string> responseBody = decodeResponseBody(payload);
+    test:assertEquals(responseBody["message"], "Unsubscribing from the topic");
 }
 
 isolated function decodeResponseBody(string payload) returns map<string> {
