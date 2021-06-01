@@ -53,7 +53,7 @@ public client class SubscriptionClient {
 
         http:Client httpClient = self.httpClient;
         http:Request builtSubscriptionRequest = buildSubscriptionChangeRequest(MODE_SUBSCRIBE, subscriptionRequest);
-        http:Response response = check httpClient->post("", builtSubscriptionRequest);
+        http:Response|error response = httpClient->post("", builtSubscriptionRequest);
         return processHubResponse(self.url, MODE_SUBSCRIBE, subscriptionRequest, response);
     }
 
@@ -69,7 +69,7 @@ public client class SubscriptionClient {
 
         http:Client httpClient = self.httpClient;
         http:Request builtUnsubscriptionRequest = buildSubscriptionChangeRequest(MODE_UNSUBSCRIBE, unsubscriptionRequest);
-        http:Response response = check httpClient->post("", builtUnsubscriptionRequest);
+        http:Response|error response = httpClient->post("", builtUnsubscriptionRequest);
         return processHubResponse(self.url, MODE_UNSUBSCRIBE, unsubscriptionRequest, response);
     }
 
@@ -132,7 +132,13 @@ isolated function processHubResponse(@untainted string hub, @untainted string mo
 
     string topic = subscriptionChangeRequest.topic;
     if response is error {
-        return error SubscriptionInitiationError("Error occurred for request: Mode[" + mode+ "] at Hub[" + hub + "] - " + response.message());
+        string message = "";
+        if (response is http:ApplicationResponseError) {
+            message = <string> response.detail().body;
+        } else {
+            message = response.message();
+        }
+        return error SubscriptionInitiationError("Error occurred for request: Mode[" + mode+ "] at Hub[" + hub + "] - " + message);
     } else {
         http:Response hubResponse = <http:Response> response;
         int responseStatusCode = hubResponse.statusCode;
@@ -141,15 +147,6 @@ isolated function processHubResponse(@untainted string hub, @untainted string mo
             return error SubscriptionInitiationError("Redirection response received for subscription change request made with " +
                                "followRedirects disabled or after maxCount exceeded: Hub [" + hub + "], Topic [" +
                                subscriptionChangeRequest.topic + "]");
-        } else if !isSuccessStatusCode(responseStatusCode) {
-            var responsePayload = hubResponse.getTextPayload();
-            string errorMessage = "Error in request: Mode[" + mode + "] at Hub[" + hub + "]";
-            if responsePayload is string {
-                errorMessage = errorMessage + " - " + responsePayload;
-            } else {
-                errorMessage = errorMessage + " - Error occurred identifying cause: " + responsePayload.message();
-            }
-            return error SubscriptionInitiationError(errorMessage);
         } else {
             if responseStatusCode != http:STATUS_ACCEPTED {
                 log:printWarn(string`Subscription request considered successful for non 202 status code: ${responseStatusCode.toString()}`);
