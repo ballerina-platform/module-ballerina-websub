@@ -42,7 +42,7 @@ public client class SubscriptionClient {
 
     # Sends a subscription request to the provided `hub`.
     # ```ballerina
-    # websub:SubscriptionChangeResponse response = check websubHubClientEP->subscribe(subscriptionRequest);
+    # websub:SubscriptionChangeResponse response = check subscriberClientEp->subscribe(subscriptionRequest);
     # ```
     #
     # + subscriptionRequest - The request payload containing the subscription details
@@ -59,7 +59,7 @@ public client class SubscriptionClient {
 
     # Sends an unsubscription request to a WebSub Hub.
     # ```ballerina
-    # websub:SubscriptionChangeResponse response = check websubHubClientEP->unsubscribe(subscriptionRequest);
+    # websub:SubscriptionChangeResponse response = check subscriberClientEp->unsubscribe(subscriptionRequest);
     # ```
     # + unsubscriptionRequest - The request payload containing the unsubscription details
     # + return - The `websub:SubscriptionChangeResponse` indicating that the unsubscription initiation was successful
