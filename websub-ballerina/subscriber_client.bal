@@ -16,7 +16,6 @@
 
 import ballerina/url;
 import ballerina/http;
-import ballerina/log;
 import ballerina/mime;
 
 # The HTTP based client for WebSub subscription and unsubscription.
