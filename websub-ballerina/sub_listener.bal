@@ -320,10 +320,7 @@ isolated function initiateSubscription(SubscriberServiceConfiguration serviceCon
     SubscriptionClient subscriberClientEp = check getSubscriberClient(hubUrl, serviceConfig?.httpConfig);
     SubscriptionChangeRequest request = retrieveSubscriptionRequest(topicUrl, callbackUrl, serviceConfig);
     var response = subscriberClientEp->subscribe(request);
-    if response is SubscriptionChangeResponse {
-        string subscriptionSuccessMsg = string`Subscription Request successfully sent to Hub[${response.hub}], for Topic[${response.topic}], with Callback [${callbackUrl}]`;
-        log:printInfo(string`${subscriptionSuccessMsg}. Awaiting intent verification.`);
-    } else {
+    if response is error {
         return response;
     }
 }
