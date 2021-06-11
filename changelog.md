@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - Multipart content retrieval on event-notification.
 - Subscriber resubscription event.
+- [Log error when return from the remote method leads to an error](https://github.com/ballerina-platform/ballerina-standard-library/issues/1450)
+- [WebSubHub Compiler Plugin does not allow additional methods inside service declaration](https://github.com/ballerina-platform/ballerina-standard-library/issues/1417)
 
 ## [1.2.0-beta.1] - 2021-05-06
 
