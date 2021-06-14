@@ -54,6 +54,7 @@ public class SubscriberCallback implements Callback {
 
     @Override
     public void notifyFailure(BError bError) {
+        bError.printStackTrace();
         BString errorMessage = fromString("service method invocation failed: " + bError.getErrorMessage());
         BError invocationError = ErrorCreator.createError(module, "ServiceExecutionError",
                 errorMessage, bError, null);
