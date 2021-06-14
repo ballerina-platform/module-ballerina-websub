@@ -135,7 +135,7 @@ public class Listener {
             error? result = initiateSubscription(serviceConfig, <string>callback);
             if result is error {
                 string errorDetails = result.message();
-                string errorMsg = string`Subscription initiation failed due to: ${errorDetails}`;
+                string errorMsg = string `Subscription initiation failed due to: ${errorDetails}`;
                 return error SubscriptionInitiationError(errorMsg);
             }
         }
