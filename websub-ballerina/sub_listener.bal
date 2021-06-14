@@ -134,7 +134,8 @@ public class Listener {
         if serviceConfig is SubscriberServiceConfiguration {
             error? result = initiateSubscription(serviceConfig, <string>callback);
             if result is error {
-                string errorMsg = string`Subscription initiation failed due to [${result.message()}]`;
+                string errorDetails = result.message();
+                string errorMsg = string`Subscription initiation failed due to: ${errorDetails}`;
                 return error SubscriptionInitiationError(errorMsg);
             }
         }
@@ -320,7 +321,10 @@ isolated function initiateSubscription(SubscriberServiceConfiguration serviceCon
     SubscriptionClient subscriberClientEp = check getSubscriberClient(hubUrl, serviceConfig?.httpConfig);
     SubscriptionChangeRequest request = retrieveSubscriptionRequest(topicUrl, callbackUrl, serviceConfig);
     var response = subscriberClientEp->subscribe(request);
-    if response is error {
+    if response is SubscriptionChangeResponse {
+        string subscriptionSuccessMsg = string`Subscription Request successfully sent to Hub[${response.hub}], for Topic[${response.topic}], with Callback [${callbackUrl}]`;
+        log:printDebug(string`${subscriptionSuccessMsg}`);
+    } else {
         return response;
     }
 }
