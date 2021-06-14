@@ -16,6 +16,7 @@
 
 import ballerina/test;
 import ballerina/http;
+import ballerina/log;
 
 const string CALLBACK = "https://sample.subscriber.com/subscriber";
 const string DISCOVERY_SUCCESS_URL = "http://127.0.0.1:9192/common/discovery";
@@ -68,6 +69,11 @@ isolated function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @t
     SubscriberServiceConfiguration config = getServiceConfig(DISCOVERY_FAILURE_URL);
     var response = initiateSubscription(config, CALLBACK);
     test:assertTrue(response is ResourceDiscoveryFailedError);
+    if response is error {
+        string errorDetails = response.message();
+        string errorMsg = string`Subscription initiation failed due to: ${errorDetails}`;
+        log:printError(errorMsg);
+    }
 }
 
 @test:Config { 
@@ -77,5 +83,10 @@ isolated function testSubscriptionInitiationFailureWithHubAndTopic() returns @ta
     SubscriberServiceConfiguration config = getServiceConfig([ HUB_FAILURE_URL, COMMON_TOPIC ]);
     var response = initiateSubscription(config, CALLBACK);
     test:assertTrue(response is SubscriptionInitiationError);
+    if response is error {
+        string errorDetails = response.message();
+        string errorMsg = string`Subscription initiation failed due to: ${errorDetails}`;
+        log:printError(errorMsg);
+    }
 }
 
