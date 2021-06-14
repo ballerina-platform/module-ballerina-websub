@@ -26,14 +26,14 @@ service /subscriber on new websub:Listener(9090) {
                 int hookId = check retrievedContent.hook_id;
                 json sender = check retrievedContent.sender;
                 int senderId = check sender.id;
-                io:println(string`PingEvent received for webhook [${hookId}]`);
-                io:println(string`Event sender [${senderId}]`);
+                io:println(string `PingEvent received for webhook [${hookId}]`);
+                io:println(string `Event sender [${senderId}]`);
             } else if (retrievedContent.ref is string) {
                 json repository = check retrievedContent.repository;
                 string repositoryName = check repository.name;
                 string lastUpdatedTime = check repository.updated_at;
-                io:println(string`PushEvent received for [${repositoryName}]`);
-                io:println(string`Last updated at ${lastUpdatedTime}`);
+                io:println(string `PushEvent received for [${repositoryName}]`);
+                io:println(string `Last updated at ${lastUpdatedTime}`);
             }
         } else {
             io:println("Unrecognized content type, hence ignoring");

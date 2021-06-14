@@ -186,7 +186,7 @@ isolated function retrieveContentHash(string method, string key, string payload)
             return crypto:hmacSha512(contentPayload, keyArr);
         }
         _ => {
-            string errorMsg = string`Unrecognized hashning-method [${method}] found`;
+            string errorMsg = string `Unrecognized hashning-method [${method}] found`;
             log:printError(errorMsg);
             return error Error(errorMsg);
         }

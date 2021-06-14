@@ -71,7 +71,7 @@ isolated function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @t
     test:assertTrue(response is ResourceDiscoveryFailedError);
     if response is error {
         string errorDetails = response.message();
-        string errorMsg = string`Subscription initiation failed due to: ${errorDetails}`;
+        string errorMsg = string `Subscription initiation failed due to: ${errorDetails}`;
         log:printError(errorMsg);
     }
 }
@@ -85,7 +85,7 @@ isolated function testSubscriptionInitiationFailureWithHubAndTopic() returns @ta
     test:assertTrue(response is SubscriptionInitiationError);
     if response is error {
         string errorDetails = response.message();
-        string errorMsg = string`Subscription initiation failed due to: ${errorDetails}`;
+        string errorMsg = string `Subscription initiation failed due to: ${errorDetails}`;
         log:printError(errorMsg);
     }
 }

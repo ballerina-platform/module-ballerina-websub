@@ -227,7 +227,7 @@ isolated function retrieveCallbackUrl(string? providedCallback, boolean appendSe
     if providedCallback is string {
         if appendServicePath {
             string completeSevicePath = retrieveCompleteServicePath(servicePath);
-            return string`${providedCallback}${completeSevicePath}`;
+            return string `${providedCallback}${completeSevicePath}`;
         } else {
             return providedCallback;
         }
@@ -250,7 +250,7 @@ isolated function generateCallbackUrl(string[]|string servicePath,
     string host = config.host;
     string protocol = config.secureSocket is () ? "http" : "https";        
     string completeSevicePath = retrieveCompleteServicePath(servicePath);
-    return string`${protocol}://${host}:${port.toString()}${completeSevicePath}`;
+    return string `${protocol}://${host}:${port.toString()}${completeSevicePath}`;
 }
 
 # Retrieves the complete service path.
@@ -322,8 +322,8 @@ isolated function initiateSubscription(SubscriberServiceConfiguration serviceCon
     SubscriptionChangeRequest request = retrieveSubscriptionRequest(topicUrl, callbackUrl, serviceConfig);
     var response = subscriberClientEp->subscribe(request);
     if response is SubscriptionChangeResponse {
-        string subscriptionSuccessMsg = string`Subscription Request successfully sent to Hub[${response.hub}], for Topic[${response.topic}], with Callback [${callbackUrl}]`;
-        log:printDebug(string`${subscriptionSuccessMsg}`);
+        string subscriptionSuccessMsg = string `Subscription Request successfully sent to Hub[${response.hub}], for Topic[${response.topic}], with Callback [${callbackUrl}]`;
+        log:printDebug(subscriptionSuccessMsg);
     } else {
         return response;
     }
