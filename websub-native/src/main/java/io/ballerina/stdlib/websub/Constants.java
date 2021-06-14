@@ -18,18 +18,12 @@
 
 package io.ballerina.stdlib.websub;
 
-import java.util.List;
-
 /**
  * {@code Constants} contains the public constants to be used.
  */
 public interface Constants {
     String PACKAGE_ORG = "ballerina";
     String PACKAGE_NAME = "websub";
-
-    List<String> MODULE_DEFINED_ERRORS = List.of(
-            "SubscriptionVerificationError", "SubscriptionDeletedError"
-    );
 
     String SERVICE_OBJECT = "WEBSUB_SERVICE_OBJECT";
 }

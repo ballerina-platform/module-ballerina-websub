@@ -22,18 +22,16 @@ listener Listener errorReturnsSubscriberListener = new (9099);
 
 var subscriberWithErrorReturns = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000 } 
                               service object {
-    isolated remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement|error? {
-        return error Error("Error occured while processing request");
+    isolated remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns error? {
+        return error ("Error occured while processing request");
     }
 
-    isolated remote function onSubscriptionVerification(SubscriptionVerification msg)
-                        returns SubscriptionVerificationSuccess|SubscriptionVerificationError|error {
-        return error Error("Error occured while processing request");
+    isolated remote function onSubscriptionVerification(SubscriptionVerification msg) returns error {
+        return error ("Error occured while processing request");
     }
 
-    isolated remote function onEventNotification(ContentDistributionMessage event) 
-                        returns Acknowledgement|SubscriptionDeletedError|error? {
-        return error Error("Error occured while processing request");
+    isolated remote function onEventNotification(ContentDistributionMessage event) returns error? {
+        return error ("Error occured while processing request");
     }
 };
 
