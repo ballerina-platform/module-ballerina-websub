@@ -90,3 +90,41 @@ isolated function testSubscriptionInitiationFailureWithHubAndTopic() returns @ta
     }
 }
 
+final var websubServiceObj = service object {
+    isolated remote function onEventNotification(ContentDistributionMessage event) 
+                        returns Acknowledgement {        
+        return ACKNOWLEDGEMENT;
+    }
+};
+
+listener Listener ls = new (9100);
+
+@test:Config { 
+    groups: ["subscriptionInitiation"]
+}
+function testSubInitFailedWithListenerForResourceDiscoveryFailure() returns @tainted error? {
+    var res = ls.attachWithConfig(websubServiceObj, getServiceConfig(DISCOVERY_FAILURE_URL), "sub");
+    test:assertFalse(res is error);
+    var startDetails = ls.'start();
+    test:assertTrue(startDetails is error);
+    if startDetails is error {
+        string expected = "Subscription initiation failed due to: Link header unavailable in discovery response";
+        test:assertEquals(startDetails.message(), expected);
+    }
+    check ls.gracefulStop();
+}
+
+@test:Config { 
+    groups: ["subscriptionInitiation"]
+}
+function testSubInitFailedWithListenerForSubFailure() returns @tainted error? {
+    var res = ls.attachWithConfig(websubServiceObj, getServiceConfig([ HUB_FAILURE_URL, COMMON_TOPIC ]), "sub");
+    test:assertFalse(res is error);
+    var startDetails = ls.'start();
+    test:assertTrue(startDetails is error);
+    if startDetails is error {
+        string expected = "Subscription initiation failed due to: Error in request: Mode[subscribe] at Hub[http://127.0.0.1:9192/common/failed] - no matching resource found for path : /common/failed , method : POST";
+        test:assertEquals(startDetails.message(), expected);
+    }
+    check ls.gracefulStop();
+}
