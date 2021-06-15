@@ -282,6 +282,7 @@ public class CompilerPluginTest {
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
     }
 
+    @Test
     public void testValidWebsubServiceClassDeclarationWithAdditionalMethods() {
         Package currentPackage = loadPackage("sample_20");
         PackageCompilation compilation = currentPackage.getCompilation();

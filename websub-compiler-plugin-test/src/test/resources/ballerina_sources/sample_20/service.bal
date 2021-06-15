@@ -20,15 +20,15 @@ import ballerina/io;
 @websub:SubscriberServiceConfig{}
 service /subscriber on new websub:Listener(9090) {
     remote function onEventNotification(websub:ContentDistributionMessage event) returns error? {
-        if (isJsonContent(event)) {
-            json retrievedContent = check event.content;
-            if (isPingEvent(retrievedContent)) {
+        if (self.isJsonContent(event)) {
+            json retrievedContent = <json> event.content;
+            if (self.isPingEvent(retrievedContent)) {
                 int hookId = check retrievedContent.hook_id;
                 json sender = check retrievedContent.sender;
                 int senderId = check sender.id;
                 io:println(string `PingEvent received for webhook [${hookId}]`);
                 io:println(string `Event sender [${senderId}]`);
-            } else if (isPushEvent(retrievedContent)) {
+            } else if (self.isPushEvent(retrievedContent)) {
                 json repository = check retrievedContent.repository;
                 string repositoryName = check repository.name;
                 string lastUpdatedTime = check repository.updated_at;
