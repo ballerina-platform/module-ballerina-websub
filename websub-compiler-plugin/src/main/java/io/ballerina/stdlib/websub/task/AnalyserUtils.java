@@ -19,8 +19,10 @@
 package io.ballerina.stdlib.websub.task;
 
 import io.ballerina.compiler.api.ModuleID;
+import io.ballerina.compiler.api.symbols.FunctionSymbol;
 import io.ballerina.compiler.api.symbols.ModuleSymbol;
 import io.ballerina.compiler.api.symbols.ObjectTypeSymbol;
+import io.ballerina.compiler.api.symbols.Qualifier;
 import io.ballerina.compiler.api.symbols.TypeDescKind;
 import io.ballerina.compiler.api.symbols.TypeReferenceTypeSymbol;
 import io.ballerina.compiler.api.symbols.TypeSymbol;
@@ -133,5 +135,9 @@ public final class AnalyserUtils {
 
     public static String getQualifiedType(String paramType, String moduleName) {
         return moduleName.isBlank() ? paramType : String.format("%s:%s", moduleName, paramType);
+    }
+
+    public static boolean isRemoteMethod(FunctionSymbol functionSymbol) {
+        return functionSymbol.qualifiers().contains(Qualifier.REMOTE);
     }
 }

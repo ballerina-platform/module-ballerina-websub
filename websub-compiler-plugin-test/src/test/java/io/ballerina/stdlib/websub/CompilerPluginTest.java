@@ -63,8 +63,9 @@ public class CompilerPluginTest {
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_102;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
+        String expectedMsg = MessageFormat.format(expectedCode.getDescription(), "onEventNotification");
         Assert.assertEquals(diagnosticInfo.code(), expectedCode.getCode());
-        Assert.assertEquals(diagnostic.message(), expectedCode.getDescription());
+        Assert.assertEquals(diagnostic.message(), expectedMsg);
     }
 
     @Test
@@ -276,6 +277,13 @@ public class CompilerPluginTest {
     
     public void testValidWebsubServiceClassDeclaration() {
         Package currentPackage = loadPackage("sample_19");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+    }
+
+    public void testValidWebsubServiceClassDeclarationWithAdditionalMethods() {
+        Package currentPackage = loadPackage("sample_20");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
         Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
