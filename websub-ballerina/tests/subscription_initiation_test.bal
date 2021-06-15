@@ -16,6 +16,7 @@
 
 import ballerina/test;
 import ballerina/http;
+import ballerina/log;
 
 const string CALLBACK = "https://sample.subscriber.com/subscriber";
 const string DISCOVERY_SUCCESS_URL = "http://127.0.0.1:9192/common/discovery";
@@ -68,6 +69,11 @@ isolated function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @t
     SubscriberServiceConfiguration config = getServiceConfig(DISCOVERY_FAILURE_URL);
     var response = initiateSubscription(config, CALLBACK);
     test:assertTrue(response is ResourceDiscoveryFailedError);
+    if response is error {
+        string errorDetails = response.message();
+        string errorMsg = string `Subscription initiation failed due to: ${errorDetails}`;
+        log:printError(errorMsg);
+    }
 }
 
 @test:Config { 
@@ -77,5 +83,48 @@ isolated function testSubscriptionInitiationFailureWithHubAndTopic() returns @ta
     SubscriberServiceConfiguration config = getServiceConfig([ HUB_FAILURE_URL, COMMON_TOPIC ]);
     var response = initiateSubscription(config, CALLBACK);
     test:assertTrue(response is SubscriptionInitiationError);
+    if response is error {
+        string errorDetails = response.message();
+        string errorMsg = string `Subscription initiation failed due to: ${errorDetails}`;
+        log:printError(errorMsg);
+    }
 }
 
+final var websubServiceObj = service object {
+    isolated remote function onEventNotification(ContentDistributionMessage event) 
+                        returns Acknowledgement {        
+        return ACKNOWLEDGEMENT;
+    }
+};
+
+listener Listener ls = new (9100);
+
+@test:Config { 
+    groups: ["subscriptionInitiation"]
+}
+function testSubInitFailedWithListenerForResourceDiscoveryFailure() returns @tainted error? {
+    var res = ls.attachWithConfig(websubServiceObj, getServiceConfig(DISCOVERY_FAILURE_URL), "sub");
+    test:assertFalse(res is error);
+    var startDetails = ls.'start();
+    test:assertTrue(startDetails is error);
+    if startDetails is error {
+        string expected = "Subscription initiation failed due to: Link header unavailable in discovery response";
+        test:assertEquals(startDetails.message(), expected);
+    }
+    check ls.gracefulStop();
+}
+
+@test:Config { 
+    groups: ["subscriptionInitiation"]
+}
+function testSubInitFailedWithListenerForSubFailure() returns @tainted error? {
+    var res = ls.attachWithConfig(websubServiceObj, getServiceConfig([ HUB_FAILURE_URL, COMMON_TOPIC ]), "sub");
+    test:assertFalse(res is error);
+    var startDetails = ls.'start();
+    test:assertTrue(startDetails is error);
+    if startDetails is error {
+        string expected = "Subscription initiation failed due to: Error in request: Mode[subscribe] at Hub[http://127.0.0.1:9192/common/failed] - no matching resource found for path : /common/failed , method : POST";
+        test:assertEquals(startDetails.message(), expected);
+    }
+    check ls.gracefulStop();
+}

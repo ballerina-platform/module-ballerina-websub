@@ -139,7 +139,7 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
             }; 
         }
         _ => {
-            log:printError(string`Unrecognized content-type [${contentType}] found`);
+            log:printError(string `Unrecognized content-type [${contentType}] found`);
         }
     }
 

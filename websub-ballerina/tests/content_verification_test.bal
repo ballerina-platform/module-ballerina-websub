@@ -58,7 +58,7 @@ function testOnEventNotificationSuccessForContentVerification() returns @tainted
     http:Request request = new;
     json payload =  {"action":"publish","mode":"remote-hub"};
     byte[] payloadHash = check retrievePayloadSignature(hashKey, payload);
-    request.setHeader("X-Hub-Signature", string`sha256=${payloadHash.toBase16()}`);
+    request.setHeader("X-Hub-Signature", string `sha256=${payloadHash.toBase16()}`);
     request.setPayload(payload);
     http:Response response = check contentVerificationClient->post("/", request);
     test:assertEquals(response.statusCode, 202);
@@ -73,7 +73,7 @@ function testOnEventNotificationSuccessXmlForContentVerification() returns @tain
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
     byte[] payloadHash = check retrievePayloadSignature(hashKey, payload);
-    request.setHeader("X-Hub-Signature", string`sha256=${payloadHash.toBase16()}`);
+    request.setHeader("X-Hub-Signature", string `sha256=${payloadHash.toBase16()}`);
     request.setPayload(payload);
     http:Response response = check contentVerificationClient->post("/", request);
     test:assertEquals(response.statusCode, 202);
@@ -88,7 +88,7 @@ function testOnEventNotificationSuccessForUrlEncodedForContentVerification() ret
     string payload = "param1=value1&param2=value2";
     byte[] payloadHash = check retrievePayloadSignature(hashKey, payload);
     request.setTextPayload(payload);
-    request.setHeader("X-Hub-Signature", string`sha256=${payloadHash.toBase16()}`);
+    request.setHeader("X-Hub-Signature", string `sha256=${payloadHash.toBase16()}`);
     check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
     http:Response response = check contentVerificationClient->post("", request);
     test:assertEquals(response.statusCode, 202);

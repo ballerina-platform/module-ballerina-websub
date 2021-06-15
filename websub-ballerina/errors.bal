@@ -17,7 +17,7 @@
 # Represents a webSub distinct error.
 public type Error distinct error<CommonResponse>;
 
-# Represents a websubhub service execution error.
+# Represents a websub service execution error.
 public type ServiceExecutionError distinct error<CommonResponse>;
 
 # Represents a listener errors.

@@ -16,7 +16,6 @@
 
 import ballerina/url;
 import ballerina/http;
-import ballerina/log;
 import ballerina/mime;
 
 # The HTTP based client for WebSub subscription and unsubscription.
@@ -42,7 +41,7 @@ public client class SubscriptionClient {
 
     # Sends a subscription request to the provided `hub`.
     # ```ballerina
-    # websub:SubscriptionChangeResponse response = check websubHubClientEP->subscribe(subscriptionRequest);
+    # websub:SubscriptionChangeResponse response = check subscriberClientEp->subscribe(subscriptionRequest);
     # ```
     #
     # + subscriptionRequest - The request payload containing the subscription details
@@ -59,7 +58,7 @@ public client class SubscriptionClient {
 
     # Sends an unsubscription request to a WebSub Hub.
     # ```ballerina
-    # websub:SubscriptionChangeResponse response = check websubHubClientEP->unsubscribe(subscriptionRequest);
+    # websub:SubscriptionChangeResponse response = check subscriberClientEp->unsubscribe(subscriptionRequest);
     # ```
     # + unsubscriptionRequest - The request payload containing the unsubscription details
     # + return - The `websub:SubscriptionChangeResponse` indicating that the unsubscription initiation was successful
@@ -151,9 +150,6 @@ isolated function processHubResponse(@untainted string hub, @untainted string mo
             }
             return error SubscriptionInitiationError(errorMessage);
         } else {
-            if responseStatusCode != http:STATUS_ACCEPTED {
-                log:printWarn(string`Subscription request considered successful for non 202 status code: ${responseStatusCode.toString()}`);
-            }
             SubscriptionChangeResponse subscriptionChangeResponse = {hub:hub, topic:topic, response:hubResponse};
             return subscriptionChangeResponse;
         }

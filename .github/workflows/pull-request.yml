@@ -30,7 +30,7 @@ jobs:
         if: failure()
         with:
           name: Ballerina Internal Log
-          path: websubhub-ballerina/ballerina-internal.log
+          path: websub-ballerina/ballerina-internal.log
           if-no-files-found: ignore
       - name: Generate Codecov Report
         if:  github.event_name == 'pull_request'
