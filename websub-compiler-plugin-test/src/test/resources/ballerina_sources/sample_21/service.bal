@@ -17,6 +17,7 @@
 import ballerina/websub;
 import ballerina/io;
 import ballerina/lang.value;
+import ballerina/jballerina.java;
 
 @websub:SubscriberServiceConfig{}
 service /subscriber on new websub:Listener(9090) {
@@ -52,4 +53,16 @@ service /subscriber on new websub:Listener(9090) {
     function isPushEvent(json retrievedContent) returns boolean {
         return retrievedContent.ref is string;
     }
+
+    // Retrieves the current System output stream
+    isolated function out() returns handle = @java:FieldGet {
+        name: "out",
+        'class: "java.lang.System"
+    } external;
+
+    // Calls `println` method of the  `PrintStream`
+    function println(handle receiver, handle message) = @java:Method {
+        paramTypes: ["java.lang.String"],
+        'class: "java.io.PrintStream"
+    } external;
 }
