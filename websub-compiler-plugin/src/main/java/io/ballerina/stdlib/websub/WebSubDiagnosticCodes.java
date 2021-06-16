@@ -29,7 +29,7 @@ public enum WebSubDiagnosticCodes {
     WEBSUB_101("WEBSUB_101",
             "Subscriber service should be annotated with websub:SubscriberServiceConfig",
             DiagnosticSeverity.ERROR),
-    WEBSUB_102("WEBSUB_102", "websub:SubscriberService should only implement remote methods",
+    WEBSUB_102("WEBSUB_102", "{0} method should be declared as a remote method",
             DiagnosticSeverity.ERROR),
     WEBSUB_103("WEBSUB_103", "websub:SubscriberService should implement onEventNotification method",
             DiagnosticSeverity.ERROR),
