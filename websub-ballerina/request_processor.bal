@@ -37,7 +37,7 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
         hubLeaseSeconds: params?.hubLeaseSeconds
     };
 
-    SubscriptionVerificationSuccess|SubscriptionVerificationError|error result = adaptor.callOnSubscriptionVerificationMethod(message);
+    SubscriptionVerificationSuccess|error result = adaptor.callOnSubscriptionVerificationMethod(message);
     if result is SubscriptionVerificationError {
         response.statusCode = http:STATUS_NOT_FOUND;
         var errorDetails = result.detail();
@@ -147,7 +147,7 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
         response.statusCode = http:STATUS_BAD_REQUEST;
         return;
     } else {
-        Acknowledgement|SubscriptionDeletedError|error? result = adaptor.callOnEventNotificationMethod(message);
+        Acknowledgement|error? result = adaptor.callOnEventNotificationMethod(message, request);
         if result is Acknowledgement {
             updateResponseBody(response, result["body"], result["headers"]);
         } else if result is SubscriptionDeletedError {

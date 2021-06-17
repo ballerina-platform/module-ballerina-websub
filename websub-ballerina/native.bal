@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+import ballerina/http;
 import ballerina/jballerina.java;
 
 isolated class HttpToWebsubAdaptor {
@@ -35,12 +36,16 @@ isolated class HttpToWebsubAdaptor {
         'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"
     } external;
 
-    isolated function callOnEventNotificationMethod(ContentDistributionMessage msg)
+    isolated function callOnEventNotificationMethod(ContentDistributionMessage msg, http:Request request)
                                     returns Acknowledgement|SubscriptionDeletedError|error? = @java:Method {
         'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"
     } external;
 }
 
 isolated function externInit(HttpToWebsubAdaptor adaptor, SubscriberService serviceObj) = @java:Method {
+    'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"
+} external;
+
+isolated function retrieveHttpRequest(ContentDistributionMessage msg) returns http:Request = @java:Method {
     'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"
 } external;

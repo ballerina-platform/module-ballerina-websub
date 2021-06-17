@@ -26,4 +26,5 @@ public interface Constants {
     String PACKAGE_NAME = "websub";
 
     String SERVICE_OBJECT = "WEBSUB_SERVICE_OBJECT";
+    String HTTP_REQUEST = "HTTP_REQUEST";
 }
