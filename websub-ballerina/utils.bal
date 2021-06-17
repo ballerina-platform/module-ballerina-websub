@@ -250,3 +250,15 @@ isolated function respondToRequest(http:Caller caller, http:Response response) {
 isolated function isSuccessStatusCode(int statusCode) returns boolean {
     return (200 <= statusCode && statusCode < 300);
 }
+
+# Returns the value of the specified header. If the specified header key maps to multiple values, the first of
+# these values is returned.
+#
+# + msg - Current `websub:ContentDistributionMessage` object
+# + headerName - The header name
+# + return - The first header value for the specified header name or the `http:HeaderNotFoundError` if the header is not
+#            found.
+public isolated function getHeader(ContentDistributionMessage msg, string headerName) returns string|http:HeaderNotFoundError {
+    http:Request originalRequest = retrieveHttpRequest(msg);
+    return originalRequest.getHeader(headerName);
+}

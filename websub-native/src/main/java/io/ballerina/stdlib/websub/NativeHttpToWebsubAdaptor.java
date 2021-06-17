@@ -33,6 +33,7 @@ import io.ballerina.runtime.api.values.BString;
 
 import java.util.ArrayList;
 
+import static io.ballerina.stdlib.websub.Constants.HTTP_REQUEST;
 import static io.ballerina.stdlib.websub.Constants.SERVICE_OBJECT;
 
 /**
@@ -66,10 +67,15 @@ public class NativeHttpToWebsubAdaptor {
     }
 
     public static Object callOnEventNotificationMethod(Environment env, BObject adaptor,
-                                                       BMap<BString, Object> message) {
+                                                       BMap<BString, Object> message, BObject bHttpRequest) {
+        message.addNativeData(HTTP_REQUEST, bHttpRequest);
         BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
         return invokeRemoteFunction(env, serviceObj, message,
                 "callOnEventNotificationMethod", "onEventNotification");
+    }
+
+    public static BObject retrieveHttpRequest(BMap<BString, Object> message) {
+        return (BObject) message.getNativeData(HTTP_REQUEST);
     }
 
     private static Object invokeRemoteFunction(Environment env, BObject bSubscriberService, Object message,

@@ -147,7 +147,7 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
         response.statusCode = http:STATUS_BAD_REQUEST;
         return;
     } else {
-        Acknowledgement|SubscriptionDeletedError|error? result = adaptor.callOnEventNotificationMethod(message);
+        Acknowledgement|SubscriptionDeletedError|error? result = adaptor.callOnEventNotificationMethod(message, request);
         if result is Acknowledgement {
             updateResponseBody(response, result["body"], result["headers"]);
         } else if result is SubscriptionDeletedError {
