@@ -31,8 +31,7 @@ isolated service class HttpService {
     # 
     # + adaptor - The `websub:HttpToWebsubAdaptor` instance which used as a wrapper to execute service methods
     # + callback - Optional `secretKey` value to be used in the content distribution verification
-    # + return - The `websub:HttpService` or an `error` if the initialization failed
-    isolated function init(HttpToWebsubAdaptor adaptor, string? secretKey) returns error? {
+    isolated function init(HttpToWebsubAdaptor adaptor, string? secretKey) {
         self.adaptor = adaptor;
         self.secretKey = secretKey;
         string[] methodNames = adaptor.getServiceMethodNames();
