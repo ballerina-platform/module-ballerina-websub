@@ -30,14 +30,10 @@ public client class DiscoveryService {
     # 
     # + resourceUrl - User-provided resource URL
     # + publisherClientConfig - Optional `http:ClientConfiguration` to be used in the underlying `http:Client`
-    # + return - The `websub:DiscoveryService` or an `error` if the initialization failed
-    public isolated function init(string discoveryUrl, http:ClientConfiguration? publisherClientConfig) returns error? {
+    # + return - The `websub:DiscoveryService` or an `websub:Error` if the initialization failed
+    public isolated function init(string discoveryUrl, http:ClientConfiguration? config) returns Error? {
         self.resourceUrl = discoveryUrl;
-        if publisherClientConfig is http:ClientConfiguration {
-            self.discoveryClientEp = check new (discoveryUrl, publisherClientConfig);
-        } else {
-            self.discoveryClientEp = check new (discoveryUrl);
-        }
+        self.discoveryClientEp = check retrieveHttpClient(self.resourceUrl, config);
     }
 
     # Discovers the URLs of the hub and topic defined by a resource URL.
