@@ -48,7 +48,7 @@ public client class SubscriptionClient {
     # + return - The `websub:SubscriptionChangeResponse` indicating that the subscription initiation was successful
     #            or else an `websub:SubscriptionInitiationError`
     isolated remote function subscribe(SubscriptionChangeRequest subscriptionRequest)
-        returns @tainted SubscriptionChangeResponse|SubscriptionInitiationError {
+            returns SubscriptionChangeResponse|SubscriptionInitiationError {
         http:Client httpClient = self.httpClient;
         http:Request builtSubscriptionRequest = buildSubscriptionChangeRequest(MODE_SUBSCRIBE, subscriptionRequest);
         http:Response|error response = httpClient->post("", builtSubscriptionRequest);
@@ -63,7 +63,7 @@ public client class SubscriptionClient {
     # + return - The `websub:SubscriptionChangeResponse` indicating that the unsubscription initiation was successful
     #            or else an `websub:SubscriptionInitiationError`
     isolated remote function unsubscribe(SubscriptionChangeRequest unsubscriptionRequest)
-        returns @tainted SubscriptionChangeResponse|SubscriptionInitiationError {
+            returns SubscriptionChangeResponse|SubscriptionInitiationError {
         http:Client httpClient = self.httpClient;
         http:Request builtUnsubscriptionRequest = buildSubscriptionChangeRequest(MODE_UNSUBSCRIBE, unsubscriptionRequest);
         http:Response|error response = httpClient->post("", builtUnsubscriptionRequest);
@@ -83,7 +83,7 @@ public client class SubscriptionClient {
 # + mode - Mode of subscription (subscribe/unsubscribe)
 # + subscriptionChangeRequest - The request payload containing the subscription/unsubscription details
 # + return - An `http:Request` to be sent to the hub to subscribe/unsubscribe
-isolated function buildSubscriptionChangeRequest(@untainted string mode, 
+isolated function buildSubscriptionChangeRequest(string mode, 
                                                  SubscriptionChangeRequest subscriptionChangeRequest) 
                                                  returns http:Request {
     http:Request request = new;
@@ -122,9 +122,9 @@ isolated function buildSubscriptionChangeRequest(@untainted string mode,
 # + subscriptionChangeRequest - The request containing the subscription/unsubscription details
 # + response - Original response received from the `hub` as `http:Response`,`http:PayloadType`, or an `error`
 # + return - The `websub:SubscriptionChangeResponse` if the requested subscription action is successfull or else an `error`
-isolated function processHubResponse(@untainted string hub, @untainted string mode, 
+isolated function processHubResponse(string hub, @untainted string mode, 
                                      SubscriptionChangeRequest subscriptionChangeRequest,
-                                     http:Response|http:PayloadType|error response) returns @tainted SubscriptionChangeResponse|SubscriptionInitiationError {
+                                     http:Response|http:PayloadType|error response) returns SubscriptionChangeResponse|SubscriptionInitiationError {
 
     string topic = subscriptionChangeRequest.topic;
     if response is error {
