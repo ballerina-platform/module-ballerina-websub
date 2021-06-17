@@ -397,3 +397,27 @@ isolated function testRequestHeadersRetrievalWithoutHeaderValue() returns @taint
     test:assertEquals(response.getContentType(), mime:APPLICATION_FORM_URLENCODED);
     test:assertEquals(decodedPayload.get("Message"), "Header Not Found");
 }
+
+@test:Config { 
+    groups: ["httpClientRetrieval"]
+}
+isolated function testRetrieveHttpClientWithConfig() {
+    http:ClientConfiguration httpsConfig = {
+        secureSocket: {
+            cert: {
+                path: "tests/resources/ballerinaTruststore.pkcs12",
+                password: "ballerina"
+            }
+        }
+    };
+    var clientEp = retrieveHttpClient("https://test.com/sample", httpsConfig);
+    test:assertTrue(clientEp is http:Client);
+}
+
+@test:Config { 
+    groups: ["httpClientRetrieval"]
+}
+isolated function testRetrieveHttpClientWithoutConfig() {
+    var clientEp = retrieveHttpClient("https://test.com/sample", ());
+    test:assertTrue(clientEp is http:Client);
+}

@@ -30,14 +30,10 @@ public client class DiscoveryService {
     # 
     # + resourceUrl - User-provided resource URL
     # + publisherClientConfig - Optional `http:ClientConfiguration` to be used in the underlying `http:Client`
-    # + return - The `websub:DiscoveryService` or an `error` if the initialization failed
-    public isolated function init(string discoveryUrl, http:ClientConfiguration? publisherClientConfig) returns error? {
+    # + return - The `websub:DiscoveryService` or an `websub:Error` if the initialization failed
+    public isolated function init(string discoveryUrl, http:ClientConfiguration? config) returns Error? {
         self.resourceUrl = discoveryUrl;
-        if publisherClientConfig is http:ClientConfiguration {
-            self.discoveryClientEp = check new (discoveryUrl, publisherClientConfig);
-        } else {
-            self.discoveryClientEp = check new (discoveryUrl);
-        }
+        self.discoveryClientEp = check retrieveHttpClient(self.resourceUrl, config);
     }
 
     # Discovers the URLs of the hub and topic defined by a resource URL.
@@ -47,9 +43,9 @@ public client class DiscoveryService {
     # 
     # + expectedMediaTypes - The expected media types for the subscriber client
     # + expectedLanguageTypes - The expected language types for the subscriber client
-    # + return - A `(hub, topic)` as a `(string, string)` if successful or else an `error` if not
+    # + return - A `(hub, topic)` as a `(string, string)` if successful or else an `websub:ResourceDiscoveryFailedError` if not
     remote isolated function discoverResourceUrls(string?|string[] expectedMediaTypes, string?|string[] expectedLanguageTypes) 
-                                        returns @tainted [string, string]|error {    
+                                        returns [string, string]|ResourceDiscoveryFailedError {    
         map<string|string[]> headers = {};
         if expectedMediaTypes is string {
             headers[ACCEPT_HEADER] = expectedMediaTypes;
@@ -84,7 +80,7 @@ public client class DiscoveryService {
                 [topic, hubs] = topicAndHubs;
                 return [hubs[0], topic]; // guaranteed by `extractTopicAndHubUrls` for hubs to have length > 0
             } else {
-                return topicAndHubs;
+                return error ResourceDiscoveryFailedError(topicAndHubs.message());
             }
         } else {
             return error ResourceDiscoveryFailedError("Error occurred with WebSub discovery for Resource URL [" + self.resourceUrl + "]: " +
@@ -100,7 +96,7 @@ public client class DiscoveryService {
 # 
 # + response - Received `http:Response` instance
 # + return - Tuple `(topic, hubs)` if parsing and extraction is successful or else an `error`
-isolated function extractTopicAndHubUrls(http:Response response) returns @tainted [string, string[]]|error {
+isolated function extractTopicAndHubUrls(http:Response response) returns [string, string[]]|error {
     string[] linkHeaders = [];
     if response.hasHeader("Link") {
         linkHeaders = check response.getHeaders("Link");

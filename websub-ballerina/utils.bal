@@ -251,6 +251,24 @@ isolated function isSuccessStatusCode(int statusCode) returns boolean {
     return (200 <= statusCode && statusCode < 300);
 }
 
+isolated function retrieveHttpClient(string url, http:ClientConfiguration? config) returns http:Client|Error {
+    if config is http:ClientConfiguration {
+        http:Client|error clientEp = new (url, config);
+        if (clientEp is http:Client) {
+            return clientEp;
+        } else {
+            return error Error("Client initialization failed", clientEp);
+        }
+    } else {
+        http:Client|error clientEp = new (url);
+        if (clientEp is http:Client) {
+            return clientEp;
+        } else {
+            return error Error("Client initialization failed", clientEp);
+        }
+    }
+}
+
 # Returns the value of the specified header. If the specified header key maps to multiple values, the first of
 # these values is returned.
 #
