@@ -258,8 +258,11 @@ isolated function testCallbackUrlLoggingFailureForServicePathProvided() returns 
     test:assertFalse(isLoggingEnabled, "Callback URL logging is enabled for invalid scenario");
 }
 
+
+listener Listener utilTestListener = new (9101);
+
 @SubscriberServiceConfig{}
-service /subscriber on new Listener(9101) {
+service /utilTest1 on utilTestListener {
     isolated remote function onEventNotification(ContentDistributionMessage event) returns Acknowledgement {
         string|http:HeaderNotFoundError headerValue = getHeader(event, "Custom-Header");
         if (headerValue is string) {
@@ -278,7 +281,28 @@ service /subscriber on new Listener(9101) {
     }
 }
 
-final http:Client headerUtilTestClient = check new ("http://localhost:9101/subscriber");
+@SubscriberServiceConfig{}
+service /utilTest2 on utilTestListener {
+    isolated remote function onEventNotification(ContentDistributionMessage event) returns Acknowledgement {
+        string[]|http:HeaderNotFoundError values = getHeaders(event, "Custom-Header");
+        if (values is string[]) {
+            string concatenatedValues = string:'join(",", ...values);
+            return {
+                body: {
+                    "Custom-Header": concatenatedValues
+                }
+            };
+        } else {
+            return {
+                body: {
+                    "Message": "Header Not Found"
+                }
+            };
+        }
+    }
+}
+
+final http:Client headerUtilTestClient1 = check new ("http://localhost:9101/utilTest1");
 
 @test:Config { 
     groups: ["requestHeader"]
@@ -287,7 +311,7 @@ isolated function testRequestHeaderRetrievalWithStandardHeadeName() returns @tai
     http:Request request = new;
     request.setHeader("Custom-Header", "Custom Header Value");
     request.setTextPayload("This is a sample message");
-    http:Response response = check headerUtilTestClient->post("/", request);
+    http:Response response = check headerUtilTestClient1->post("/", request);
     string payload = check response.getTextPayload();
     map<string> decodedPayload = decodeResponseBody(payload);
     test:assertEquals(response.statusCode, 202);
@@ -302,7 +326,7 @@ isolated function testRequestHeaderRetrievalWithNonStandardHeadeName() returns @
     http:Request request = new;
     request.setHeader("custoM-HeaDer", "Custom Header Value");
     request.setTextPayload("This is a sample message");
-    http:Response response = check headerUtilTestClient->post("/", request);
+    http:Response response = check headerUtilTestClient1->post("/", request);
     string payload = check response.getTextPayload();
     map<string> decodedPayload = decodeResponseBody(payload);
     test:assertEquals(response.statusCode, 202);
@@ -316,7 +340,57 @@ isolated function testRequestHeaderRetrievalWithNonStandardHeadeName() returns @
 isolated function testRequestHeaderRetrievalWithoutHeaderValue() returns @tainted error? {
     http:Request request = new;
     request.setTextPayload("This is a sample message");
-    http:Response response = check headerUtilTestClient->post("/", request);
+    http:Response response = check headerUtilTestClient1->post("/", request);
+    string payload = check response.getTextPayload();
+    map<string> decodedPayload = decodeResponseBody(payload);
+    test:assertEquals(response.statusCode, 202);
+    test:assertEquals(response.getContentType(), mime:APPLICATION_FORM_URLENCODED);
+    test:assertEquals(decodedPayload.get("Message"), "Header Not Found");
+}
+
+final http:Client headerUtilTestClient2 = check new ("http://localhost:9101/utilTest2");
+
+@test:Config { 
+    groups: ["requestHeader"]
+}
+isolated function testRequestHeadersRetrievalWithStandardHeadeName() returns @tainted error? {
+    http:Request request = new;
+    request.addHeader("Custom-Header", "Val1");
+    request.addHeader("Custom-Header", "Val2");
+    request.addHeader("Custom-Header", "Val3");
+    request.setTextPayload("This is a sample message");
+    http:Response response = check headerUtilTestClient2->post("/", request);
+    string payload = check response.getTextPayload();
+    map<string> decodedPayload = decodeResponseBody(payload);
+    test:assertEquals(response.statusCode, 202);
+    test:assertEquals(response.getContentType(), mime:APPLICATION_FORM_URLENCODED);
+    test:assertEquals(decodedPayload.get("Custom-Header"), "Val1,Val2,Val3");
+}
+
+@test:Config { 
+    groups: ["requestHeader"]
+}
+isolated function testRequestHeadersRetrievalWithNonStandardHeadeName() returns @tainted error? {
+    http:Request request = new;
+    request.addHeader("custoM-HeaDer", "Val1");
+    request.addHeader("custoM-HeaDer", "Val2");
+    request.addHeader("custoM-HeaDer", "Val3");
+    request.setTextPayload("This is a sample message");
+    http:Response response = check headerUtilTestClient2->post("/", request);
+    string payload = check response.getTextPayload();
+    map<string> decodedPayload = decodeResponseBody(payload);
+    test:assertEquals(response.statusCode, 202);
+    test:assertEquals(response.getContentType(), mime:APPLICATION_FORM_URLENCODED);
+    test:assertEquals(decodedPayload.get("Custom-Header"), "Val1,Val2,Val3");
+}
+
+@test:Config { 
+    groups: ["requestHeader"]
+}
+isolated function testRequestHeadersRetrievalWithoutHeaderValue() returns @tainted error? {
+    http:Request request = new;
+    request.setTextPayload("This is a sample message");
+    http:Response response = check headerUtilTestClient2->post("/", request);
     string payload = check response.getTextPayload();
     map<string> decodedPayload = decodeResponseBody(payload);
     test:assertEquals(response.statusCode, 202);

@@ -262,3 +262,14 @@ public isolated function getHeader(ContentDistributionMessage msg, string header
     http:Request originalRequest = retrieveHttpRequest(msg);
     return originalRequest.getHeader(headerName);
 }
+
+# Gets all the header values to which the specified header key maps to.
+#
+# + msg - Current `websub:ContentDistributionMessage` object
+# + headerName - The header name
+# + return - The header values the specified header key maps to or the `http:HeaderNotFoundError` if the header is not
+#            found.
+public isolated function getHeaders(ContentDistributionMessage msg, string headerName) returns string[]|http:HeaderNotFoundError {
+    http:Request originalRequest = retrieveHttpRequest(msg);
+    return originalRequest.getHeaders(headerName);
+}
