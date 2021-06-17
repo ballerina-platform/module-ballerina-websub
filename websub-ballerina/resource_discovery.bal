@@ -47,9 +47,9 @@ public client class DiscoveryService {
     # 
     # + expectedMediaTypes - The expected media types for the subscriber client
     # + expectedLanguageTypes - The expected language types for the subscriber client
-    # + return - A `(hub, topic)` as a `(string, string)` if successful or else an `error` if not
+    # + return - A `(hub, topic)` as a `(string, string)` if successful or else an `websub:ResourceDiscoveryFailedError` if not
     remote isolated function discoverResourceUrls(string?|string[] expectedMediaTypes, string?|string[] expectedLanguageTypes) 
-                                        returns @tainted [string, string]|error {    
+                                        returns [string, string]|ResourceDiscoveryFailedError {    
         map<string|string[]> headers = {};
         if expectedMediaTypes is string {
             headers[ACCEPT_HEADER] = expectedMediaTypes;
@@ -84,7 +84,7 @@ public client class DiscoveryService {
                 [topic, hubs] = topicAndHubs;
                 return [hubs[0], topic]; // guaranteed by `extractTopicAndHubUrls` for hubs to have length > 0
             } else {
-                return topicAndHubs;
+                return error ResourceDiscoveryFailedError(topicAndHubs.message());
             }
         } else {
             return error ResourceDiscoveryFailedError("Error occurred with WebSub discovery for Resource URL [" + self.resourceUrl + "]: " +

@@ -46,10 +46,9 @@ public client class SubscriptionClient {
     #
     # + subscriptionRequest - The request payload containing the subscription details
     # + return - The `websub:SubscriptionChangeResponse` indicating that the subscription initiation was successful
-    #            or else an `error`
+    #            or else an `websub:SubscriptionInitiationError`
     isolated remote function subscribe(SubscriptionChangeRequest subscriptionRequest)
-        returns @tainted SubscriptionChangeResponse|error {
-
+        returns @tainted SubscriptionChangeResponse|SubscriptionInitiationError {
         http:Client httpClient = self.httpClient;
         http:Request builtSubscriptionRequest = buildSubscriptionChangeRequest(MODE_SUBSCRIBE, subscriptionRequest);
         http:Response|error response = httpClient->post("", builtSubscriptionRequest);
@@ -62,10 +61,9 @@ public client class SubscriptionClient {
     # ```
     # + unsubscriptionRequest - The request payload containing the unsubscription details
     # + return - The `websub:SubscriptionChangeResponse` indicating that the unsubscription initiation was successful
-    #            or else an `error`
+    #            or else an `websub:SubscriptionInitiationError`
     isolated remote function unsubscribe(SubscriptionChangeRequest unsubscriptionRequest)
-        returns @tainted SubscriptionChangeResponse|error {
-
+        returns @tainted SubscriptionChangeResponse|SubscriptionInitiationError {
         http:Client httpClient = self.httpClient;
         http:Request builtUnsubscriptionRequest = buildSubscriptionChangeRequest(MODE_UNSUBSCRIBE, unsubscriptionRequest);
         http:Response|error response = httpClient->post("", builtUnsubscriptionRequest);
@@ -87,9 +85,8 @@ public client class SubscriptionClient {
 # + return - An `http:Request` to be sent to the hub to subscribe/unsubscribe
 isolated function buildSubscriptionChangeRequest(@untainted string mode, 
                                                  SubscriptionChangeRequest subscriptionChangeRequest) 
-                                                returns (http:Request) {
+                                                 returns http:Request {
     http:Request request = new;
-
     string callback = subscriptionChangeRequest.callback;
     var encodedCallback = url:encode(callback, "UTF-8");
     if encodedCallback is string {
@@ -127,7 +124,7 @@ isolated function buildSubscriptionChangeRequest(@untainted string mode,
 # + return - The `websub:SubscriptionChangeResponse` if the requested subscription action is successfull or else an `error`
 isolated function processHubResponse(@untainted string hub, @untainted string mode, 
                                      SubscriptionChangeRequest subscriptionChangeRequest,
-                                     http:Response|http:PayloadType|error response) returns @tainted SubscriptionChangeResponse|error {
+                                     http:Response|http:PayloadType|error response) returns @tainted SubscriptionChangeResponse|SubscriptionInitiationError {
 
     string topic = subscriptionChangeRequest.topic;
     if response is error {
