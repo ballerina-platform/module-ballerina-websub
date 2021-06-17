@@ -401,7 +401,7 @@ isolated function testRequestHeadersRetrievalWithoutHeaderValue() returns @taint
 @test:Config { 
     groups: ["httpClientRetrieval"]
 }
-isolated function testRetrieveHttpClientWithConfig() returns @tainted error? {
+isolated function testRetrieveHttpClientWithConfig() {
     http:ClientConfiguration httpsConfig = {
         secureSocket: {
             cert: {
@@ -410,14 +410,14 @@ isolated function testRetrieveHttpClientWithConfig() returns @tainted error? {
             }
         }
     };
-    http:Client clientEp = check retrieveHttpClient("https://test.com/sample", httpsConfig);
+    var clientEp = retrieveHttpClient("https://test.com/sample", httpsConfig);
     test:assertTrue(clientEp is http:Client);
 }
 
 @test:Config { 
     groups: ["httpClientRetrieval"]
 }
-isolated function testRetrieveHttpClientWithoutConfig() returns @tainted error? {
-    http:Client clientEp = check retrieveHttpClient("https://test.com/sample", ());
+isolated function testRetrieveHttpClientWithoutConfig() {
+    var clientEp = retrieveHttpClient("https://test.com/sample", ());
     test:assertTrue(clientEp is http:Client);
 }
