@@ -113,7 +113,7 @@ dependencies {
     externalJars(group: 'org.wso2.carbon.metrics', name: 'org.wso2.carbon.metrics.core', version: "${wso2CarbonMetricsVersion}") {
         transitive = false
     }
-    externalJars(group: 'org.ballerinalang', name: 'http-native', version: "${stdlibHttpVersion}") {
+    externalJars(group: 'io.ballerina.stdlib', name: 'http-native', version: "${stdlibHttpVersion}") {
         transitive = false
     }
 }

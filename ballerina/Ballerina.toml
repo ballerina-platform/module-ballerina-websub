@@ -4,7 +4,7 @@ name = "websub"
 version = "@toml.version@"
 
 [[platform.java11.dependency]]
-path = "../websub-native/build/libs/websub-native-@project.version@.jar"
+path = "../native/build/libs/websub-native-@project.version@.jar"
 groupId = "ballerina"
 artifactId = "web-sub"
 version = "@project.version@"
@@ -12,7 +12,7 @@ version = "@project.version@"
 
 [[platform.java11.dependency]]
 path = "./lib/http-native-@http.native.version@.jar"
-groupId = "org.ballerinalang"
+groupId = "io.ballerina.stdlib"
 artifactId = "http-native"
 version = "@http.native.version@"
 
