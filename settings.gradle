@@ -12,11 +12,18 @@ plugins {
 }
 
 rootProject.name = 'websub'
-include ':build-config:checkstyle'
+
+include ':checkstyle'
 include ':websub-native'
 include ':websub-ballerina'
 include ':websub-compiler-plugin'
 include ':websub-compiler-plugin-test'
+
+project(':checkstyle').projectDir = file("build-config${File.separator}checkstyle")
+project(':websub-native').projectDir = file("native")
+project(':websub-compiler-plugin').projectDir = file("compiler-plugin")
+project(':websub-ballerina').projectDir = file("ballerina")
+project(':websub-compiler-plugin-test').projectDir = file("compiler-plugin-test")
 
 gradleEnterprise {
     buildScan {
