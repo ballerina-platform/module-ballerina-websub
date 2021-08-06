@@ -44,8 +44,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static io.ballerina.stdlib.websub.task.AnalyserUtils.getTypeDescription;
 import static io.ballerina.stdlib.websub.task.AnalyserUtils.getQualifiedType;
+import static io.ballerina.stdlib.websub.task.AnalyserUtils.getTypeDescription;
 import static io.ballerina.stdlib.websub.task.AnalyserUtils.isRemoteMethod;
 import static io.ballerina.stdlib.websub.task.AnalyserUtils.updateContext;
 
