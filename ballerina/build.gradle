@@ -35,9 +35,7 @@ def packageName = "websub"
 def packageOrg = "ballerina"
 def tomlVersion = stripBallerinaExtensionVersion("${project.version}")
 def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
-def ballerinaDependencyFile = new File("$project.projectDir/Dependencies.toml")
 def ballerinaCompilerPluginFile = new File("$project.projectDir/CompilerPlugin.toml")
-def originalDependencies = ballerinaDependencyFile.text
 def originalCompilerPlugin = ballerinaCompilerPluginFile.text
 def originalConfig = ballerinaConfigFile.text
 
@@ -147,22 +145,6 @@ task updateTomlFiles {
         newConfig = newConfig.replace("@http.native.version@", project.stdlibHttpVersion)
         ballerinaConfigFile.text = newConfig
 
-        // Dynamic version update of stdlib dependencies
-        def newDependencyConfig = ballerinaDependencyFile.text.replace("@stdlib.http.version@", stdlibDependentHttpVersion)
-        newDependencyConfig = newDependencyConfig.replace("@stdlib.mime.version@", stdlibDependentMimeVersion)
-        newDependencyConfig = newDependencyConfig.replace("@stdlib.auth.version@", stdlibDependentAuthVersion)
-        newDependencyConfig = newDependencyConfig.replace("@stdlib.cache.version@", stdlibDependentCacheVersion)
-        newDependencyConfig = newDependencyConfig.replace("@stdlib.crypto.version@", stdlibDependentCryptoVersion)
-        newDependencyConfig = newDependencyConfig.replace("@stdlib.url.version@", stdlibDependentUrlVersion)
-        newDependencyConfig = newDependencyConfig.replace("@stdlib.log.version@", stdlibDependentLogVersion)
-        newDependencyConfig = newDependencyConfig.replace("@stdlib.time.version@", stdlibDependentTimeVersion)
-        newDependencyConfig = newDependencyConfig.replace("@stdlib.os.version@", stdlibDependentOsVersion)
-        newDependencyConfig = newDependencyConfig.replace("@stdlib.io.version@", stdlibDependentIoVersion)
-        newDependencyConfig = newDependencyConfig.replace("@stdlib.regex.version@", stdlibDependentRegexVersion)
-        newDependencyConfig = newDependencyConfig.replace("@stdlib.uuid.version@", stdlibDependentUuidVersion)
-        newDependencyConfig = newDependencyConfig.replace("@stdlib.random.version@", stdlibDependentRandomVersion)
-        ballerinaDependencyFile.text = newDependencyConfig
-
         def newPluginConfig = ballerinaCompilerPluginFile.text.replace("@project.version@", project.version)
         ballerinaCompilerPluginFile.text = newPluginConfig
     }
@@ -171,7 +153,6 @@ task updateTomlFiles {
 task revertTomlFiles {
     doLast {
         ballerinaConfigFile.text = originalConfig
-        ballerinaDependencyFile.text = originalDependencies
         ballerinaCompilerPluginFile.text = originalCompilerPlugin
     }
 }
