@@ -18,16 +18,16 @@
 
 package io.ballerina.stdlib.websub;
 
-import io.ballerina.projects.plugins.CompilerPlugin;
-import io.ballerina.projects.plugins.CompilerPluginContext;
+import io.ballerina.projects.plugins.CompilerLifecycleContext;
+import io.ballerina.projects.plugins.CompilerLifecycleListener;
+import io.ballerina.stdlib.websub.task.WebSubServiceInfoPackagingTask;
 
 /**
- * {@code WebSubCompilerPlugin} handles compile-time code analysis for WebSub based Services.
+ * {@code WebSubLifeCycleListener} initiates post compile tasks related to WebSub service path generation.
  */
-public class WebSubCompilerPlugin extends CompilerPlugin {
+public class WebSubLifeCycleListener extends CompilerLifecycleListener {
     @Override
-    public void init(CompilerPluginContext context) {
-        context.addCodeAnalyzer(new WebSubCodeAnalyzer());
-        context.addCompilerLifecycleListener(new WebSubLifeCycleListener());
+    public void init(CompilerLifecycleContext context) {
+        context.addCodeGenerationCompletedTask(new WebSubServiceInfoPackagingTask());
     }
 }
