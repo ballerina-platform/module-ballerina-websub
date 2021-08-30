@@ -21,11 +21,18 @@ package io.ballerina.stdlib.websub.task;
 import io.ballerina.compiler.api.symbols.ServiceDeclarationSymbol;
 import io.ballerina.compiler.api.symbols.Symbol;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
+import io.ballerina.projects.Project;
 import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
+import io.ballerina.stdlib.websub.WebSubDiagnosticCodes;
+import io.ballerina.stdlib.websub.task.service.path.ServicePathGenerationException;
+import io.ballerina.stdlib.websub.task.service.path.ServicePathGeneratorManager;
 import io.ballerina.stdlib.websub.task.validator.ServiceDeclarationValidator;
+import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 
 import java.util.Optional;
+
+import static io.ballerina.stdlib.websub.task.AnalyserUtils.updateContext;
 
 /**
  * {@code ServiceDeclarationValidator} validates whether websub service declaration is complying to current websub
@@ -33,19 +40,42 @@ import java.util.Optional;
  */
 public class ServiceAnalysisTask implements AnalysisTask<SyntaxNodeAnalysisContext> {
     private final ServiceDeclarationValidator validator;
+    private final ServicePathGeneratorManager servicePathGenerator;
 
     public ServiceAnalysisTask() {
         this.validator = ServiceDeclarationValidator.getInstance();
+        this.servicePathGenerator = new ServicePathGeneratorManager();
     }
 
     @Override
     public void perform(SyntaxNodeAnalysisContext context) {
+        Project currentProject = context.currentPackage().project();
         ServiceDeclarationNode serviceNode = (ServiceDeclarationNode) context.node();
         Optional<Symbol> serviceDeclarationOpt = context.semanticModel().symbol(serviceNode);
         if (serviceDeclarationOpt.isPresent()) {
             ServiceDeclarationSymbol serviceDeclarationSymbol = (ServiceDeclarationSymbol) serviceDeclarationOpt.get();
             if (isWebSubService(serviceDeclarationSymbol)) {
                 this.validator.validate(context, serviceNode, serviceDeclarationSymbol);
+            }
+            generateUniqueServicePath(context, currentProject, serviceDeclarationSymbol.hashCode(), serviceNode);
+        }
+    }
+
+    private void generateUniqueServicePath(SyntaxNodeAnalysisContext context, Project currentProject,
+                                           int serviceId, ServiceDeclarationNode serviceNode) {
+        // check whether current project compilation contains any error
+        // generate service path only if there is no error
+        boolean isValidWebSubService = context.compilation().diagnosticResult()
+                .diagnostics().stream()
+                .noneMatch(d -> d.diagnosticInfo().severity().equals(DiagnosticSeverity.ERROR));
+
+        if (isValidWebSubService) {
+            try {
+                this.servicePathGenerator.generate(currentProject, serviceId);
+            } catch (ServicePathGenerationException ex) {
+                String errorMsg = ex.getLocalizedMessage();
+                WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_200;
+                updateContext(context, errorCode, serviceNode.location(), errorMsg);
             }
         }
     }

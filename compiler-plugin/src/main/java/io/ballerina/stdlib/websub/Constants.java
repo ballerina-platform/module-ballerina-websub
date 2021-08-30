@@ -42,4 +42,10 @@ public interface Constants {
     String ERROR = "annotations:error";
 
     String OPTIONAL = "?";
+
+    // resource directory structure related constants
+    String TARGET_DIR_NAME = "target";
+    String BIN_DIR_NAME = "bin";
+    String RESOURCES_DIR_NAME = "resources";
+    String RESOURCE_DIR_NAME = "resource";
 }

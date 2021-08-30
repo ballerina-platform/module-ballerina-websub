@@ -36,6 +36,10 @@ import io.ballerina.tools.diagnostics.Diagnostic;
 import io.ballerina.tools.diagnostics.DiagnosticFactory;
 import io.ballerina.tools.diagnostics.DiagnosticInfo;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -123,5 +127,18 @@ public final class AnalyserUtils {
 
     public static boolean isRemoteMethod(FunctionSymbol functionSymbol) {
         return functionSymbol.qualifiers().contains(Qualifier.REMOTE);
+    }
+
+    /**
+     * Writes a file with content to specified {@code filePath}.
+     *
+     * @param filePath valid file path to write the content
+     * @param content  content of the file
+     * @throws IOException when a file operation fails
+     */
+    public static void writeFile(Path filePath, String content) throws IOException {
+        try (FileWriter writer = new FileWriter(filePath.toString(), StandardCharsets.UTF_8, true)) {
+            writer.write(content);
+        }
     }
 }
