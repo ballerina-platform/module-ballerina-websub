@@ -15,10 +15,12 @@
 // under the License.
 
 import ballerina/http;
+import ballerina/lang.runtime;
 import ballerina/log;
 
 # Represents a Subscriber Service listener endpoint.
 public class Listener {
+    private final decimal gracefulStopTime = 30;
     private http:Listener httpListener;
     private http:ListenerConfiguration listenerConfig;
     private SubscriberServiceConfiguration? serviceConfig;
@@ -171,6 +173,8 @@ public class Listener {
             error? result = initiateUnsubscription(serviceConfig, <string>callback);
             if result is error {
                 log:printWarn("Unsubscription initiation failed", result);
+            } else {
+                runtime:sleep(self.gracefulStopTime);
             }
         }
 
@@ -187,15 +191,6 @@ public class Listener {
     # 
     # + return - An `websub:Error`, if an error occurred during the listener stopping process or else `()`
     public isolated function immediateStop() returns Error? {
-        SubscriberServiceConfiguration? serviceConfig = self.serviceConfig;
-        string? callback = self.callbackUrl;
-        if serviceConfig is SubscriberServiceConfiguration && serviceConfig.unsubscribeOnShutdown {
-            error? result = initiateUnsubscription(serviceConfig, <string>callback);
-            if result is error {
-                log:printWarn("Unsubscription initiation failed", result);
-            }
-        }
-
         error? result = self.httpListener.immediateStop();
         if (result is error) {
             return error Error("Error occurred while stopping the service", result);
