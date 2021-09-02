@@ -146,8 +146,8 @@ public class Listener {
             return error Error("Error occurred while starting the service", listenerError);
         }
 
-        var serviceConfig = self.serviceConfig;
-        var callback = self.callbackUrl;
+        SubscriberServiceConfiguration? serviceConfig = self.serviceConfig;
+        string? callback = self.callbackUrl;
         if serviceConfig is SubscriberServiceConfiguration {
             error? result = initiateSubscription(serviceConfig, <string>callback);
             if result is error {
@@ -165,6 +165,15 @@ public class Listener {
     # 
     # + return - An `websub:Error`, if an error occurred during the listener stopping process or else `()`
     public isolated function gracefulStop() returns Error? {
+        SubscriberServiceConfiguration? serviceConfig = self.serviceConfig;
+        string? callback = self.callbackUrl;
+        if serviceConfig is SubscriberServiceConfiguration && serviceConfig.unsubscribeOnShutdown {
+            error? result = initiateUnsubscription(serviceConfig, <string>callback);
+            if result is error {
+                log:printWarn("Unsubscription initiation failed", result);
+            }
+        }
+
         error? result = self.httpListener.gracefulStop();
         if (result is error) {
             return error Error("Error occurred while stopping the service", result);
@@ -178,6 +187,15 @@ public class Listener {
     # 
     # + return - An `websub:Error`, if an error occurred during the listener stopping process or else `()`
     public isolated function immediateStop() returns Error? {
+        SubscriberServiceConfiguration? serviceConfig = self.serviceConfig;
+        string? callback = self.callbackUrl;
+        if serviceConfig is SubscriberServiceConfiguration && serviceConfig.unsubscribeOnShutdown {
+            error? result = initiateUnsubscription(serviceConfig, <string>callback);
+            if result is error {
+                log:printWarn("Unsubscription initiation failed", result);
+            }
+        }
+
         error? result = self.httpListener.immediateStop();
         if (result is error) {
             return error Error("Error occurred while stopping the service", result);
@@ -307,48 +325,54 @@ isolated function isLoggingGeneratedCallback(string? providedCallback, string[]|
     return providedCallback is () && (servicePath is () || (servicePath is string[] && (<string[]>servicePath).length() == 0));
 }
 
-# Initiates the subscription to the `topic` in the mentioned `hub`.
-# ```ballerina
-# check initiateSubscription(serviceConfig, "https://callback.url/subscriber");
-# ```
-# 
-# + serviceConfig - User provided `websub:SubscriberServiceConfiguration`
-# + callbackUrl - Subscriber callback URL
-# + return - An `error`, if an error occurred during the subscription-initiation or else `()`
 isolated function initiateSubscription(SubscriberServiceConfiguration serviceConfig, string callbackUrl) returns error? {
-    string|[string, string]? target = serviceConfig?.target;
-        
-    string hubUrl;
-    string topicUrl;
-        
-    if target is string {
-        var discoveryConfig = serviceConfig?.discoveryConfig;
-        http:ClientConfiguration? discoveryHttpConfig = discoveryConfig?.httpConfig ?: ();
-        string?|string[] expectedMediaTypes = discoveryConfig?.accept ?: ();
-        string?|string[] expectedLanguageTypes = discoveryConfig?.acceptLanguage ?: ();
-
-        DiscoveryService discoveryClient = check new (target, discoveryConfig?.httpConfig);
-        var discoveryDetails = discoveryClient->discoverResourceUrls(expectedMediaTypes, expectedLanguageTypes);
-        if discoveryDetails is [string, string] {
-            [hubUrl, topicUrl] = <[string, string]> discoveryDetails;
-        } else {
-            return error ResourceDiscoveryFailedError(discoveryDetails.message());
-        }
-    } else if target is [string, string] {
-        [hubUrl, topicUrl] = <[string, string]> target;
+    string hub;
+    string topic;
+    [string, string]? resourceDetails = check retrieveResourceDetails(serviceConfig);
+    if resourceDetails is [string, string] {
+        [hub, topic] = resourceDetails;
     } else {
         log:printWarn("Subscription not initiated as subscriber target-URL is not provided");
         return;
     }
 
-    SubscriptionClient subscriberClientEp = check getSubscriberClient(hubUrl, serviceConfig?.httpConfig);
-    SubscriptionChangeRequest request = retrieveSubscriptionRequest(topicUrl, callbackUrl, serviceConfig);
-    var response = subscriberClientEp->subscribe(request);
-    if response is SubscriptionChangeResponse {
-        string subscriptionSuccessMsg = string `Subscription Request successfully sent to Hub[${response.hub}], for Topic[${response.topic}], with Callback [${callbackUrl}]`;
-        log:printDebug(subscriptionSuccessMsg);
+    SubscriptionClient subscriberClientEp = check getSubscriberClient(hub, serviceConfig?.httpConfig);
+    SubscriptionChangeRequest request = retrieveSubscriptionRequest(topic, callbackUrl, serviceConfig);
+    SubscriptionChangeResponse response = check subscriberClientEp->subscribe(request);
+    string subscriptionSuccessMsg = string `Subscription Request successfully sent to Hub[${response.hub}], for Topic[${response.topic}], with Callback [${callbackUrl}]`;
+    log:printDebug(subscriptionSuccessMsg);
+}
+
+isolated function initiateUnsubscription(SubscriberServiceConfiguration serviceConfig, string callbackUrl) returns error? {
+    string hub;
+    string topic;
+    [string, string]? resourceDetails = check retrieveResourceDetails(serviceConfig);
+    if resourceDetails is [string, string] {
+        [hub, topic] = resourceDetails;
     } else {
-        return response;
+        log:printWarn("Unsubscription not initiated as subscriber target-URL is not provided");
+        return;
+    }
+
+    SubscriptionClient subscriberClientEp = check getSubscriberClient(hub, serviceConfig?.httpConfig);
+    SubscriptionChangeRequest request = retrieveSubscriptionRequest(topic, callbackUrl, serviceConfig);
+    SubscriptionChangeResponse response = check subscriberClientEp->unsubscribe(request);
+    string subscriptionSuccessMsg = string `Unubscription Request successfully sent to Hub[${response.hub}], for Topic[${response.topic}], with Callback [${callbackUrl}]`;
+    log:printDebug(subscriptionSuccessMsg);
+}
+
+isolated function retrieveResourceDetails(SubscriberServiceConfiguration serviceConfig) returns [string, string]|error? {
+    string|[string, string]? target = serviceConfig?.target;
+    if target is string {
+        var discoveryConfig = serviceConfig?.discoveryConfig;
+        http:ClientConfiguration? discoveryHttpConfig = discoveryConfig?.httpConfig ?: ();
+        string?|string[] expectedMediaTypes = discoveryConfig?.accept ?: ();
+        string?|string[] expectedLanguageTypes = discoveryConfig?.acceptLanguage ?: ();
+        DiscoveryService discoveryClient = check new (target, discoveryConfig?.httpConfig);
+        [string, string] resourceDetails = check discoveryClient->discoverResourceUrls(expectedMediaTypes, expectedLanguageTypes);
+        return resourceDetails;
+    } else if target is [string, string] {
+        return target;
     }
 }
 
