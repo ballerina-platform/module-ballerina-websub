@@ -24,6 +24,7 @@ import ballerina/http;
 # + callback - The callback URL for subscriber-service
 # + secret - The secret to be used for authenticated content distribution
 # + appendServiceUrl - This flag notifies whether or not to append service-path to callback-url
+# + unsubscribeOnShutdown - This flag notifies whether or not to initiate unsubscription when the service is shutting down
 # + httpConfig - The configuration for the hub client used to interact with the discovered/specified hub
 # + discoveryConfig - HTTP client configurations for resource discovery
 public type SubscriberServiceConfiguration record {|
@@ -31,7 +32,8 @@ public type SubscriberServiceConfiguration record {|
     int leaseSeconds?;
     string callback?;
     string secret?;
-    boolean appendServiceUrl = false;   
+    boolean appendServiceUrl = false;
+    boolean unsubscribeOnShutdown = false;   
     http:ClientConfiguration httpConfig?;
     record {|
         string|string[] accept?;
