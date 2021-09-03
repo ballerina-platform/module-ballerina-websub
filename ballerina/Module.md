@@ -106,7 +106,7 @@ ngrok http -bind-tls=true 9090
     target: "RESOURCE_URL", 
     leaseSeconds: 36000,
     callback: "<NGROK_PUBLIC_URL>",
-    appendServiceUrl: true
+    appendServicePath: true
 } 
 service on new websub:Listener(9090) {
     remote function onEventNotification(websub:ContentDistributionMessage event) 
@@ -127,7 +127,7 @@ service on new websub:Listener(9090) {
     target: "RESOURCE_URL", 
     leaseSeconds: 36000,
     callback: "<NGROK_PUBLIC_URL>",
-    appendServiceUrl: true
+    appendServicePath: true
 } 
 service on new websub:Listener(9090) {
     remote function onEventNotification(websub:ContentDistributionMessage event) 
