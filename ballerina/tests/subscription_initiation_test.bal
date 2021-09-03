@@ -42,7 +42,8 @@ isolated function getServiceConfig(string|[string, string] target) returns Subsc
     return {
         target: target,
         leaseSeconds: 36000,
-        callback: CALLBACK
+        callback: CALLBACK,
+        unsubscribeOnShutdown: false
     };
 }
 

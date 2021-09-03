@@ -66,6 +66,7 @@ isolated function getServiceConfigwithRediects(string|[string, string] target) r
         target: target,
         leaseSeconds: 36000,
         callback: CALLBACK,
+        unsubscribeOnShutdown: false,
         httpConfig: {
             followRedirects: {
                 enabled: true, 
