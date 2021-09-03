@@ -261,7 +261,9 @@ isolated function testCallbackUrlLoggingFailureForServicePathProvided() returns 
 
 listener Listener utilTestListener = new (9101);
 
-@SubscriberServiceConfig{}
+@SubscriberServiceConfig{
+    unsubscribeOnShutdown: false
+}
 service /utilTest1 on utilTestListener {
     isolated remote function onEventNotification(ContentDistributionMessage event) returns Acknowledgement {
         string|http:HeaderNotFoundError headerValue = getHeader(event, "Custom-Header");
@@ -281,7 +283,9 @@ service /utilTest1 on utilTestListener {
     }
 }
 
-@SubscriberServiceConfig{}
+@SubscriberServiceConfig{
+    unsubscribeOnShutdown: false
+}
 service /utilTest2 on utilTestListener {
     isolated remote function onEventNotification(ContentDistributionMessage event) returns Acknowledgement {
         string[]|http:HeaderNotFoundError values = getHeaders(event, "Custom-Header");
