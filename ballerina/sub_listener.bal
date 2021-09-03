@@ -20,7 +20,6 @@ import ballerina/log;
 
 # Represents a Subscriber Service listener endpoint.
 public class Listener {
-    private final decimal gracefulStopTime = 30;
     private http:Listener httpListener;
     private http:ListenerConfiguration listenerConfig;
     private SubscriberServiceConfiguration? serviceConfig;
@@ -174,7 +173,7 @@ public class Listener {
             if result is error {
                 log:printWarn("Unsubscription initiation failed", result);
             } else {
-                runtime:sleep(self.gracefulStopTime);
+                runtime:sleep(serviceConfig.gracefulShutdownPeriod);
             }
         }
 
