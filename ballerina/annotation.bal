@@ -34,8 +34,8 @@ public type SubscriberServiceConfiguration record {|
     string callback?;
     string secret?;
     boolean appendServicePath = false;
-    boolean unsubscribeOnShutdown = false;
-    decimal gracefulShutdownPeriod = 30;
+    boolean unsubscribeOnShutdown = true;
+    decimal gracefulShutdownPeriod = 10;
     http:ClientConfiguration httpConfig?;
     record {|
         string|string[] accept?;
