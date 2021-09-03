@@ -169,6 +169,7 @@ public class Listener {
         SubscriberServiceConfiguration? serviceConfig = self.serviceConfig;
         string? callback = self.callbackUrl;
         if serviceConfig is SubscriberServiceConfiguration && serviceConfig.unsubscribeOnShutdown {
+            log:printInfo("Unsubscribing from the hub...");
             error? result = initiateUnsubscription(serviceConfig, <string>callback);
             if result is error {
                 log:printWarn("Unsubscription initiation failed", result);
