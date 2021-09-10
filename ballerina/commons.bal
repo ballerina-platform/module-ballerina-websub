@@ -71,13 +71,26 @@ const string SHA_256 = "sha256";
 const string SHA_384 = "sha384";
 const string SHA_512 = "sha512";
 
-# Record representing the subscription / unsubscription intent verification request-body.
+# Record representing the subscription intent verification request-body.
 # 
 # + hubMode - The `hub.mode` parameter (subscribe / unsubscribe)
 # + hubTopic - The topic URL
 # + hubChallenge - The `hub.challenge` parameter used for verification
 # + hubLeaseSeconds - The `hub.lease_seconds` parameter used to validate the expiration of subscription
 public type SubscriptionVerification record {
+    string hubMode;
+    string hubTopic;
+    string hubChallenge;
+    string? hubLeaseSeconds;
+};
+
+# Record representing the unsubscription intent verification request-body.
+# 
+# + hubMode - The `hub.mode` parameter (subscribe / unsubscribe)
+# + hubTopic - The topic URL
+# + hubChallenge - The `hub.challenge` parameter used for verification
+# + hubLeaseSeconds - The `hub.lease_seconds` parameter used to validate the expiration of subscription
+public type UnsubscriptionVerification record {
     string hubMode;
     string hubTopic;
     string hubChallenge;
@@ -104,8 +117,13 @@ type CommonResponse record {|
     map<string> body?;
 |};
 
-# Record representing the subscription / unsubscription intent verification success.
+# Record representing the subscription intent verification success.
 public type SubscriptionVerificationSuccess record {
+    *CommonResponse;
+};
+
+# Record representing the unsubscription intent verification success.
+public type UnsubscriptionVerificationSuccess record {
     *CommonResponse;
 };
 
