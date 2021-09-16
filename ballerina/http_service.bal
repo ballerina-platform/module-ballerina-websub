@@ -22,6 +22,7 @@ isolated service class HttpService {
     private final string? secretKey;
     private final boolean isSubscriptionValidationDeniedAvailable;
     private final boolean isSubscriptionVerificationAvailable;
+    private final boolean isUnsubscriptionVerificationAvailable;
     private final boolean isEventNotificationAvailable;
 
     # Initializes `websub:HttpService` endpoint.
@@ -37,6 +38,7 @@ isolated service class HttpService {
         string[] methodNames = adaptor.getServiceMethodNames();
         self.isSubscriptionValidationDeniedAvailable = isMethodAvailable("onSubscriptionValidationDenied", methodNames);
         self.isSubscriptionVerificationAvailable = isMethodAvailable("onSubscriptionVerification", methodNames);
+        self.isUnsubscriptionVerificationAvailable = isMethodAvailable("onUnsubscriptionVerification", methodNames);
         self.isEventNotificationAvailable = isMethodAvailable("onEventNotification", methodNames);
     }
 
@@ -75,17 +77,12 @@ isolated service class HttpService {
                 if params?.hubChallenge is () || params?.hubTopic is () {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                 } else {
-                    if self.isSubscriptionVerificationAvailable {
-                        processSubscriptionVerification(caller, response, <@untainted> params, self.adaptor);
-                    } else {
-                        response.statusCode = http:STATUS_OK;
-                        response.setTextPayload(<string>params?.hubChallenge);
-                    }
+                    self.processVerification(params, caller, response);
                 }
             }
             MODE_DENIED => {
                 if self.isSubscriptionValidationDeniedAvailable {
-                    processSubscriptionDenial(caller, response, <@untainted> params, self.adaptor);
+                    processSubscriptionDenial(caller, response, params, self.adaptor);
                 } else {
                     response.statusCode = http:STATUS_OK;
                     updateResponseBody(response, ACKNOWLEDGEMENT["body"], ACKNOWLEDGEMENT["headers"]);
@@ -99,6 +96,17 @@ isolated service class HttpService {
         }
 
         respondToRequest(caller, response);
+    }
+
+    isolated function processVerification(RequestQueryParams params, http:Caller caller, http:Response response) {
+        if params?.hubMode == MODE_SUBSCRIBE && self.isSubscriptionVerificationAvailable {
+            processSubscriptionVerification(caller, response, params, self.adaptor);
+        } else if params?.hubMode == MODE_UNSUBSCRIBE && self.isUnsubscriptionVerificationAvailable {
+            processUnsubscriptionVerification(caller, response, params, self.adaptor);
+        } else {
+            response.statusCode = http:STATUS_OK;
+            response.setTextPayload(<string>params?.hubChallenge);
+        }
     }
 }
 

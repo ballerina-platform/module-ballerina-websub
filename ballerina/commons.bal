@@ -180,4 +180,6 @@ type RequestQueryParams record {|
 public final readonly & Acknowledgement ACKNOWLEDGEMENT = {};
 public final readonly & SubscriptionVerificationSuccess SUBSCRIPTION_VERIFICATION_SUCCESS = {};
 public final SubscriptionVerificationError SUBSCRIPTION_VERIFICATION_ERROR = error SubscriptionVerificationError("Subscription verification failed");
+public final readonly & UnsubscriptionVerificationSuccess UNSUBSCRIPTION_VERIFICATION_SUCCESS = {};
+public final UnsubscriptionVerificationError UNSUBSCRIPTION_VERIFICATION_ERROR = error UnsubscriptionVerificationError("Unsubscription verification failed");
 public final SubscriptionDeletedError SUBSCRIPTION_DELETED_ERROR = error SubscriptionDeletedError("Subscription deleted");

@@ -59,6 +59,13 @@ public class NativeHttpToWebsubAdaptor {
         return invokeRemoteFunction(env, serviceObj, message,
                 "callOnSubscriptionVerificationMethod", "onSubscriptionVerification");
     }
+    
+    public static Object callOnUnsubscriptionVerificationMethod(Environment env, BObject adaptor,
+                                                                BMap<BString, Object> message) {
+        BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
+        return invokeRemoteFunction(env, serviceObj, message,
+                "callOnUnsubscriptionVerificationMethod", "onUnsubscriptionVerification");
+    }
 
     public static Object callOnSubscriptionDeniedMethod(Environment env, BObject adaptor, BError message) {
         BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
