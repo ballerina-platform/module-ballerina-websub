@@ -25,7 +25,6 @@ import ballerina/http;
 # + secret - The secret to be used for authenticated content distribution
 # + appendServicePath - This flag notifies whether or not to append service-path to callback-url
 # + unsubscribeOnShutdown - This flag notifies whether or not to initiate unsubscription when the service is shutting down
-# + gracefulShutdownPeriod - The time period in seconds to wait for unsubscription verification
 # + httpConfig - The configuration for the hub client used to interact with the discovered/specified hub
 # + discoveryConfig - HTTP client configurations for resource discovery
 public type SubscriberServiceConfiguration record {|
@@ -35,13 +34,20 @@ public type SubscriberServiceConfiguration record {|
     string secret?;
     boolean appendServicePath = false;
     boolean unsubscribeOnShutdown = true;
-    decimal gracefulShutdownPeriod = 10;
     http:ClientConfiguration httpConfig?;
     record {|
         string|string[] accept?;
         string|string[] acceptLanguage?;
         http:ClientConfiguration httpConfig?;
     |} discoveryConfig?;
+|};
+
+type InferredSubscriberConfig record {|
+    string|[string, string] target?;
+    int leaseSeconds?;
+    string callback;
+    string secret?;
+    boolean unsubscribeOnShutdown;
 |};
 
 # WebSub Subscriber Configuration for the service, indicating subscription related parameters.

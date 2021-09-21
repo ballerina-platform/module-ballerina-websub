@@ -47,12 +47,25 @@ isolated function getServiceConfig(string|[string, string] target) returns Subsc
     };
 }
 
+final var websubServiceObj = service object {
+    isolated remote function onEventNotification(ContentDistributionMessage event) 
+                        returns Acknowledgement {        
+        return ACKNOWLEDGEMENT;
+    }
+};
+
+isolated function getHttpService(SubscriberServiceConfiguration config) returns HttpService {
+    HttpToWebsubAdaptor adaptor = new (websubServiceObj);
+    return new (adaptor, config, CALLBACK);
+}
+
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
 isolated function testSubscriptionInitiationSuccessWithDiscoveryUrl() returns @tainted error? {
     SubscriberServiceConfiguration config = getServiceConfig(DISCOVERY_SUCCESS_URL);
-    check initiateSubscription(config, CALLBACK);
+    HttpService 'service = getHttpService(config);
+    check 'service.initiateSubscription();
 }
 
 @test:Config { 
@@ -60,7 +73,8 @@ isolated function testSubscriptionInitiationSuccessWithDiscoveryUrl() returns @t
 }
 isolated function testSubscriptionInitiationSuccessWithHubAndTopic() returns @tainted error? {
     SubscriberServiceConfiguration config = getServiceConfig([ HUB_SUCCESS_URL, COMMON_TOPIC ]);
-    check initiateSubscription(config, CALLBACK);
+    HttpService 'service = getHttpService(config);
+    check 'service.initiateSubscription();
 }
 
 @test:Config { 
@@ -68,7 +82,8 @@ isolated function testSubscriptionInitiationSuccessWithHubAndTopic() returns @ta
 }
 isolated function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @tainted error? {
     SubscriberServiceConfiguration config = getServiceConfig(DISCOVERY_FAILURE_URL);
-    var response = initiateSubscription(config, CALLBACK);
+    HttpService 'service = getHttpService(config);
+    var response = 'service.initiateSubscription();
     test:assertTrue(response is ResourceDiscoveryFailedError);
     if response is error {
         string errorDetails = response.message();
@@ -82,7 +97,8 @@ isolated function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @t
 }
 isolated function testSubscriptionInitiationFailureWithHubAndTopic() returns @tainted error? {
     SubscriberServiceConfiguration config = getServiceConfig([ HUB_FAILURE_URL, COMMON_TOPIC ]);
-    var response = initiateSubscription(config, CALLBACK);
+    HttpService 'service = getHttpService(config);
+    var response = 'service.initiateSubscription();
     test:assertTrue(response is SubscriptionInitiationError);
     if response is error {
         string errorDetails = response.message();
@@ -90,13 +106,6 @@ isolated function testSubscriptionInitiationFailureWithHubAndTopic() returns @ta
         log:printError(errorMsg);
     }
 }
-
-final var websubServiceObj = service object {
-    isolated remote function onEventNotification(ContentDistributionMessage event) 
-                        returns Acknowledgement {        
-        return ACKNOWLEDGEMENT;
-    }
-};
 
 listener Listener ls = new (9100);
 

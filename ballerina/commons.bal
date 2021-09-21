@@ -71,6 +71,9 @@ const string SHA_256 = "sha256";
 const string SHA_384 = "sha384";
 const string SHA_512 = "sha512";
 
+const string HTTP = "http";
+const string HTTPS = "https";
+
 # Record representing the subscription intent verification request-body.
 # 
 # + hubMode - The `hub.mode` parameter (subscribe / unsubscribe)
@@ -133,8 +136,11 @@ public type Acknowledgement record {
 };
 
 # Provides a set of configurations for configure the underlying HTTP listener of the WebSub listener.
+# 
+# + gracefulShutdownPeriod - The time period in seconds to wait for unsubscription verification
 public type ListenerConfiguration record {|
     *http:ListenerConfiguration;
+    decimal gracefulShutdownPeriod = 10;
 |};
 
 # Record representing a WebSub subscription change request-body.

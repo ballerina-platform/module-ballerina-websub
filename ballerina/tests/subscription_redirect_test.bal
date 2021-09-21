@@ -81,7 +81,8 @@ isolated function getServiceConfigwithRediects(string|[string, string] target) r
 }
 isolated function testSubscriptionInitiationWithRetrySuccess() returns @tainted error? {
     SubscriberServiceConfiguration config = getServiceConfigwithRediects([ HUB_REDIREC_SUCCESS_URL, COMMON_TOPIC ]);
-    check initiateSubscription(config, CALLBACK);
+    HttpService 'service = getHttpService(config);
+    check 'service.initiateSubscription();
 }
 
 @test:Config { 
@@ -92,7 +93,8 @@ isolated function testSubscriptionInitiationWithRetryFailure() returns @tainted 
                                "followRedirects disabled or after maxCount exceeded: Hub [" + HUB_REDIREC_FAILURE_URL + "], Topic [" +
                                COMMON_TOPIC + "]";
     SubscriberServiceConfiguration config = getServiceConfigwithRediects([ HUB_REDIREC_FAILURE_URL, COMMON_TOPIC ]);
-    error? resp = initiateSubscription(config, CALLBACK);
+    HttpService 'service = getHttpService(config);
+    error? resp = 'service.initiateSubscription();
     test:assertTrue(resp is SubscriptionInitiationError);
     if (resp is SubscriptionInitiationError) {
         test:assertEquals(resp.message(), expectedMsg);
