@@ -27,4 +27,7 @@ public interface Constants {
 
     String SERVICE_OBJECT = "WEBSUB_SERVICE_OBJECT";
     String HTTP_REQUEST = "HTTP_REQUEST";
+
+    String SERVICE_PATH = "SERVICE_PATH";
+    String SERVICE_REGISTRY = "SERVICE_REGISTRY";
 }
