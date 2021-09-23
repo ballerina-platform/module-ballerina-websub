@@ -134,6 +134,15 @@ isolated service class HttpService {
     public isolated function initiateUnsubscription() returns error? {
         SubscriberServiceConfiguration? config = self.retrieveSubscriberConfig();
         if config is SubscriberServiceConfiguration {
+            // if unsubscribe on-shutdown is switched off, do not proceed
+            if !config.unsubscribeOnShutdown {
+                // since unsubscribe on-shutdown is switched off, marking unsubscription verified
+                // otherwise the listener will wait for graceful-shutdown timeout
+                lock {
+                    self.unsubscriptionVerified = true;
+                }
+                return;
+            }
             check unsubscribe(config, self.callback);
         }
     }
@@ -168,11 +177,6 @@ isolated function subscribe(SubscriberServiceConfiguration config, string callba
 }
 
 isolated function unsubscribe(SubscriberServiceConfiguration config, string callback) returns error? {
-    // if unsubscribe on-shutdown is switched off, do not proceed
-    if !config.unsubscribeOnShutdown {
-        return;
-    }
-
     string hub;
     string topic;
     [string, string]? resourceDetails = check retrieveResourceDetails(config);
