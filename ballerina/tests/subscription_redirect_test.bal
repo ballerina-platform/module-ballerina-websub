@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// import ballerina/test;
+import ballerina/test;
 import ballerina/http;
 
 const string HUB_REDIREC_SUCCESS_URL = "http://127.0.0.1:9193/hub1/redSuccess";
@@ -61,40 +61,39 @@ service /hub4 on new http:Listener(9196) {
     }
 }
 
-// todo: redo a new test suite for this
+isolated function getServiceConfigwithRediects(string|[string, string] target) returns SubscriberServiceConfiguration {
+    return {
+        target: target,
+        leaseSeconds: 36000,
+        callback: CALLBACK,
+        httpConfig: {
+            followRedirects: {
+                enabled: true, 
+                maxCount: 2
+            }
+        }
+    };
+}
 
-// isolated function getHttpServiceWithRedirects(InferredSubscriberConfig config) returns HttpService {
-//     http:ClientConfiguration redirectConfig = {
-//         followRedirects: {
-//             enabled: true,
-//             maxCount: 2
-//         }
-//     };
-//     HttpToWebsubAdaptor adaptor = new (websubServiceObj);
-//     return new (adaptor, config, redirectConfig);
-// }
+@test:Config { 
+    groups: ["subscriptionInitiation"]
+}
+isolated function testSubscriptionInitiationWithRetrySuccess() returns @tainted error? {
+    SubscriberServiceConfiguration config = getServiceConfigwithRediects([ HUB_REDIREC_SUCCESS_URL, COMMON_TOPIC ]);
+    check subscribe(config, CALLBACK);
+}
 
-// @test:Config { 
-//     groups: ["subscriptionInitiation"]
-// }
-// isolated function testSubscriptionInitiationWithRetrySuccess() returns @tainted error? {
-//     InferredSubscriberConfig config = getServiceConfig([ HUB_REDIREC_SUCCESS_URL, COMMON_TOPIC ]);
-//     HttpService 'service = getHttpServiceWithRedirects(config);
-//     check 'service.initiateSubscription();
-// }
-
-// @test:Config { 
-//     groups: ["subscriptionInitiation"]
-// }
-// isolated function testSubscriptionInitiationWithRetryFailure() returns @tainted error? {
-//     string expectedMsg = "Redirection response received for subscription change request made with " +
-//                                "followRedirects disabled or after maxCount exceeded: Hub [" + HUB_REDIREC_FAILURE_URL + "], Topic [" +
-//                                COMMON_TOPIC + "]";
-//     InferredSubscriberConfig config = getServiceConfig([ HUB_REDIREC_FAILURE_URL, COMMON_TOPIC ]);
-//     HttpService 'service = getHttpServiceWithRedirects(config);
-//     error? resp = 'service.initiateSubscription();
-//     test:assertTrue(resp is SubscriptionInitiationError);
-//     if (resp is SubscriptionInitiationError) {
-//         test:assertEquals(resp.message(), expectedMsg);
-//     }
-// }
+@test:Config { 
+    groups: ["subscriptionInitiation"]
+}
+isolated function testSubscriptionInitiationWithRetryFailure() returns @tainted error? {
+    string expectedMsg = "Redirection response received for subscription change request made with " +
+                               "followRedirects disabled or after maxCount exceeded: Hub [" + HUB_REDIREC_FAILURE_URL + "], Topic [" +
+                               COMMON_TOPIC + "]";
+    SubscriberServiceConfiguration config = getServiceConfigwithRediects([ HUB_REDIREC_FAILURE_URL, COMMON_TOPIC ]);
+    error? resp = subscribe(config, CALLBACK);
+    test:assertTrue(resp is SubscriptionInitiationError);
+    if (resp is SubscriptionInitiationError) {
+        test:assertEquals(resp.message(), expectedMsg);
+    }
+}
