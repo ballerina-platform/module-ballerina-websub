@@ -99,14 +99,6 @@ function testSubscriberServiceAnnotationRetrievalFailure() returns @tainted erro
 @test:Config { 
     groups: ["servicePathRetrieval"]
 }
-isolated function testServicePathRetrievalForString() returns @tainted error? {
-    string servicePath = retrieveServicePath("subscriber");
-    test:assertTrue(servicePath is string, "Service path retrieval failed for 'string'");
-}
-
-@test:Config { 
-    groups: ["servicePathRetrieval"]
-}
 isolated function testServicePathRetrievalForEmptyServicePath() returns @tainted error? {
     string servicePath = retrieveServicePath(());
     test:assertTrue(servicePath is string, "Service path retrieval failed for 'empty service path'");

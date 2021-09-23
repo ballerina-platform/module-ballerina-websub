@@ -30,4 +30,5 @@ public interface Constants {
 
     String SERVICE_PATH = "SERVICE_PATH";
     String SERVICE_REGISTRY = "SERVICE_REGISTRY";
+    String SUBSCRIBER_CONFIG = "SUBSCRIBER_CONFIG";
 }

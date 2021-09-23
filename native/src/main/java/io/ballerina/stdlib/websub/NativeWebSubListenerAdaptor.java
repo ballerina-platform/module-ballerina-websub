@@ -22,6 +22,7 @@ import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.ArrayType;
 import io.ballerina.runtime.api.values.BArray;
+import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 
@@ -29,16 +30,21 @@ import java.util.Objects;
 
 import static io.ballerina.stdlib.websub.Constants.SERVICE_PATH;
 import static io.ballerina.stdlib.websub.Constants.SERVICE_REGISTRY;
+import static io.ballerina.stdlib.websub.Constants.SUBSCRIBER_CONFIG;
 
 /**
  * {@code NativeWebSubListenerAdaptor} is a wrapper object used to save/retrieve native data related to WebSub Listener.
  */
 public class NativeWebSubListenerAdaptor {
     public static void externAttach(BObject websubListener, BString servicePath,
-                                    BObject subscriberService, BObject httpService) {
+                                    BObject subscriberService, BObject httpService,
+                                    BMap<BString, Object> subscriberConfig) {
         // add service-path to subscriber-obj as native data
         // this information is useful to execute subscriber-service detach from websub-listener
         subscriberService.addNativeData(SERVICE_PATH, servicePath);
+
+        // add subscriber-config to native-data. this information is useful when initiating subscription/unsubscription
+        httpService.addNativeData(SUBSCRIBER_CONFIG, subscriberConfig);
 
         // add http-service into listener service-registry
         ServiceRegistry serviceRegistry = getServiceRegistry(websubListener);

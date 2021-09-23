@@ -99,14 +99,13 @@ public class Listener {
         string callback = constructCallbackUrl(serviceConfig, self.port, self.listenerConfig,
                                                 completeSevicePath, logGeneratedServicePath);
         HttpToWebsubAdaptor adaptor = new ('service);
-        InferredSubscriberConfig subscriberConfig = check retrieveSubscriberConfig(serviceConfig, callback);
-        HttpService httpService = check new (adaptor, subscriberConfig, serviceConfig?.httpConfig);
+        HttpService httpService = check new (adaptor, callback, serviceConfig?.secret);
         check self.httpListener.attach(httpService, completeSevicePath);
-        self.externAttach(completeSevicePath, 'service, httpService);
+        self.externAttach(completeSevicePath, 'service, httpService, serviceConfig);
     }
 
     isolated function externAttach(string servicePath, SubscriberService subscriberService,
-                                    HttpService httpService) = @java:Method {
+                                    HttpService httpService, SubscriberServiceConfiguration config) = @java:Method {
         'class: "io.ballerina.stdlib.websub.NativeWebSubListenerAdaptor"
     } external;
 
@@ -226,45 +225,6 @@ isolated function retrieveHttpListenerConfig(ListenerConfiguration config) retur
 isolated function retrieveSubscriberServiceAnnotations(SubscriberService serviceType) returns SubscriberServiceConfiguration? {
     typedesc<any> serviceTypedesc = typeof serviceType;
     return serviceTypedesc.@SubscriberServiceConfig;
-}
-
-isolated function retrieveSubscriberConfig(SubscriberServiceConfiguration serviceConfig, string callback) returns InferredSubscriberConfig|error {
-    InferredSubscriberConfig config = {
-        callback: callback,
-        unsubscribeOnShutdown: serviceConfig.unsubscribeOnShutdown
-    };
-    
-    [string, string]? resourceDetails = check retrieveResourceDetails(serviceConfig);
-    if resourceDetails is [string, string] {
-        config.target = resourceDetails;
-    }
-
-    int? leaseSeconds = serviceConfig?.leaseSeconds;
-    if leaseSeconds is int {
-        config.leaseSeconds = leaseSeconds;
-    }
-
-    string? secret = serviceConfig?.secret;
-    if secret is string {
-        config.secret = secret;
-    }
-
-    return config;
-}
-
-isolated function retrieveResourceDetails(SubscriberServiceConfiguration serviceConfig) returns [string, string]|error? {
-    string|[string, string]? target = serviceConfig?.target;
-    if target is string {
-        var discoveryConfig = serviceConfig?.discoveryConfig;
-        http:ClientConfiguration? discoveryHttpConfig = discoveryConfig?.httpConfig ?: ();
-        string?|string[] expectedMediaTypes = discoveryConfig?.accept ?: ();
-        string?|string[] expectedLanguageTypes = discoveryConfig?.acceptLanguage ?: ();
-        DiscoveryService discoveryClient = check new (target, discoveryConfig?.httpConfig);
-        [string, string] resourceDetails = check discoveryClient->discoverResourceUrls(expectedMediaTypes, expectedLanguageTypes);
-        return resourceDetails;
-    } else if target is [string, string] {
-        return target;
-    }
 }
 
 isolated function constructCallbackUrl(SubscriberServiceConfiguration subscriberConfig, int port, 

@@ -42,13 +42,5 @@ public type SubscriberServiceConfiguration record {|
     |} discoveryConfig?;
 |};
 
-type InferredSubscriberConfig record {|
-    [string, string] target?;
-    int leaseSeconds?;
-    string callback;
-    string secret?;
-    boolean unsubscribeOnShutdown;
-|};
-
 # WebSub Subscriber Configuration for the service, indicating subscription related parameters.
 public annotation SubscriberServiceConfiguration SubscriberServiceConfig on service;

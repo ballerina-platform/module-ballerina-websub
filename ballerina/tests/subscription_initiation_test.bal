@@ -14,9 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// import ballerina/test;
+import ballerina/test;
 import ballerina/http;
-// import ballerina/log;
+import ballerina/log;
 
 const string CALLBACK = "https://sample.subscriber.com/subscriber";
 const string DISCOVERY_SUCCESS_URL = "http://127.0.0.1:9192/common/discovery";
@@ -38,15 +38,6 @@ service /common on new http:Listener(9192) {
     }
 }
 
-isolated function getServiceConfig([string, string] target) returns InferredSubscriberConfig {
-    return {
-        target: target,
-        leaseSeconds: 36000,
-        callback: CALLBACK,
-        unsubscribeOnShutdown: false
-    };
-}
-
 isolated function getServiceAnnotationConfig(string|[string, string] target) returns SubscriberServiceConfiguration {
     return {
         target: target,
@@ -63,93 +54,153 @@ final var websubServiceObj = service object {
     }
 };
 
-isolated function getHttpService(InferredSubscriberConfig config) returns HttpService|error {
-    HttpToWebsubAdaptor adaptor = new (websubServiceObj);
-    return new (adaptor, config);
+@test:Config { 
+    groups: ["subscriptionInitiation"]
+}
+isolated function testSubscriptionInitiationSuccessWithDiscoveryUrl() returns @tainted error? {
+    SubscriberServiceConfiguration config = getServiceAnnotationConfig(DISCOVERY_SUCCESS_URL);
+    check subscribe(config, "https://sample.com/sub1");
 }
 
+@test:Config { 
+    groups: ["subscriptionInitiation"]
+}
+isolated function testSubscriptionInitiationSuccessWithHubAndTopic() returns @tainted error? {
+    SubscriberServiceConfiguration config = getServiceAnnotationConfig([ HUB_SUCCESS_URL, COMMON_TOPIC ]);
+    check subscribe(config, "https://sample.com/sub1");
+}
 
-// todo: redo a new test suite for this
+@test:Config { 
+    groups: ["subscriptionInitiation"]
+}
+isolated function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @tainted error? {
+    SubscriberServiceConfiguration config = getServiceAnnotationConfig(DISCOVERY_FAILURE_URL);
+    var response = subscribe(config, "https://sample.com/sub1");
+    test:assertTrue(response is ResourceDiscoveryFailedError);
+    if response is error {
+        string errorDetails = response.message();
+        string errorMsg = string `Subscription initiation failed due to: ${errorDetails}`;
+        log:printError(errorMsg);
+    }
+}
 
-// @test:Config { 
-//     groups: ["subscriptionInitiation"]
-// }
-// isolated function testSubscriptionInitiationSuccessWithDiscoveryUrl() returns @tainted error? {
-//     [string, string]? target = check retrieveResourceDetails(getServiceAnnotationConfig(DISCOVERY_SUCCESS_URL));
-//     if target is [string, string] {
-//         InferredSubscriberConfig config = getServiceConfig(target);
-//         HttpService 'service = check getHttpService(config);
-//         check 'service.initiateSubscription();
-//     } else {
-//         test:assertFail(msg = "Could not find the resources for subscription");
-//     }
-// }
+@test:Config { 
+    groups: ["subscriptionInitiation"]
+}
+isolated function testSubscriptionInitiationFailureWithHubAndTopic() returns @tainted error? {
+    SubscriberServiceConfiguration config = getServiceAnnotationConfig([ HUB_FAILURE_URL, COMMON_TOPIC ]);
+    var response = subscribe(config, "https://sample.com/sub1");
+    test:assertTrue(response is SubscriptionInitiationError);
+    if response is error {
+        string errorDetails = response.message();
+        string errorMsg = string `Subscription initiation failed due to: ${errorDetails}`;
+        log:printError(errorMsg);
+    }
+}
 
-// @test:Config { 
-//     groups: ["subscriptionInitiation"]
-// }
-// isolated function testSubscriptionInitiationSuccessWithHubAndTopic() returns @tainted error? {
-//     InferredSubscriberConfig config = getServiceConfig([ HUB_SUCCESS_URL, COMMON_TOPIC ]);
-//     HttpService 'service = check getHttpService(config);
-//     check 'service.initiateSubscription();
-// }
+@test:Config { 
+    groups: ["unSubscriptionInitiation"]
+}
+isolated function testUnSubscriptionInitiationSuccessWithDiscoveryUrl() returns error? {
+    SubscriberServiceConfiguration config = {
+        target: DISCOVERY_SUCCESS_URL,
+        leaseSeconds: 36000,
+        callback: CALLBACK,
+        unsubscribeOnShutdown: true
+    };
+    check unsubscribe(config, "https://sample.com/sub1");
+}
 
-// @test:Config { 
-//     groups: ["subscriptionInitiation"]
-// }
-// isolated function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @tainted error? {
-//     var response = retrieveResourceDetails(getServiceAnnotationConfig(DISCOVERY_FAILURE_URL));
-//     test:assertTrue(response is ResourceDiscoveryFailedError);
-//     if response is error {
-//         string errorDetails = response.message();
-//         string errorMsg = string `Subscription initiation failed due to: ${errorDetails}`;
-//         log:printError(errorMsg);
-//     }
-// }
+@test:Config { 
+    groups: ["unSubscriptionInitiation"]
+}
+isolated function testUnSubscriptionInitiationFailureWithDiscoveryUrl() returns error? {
+    SubscriberServiceConfiguration config = {
+        target: DISCOVERY_FAILURE_URL,
+        leaseSeconds: 36000,
+        callback: CALLBACK,
+        unsubscribeOnShutdown: true
+    };
+    var response = unsubscribe(config, "https://sample.com/sub1");
+    test:assertTrue(response is ResourceDiscoveryFailedError);
+    if response is error {
+        string errorDetails = response.message();
+        string errorMsg = string `Subscription initiation failed due to: ${errorDetails}`;
+        log:printError(errorMsg);
+    }
+}
 
-// @test:Config { 
-//     groups: ["subscriptionInitiation"]
-// }
-// isolated function testSubscriptionInitiationFailureWithHubAndTopic() returns @tainted error? {
-//     InferredSubscriberConfig config = getServiceConfig([ HUB_FAILURE_URL, COMMON_TOPIC ]);
-//     HttpService 'service = check getHttpService(config);
-//     var response = 'service.initiateSubscription();
-//     test:assertTrue(response is SubscriptionInitiationError);
-//     if response is error {
-//         string errorDetails = response.message();
-//         string errorMsg = string `Subscription initiation failed due to: ${errorDetails}`;
-//         log:printError(errorMsg);
-//     }
-// }
+@test:Config { 
+    groups: ["unSubscriptionInitiation"]
+}
+isolated function testUnSubscriptionInitiationFailureWithHubAndTopic() returns error? {
+    SubscriberServiceConfiguration config = {
+        target: [HUB_FAILURE_URL, COMMON_TOPIC],
+        leaseSeconds: 36000,
+        callback: CALLBACK,
+        unsubscribeOnShutdown: true
+    };
+    var response = unsubscribe(config, "https://sample.com/sub1");
+    test:assertTrue(response is SubscriptionInitiationError);
+    if response is error {
+        string errorDetails = response.message();
+        string errorMsg = string `Subscription initiation failed due to: ${errorDetails}`;
+        log:printError(errorMsg);
+    }
+}
 
-// listener Listener ls = new (9100);
+@test:Config { 
+    groups: ["unSubscriptionInitiation"]
+}
+isolated function testUnSubscriptionInitiationSuccessWithHubAndTopic() returns error? {
+    SubscriberServiceConfiguration config = {
+        target: [HUB_SUCCESS_URL, COMMON_TOPIC],
+        leaseSeconds: 36000,
+        callback: CALLBACK,
+        unsubscribeOnShutdown: true
+    };
+    check unsubscribe(config, "https://sample.com/sub1");
+}
 
-// @test:Config { 
-//     groups: ["subscriptionInitiation"]
-// }
-// function testSubInitFailedWithListenerForResourceDiscoveryFailure() returns @tainted error? {
-//     var res = ls.attachWithConfig(websubServiceObj, getServiceAnnotationConfig(DISCOVERY_FAILURE_URL), "sub");
-//     test:assertFalse(res is error);
-//     var startDetails = ls.'start();
-//     test:assertTrue(startDetails is error);
-//     if startDetails is error {
-//         string expected = "Subscription initiation failed due to: Link header unavailable in discovery response";
-//         test:assertEquals(startDetails.message(), expected);
-//     }
-//     check ls.gracefulStop();
-// }
+@test:Config { 
+    groups: ["unSubscriptionInitiation"]
+}
+isolated function testUnSubscriptionInitiationDisable() returns error? {
+    SubscriberServiceConfiguration config = getServiceAnnotationConfig([ HUB_SUCCESS_URL, COMMON_TOPIC ]);
+    check unsubscribe(config, "https://sample.com/sub1");
+}
 
-// @test:Config { 
-//     groups: ["subscriptionInitiation"]
-// }
-// function testSubInitFailedWithListenerForSubFailure() returns @tainted error? {
-//     var res = ls.attachWithConfig(websubServiceObj, getServiceAnnotationConfig([ HUB_FAILURE_URL, COMMON_TOPIC ]), "sub");
-//     test:assertFalse(res is error);
-//     var startDetails = ls.'start();
-//     test:assertTrue(startDetails is error);
-//     if startDetails is error {
-//         string expected = "Subscription initiation failed due to: Error in request: Mode[subscribe] at Hub[http://127.0.0.1:9192/common/failed] - no matching resource found for path : /common/failed , method : POST";
-//         test:assertEquals(startDetails.message(), expected);
-//     }
-//     check ls.gracefulStop();
-// }
+listener Listener ls = new (9100);
+
+@test:Config { 
+    groups: ["subscriptionInitiation"]
+}
+function testSubInitFailedWithListenerForResourceDiscoveryFailure() returns @tainted error? {
+    var res = ls.attachWithConfig(websubServiceObj, getServiceAnnotationConfig(DISCOVERY_FAILURE_URL), "sub");
+    if res is error {
+        log:printError("[testSubInitFailedWithListenerForResourceDiscoveryFailure] error occurred ", 'error = res);
+    }
+    test:assertFalse(res is error);
+    var startDetails = ls.'start();
+    test:assertTrue(startDetails is error);
+    if startDetails is error {
+        string expected = "Subscription initiation failed due to: Link header unavailable in discovery response";
+        test:assertEquals(startDetails.message(), expected);
+    }
+    check ls.gracefulStop();
+}
+
+@test:Config { 
+    groups: ["subscriptionInitiation"]
+}
+function testSubInitFailedWithListenerForSubFailure() returns @tainted error? {
+    var res = ls.attachWithConfig(websubServiceObj, getServiceAnnotationConfig([ HUB_FAILURE_URL, COMMON_TOPIC ]), "sub");
+    test:assertFalse(res is error);
+    var startDetails = ls.'start();
+    test:assertTrue(startDetails is error);
+    if startDetails is error {
+        string expected = "Subscription initiation failed due to: Error in request: Mode[subscribe] at Hub[http://127.0.0.1:9192/common/failed] - no matching resource found for path : /common/failed , method : POST";
+        test:assertEquals(startDetails.message(), expected);
+    }
+    check ls.gracefulStop();
+}
