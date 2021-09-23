@@ -43,7 +43,7 @@ public type SubscriberServiceConfiguration record {|
 |};
 
 type InferredSubscriberConfig record {|
-    string|[string, string] target?;
+    [string, string] target?;
     int leaseSeconds?;
     string callback;
     string secret?;

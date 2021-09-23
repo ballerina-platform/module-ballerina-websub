@@ -116,7 +116,7 @@ isolated function testServicePathRetrievalForEmptyServicePath() returns @tainted
     groups: ["completeServicePathRetrieval"]
 }
 isolated function testCompleteServicePathRetrievalWithString() returns @tainted error? {
-    string expectedServicePath = "/subscriber";
+    string expectedServicePath = "subscriber";
     string generatedServicePath = retrieveServicePath("subscriber");
     test:assertEquals(generatedServicePath, expectedServicePath, "Generated service-path does not matched expected service-path"); 
 }
@@ -125,7 +125,7 @@ isolated function testCompleteServicePathRetrievalWithString() returns @tainted 
     groups: ["completeServicePathRetrieval"]
 }
 isolated function testCompleteServicePathRetrievalWithStringArray() returns @tainted error? {
-    string expectedServicePath = "/subscriber/foo/bar";
+    string expectedServicePath = "subscriber/foo/bar";
     string generatedServicePath = retrieveServicePath(["subscriber", "foo", "bar"]);
     test:assertEquals(generatedServicePath, expectedServicePath, "Generated service-path does not matched expected service-path"); 
 }
@@ -235,7 +235,7 @@ isolated function testCallbackUrlForArrayTypeServicePath() returns @tainted erro
     };
     string expectedCallbackUrl = "http://192.168.1.1:9090/subscriber/foo/bar";
     SubscriberServiceConfiguration config = {};
-    string generatedCallbackUrl = constructCallbackUrl(config, 9090, listenerConfig, "subscriber", false);
+    string generatedCallbackUrl = constructCallbackUrl(config, 9090, listenerConfig, "subscriber/foo/bar", false);
     test:assertEquals(generatedCallbackUrl, expectedCallbackUrl, "Generated callback url does not match expected callback url");   
 }
 

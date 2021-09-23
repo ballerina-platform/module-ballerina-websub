@@ -65,7 +65,7 @@ public class Listener {
         if serviceConfig is SubscriberServiceConfiguration {
             error? result = self.executeAttach('service, serviceConfig, name);
             if (result is error) {
-                return error Error("Error occurred while attaching the service", result);
+                return error Error("Error occurred while attaching the service: ", result);
             }
         } else {
             return error ListenerError("Could not find the required service-configurations");
@@ -99,7 +99,8 @@ public class Listener {
         string callback = constructCallbackUrl(serviceConfig, self.port, self.listenerConfig,
                                                 completeSevicePath, logGeneratedServicePath);
         HttpToWebsubAdaptor adaptor = new ('service);
-        HttpService httpService = new (adaptor, serviceConfig, callback);
+        InferredSubscriberConfig subscriberConfig = check retrieveSubscriberConfig(serviceConfig, callback);
+        HttpService httpService = check new (adaptor, subscriberConfig, serviceConfig?.httpConfig);
         check self.httpListener.attach(httpService, completeSevicePath);
         self.externAttach(completeSevicePath, 'service, httpService);
     }
@@ -227,11 +228,27 @@ isolated function retrieveSubscriberServiceAnnotations(SubscriberService service
     return serviceTypedesc.@SubscriberServiceConfig;
 }
 
-isolated function retrieveSubscriberConfig(SubscriberServiceConfiguration serviceConfig, string callback) returns InferredSubscriberConfig {
+isolated function retrieveSubscriberConfig(SubscriberServiceConfiguration serviceConfig, string callback) returns InferredSubscriberConfig|error {
     InferredSubscriberConfig config = {
-        callback: callack
+        callback: callback,
+        unsubscribeOnShutdown: serviceConfig.unsubscribeOnShutdown
     };
     
+    [string, string]? resourceDetails = check retrieveResourceDetails(serviceConfig);
+    if resourceDetails is [string, string] {
+        config.target = resourceDetails;
+    }
+
+    int? leaseSeconds = serviceConfig?.leaseSeconds;
+    if leaseSeconds is int {
+        config.leaseSeconds = leaseSeconds;
+    }
+
+    string? secret = serviceConfig?.secret;
+    if secret is string {
+        config.secret = secret;
+    }
+
     return config;
 }
 

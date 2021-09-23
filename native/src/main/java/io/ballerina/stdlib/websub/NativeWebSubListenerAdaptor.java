@@ -62,11 +62,15 @@ public class NativeWebSubListenerAdaptor {
     }
 
     public static BArray retrieveAttachedServices(BObject websubListener) {
-        ServiceRegistry serviceRegistry = (ServiceRegistry) websubListener.getNativeData(SERVICE_REGISTRY);
-        BObject[] attachedServices = serviceRegistry.getAttachedServices();
-        if (attachedServices.length > 0) {
-            ArrayType arrType = TypeCreator.createArrayType(attachedServices[0].getType());
-            return ValueCreator.createArrayValue(attachedServices, arrType);
+        Object serviceRegistryObj = websubListener.getNativeData(SERVICE_REGISTRY);
+        if (Objects.nonNull(serviceRegistryObj)) {
+            ServiceRegistry serviceRegistry = (ServiceRegistry) serviceRegistryObj;
+            BObject[] attachedServices = serviceRegistry.getAttachedServices();
+            if (attachedServices.length > 0) {
+                ArrayType arrType = TypeCreator.createArrayType(attachedServices[0].getType());
+                return ValueCreator.createArrayValue(attachedServices, arrType);
+            }
+            return null;
         }
         return null;
     }
