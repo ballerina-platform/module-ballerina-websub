@@ -171,14 +171,11 @@ transitive = true
 org = "ballerina"
 name = "lang.runtime"
 version = "0.0.0"
-transitive = false
+transitive = true
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "lang.array"},
 	{org = "ballerina", name = "lang.value"}
-]
-modules = [
-	{org = "ballerina", packageName = "lang.runtime", moduleName = "lang.runtime"}
 ]
 
 [[package]]
