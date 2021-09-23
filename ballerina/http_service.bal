@@ -27,6 +27,7 @@ isolated service class HttpService {
     private final boolean isSubscriptionVerificationAvailable;
     private final boolean isUnsubscriptionVerificationAvailable;
     private final boolean isEventNotificationAvailable;
+    private boolean unsubscriptionVerified;
 
     # Initializes `websub:HttpService` endpoint.
     # ```ballerina
@@ -40,6 +41,7 @@ isolated service class HttpService {
         self.adaptor = adaptor;
         self.callback = callback;
         self.secretKey = secretKey;
+        self.unsubscriptionVerified = false;
         string[] methodNames = adaptor.getServiceMethodNames();
         self.isSubscriptionValidationDeniedAvailable = isMethodAvailable("onSubscriptionValidationDenied", methodNames);
         self.isSubscriptionVerificationAvailable = isMethodAvailable("onSubscriptionVerification", methodNames);
@@ -105,6 +107,13 @@ isolated service class HttpService {
     }
 
     isolated function processVerification(RequestQueryParams params, http:Caller caller, http:Response response) {
+        // if the received verification event is unsubscription, then update the internal state
+        if params?.hubMode == MODE_UNSUBSCRIBE {
+            lock {
+                self.unsubscriptionVerified = true;
+            }
+        }
+        
         if params?.hubMode == MODE_SUBSCRIBE && self.isSubscriptionVerificationAvailable {
             processSubscriptionVerification(caller, response, params, self.adaptor);
         } else if params?.hubMode == MODE_UNSUBSCRIBE && self.isUnsubscriptionVerificationAvailable {
@@ -126,6 +135,12 @@ isolated service class HttpService {
         SubscriberServiceConfiguration? config = self.retrieveSubscriberConfig();
         if config is SubscriberServiceConfiguration {
             check unsubscribe(config, self.callback);
+        }
+    }
+
+    public isolated function isUnsubscriptionVerified() returns boolean {
+        lock {
+            return self.unsubscriptionVerified;
         }
     }
 

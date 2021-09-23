@@ -18,7 +18,7 @@ import ballerina/http;
 import ballerina/lang.'string as strings;
 import ballerina/log;
 import ballerina/jballerina.java;
-import ballerina/lang.runtime;
+import ballerina/time;
 
 # Represents a Subscriber Service listener endpoint.
 public class Listener {
@@ -175,8 +175,7 @@ public class Listener {
                     log:printWarn("Unsubscription initiation failed", result);
                 }
             }
-            // todo: implement unsubscription timeout properly
-            runtime:sleep(self.gracefulShutdownPeriod);
+            self.waitForVerification(attachedServices);
         }
 
         error? result = self.httpListener.gracefulStop();
@@ -188,6 +187,16 @@ public class Listener {
     isolated function retrieveAttachedServices() returns HttpService[]? = @java:Method {
         'class: "io.ballerina.stdlib.websub.NativeWebSubListenerAdaptor"
     } external;
+
+    isolated function waitForVerification(HttpService[] availableServices) {
+        time:Utc timeout = time:utcAddSeconds(time:utcNow(), self.gracefulShutdownPeriod);
+        boolean completed = false;
+        // wait until verification for all the subscribers are completed or verification time-out expires
+        while !completed && time:utcDiffSeconds(timeout, time:utcNow()) > 0D {
+            completed = availableServices
+                .reduce(isolated function (boolean v1, HttpService s1) returns boolean => v1 && s1.isUnsubscriptionVerified(), true);
+        }
+    }
 
     # Stops the service listener immediately.
     # ```ballerina

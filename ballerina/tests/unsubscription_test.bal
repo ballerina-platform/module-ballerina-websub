@@ -18,6 +18,7 @@ import ballerina/http;
 import ballerina/log;
 import ballerina/uuid;
 import ballerina/test;
+import ballerina/lang.runtime;
 
 isolated boolean verified = false;
 
@@ -83,5 +84,6 @@ function testUnsubscriptionOnGracefulStop() returns @tainted error? {
     check unsubscriptionTestListener.attach(unsubscriptionTestSubscriber, "sub");
     check unsubscriptionTestListener.'start();
     check unsubscriptionTestListener.gracefulStop();
+    runtime:sleep(1);
     test:assertTrue(isVerified());
 }
