@@ -32,9 +32,11 @@ import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static io.ballerina.stdlib.websub.Constants.HTTP_REQUEST;
 import static io.ballerina.stdlib.websub.Constants.SERVICE_OBJECT;
+import static io.ballerina.stdlib.websub.Constants.SUBSCRIBER_CONFIG;
 
 /**
  * {@code NativeHttpToWebsubAdaptor} is a wrapper object used for service method execution.
@@ -42,6 +44,15 @@ import static io.ballerina.stdlib.websub.Constants.SERVICE_OBJECT;
 public class NativeHttpToWebsubAdaptor {
     public static void externInit(BObject adaptor, BObject service) {
         adaptor.addNativeData(SERVICE_OBJECT, service);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static BMap<BString, Object> retrieveSubscriberConfig(BObject httpService) {
+        Object config = httpService.getNativeData(SUBSCRIBER_CONFIG);
+        if (Objects.nonNull(config)) {
+            return (BMap<BString, Object>) config;
+        }
+        return null;
     }
 
     public static BArray getServiceMethodNames(BObject adaptor) {
@@ -58,6 +69,13 @@ public class NativeHttpToWebsubAdaptor {
         BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
         return invokeRemoteFunction(env, serviceObj, message,
                 "callOnSubscriptionVerificationMethod", "onSubscriptionVerification");
+    }
+    
+    public static Object callOnUnsubscriptionVerificationMethod(Environment env, BObject adaptor,
+                                                                BMap<BString, Object> message) {
+        BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
+        return invokeRemoteFunction(env, serviceObj, message,
+                "callOnUnsubscriptionVerificationMethod", "onUnsubscriptionVerification");
     }
 
     public static Object callOnSubscriptionDeniedMethod(Environment env, BObject adaptor, BError message) {

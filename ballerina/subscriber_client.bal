@@ -19,11 +19,9 @@ import ballerina/http;
 import ballerina/mime;
 
 # The HTTP based client for WebSub subscription and unsubscription.
-public client class SubscriptionClient {
-
-    private string url;
-    private http:Client httpClient;
-    private http:FollowRedirects? followRedirects = ();
+public isolated client class SubscriptionClient {
+    private final string url;
+    private final http:Client httpClient;
 
     # Initializes the `websub:SubscriptionClient` instance.
     # ```ballerina
@@ -36,7 +34,6 @@ public client class SubscriptionClient {
     public isolated function init(string url, *http:ClientConfiguration config) returns Error? {
         self.url = url;
         self.httpClient = check retrieveHttpClient(self.url, config);
-        self.followRedirects = config?.followRedirects;
     }
 
     # Sends a subscription request to the provided `hub`.

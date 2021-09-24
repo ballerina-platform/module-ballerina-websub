@@ -15,14 +15,19 @@
 // under the License.
 
 import ballerina/http;
+import ballerina/log;
+import ballerina/jballerina.java;
 
 # Represents an underlying HTTP Service.
 isolated service class HttpService {
     private final HttpToWebsubAdaptor adaptor;
+    private final string callback;
     private final string? secretKey;
     private final boolean isSubscriptionValidationDeniedAvailable;
     private final boolean isSubscriptionVerificationAvailable;
+    private final boolean isUnsubscriptionVerificationAvailable;
     private final boolean isEventNotificationAvailable;
+    private boolean unsubscriptionVerified;
 
     # Initializes `websub:HttpService` endpoint.
     # ```ballerina
@@ -30,13 +35,17 @@ isolated service class HttpService {
     # ```
     # 
     # + adaptor - The `websub:HttpToWebsubAdaptor` instance which used as a wrapper to execute service methods
-    # + callback - Optional `secretKey` value to be used in the content distribution verification
-    isolated function init(HttpToWebsubAdaptor adaptor, string? secretKey) {
+    # + callback - Callback URL to be used in subscription/unsubscription verificaton
+    # + secretKey - Optional `secretKey` value to be used in the content distribution verification
+    isolated function init(HttpToWebsubAdaptor adaptor, string callback, string? secretKey) returns error? {
         self.adaptor = adaptor;
+        self.callback = callback;
         self.secretKey = secretKey;
+        self.unsubscriptionVerified = false;
         string[] methodNames = adaptor.getServiceMethodNames();
         self.isSubscriptionValidationDeniedAvailable = isMethodAvailable("onSubscriptionValidationDenied", methodNames);
         self.isSubscriptionVerificationAvailable = isMethodAvailable("onSubscriptionVerification", methodNames);
+        self.isUnsubscriptionVerificationAvailable = isMethodAvailable("onUnsubscriptionVerification", methodNames);
         self.isEventNotificationAvailable = isMethodAvailable("onEventNotification", methodNames);
     }
 
@@ -48,7 +57,8 @@ isolated service class HttpService {
         http:Response response = new;
         response.statusCode = http:STATUS_ACCEPTED;
         if self.isEventNotificationAvailable {
-            string secretKey = self.secretKey is () ? "" : <string>self.secretKey;
+            string? configuredSecret = self.secretKey;
+            string secretKey = configuredSecret is () ? "" : configuredSecret;
             error? result = processEventNotification(caller, request, response, self.adaptor, secretKey);
             if result is error {
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
@@ -75,17 +85,12 @@ isolated service class HttpService {
                 if params?.hubChallenge is () || params?.hubTopic is () {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                 } else {
-                    if self.isSubscriptionVerificationAvailable {
-                        processSubscriptionVerification(caller, response, <@untainted> params, self.adaptor);
-                    } else {
-                        response.statusCode = http:STATUS_OK;
-                        response.setTextPayload(<string>params?.hubChallenge);
-                    }
+                    self.processVerification(params, caller, response);
                 }
             }
             MODE_DENIED => {
                 if self.isSubscriptionValidationDeniedAvailable {
-                    processSubscriptionDenial(caller, response, <@untainted> params, self.adaptor);
+                    processSubscriptionDenial(caller, response, params, self.adaptor);
                 } else {
                     response.statusCode = http:STATUS_OK;
                     updateResponseBody(response, ACKNOWLEDGEMENT["body"], ACKNOWLEDGEMENT["headers"]);
@@ -99,6 +104,117 @@ isolated service class HttpService {
         }
 
         respondToRequest(caller, response);
+    }
+
+    isolated function processVerification(RequestQueryParams params, http:Caller caller, http:Response response) {
+        // if the received verification event is unsubscription, then update the internal state
+        if params?.hubMode == MODE_UNSUBSCRIBE {
+            lock {
+                self.unsubscriptionVerified = true;
+            }
+        }
+        
+        if params?.hubMode == MODE_SUBSCRIBE && self.isSubscriptionVerificationAvailable {
+            processSubscriptionVerification(caller, response, params, self.adaptor);
+        } else if params?.hubMode == MODE_UNSUBSCRIBE && self.isUnsubscriptionVerificationAvailable {
+            processUnsubscriptionVerification(caller, response, params, self.adaptor);
+        } else {
+            response.statusCode = http:STATUS_OK;
+            response.setTextPayload(<string>params?.hubChallenge);
+        }
+    }
+
+    public isolated function initiateSubscription() returns error? {
+        SubscriberServiceConfiguration? config = self.retrieveSubscriberConfig();
+        if config is SubscriberServiceConfiguration {
+            check subscribe(config, self.callback);
+        }
+    }
+
+    public isolated function initiateUnsubscription() returns error? {
+        SubscriberServiceConfiguration? config = self.retrieveSubscriberConfig();
+        if config is SubscriberServiceConfiguration {
+            // if unsubscribe on-shutdown is switched off, do not proceed
+            if !config.unsubscribeOnShutdown {
+                // since unsubscribe on-shutdown is switched off, marking unsubscription verified
+                // otherwise the listener will wait for graceful-shutdown timeout
+                lock {
+                    self.unsubscriptionVerified = true;
+                }
+                return;
+            }
+            check unsubscribe(config, self.callback);
+        }
+    }
+
+    public isolated function isUnsubscriptionVerified() returns boolean {
+        lock {
+            return self.unsubscriptionVerified;
+        }
+    }
+
+    isolated function retrieveSubscriberConfig() returns SubscriberServiceConfiguration? = @java:Method {
+        'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"
+    } external;
+}
+
+isolated function subscribe(SubscriberServiceConfiguration config, string callback) returns error? {
+    string hub;
+    string topic;
+    [string, string]? resourceDetails = check retrieveResourceDetails(config);
+    if resourceDetails is [string, string] {
+        [hub, topic] = resourceDetails;
+    } else {
+        log:printWarn("Subscription not initiated as subscriber target-URL is not provided");
+        return;
+    }
+    SubscriptionClient subscriberClientEp = check getSubscriberClient(hub, config?.httpConfig);
+    SubscriptionChangeRequest request = retrieveSubscriptionRequest(topic, config, callback);
+    SubscriptionChangeResponse response = check subscriberClientEp->subscribe(request);
+    string subscriptionSuccessMsg = string `Subscription Request successfully sent to Hub[${response.hub}], 
+                    for Topic[${response.topic}], with Callback [${callback}]`;
+    log:printDebug(subscriptionSuccessMsg);
+}
+
+isolated function unsubscribe(SubscriberServiceConfiguration config, string callback) returns error? {
+    string hub;
+    string topic;
+    [string, string]? resourceDetails = check retrieveResourceDetails(config);
+    if resourceDetails is [string, string] {
+        [hub, topic] = resourceDetails;
+    } else {
+        log:printWarn("Unsubscription not initiated as subscriber target-URL is not provided");
+        return;
+    }
+
+    SubscriptionClient subscriberClientEp = check getSubscriberClient(hub, config?.httpConfig);
+    SubscriptionChangeRequest request = retrieveSubscriptionRequest(topic, config, callback);
+    SubscriptionChangeResponse response = check subscriberClientEp->unsubscribe(request);
+    string subscriptionSuccessMsg = string `Unubscription Request successfully sent to Hub[${response.hub}], 
+                    for Topic[${response.topic}], with Callback [${callback}]`;
+    log:printDebug(subscriptionSuccessMsg);
+}
+
+isolated function retrieveResourceDetails(SubscriberServiceConfiguration serviceConfig) returns [string, string]|error? {
+    string|[string, string]? target = serviceConfig?.target;
+    if target is string {
+        var discoveryConfig = serviceConfig?.discoveryConfig;
+        http:ClientConfiguration? discoveryHttpConfig = discoveryConfig?.httpConfig ?: ();
+        string?|string[] expectedMediaTypes = discoveryConfig?.accept ?: ();
+        string?|string[] expectedLanguageTypes = discoveryConfig?.acceptLanguage ?: ();
+        DiscoveryService discoveryClient = check new (target, discoveryConfig?.httpConfig);
+        [string, string] resourceDetails = check discoveryClient->discoverResourceUrls(expectedMediaTypes, expectedLanguageTypes);
+        return resourceDetails;
+    } else if target is [string, string] {
+        return target;
+    }
+}
+
+isolated function getSubscriberClient(string hubUrl, http:ClientConfiguration? config) returns SubscriptionClient|error {
+    if config is http:ClientConfiguration {
+        return check new SubscriptionClient(hubUrl, config); 
+    } else {
+        return check new SubscriptionClient(hubUrl);
     }
 }
 

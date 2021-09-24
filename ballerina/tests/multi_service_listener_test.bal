@@ -21,7 +21,9 @@ import ballerina/mime;
 
 listener Listener multiServiceListener = new(9096);
 
-@SubscriberServiceConfig {} 
+@SubscriberServiceConfig {
+    unsubscribeOnShutdown: false
+} 
 service /subscriberOne on multiServiceListener {
     isolated remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         log:printDebug("onSubscriptionValidationDenied invoked");
@@ -45,7 +47,9 @@ service /subscriberOne on multiServiceListener {
     }
 }
 
-@SubscriberServiceConfig {} 
+@SubscriberServiceConfig {
+    unsubscribeOnShutdown: false
+} 
 service /subscriberTwo on multiServiceListener {
     isolated remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         log:printDebug("onSubscriptionValidationDenied invoked");

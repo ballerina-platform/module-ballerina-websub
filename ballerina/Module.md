@@ -45,6 +45,12 @@ service /subscriber on new websub:Listener(9090) {
         return websub:SUBSCRIPTION_VERIFICATION_SUCCESS;
     }
 
+    remote function onUnsubscriptionVerification(websub:UnsubscriptionVerification msg)
+                        returns websub:UnsubscriptionVerificationSuccess|websub:UnsubscriptionVerificationError {
+        // implement unsubscription intent verification logic here
+        return websub:UNSUBSCRIPTION_VERIFICATION_SUCCESS;
+    }
+
     remote function onEventNotification(websub:ContentDistributionMessage event) 
                         returns websub:Acknowledgement|websub:SubscriptionDeletedError? {
         // implement on event notification logic here
@@ -106,7 +112,7 @@ ngrok http -bind-tls=true 9090
     target: "RESOURCE_URL", 
     leaseSeconds: 36000,
     callback: "<NGROK_PUBLIC_URL>",
-    appendServiceUrl: true
+    appendServicePath: true
 } 
 service on new websub:Listener(9090) {
     remote function onEventNotification(websub:ContentDistributionMessage event) 
@@ -119,6 +125,31 @@ service on new websub:Listener(9090) {
 }
 ```
 
+#### Unsubscribing from the Hub
+
+* The WebSub Subscriber has the capability to initiate unsubscription flow on Subscriber termination.
+```ballerina
+websub:ListenerConfiguration listenerConfigs = {
+    gracefulShutdownPeriod: 15
+};
+
+@websub:SubscriberServiceConfig {
+    target: ["https://sample.hub.com", "https://sample.topic1.com"], 
+    leaseSeconds: 36000,
+    // By default this is set to `false`, hence subscriber on default mode would not initiate unsubscription flow
+    unsubscribeOnShutdown: true
+}
+service /subscriber on new websub:Listener(9090, listenerConfigs)  {
+    isolated remote function onEventNotification(websub:ContentDistributionMessage event) 
+                        returns websub:Acknowledgement {
+        // implement logic here
+        return websub:ACKNOWLEDGEMENT;
+    }
+
+    // other remote methods are optional to be implemented
+}
+``` 
+
 # Returning Errors from Remote Methods
 
 * Remote functions in `websub:SubscriberService` can return `error` type.
@@ -127,7 +158,7 @@ service on new websub:Listener(9090) {
     target: "RESOURCE_URL", 
     leaseSeconds: 36000,
     callback: "<NGROK_PUBLIC_URL>",
-    appendServiceUrl: true
+    appendServicePath: true
 } 
 service on new websub:Listener(9090) {
     remote function onEventNotification(websub:ContentDistributionMessage event) 
@@ -154,4 +185,5 @@ function validateRequest(websub:ContentDistributionMessage event) returns boolea
 | ----------- | ---------------- |
 | onSubscriptionValidationDenied | Successfull acknowledgement|
 | onSubscriptionVerification | Subscription verification failure|
+| onUnsubscriptionVerification | Unsubscription verification failure|
 | onEventNotification | Successfull acknowledgement|

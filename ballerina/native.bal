@@ -31,6 +31,11 @@ isolated class HttpToWebsubAdaptor {
         'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"
     } external;
 
+    isolated function callOnUnsubscriptionVerificationMethod(UnsubscriptionVerification msg)
+                                    returns UnsubscriptionVerificationSuccess|UnsubscriptionVerificationError|error = @java:Method {
+        'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"
+    } external;
+
     isolated function callOnSubscriptionDeniedMethod(SubscriptionDeniedError msg)
                                     returns Acknowledgement|error? = @java:Method {
         'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"

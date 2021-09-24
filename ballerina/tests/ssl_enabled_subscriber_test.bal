@@ -30,7 +30,9 @@ ListenerConfiguration listenerConfigs = {
 
 listener Listener sslEnabledListener = new(9095, listenerConfigs);
 
-@SubscriberServiceConfig {} 
+@SubscriberServiceConfig {
+    unsubscribeOnShutdown: false
+} 
 service /subscriber on sslEnabledListener {
     isolated remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         log:printDebug("onSubscriptionValidationDenied invoked");

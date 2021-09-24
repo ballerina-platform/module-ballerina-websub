@@ -26,7 +26,8 @@ boolean jsonContentVerified = false;
 boolean xmlContentVerified = false;
 
 @SubscriberServiceConfig {
-    secret: hashKey
+    secret: hashKey,
+    unsubscribeOnShutdown: false
 } 
 service /subscriber on new Listener(9098) {
     remote function onEventNotification(ContentDistributionMessage event) 

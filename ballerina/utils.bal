@@ -50,11 +50,10 @@ isolated function generateRandomString(int length) returns string|error {
 # ```
 # 
 # + topicUrl - The `topic` to which the subscriber wants to subscribe
-# + callback - Subscriber callback URL to be used by the `hub`
 # + config - User-defined subscriber service configurations
+# + callback - Callback URL for subscription/unsubscription verification
 # + return - Generated `websub:SubscriptionChangeRequest` from the provided configurations
-isolated function retrieveSubscriptionRequest(string topicUrl, string callback, 
-                                              SubscriberServiceConfiguration config) returns SubscriptionChangeRequest {        
+isolated function retrieveSubscriptionRequest(string topicUrl, SubscriberServiceConfiguration config, string callback) returns SubscriptionChangeRequest {        
     SubscriptionChangeRequest request = { topic: topicUrl, callback: callback };
         
     int? leaseSeconds = config?.leaseSeconds;

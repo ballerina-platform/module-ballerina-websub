@@ -21,9 +21,13 @@ import ballerina/test;
 
 listener Listener additionalErrorDetailsListener = new (9093);
 
-var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000 } 
-                              service object {
-    isolated remote function onSubscriptionVerification(SubscriptionVerification msg)
+var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig {
+    target: "http://0.0.0.0:9191/common/discovery",
+    leaseSeconds: 36000,
+    unsubscribeOnShutdown: false
+} 
+    service object {
+    isolated remote function onSubscriptionVerification(SubscriptionVerification msg) 
                         returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
         log:printDebug("onSubscriptionVerification invoked ", verificationMessage = msg);
         if (msg.hubTopic == "test1") {
@@ -35,13 +39,13 @@ var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig { target: "http
         } else {
             return SUBSCRIPTION_VERIFICATION_SUCCESS;
         }
-      }
+    }
 
     isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked: ", contentDistributionNotification = event);
         return error SubscriptionDeletedError(
-            "Subscriber wants to unsubscribe",
+            "Subscriber wants to unsubscribe", 
             headers = {"header1": "value"}, 
             body = {"message": "Unsubscribing from the topic"});
     }
