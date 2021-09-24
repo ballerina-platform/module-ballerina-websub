@@ -18,6 +18,7 @@ import ballerina/http;
 import ballerina/lang.'string as strings;
 import ballerina/log;
 import ballerina/jballerina.java;
+import ballerina/lang.runtime;
 import ballerina/time;
 
 # Represents a Subscriber Service listener endpoint.
@@ -193,6 +194,8 @@ public class Listener {
         boolean completed = false;
         // wait until verification for all the subscribers are completed or verification time-out expires
         while !completed && time:utcDiffSeconds(timeout, time:utcNow()) > 0D {
+            // todo: update API docs
+            runtime:sleep(2);
             completed = availableServices
                 .reduce(isolated function (boolean v1, HttpService s1) returns boolean => v1 && s1.isUnsubscriptionVerified(), true);
         }

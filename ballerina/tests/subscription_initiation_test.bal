@@ -42,8 +42,7 @@ isolated function getServiceAnnotationConfig(string|[string, string] target) ret
     return {
         target: target,
         leaseSeconds: 36000,
-        callback: CALLBACK,
-        unsubscribeOnShutdown: false
+        callback: CALLBACK
     };
 }
 

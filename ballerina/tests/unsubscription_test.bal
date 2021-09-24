@@ -68,7 +68,8 @@ listener Listener unsubscriptionTestListener = new (9102);
 
 var unsubscriptionTestSubscriber = @SubscriberServiceConfig {
     target: ["http://127.0.0.1:9197/common/hub", "test"], 
-    leaseSeconds: 36000
+    leaseSeconds: 36000,
+    unsubscribeOnShutdown: true
 }
 service object {
     isolated remote function onEventNotification(ContentDistributionMessage event) 

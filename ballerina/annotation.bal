@@ -33,7 +33,7 @@ public type SubscriberServiceConfiguration record {|
     string callback?;
     string secret?;
     boolean appendServicePath = false;
-    boolean unsubscribeOnShutdown = true;
+    boolean unsubscribeOnShutdown = false;
     http:ClientConfiguration httpConfig?;
     record {|
         string|string[] accept?;

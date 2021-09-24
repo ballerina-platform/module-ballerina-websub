@@ -140,7 +140,7 @@ public type Acknowledgement record {
 # + gracefulShutdownPeriod - The time period in seconds to wait for unsubscription verification
 public type ListenerConfiguration record {|
     *http:ListenerConfiguration;
-    decimal gracefulShutdownPeriod = 10;
+    decimal gracefulShutdownPeriod = 20;
 |};
 
 # Record representing a WebSub subscription change request-body.
