@@ -208,6 +208,7 @@ name = "log"
 version = "2.0.0"
 transitive = false
 dependencies = [
+	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "observe"}
 ]
@@ -345,6 +346,30 @@ dependencies = [
 ]
 modules = [
 	{org = "ballerina", packageName = "uuid", moduleName = "uuid"}
+]
+
+[[package]]
+org = "ballerina"
+name = "websub"
+version = "2.0.0"
+transitive = false
+dependencies = [
+	{org = "ballerina", name = "crypto"},
+	{org = "ballerina", name = "http"},
+	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "lang.runtime"},
+	{org = "ballerina", name = "lang.string"},
+	{org = "ballerina", name = "log"},
+	{org = "ballerina", name = "mime"},
+	{org = "ballerina", name = "random"},
+	{org = "ballerina", name = "regex"},
+	{org = "ballerina", name = "test"},
+	{org = "ballerina", name = "time"},
+	{org = "ballerina", name = "url"},
+	{org = "ballerina", name = "uuid"}
+]
+modules = [
+	{org = "ballerina", packageName = "websub", moduleName = "websub"}
 ]
 
 
