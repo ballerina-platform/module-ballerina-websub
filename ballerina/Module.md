@@ -99,14 +99,14 @@ service on new websub:Listener(9090) {
 
 #### Running Subscriber Service Locally
 
-* [**nGrok**](https://ngrok.com/) is a TCP Tunneling software, which is used to expose services running locally in the public network.
-* If you want to run the subscriber service in your local machine, you could use **nGrok** to expose it to the public network.
-* First, [download and install](https://ngrok.com/download) **nGrok**.
+* [**ngrok**](https://ngrok.com/) is a TCP Tunneling software, which is used to expose services running locally in the public network.
+* If you want to run the subscriber service in your local machine, you could use **ngrok** to expose it to the public network.
+* First, [download and install](https://ngrok.com/download) **ngrok**.
 * Run the following command to expose the local port `9090` to the public network via `HTTPS`. For information, see the [ngrok documentation](https://ngrok.com/docs#http-bind-tls)).
 ```bash
 ngrok http -bind-tls=true 9090
 ```
-* Extract the public URL provided by **nGrok** and provide it as the callback URL for the subscriber service.
+* Extract the public URL provided by **ngrok** and provide it as the callback URL for the subscriber service.
 ```ballerina
 @websub:SubscriberServiceConfig {
     target: "RESOURCE_URL", 
