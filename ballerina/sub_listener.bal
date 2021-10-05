@@ -191,13 +191,15 @@ public class Listener {
 
     isolated function waitForVerification(HttpService[] availableServices) {
         time:Utc timeout = time:utcAddSeconds(time:utcNow(), self.gracefulShutdownPeriod);
-        boolean completed = false;
         // wait until verification for all the subscribers are completed or verification time-out expires
-        while !completed && time:utcDiffSeconds(timeout, time:utcNow()) > 0D {
+        while !self.isVerificationCompleted(availableServices) && time:utcDiffSeconds(timeout, time:utcNow()) > 0D {
             runtime:sleep(2);
-            completed = availableServices
-                .reduce(isolated function (boolean v1, HttpService s1) returns boolean => v1 && s1.isUnsubscriptionVerified(), true);
         }
+    }
+
+    isolated function isVerificationCompleted(HttpService[] availableServices) returns boolean {
+        return availableServices
+                .reduce(isolated function (boolean v1, HttpService s1) returns boolean => v1 && s1.isUnsubscriptionVerified(), true);
     }
 
     # Stops the service listener immediately.
