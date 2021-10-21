@@ -86,7 +86,7 @@ public final class AnalyserUtils {
         if (TypeDescKind.TYPE_REFERENCE.equals(paramKind)) {
             TypeSymbol internalType = ((TypeReferenceTypeSymbol) paramType).typeDescriptor();
             if (internalType instanceof ErrorTypeSymbol) {
-                return getErrorTypeDescription(internalType);
+                return getErrorTypeDescription(paramType);
             } else {
                 String moduleName = paramType.getModule().flatMap(ModuleSymbol::getName).orElse("");
                 String type = paramType.getName().orElse("");
