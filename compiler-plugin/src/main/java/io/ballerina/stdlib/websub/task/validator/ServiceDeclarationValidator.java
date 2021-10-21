@@ -241,7 +241,7 @@ public class ServiceDeclarationValidator {
         } else if (TypeDescKind.TYPE_REFERENCE.equals(typeKind)) {
             TypeSymbol internalType = ((TypeReferenceTypeSymbol) returnTypeDescriptor).typeDescriptor();
             if (internalType instanceof ErrorTypeSymbol) {
-                return isInvalidErrorReturn(allowedReturnTypes, internalType);
+                return isInvalidErrorReturn(allowedReturnTypes, returnTypeDescriptor);
             } else {
                 String moduleName = returnTypeDescriptor.getModule().flatMap(ModuleSymbol::getName).orElse("");
                 String paramType = returnTypeDescriptor.getName().orElse("");
