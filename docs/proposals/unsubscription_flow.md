@@ -89,7 +89,7 @@ public type UnsubscriptionVerificationError distinct Error;
 - `unsubscribeOnShutdown` configuration should be added to `websub:SubscriberServiceConfig`.
 
 ### Default Values
-Since we are introducing two new configurations for this feature we would be using following default values:
+Since we are introducing two new configurations, we would use following default values:
 ```ballerina
 // This will be turned on by default since every `subscriber` should be unsubscribe on termination.
 unsubscribeOnShutdown = true
