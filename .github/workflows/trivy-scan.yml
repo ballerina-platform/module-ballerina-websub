@@ -27,5 +27,4 @@ jobs:
           scan-type: 'fs'
           scan-ref: '/github/workspace/ballerina/lib'
           format: 'table'
-          timeout: '10m0s'
           exit-code: '1'

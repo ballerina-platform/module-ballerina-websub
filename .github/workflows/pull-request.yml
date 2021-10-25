@@ -24,7 +24,7 @@ jobs:
 
       - name: Generate Codecov Report
         if:  github.event_name == 'pull_request'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v1
           
   windows-build:
     name: Build on Windows
