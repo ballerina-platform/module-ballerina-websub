@@ -96,5 +96,5 @@ unsubscribeOnShutdown = true
 
 // This is the default timeout period to unsubscription verification. 
 // If unsubscription verification happens before this time period then listener will not wait further more.
-gracefulShutdownPeriod = 10 seconds
+gracefulShutdownPeriod = 20 seconds
 ```
