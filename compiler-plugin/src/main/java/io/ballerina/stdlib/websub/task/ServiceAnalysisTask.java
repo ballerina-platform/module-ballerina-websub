@@ -24,6 +24,7 @@ import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 import io.ballerina.stdlib.websub.task.validator.ServiceDeclarationValidator;
+import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 
 import java.util.Optional;
 
@@ -40,6 +41,13 @@ public class ServiceAnalysisTask implements AnalysisTask<SyntaxNodeAnalysisConte
 
     @Override
     public void perform(SyntaxNodeAnalysisContext context) {
+        boolean erroneousCompilation = context.semanticModel().diagnostics().stream()
+                .anyMatch(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()));
+        // if the compilation already contains any error, do not proceed
+        if (erroneousCompilation) {
+            return;
+        }
+
         ServiceDeclarationNode serviceNode = (ServiceDeclarationNode) context.node();
         Optional<Symbol> serviceDeclarationOpt = context.semanticModel().symbol(serviceNode);
         if (serviceDeclarationOpt.isPresent()) {
