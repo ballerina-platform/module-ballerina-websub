@@ -46,7 +46,7 @@ public class CompilerPluginTest {
             .get("src", "test", "resources", "ballerina_sources").toAbsolutePath();
     private static final PrintStream OUT = System.out;
     private static final Path DISTRIBUTION_PATH = Paths
-            .get("build", "target", "ballerina-distribution").toAbsolutePath();
+            .get("../", "target", "ballerina-runtime").toAbsolutePath();
 
     @Test
     public void testValidServiceDeclaration() {
