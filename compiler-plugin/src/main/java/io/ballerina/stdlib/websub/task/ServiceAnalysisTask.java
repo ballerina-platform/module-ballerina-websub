@@ -70,20 +70,12 @@ public class ServiceAnalysisTask implements AnalysisTask<SyntaxNodeAnalysisConte
 
     private void generateUniqueServicePath(SyntaxNodeAnalysisContext context, Project currentProject,
                                            int serviceId, ServiceDeclarationNode serviceNode) {
-        // check whether current project compilation contains any error
-        // generate service path only if there is no error
-        boolean isValidWebSubService = context.compilation().diagnosticResult()
-                .diagnostics().stream()
-                .noneMatch(d -> d.diagnosticInfo().severity().equals(DiagnosticSeverity.ERROR));
-
-        if (isValidWebSubService) {
-            try {
-                this.servicePathGenerator.generate(currentProject, serviceId);
-            } catch (ServicePathGenerationException ex) {
-                String errorMsg = ex.getLocalizedMessage();
-                WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_200;
-                updateContext(context, errorCode, serviceNode.location(), errorMsg);
-            }
+        try {
+            this.servicePathGenerator.generate(currentProject, serviceId);
+        } catch (ServicePathGenerationException ex) {
+            String errorMsg = ex.getLocalizedMessage();
+            WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_200;
+            updateContext(context, errorCode, serviceNode.location(), errorMsg);
         }
     }
 
