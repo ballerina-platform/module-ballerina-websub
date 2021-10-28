@@ -29,8 +29,11 @@ public type ResourceDiscoveryFailedError distinct Error;
 # Represents a subscription-initiation failed error.
 public type SubscriptionInitiationError distinct Error;
 
-# Represents a subscription-verificatation error.
+# Represents a subscription verificatation error.
 public type SubscriptionVerificationError distinct Error;
+
+# Represents a unsubscription verificatation error.
+public type UnsubscriptionVerificationError distinct Error;
 
 # Represents a subscription-denied error.
 public type SubscriptionDeniedError distinct Error;

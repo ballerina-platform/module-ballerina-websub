@@ -64,12 +64,15 @@ public class ServiceDeclarationValidator {
         allowedMethods = List.of(
                 Constants.ON_SUBSCRIPTION_VALIDATION_DENIED,
                 Constants.ON_SUBSCRIPTION_VERIFICATION,
+                Constants.ON_UNSUBSCRIPTION_VERIFICATION,
                 Constants.ON_EVENT_NOTIFICATION);
         allowedParameterTypes = Map.of(
                 Constants.ON_SUBSCRIPTION_VALIDATION_DENIED,
                 Collections.singletonList(Constants.SUBSCRIPTION_DENIED_ERROR),
                 Constants.ON_SUBSCRIPTION_VERIFICATION,
                 Collections.singletonList(Constants.SUBSCRIPTION_VERIFICATION),
+                Constants.ON_UNSUBSCRIPTION_VERIFICATION,
+                Collections.singletonList(Constants.UNSUBSCRIPTION_VERIFICATION),
                 Constants.ON_EVENT_NOTIFICATION,
                 Collections.singletonList(Constants.CONTENT_DISTRIBUTION_MESSAGE)
         );
@@ -78,6 +81,8 @@ public class ServiceDeclarationValidator {
                 Collections.singletonList(Constants.ACKNOWLEDGEMENT),
                 Constants.ON_SUBSCRIPTION_VERIFICATION,
                 List.of(Constants.SUBSCRIPTION_VERIFICATION_SUCCESS, Constants.SUBSCRIPTION_VERIFICATION_ERROR),
+                Constants.ON_UNSUBSCRIPTION_VERIFICATION,
+                List.of(Constants.UNSUBSCRIPTION_VERIFICATION_SUCCESS, Constants.UNSUBSCRIPTION_VERIFICATION_ERROR),
                 Constants.ON_EVENT_NOTIFICATION,
                 List.of(Constants.ACKNOWLEDGEMENT, Constants.SUBSCRIPTION_DELETED_ERROR)
         );
@@ -236,7 +241,7 @@ public class ServiceDeclarationValidator {
         } else if (TypeDescKind.TYPE_REFERENCE.equals(typeKind)) {
             TypeSymbol internalType = ((TypeReferenceTypeSymbol) returnTypeDescriptor).typeDescriptor();
             if (internalType instanceof ErrorTypeSymbol) {
-                return isInvalidErrorReturn(allowedReturnTypes, internalType);
+                return isInvalidErrorReturn(allowedReturnTypes, returnTypeDescriptor);
             } else {
                 String moduleName = returnTypeDescriptor.getModule().flatMap(ModuleSymbol::getName).orElse("");
                 String paramType = returnTypeDescriptor.getName().orElse("");

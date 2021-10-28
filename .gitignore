@@ -23,11 +23,17 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# Java and Idea related ignores
+# Java related ignores
 build/
-.idea/
 target/
 .gradle/
+
+# IDE-related files
+.idea
+.code
+.project
+.settings
+.vscode
 
 # Ballerina related ignores
 Ballerina.lock

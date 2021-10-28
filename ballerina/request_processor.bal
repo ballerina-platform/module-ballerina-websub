@@ -51,6 +51,29 @@ isolated function processSubscriptionVerification(http:Caller caller, http:Respo
     }
 }
 
+isolated function processUnsubscriptionVerification(http:Caller caller, http:Response response, 
+                                                    RequestQueryParams params, HttpToWebsubAdaptor adaptor) {
+    UnsubscriptionVerification message = {
+        hubMode: <string>params?.hubMode,
+        hubTopic: <string>params?.hubTopic,
+        hubChallenge: <string>params?.hubChallenge,
+        hubLeaseSeconds: params?.hubLeaseSeconds
+    };
+
+    UnsubscriptionVerificationSuccess|error result = adaptor.callOnUnsubscriptionVerificationMethod(message);
+    if result is UnsubscriptionVerificationError {
+        response.statusCode = http:STATUS_NOT_FOUND;
+        var errorDetails = result.detail();
+        updateResponseBody(response, errorDetails["body"], errorDetails["headers"], result.message());
+    } else if result is error {
+        response.statusCode = http:STATUS_NOT_FOUND;
+        updateResponseBody(response, (), (), result.message());
+    } else {
+        response.statusCode = http:STATUS_OK;
+        response.setTextPayload(<string>params?.hubChallenge);
+    }
+}
+
 # Processes the subscription/unsubscription denial requests from the `hub`.
 # ```ballerina
 # processSubscriptionDenial(httpCaller, httpResponse, queryParams, adaptor);

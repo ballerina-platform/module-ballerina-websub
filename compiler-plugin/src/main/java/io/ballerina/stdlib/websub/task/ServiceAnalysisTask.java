@@ -49,6 +49,13 @@ public class ServiceAnalysisTask implements AnalysisTask<SyntaxNodeAnalysisConte
 
     @Override
     public void perform(SyntaxNodeAnalysisContext context) {
+        boolean erroneousCompilation = context.semanticModel().diagnostics().stream()
+                .anyMatch(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()));
+        // if the compilation already contains any error, do not proceed
+        if (erroneousCompilation) {
+            return;
+        }
+
         Project currentProject = context.currentPackage().project();
         ServiceDeclarationNode serviceNode = (ServiceDeclarationNode) context.node();
         Optional<Symbol> serviceDeclarationOpt = context.semanticModel().symbol(serviceNode);

@@ -30,14 +30,18 @@ public interface Constants {
 
     String ON_SUBSCRIPTION_VALIDATION_DENIED = "onSubscriptionValidationDenied";
     String ON_SUBSCRIPTION_VERIFICATION = "onSubscriptionVerification";
+    String ON_UNSUBSCRIPTION_VERIFICATION = "onUnsubscriptionVerification";
     String ON_EVENT_NOTIFICATION = "onEventNotification";
 
     String SUBSCRIPTION_DENIED_ERROR = "websub:SubscriptionDeniedError";
     String SUBSCRIPTION_VERIFICATION = "websub:SubscriptionVerification";
+    String UNSUBSCRIPTION_VERIFICATION = "websub:UnsubscriptionVerification";
     String CONTENT_DISTRIBUTION_MESSAGE = "websub:ContentDistributionMessage";
     String ACKNOWLEDGEMENT = "websub:Acknowledgement";
     String SUBSCRIPTION_VERIFICATION_SUCCESS = "websub:SubscriptionVerificationSuccess";
     String SUBSCRIPTION_VERIFICATION_ERROR = "websub:SubscriptionVerificationError";
+    String UNSUBSCRIPTION_VERIFICATION_SUCCESS = "websub:UnsubscriptionVerificationSuccess";
+    String UNSUBSCRIPTION_VERIFICATION_ERROR = "websub:UnsubscriptionVerificationError";
     String SUBSCRIPTION_DELETED_ERROR = "websub:SubscriptionDeletedError";
     String ERROR = "annotations:error";
 

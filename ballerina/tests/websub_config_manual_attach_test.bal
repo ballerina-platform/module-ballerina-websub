@@ -50,7 +50,8 @@ SimpleWebsubService simpleSubscriberServiceInstace = new;
 function beforeManualConfigAttachTest() returns @tainted error? {
     SubscriberServiceConfiguration config = {
         target: "http://0.0.0.0:9191/common/discovery",
-        leaseSeconds: 36000
+        leaseSeconds: 36000,
+        unsubscribeOnShutdown: false
     };
     check manualConfigAttachListener.attachWithConfig(simpleSubscriberServiceInstace, config, "subscriber");
 }

@@ -27,6 +27,7 @@ import io.ballerina.projects.environment.Environment;
 import io.ballerina.projects.environment.EnvironmentBuilder;
 import io.ballerina.tools.diagnostics.Diagnostic;
 import io.ballerina.tools.diagnostics.DiagnosticInfo;
+import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -34,6 +35,8 @@ import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class includes tests for Ballerina WebSub compiler plugin.
@@ -43,14 +46,17 @@ public class CompilerPluginTest {
             .get("src", "test", "resources", "ballerina_sources").toAbsolutePath();
     private static final PrintStream OUT = System.out;
     private static final Path DISTRIBUTION_PATH = Paths
-            .get("build", "target", "ballerina-distribution").toAbsolutePath();
+            .get("../", "target", "ballerina-runtime").toAbsolutePath();
 
     @Test
     public void testValidServiceDeclaration() {
         Package currentPackage = loadPackage("sample_1");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 0);
     }
 
     @Test
@@ -58,8 +64,11 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_2");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 1);
+        Diagnostic diagnostic = (Diagnostic) errorDiagnostics.toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_102;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
@@ -73,8 +82,11 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_3");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 1);
+        Diagnostic diagnostic = (Diagnostic) errorDiagnostics.toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_103;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
@@ -87,8 +99,11 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_4");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 1);
+        Diagnostic diagnostic = (Diagnostic) errorDiagnostics.toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_104;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
@@ -102,8 +117,11 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_5");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 1);
+        Diagnostic diagnostic = (Diagnostic) errorDiagnostics.toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_105;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
@@ -118,8 +136,11 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_6");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 1);
+        Diagnostic diagnostic = (Diagnostic) errorDiagnostics.toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_105;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
@@ -134,8 +155,11 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_7");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 1);
+        Diagnostic diagnostic = (Diagnostic) errorDiagnostics.toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_106;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
@@ -150,8 +174,11 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_8");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 1);
+        Diagnostic diagnostic = (Diagnostic) errorDiagnostics.toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_107;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
@@ -167,8 +194,11 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_9");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 1);
+        Diagnostic diagnostic = (Diagnostic) errorDiagnostics.toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_108;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
@@ -184,8 +214,11 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_10");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 1);
+        Diagnostic diagnostic = (Diagnostic) errorDiagnostics.toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_101;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
@@ -198,8 +231,11 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_11");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 1);
+        Diagnostic diagnostic = (Diagnostic) errorDiagnostics.toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_101;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
@@ -212,8 +248,11 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_12");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 1);
+        Diagnostic diagnostic = (Diagnostic) errorDiagnostics.toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_109;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
@@ -226,8 +265,11 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_13");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 1);
-        Diagnostic diagnostic = (Diagnostic) diagnosticResult.diagnostics().toArray()[0];
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 1);
+        Diagnostic diagnostic = (Diagnostic) errorDiagnostics.toArray()[0];
         DiagnosticInfo diagnosticInfo = diagnostic.diagnosticInfo();
         WebSubDiagnosticCodes expectedCode = WebSubDiagnosticCodes.WEBSUB_109;
         Assert.assertNotNull(diagnosticInfo, "DiagnosticInfo is null for erroneous service definition");
@@ -240,7 +282,10 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_14");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 0);
     }
 
     @Test
@@ -248,7 +293,10 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_15");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 0);
     }
 
     @Test
@@ -256,7 +304,10 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_16");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 0);
     }
 
     @Test
@@ -264,7 +315,10 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_17");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 0);
     }
 
     @Test
@@ -272,14 +326,20 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_18");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 0);
     }
     
     public void testValidWebsubServiceClassDeclaration() {
         Package currentPackage = loadPackage("sample_19");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 0);
     }
 
     @Test
@@ -287,7 +347,10 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_20");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 0);
     }
 
     @Test
@@ -295,7 +358,21 @@ public class CompilerPluginTest {
         Package currentPackage = loadPackage("sample_21");
         PackageCompilation compilation = currentPackage.getCompilation();
         DiagnosticResult diagnosticResult = compilation.diagnosticResult();
-        Assert.assertEquals(diagnosticResult.diagnostics().size(), 0);
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 0);
+    }
+
+    @Test
+    public void testValidWebsubServiceDeclarationWithUnsubVerification() {
+        Package currentPackage = loadPackage("sample_22");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 0);
     }
 
     private Package loadPackage(String path) {

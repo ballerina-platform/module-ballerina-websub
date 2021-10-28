@@ -22,6 +22,9 @@ public type SubscriberService service object {
 //  remote function onSubscriptionVerification(SubscriptionVerification msg)
 //                    returns SubscriptionVerificationSuccess|SubscriptionVerificationError|error;
 
+//  remote function onUnsubscriptionVerification(UnsubscriptionVerification msg)
+//                    returns UnsubscriptionVerificationSuccess|UnsubscriptionVerificationError|error;
+
 //  remote function onEventNotification(ContentDistributionMessage event) 
 //                   returns Acknowledgement|SubscriptionDeletedError|error?;
 

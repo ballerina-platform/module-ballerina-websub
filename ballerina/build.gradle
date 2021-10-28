@@ -14,6 +14,9 @@
  * limitations under the License.
  *
  */
+
+import org.apache.tools.ant.taskdefs.condition.Os
+
 buildscript {
     repositories {
         maven {
@@ -34,10 +37,10 @@ description = 'Ballerina - Websub Ballerina Generator'
 def packageName = "websub"
 def packageOrg = "ballerina"
 def tomlVersion = stripBallerinaExtensionVersion("${project.version}")
-def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
-def ballerinaCompilerPluginFile = new File("$project.projectDir/CompilerPlugin.toml")
-def originalCompilerPlugin = ballerinaCompilerPluginFile.text
-def originalConfig = ballerinaConfigFile.text
+def ballerinaTomlFilePlaceHolder = new File("${project.rootDir}/build-config/resources/Ballerina.toml")
+def compilerPluginTomlFilePlaceHolder = new File("${project.rootDir}/build-config/resources/CompilerPlugin.toml")
+def ballerinaTomlFile = new File("$project.projectDir/Ballerina.toml")
+def compilerPluginTomlFile = new File("$project.projectDir/CompilerPlugin.toml")
 
 def stripBallerinaExtensionVersion(String extVersion) {
     if (extVersion.matches(project.ext.timestampedVersionRegex)) {
@@ -132,7 +135,7 @@ task updateTomlFiles {
         def stdlibDependentUuidVersion = stripBallerinaExtensionVersion(project.stdlibUuidVersion)
         def stdlibDependentRandomVersion = stripBallerinaExtensionVersion(project.stdlibRandomVersion)
 
-        def newConfig = ballerinaConfigFile.text.replace("@project.version@", project.version)
+        def newConfig = ballerinaTomlFilePlaceHolder.text.replace("@project.version@", project.version)
         newConfig = newConfig.replace("@toml.version@", tomlVersion)
 
         // Dynamic version update of external dependencies
@@ -143,17 +146,23 @@ task updateTomlFiles {
         newConfig = newConfig.replace("@nettytcnative.version@", project.nettyTcnativeVersion)
         newConfig = newConfig.replace("@wso2carbonmetrics.version@", project.wso2CarbonMetricsVersion)
         newConfig = newConfig.replace("@http.native.version@", project.stdlibHttpVersion)
-        ballerinaConfigFile.text = newConfig
+        ballerinaTomlFile.text = newConfig
 
-        def newPluginConfig = ballerinaCompilerPluginFile.text.replace("@project.version@", project.version)
-        ballerinaCompilerPluginFile.text = newPluginConfig
+        def newPluginConfig = compilerPluginTomlFilePlaceHolder.text.replace("@project.version@", project.version)
+        compilerPluginTomlFile.text = newPluginConfig
     }
 }
 
-task revertTomlFiles {
+task commitTomlFiles {
     doLast {
-        ballerinaConfigFile.text = originalConfig
-        ballerinaCompilerPluginFile.text = originalCompilerPlugin
+        project.exec {
+            ignoreExitValue true
+            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                commandLine 'cmd', '/c', "git commit -m \"[Automated] Update the native jar versions\" Ballerina.toml Dependencies.toml"
+            } else {
+                commandLine 'sh', '-c', "git commit -m '[Automated] Update the native jar versions' Ballerina.toml Dependencies.toml"
+            }
+        }
     }
 }
 
