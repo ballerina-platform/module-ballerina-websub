@@ -21,18 +21,14 @@ package io.ballerina.stdlib.websub.task;
 import io.ballerina.compiler.api.symbols.ServiceDeclarationSymbol;
 import io.ballerina.compiler.api.symbols.Symbol;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
-import io.ballerina.projects.Project;
 import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
-import io.ballerina.stdlib.websub.WebSubDiagnosticCodes;
-import io.ballerina.stdlib.websub.task.service.path.ServicePathGenerationException;
-import io.ballerina.stdlib.websub.task.service.path.ServicePathGeneratorManager;
 import io.ballerina.stdlib.websub.task.validator.ServiceDeclarationValidator;
 import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 
 import java.util.Optional;
 
-import static io.ballerina.stdlib.websub.task.AnalyserUtils.updateContext;
+import static io.ballerina.stdlib.websub.task.AnalyserUtils.isWebSubService;
 
 /**
  * {@code ServiceDeclarationValidator} validates whether websub service declaration is complying to current websub
@@ -40,11 +36,9 @@ import static io.ballerina.stdlib.websub.task.AnalyserUtils.updateContext;
  */
 public class ServiceAnalysisTask implements AnalysisTask<SyntaxNodeAnalysisContext> {
     private final ServiceDeclarationValidator validator;
-    private final ServicePathGeneratorManager servicePathGenerator;
 
     public ServiceAnalysisTask() {
         this.validator = ServiceDeclarationValidator.getInstance();
-        this.servicePathGenerator = new ServicePathGeneratorManager();
     }
 
     @Override
@@ -56,7 +50,6 @@ public class ServiceAnalysisTask implements AnalysisTask<SyntaxNodeAnalysisConte
             return;
         }
 
-        Project currentProject = context.currentPackage().project();
         ServiceDeclarationNode serviceNode = (ServiceDeclarationNode) context.node();
         Optional<Symbol> serviceDeclarationOpt = context.semanticModel().symbol(serviceNode);
         if (serviceDeclarationOpt.isPresent()) {
@@ -64,22 +57,6 @@ public class ServiceAnalysisTask implements AnalysisTask<SyntaxNodeAnalysisConte
             if (isWebSubService(serviceDeclarationSymbol)) {
                 this.validator.validate(context, serviceNode, serviceDeclarationSymbol);
             }
-            generateUniqueServicePath(context, currentProject, serviceDeclarationSymbol.hashCode(), serviceNode);
         }
-    }
-
-    private void generateUniqueServicePath(SyntaxNodeAnalysisContext context, Project currentProject,
-                                           int serviceId, ServiceDeclarationNode serviceNode) {
-        try {
-            this.servicePathGenerator.generate(currentProject, serviceId);
-        } catch (ServicePathGenerationException ex) {
-            String errorMsg = ex.getLocalizedMessage();
-            WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_200;
-            updateContext(context, errorCode, serviceNode.location(), errorMsg);
-        }
-    }
-
-    private boolean isWebSubService(ServiceDeclarationSymbol serviceDeclarationSymbol) {
-        return serviceDeclarationSymbol.listenerTypes().stream().anyMatch(AnalyserUtils::isWebSubListener);
     }
 }

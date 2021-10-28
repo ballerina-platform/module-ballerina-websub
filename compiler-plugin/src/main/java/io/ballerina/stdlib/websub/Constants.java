@@ -45,6 +45,9 @@ public interface Constants {
     String SUBSCRIPTION_DELETED_ERROR = "websub:SubscriptionDeletedError";
     String ERROR = "annotations:error";
 
+    String CALLBACK = "callback";
+    String APPEND_SERVICE_PATH = "appendServicePath";
+
     String OPTIONAL = "?";
 
     // resource directory structure related constants
