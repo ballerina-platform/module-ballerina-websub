@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Enumeration;
@@ -58,7 +59,7 @@ public class ResourcePackagingService {
             try (ZipOutputStream outStream = new ZipOutputStream(new BufferedOutputStream(
                     new FileOutputStream(targetFile.toString())))) {
                 // add generated open-api doc related resources to target jar
-                addOpenApiResources(outStream, context);
+                addServicePathResource(outStream, context);
 
                 // copy all the content in the src-jar to the new jar
                 for (Enumeration<JarEntry> entries = srcJar.entries(); entries.hasMoreElements();) {
@@ -73,7 +74,7 @@ public class ResourcePackagingService {
         }
     }
 
-    private void addOpenApiResources(ZipOutputStream outStream, ServicePathContext context) throws IOException {
+    private void addServicePathResource(ZipOutputStream outStream, ServicePathContext context) throws IOException {
         Path resourcesDirectory = Paths.get(
                 Constants.RESOURCES_DIR_NAME, Constants.PACKAGE_ORG, Constants.PACKAGE_NAME);
         Path targetFile = resourcesDirectory.resolve(SERVICE_INFO_FILE);
@@ -81,7 +82,7 @@ public class ResourcePackagingService {
         for (ServicePathContext.ServicePathInformation servicePathInfo: context.getServicePathDetails()) {
             String entry = String.format(SERVICE_INFO_ENTRY_FORMAT,
                     servicePathInfo.getServiceId(), servicePathInfo.getServicePath());
-            try (InputStream inputStream = new ByteArrayInputStream(entry.getBytes())) {
+            try (InputStream inputStream = new ByteArrayInputStream(entry.getBytes(StandardCharsets.UTF_8))) {
                 copyContent(inputStream, outStream);
             }
         }

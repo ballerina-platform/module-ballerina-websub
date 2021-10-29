@@ -27,7 +27,11 @@ import io.ballerina.stdlib.websub.WebSubDiagnosticCodes;
 import io.ballerina.stdlib.websub.task.service.path.ResourcePackagingService;
 import io.ballerina.stdlib.websub.task.service.path.ServicePathContext;
 import io.ballerina.stdlib.websub.task.service.path.ServicePathGeneratorException;
-import io.ballerina.tools.diagnostics.*;
+import io.ballerina.tools.diagnostics.Diagnostic;
+import io.ballerina.tools.diagnostics.DiagnosticFactory;
+import io.ballerina.tools.diagnostics.DiagnosticInfo;
+import io.ballerina.tools.diagnostics.DiagnosticSeverity;
+import io.ballerina.tools.diagnostics.Location;
 import io.ballerina.tools.text.LinePosition;
 import io.ballerina.tools.text.LineRange;
 import io.ballerina.tools.text.TextRange;
@@ -35,6 +39,7 @@ import io.ballerina.tools.text.TextRange;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 
 import static io.ballerina.stdlib.websub.task.service.path.ServicePathContextHandler.getContextHandler;
@@ -123,8 +128,19 @@ public class WebSubServiceInfoPackagingTask implements CompilerLifecycleTask<Com
 
         return jarResolver
                 .getJarFilePathsRequiredForExecution().stream()
-                .filter(jarLibrary -> jarLibrary.path().getFileName().toString().endsWith(thinJarName))
+                .filter(jarLibrary -> isCorrectThinJar(jarLibrary, thinJarName))
                 .findFirst();
+    }
+
+    private boolean isCorrectThinJar(JarLibrary jarLibrary, String expectedThinJar) {
+        Path filePath = jarLibrary.path();
+        if (Objects.nonNull(filePath)) {
+            Path fileName = filePath.getFileName();
+            if (Objects.nonNull(fileName)) {
+                return fileName.toString().endsWith(expectedThinJar);
+            }
+        }
+        return false;
     }
 
     private static class NullLocation implements Location {
