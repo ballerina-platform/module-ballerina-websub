@@ -29,12 +29,12 @@ import io.ballerina.compiler.syntax.tree.MetadataNode;
 import io.ballerina.compiler.syntax.tree.NodeList;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.compiler.syntax.tree.SpecificFieldNode;
-import io.ballerina.projects.Project;
+import io.ballerina.projects.Package;
 import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 import io.ballerina.stdlib.websub.Constants;
 import io.ballerina.stdlib.websub.WebSubDiagnosticCodes;
-import io.ballerina.stdlib.websub.task.service.path.ServicePathGenerationException;
+import io.ballerina.stdlib.websub.task.service.path.ServicePathGeneratorException;
 import io.ballerina.stdlib.websub.task.service.path.ServicePathGeneratorManager;
 import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 
@@ -64,7 +64,7 @@ public class WebSubServiceInfoGeneratorTask implements AnalysisTask<SyntaxNodeAn
             return;
         }
 
-        Project currentProject = context.currentPackage().project();
+        Package currentPackage = context.currentPackage();
         ServiceDeclarationNode serviceNode = (ServiceDeclarationNode) context.node();
         Optional<Symbol> serviceDeclarationOpt = semanticModel.symbol(serviceNode);
         if (serviceDeclarationOpt.isPresent()) {
@@ -75,7 +75,7 @@ public class WebSubServiceInfoGeneratorTask implements AnalysisTask<SyntaxNodeAn
             if (!shouldGenerateServicePath(serviceNode, semanticModel)) {
                 return;
             }
-            generateUniqueServicePath(context, currentProject, serviceDeclarationSymbol.hashCode(), serviceNode);
+            generateUniqueServicePath(context, currentPackage, serviceDeclarationSymbol.hashCode(), serviceNode);
         }
     }
 
@@ -151,11 +151,11 @@ public class WebSubServiceInfoGeneratorTask implements AnalysisTask<SyntaxNodeAn
                 .map(en -> en.toString().trim());
     }
 
-    private void generateUniqueServicePath(SyntaxNodeAnalysisContext context, Project currentProject,
+    private void generateUniqueServicePath(SyntaxNodeAnalysisContext context, Package currentPackage,
                                            int serviceId, ServiceDeclarationNode serviceNode) {
         try {
-            this.servicePathGenerator.generate(currentProject, serviceId);
-        } catch (ServicePathGenerationException ex) {
+            this.servicePathGenerator.generate(currentPackage, serviceId);
+        } catch (ServicePathGeneratorException ex) {
             String errorMsg = ex.getLocalizedMessage();
             WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_200;
             updateContext(context, errorCode, serviceNode.location(), errorMsg);

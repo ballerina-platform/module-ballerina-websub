@@ -45,24 +45,24 @@ public final class ServicePathContextHandler {
         return contextHandlerInstance;
     }
 
-    public void addContext(ServicePathContext context) {
+    private void addContext(ServicePathContext context) {
         synchronized (this.contexts) {
             this.contexts.add(context);
         }
     }
 
     public void updateServicePathContext(PackageId packageId, Path srcRoot,
-                                         ServicePathContext.ServicePathInformation definition) {
+                                         ServicePathContext.ServicePathInformation servicePathInformation) {
         Optional<ServicePathContext> contextOpt = retrieveContext(packageId, srcRoot);
         if (contextOpt.isPresent()) {
             ServicePathContext context = contextOpt.get();
             synchronized (context) {
-                context.updateServicePathDetails(definition);
+                context.updateServicePathDetails(servicePathInformation);
             }
             return;
         }
         ServicePathContext context = new ServicePathContext(packageId, srcRoot);
-        context.updateServicePathDetails(definition);
+        context.updateServicePathDetails(servicePathInformation);
         addContext(context);
     }
 

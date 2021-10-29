@@ -16,6 +16,8 @@
 
 package io.ballerina.stdlib.websub.task.service.path;
 
+import io.ballerina.projects.Package;
+import io.ballerina.projects.PackageId;
 import io.ballerina.projects.Project;
 
 import java.util.List;
@@ -32,16 +34,18 @@ public final class ServicePathGeneratorManager {
                 new SingleFileServicePathGenerator(), new BalProjectServicePathGenerator());
     }
 
-    public void generate(Project currentProject, int serviceId) throws ServicePathGenerationException {
+    public void generate(Package currentPackage, int serviceId) throws ServicePathGeneratorException {
+        Project currentProject = currentPackage.project();
         for (ServicePathGenerator servicePathGenerator: servicePathGenerators) {
             if (servicePathGenerator.isSupported(currentProject.kind())) {
-                servicePathGenerator.generate(currentProject.sourceRoot(), serviceId);
+                PackageId packageId = currentPackage.packageId();
+                servicePathGenerator.generate(packageId, currentProject.sourceRoot(), serviceId);
                 return;
             }
         }
 
         // throw an error if we could not find a valid service-path generator
         // this has to be done because without service-path subscriber-service could not start
-        throw new ServicePathGenerationException("Valid service path generator not found");
+        throw new ServicePathGeneratorException("Valid service path generator not found");
     }
 }

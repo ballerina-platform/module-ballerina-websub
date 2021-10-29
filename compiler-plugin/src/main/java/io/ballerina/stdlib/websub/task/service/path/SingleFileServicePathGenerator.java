@@ -19,11 +19,6 @@
 package io.ballerina.stdlib.websub.task.service.path;
 
 import io.ballerina.projects.ProjectKind;
-import io.ballerina.stdlib.websub.Constants;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Objects;
 
 /**
  * {@code SingleFileServicePathGenerator} generates unique-service-path for subscriber-service defined
@@ -33,32 +28,5 @@ public class SingleFileServicePathGenerator extends AbstractServicePathGenerator
     @Override
     public boolean isSupported(ProjectKind projectType) {
         return ProjectKind.SINGLE_FILE_PROJECT.equals(projectType);
-    }
-
-    @Override
-    protected Path retrieveProjectRoot(Path projectRoot) {
-        // For single ballerina file, project root will be the absolute path for that particular ballerina file
-        // hence project root should be updated to the directory which contains the ballerina file
-        Path parentDirectory = retrieveParentDirectory(projectRoot);
-        if (Objects.nonNull(parentDirectory) && Files.exists(parentDirectory)) {
-            return parentDirectory;
-        }
-        return projectRoot.isAbsolute() ? projectRoot : projectRoot.toAbsolutePath();
-    }
-
-    private Path retrieveParentDirectory(Path projectRoot) {
-        if (projectRoot.isAbsolute()) {
-            return projectRoot.getParent();
-        } else {
-            return projectRoot.toAbsolutePath().getParent();
-        }
-    }
-
-    // for ballerina-project, intermediate `resources` directory will be created inside the current directory
-    @Override
-    protected Path retrieveResourcePath(Path projectRoot) {
-        return projectRoot
-                .resolve(Constants.RESOURCES_DIR_NAME)
-                .resolve(Constants.PACKAGE_ORG).resolve(Constants.PACKAGE_NAME);
     }
 }

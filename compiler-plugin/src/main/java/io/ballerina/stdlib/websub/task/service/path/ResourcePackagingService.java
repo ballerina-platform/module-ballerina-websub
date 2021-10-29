@@ -19,16 +19,17 @@ package io.ballerina.stdlib.websub.task.service.path;
 import io.ballerina.stdlib.websub.Constants;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Enumeration;
-import java.util.Objects;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static io.ballerina.stdlib.websub.task.AnalyserUtils.copyContent;
@@ -38,43 +39,53 @@ import static io.ballerina.stdlib.websub.task.AnalyserUtils.copyContent;
  */
 public class ResourcePackagingService {
     private static final String TARGET_FILE_NAME = "target_exec.jar";
+    private static final String SERVICE_INFO_FILE = "service-info.csv";
+    private static final String SERVICE_INFO_ENTRY_FORMAT = "%d, %s";
 
-    public void updateExecutableJar(Path targetBinPath, String srcFileName)
-            throws IOException, ServicePathGenerationException {
+    public void updateJarFile(Path targetBinPath, String srcFileName, ServicePathContext context)
+            throws IOException, ServicePathGeneratorException {
         Path srcFile = targetBinPath.resolve(srcFileName);
         Path targetFile = targetBinPath.resolve(TARGET_FILE_NAME);
-        generateUpdatedJar(srcFile, targetFile, targetBinPath);
+        generateUpdatedJar(srcFile, targetFile, context);
         boolean successful = deleteOldFile(srcFile);
         if (successful) {
             renameGeneratedFile(targetFile, srcFile);
         }
     }
 
-    private void generateUpdatedJar(Path srcFile, Path targetFile, Path targetBinPath) throws IOException {
+    private void generateUpdatedJar(Path srcFile, Path targetFile, ServicePathContext context) throws IOException {
         try (JarFile srcJar = new JarFile(srcFile.toString())) {
             try (ZipOutputStream outStream = new ZipOutputStream(new BufferedOutputStream(
                     new FileOutputStream(targetFile.toString())))) {
                 // add generated open-api doc related resources to target jar
-                Path resources = targetBinPath.resolve(Constants.RESOURCES_DIR_NAME);
-                Files.walkFileTree(resources, new ZipUpdater(outStream, resources));
+                addOpenApiResources(outStream, context);
 
                 // copy all the content in the src-jar to the new jar
                 for (Enumeration<JarEntry> entries = srcJar.entries(); entries.hasMoreElements();) {
                     JarEntry element = entries.nextElement();
                     outStream.putNextEntry(element);
-                    InputStream inputStream = null;
-                    try {
-                        inputStream = srcJar.getInputStream(element);
+                    try (InputStream inputStream = srcJar.getInputStream(element)) {
                         copyContent(inputStream, outStream);
                         outStream.closeEntry();
-                    } finally {
-                        if (Objects.nonNull(inputStream)) {
-                            inputStream.close();
-                        }
                     }
                 }
             }
         }
+    }
+
+    private void addOpenApiResources(ZipOutputStream outStream, ServicePathContext context) throws IOException {
+        Path resourcesDirectory = Paths.get(
+                Constants.RESOURCES_DIR_NAME, Constants.PACKAGE_ORG, Constants.PACKAGE_NAME);
+        Path targetFile = resourcesDirectory.resolve(SERVICE_INFO_FILE);
+        outStream.putNextEntry(new ZipEntry(targetFile.toString()));
+        for (ServicePathContext.ServicePathInformation servicePathInfo: context.getServicePathDetails()) {
+            String entry = String.format(SERVICE_INFO_ENTRY_FORMAT,
+                    servicePathInfo.getServiceId(), servicePathInfo.getServicePath());
+            try (InputStream inputStream = new ByteArrayInputStream(entry.getBytes())) {
+                copyContent(inputStream, outStream);
+            }
+        }
+        outStream.closeEntry();
     }
 
     private boolean deleteOldFile(Path sourceFilePath) {
@@ -86,11 +97,11 @@ public class ResourcePackagingService {
         return true;
     }
 
-    private void renameGeneratedFile(Path targetFilePath, Path sourceFilePath) throws ServicePathGenerationException {
+    private void renameGeneratedFile(Path targetFilePath, Path sourceFilePath) throws ServicePathGeneratorException {
         File targetFile = targetFilePath.toFile();
         boolean success = targetFile.renameTo(sourceFilePath.toFile());
         if (!success) {
-            throw new ServicePathGenerationException("could not rename the generated executable jar");
+            throw new ServicePathGeneratorException("could not rename the generated executable jar");
         }
     }
 }

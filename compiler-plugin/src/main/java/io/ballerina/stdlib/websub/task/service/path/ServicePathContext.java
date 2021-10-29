@@ -57,15 +57,15 @@ public class ServicePathContext {
      * {@code ServicePathInformation} contains details related to generated service-path.
      */
     public static class ServicePathInformation {
-        private final String serviceId;
+        private final int serviceId;
         private final String servicePath;
 
-        public ServicePathInformation(String serviceId, String servicePath) {
+        public ServicePathInformation(int serviceId, String servicePath) {
             this.serviceId = serviceId;
             this.servicePath = servicePath;
         }
 
-        public String getServiceId() {
+        public int getServiceId() {
             return serviceId;
         }
 

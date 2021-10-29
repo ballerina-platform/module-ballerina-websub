@@ -16,25 +16,33 @@
 
 package io.ballerina.stdlib.websub.task;
 
-import io.ballerina.projects.ProjectKind;
+import io.ballerina.projects.JBallerinaBackend;
+import io.ballerina.projects.JarLibrary;
+import io.ballerina.projects.JarResolver;
+import io.ballerina.projects.JvmTarget;
+import io.ballerina.projects.Package;
 import io.ballerina.projects.plugins.CompilerLifecycleEventContext;
 import io.ballerina.projects.plugins.CompilerLifecycleTask;
-import io.ballerina.stdlib.websub.Constants;
+import io.ballerina.stdlib.websub.WebSubDiagnosticCodes;
 import io.ballerina.stdlib.websub.task.service.path.ResourcePackagingService;
-import io.ballerina.stdlib.websub.task.service.path.ServicePathGenerationException;
+import io.ballerina.stdlib.websub.task.service.path.ServicePathContext;
+import io.ballerina.stdlib.websub.task.service.path.ServicePathGeneratorException;
+import io.ballerina.tools.diagnostics.*;
+import io.ballerina.tools.text.LinePosition;
+import io.ballerina.tools.text.LineRange;
+import io.ballerina.tools.text.TextRange;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+
+import static io.ballerina.stdlib.websub.task.service.path.ServicePathContextHandler.getContextHandler;
 
 /**
  * {@code WebSubServiceInfoPackagingTask} handles post compile tasks related to unique service path generation.
  */
 public class WebSubServiceInfoPackagingTask implements CompilerLifecycleTask<CompilerLifecycleEventContext> {
-    private static final PrintStream ERR = System.err;
-
     private final ResourcePackagingService packagingService;
 
     public WebSubServiceInfoPackagingTask() {
@@ -43,41 +51,92 @@ public class WebSubServiceInfoPackagingTask implements CompilerLifecycleTask<Com
 
     @Override
     public void perform(CompilerLifecycleEventContext context) {
-        ProjectKind projectType = context.currentPackage().project().kind();
+        boolean erroneousCompilation = context.compilation().diagnosticResult()
+                .diagnostics().stream()
+                .anyMatch(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()));
+        // if the compilation already contains any error, do not proceed
+        if (erroneousCompilation) {
+            return;
+        }
+
+        Package currentPackage = context.currentPackage();
+        Optional<ServicePathContext> servicePathContextOpt = getContextHandler()
+                .retrieveContext(currentPackage.packageId(), currentPackage.project().sourceRoot());
+        // if the shared service-path generation context not found, do not proceed
+        if (servicePathContextOpt.isEmpty()) {
+            return;
+        }
+
         Optional<Path> executablePath = context.getGeneratedArtifactPath();
-        executablePath.ifPresent(exec ->
-                updateResources(exec, ProjectKind.SINGLE_FILE_PROJECT.equals(projectType))
-        );
+        executablePath.ifPresent(exec -> {
+            ServicePathContext servicePathContext = servicePathContextOpt.get();
+            updateResources(servicePathContext, exec, context);
+        });
     }
 
-    private void updateResources(Path executablePath, boolean isSingleFile) {
+    private void updateResources(ServicePathContext context, Path executablePath,
+                                 CompilerLifecycleEventContext compilationContext) {
         Path executableJarAbsPath = executablePath.toAbsolutePath();
         // get the path for `target/bin`
         Path targetBinPath = executableJarAbsPath.getParent();
         if (null != targetBinPath && Files.exists(targetBinPath)) {
-            String executableJarFileName = executableJarAbsPath.toFile().getName();
-            try {
-                this.packagingService.updateExecutableJar(targetBinPath, executableJarFileName);
-            } catch (IOException | ServicePathGenerationException e) {
-                ERR.println("error [service-path-generation]: " + e.getLocalizedMessage());
+            // if generated service-path information is empty, do not proceed
+            if (context.getServicePathDetails().isEmpty()) {
+                return;
             }
 
-            // clean up created intermediate resources if current project is a single-ballerina-file project
-            if (isSingleFile) {
-                execCleanup(targetBinPath);
+            String executableJarFileName = executableJarAbsPath.toFile().getName();
+            try {
+                // update the executable jar
+                this.packagingService.updateJarFile(targetBinPath, executableJarFileName, context);
+
+                // update the thin-jar | this is required for dockerized applications
+                Optional<JarLibrary> thinJarOpt = getThinJar(compilationContext, executablePath);
+                if (thinJarOpt.isPresent()) {
+                    JarLibrary thinJar = thinJarOpt.get();
+                    Path thinJarLocation = thinJar.path().toAbsolutePath();
+                    Path parenDirectory = thinJarLocation.getParent();
+                    String thinJarName = thinJarLocation.toFile().getName();
+                    this.packagingService.updateJarFile(parenDirectory, thinJarName, context);
+                }
+            } catch (IOException | ServicePathGeneratorException e) {
+                WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_201;
+                DiagnosticInfo diagnosticInfo = new DiagnosticInfo(
+                        errorCode.getCode(), errorCode.getDescription(), errorCode.getSeverity());
+                Diagnostic diagnostic = DiagnosticFactory.createDiagnostic(
+                        diagnosticInfo, new NullLocation(), e.getMessage());
+                compilationContext.reportDiagnostic(diagnostic);
             }
         }
     }
 
-    private void execCleanup(Path targetPath) {
-        Path resourcesDirectory = targetPath.resolve(Constants.RESOURCES_DIR_NAME);
-        try {
-            if (Files.exists(resourcesDirectory)) {
-                Files.delete(resourcesDirectory);
-            }
-        } catch (IOException e) {
-            ERR.println("error [service-path-generation]: resource cleanup failed for single-file ballerina project"
-                    + e.getLocalizedMessage());
+    private Optional<JarLibrary> getThinJar(CompilerLifecycleEventContext compilationContext, Path executablePath) {
+        JBallerinaBackend jBallerinaBackend = JBallerinaBackend
+                .from(compilationContext.compilation(), JvmTarget.JAVA_11);
+        JarResolver jarResolver = jBallerinaBackend.jarResolver();
+
+        Package currentPackage = compilationContext.currentPackage();
+        String thinJarName = "$anon".equals(currentPackage.packageOrg().value())
+                ? executablePath.getFileName().toString()
+                : currentPackage.packageOrg().value() + "-" + currentPackage.packageName().value() +
+                "-" + currentPackage.packageVersion().value() + ".jar";
+
+        return jarResolver
+                .getJarFilePathsRequiredForExecution().stream()
+                .filter(jarLibrary -> jarLibrary.path().getFileName().toString().endsWith(thinJarName))
+                .findFirst();
+    }
+
+    private static class NullLocation implements Location {
+        @Override
+        public LineRange lineRange() {
+            LinePosition from = LinePosition.from(0, 0);
+            return LineRange.from("", from, from);
+        }
+
+        @Override
+        public TextRange textRange() {
+            return TextRange.from(0, 0);
         }
     }
 }

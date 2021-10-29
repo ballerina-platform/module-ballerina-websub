@@ -19,10 +19,6 @@
 package io.ballerina.stdlib.websub.task.service.path;
 
 import io.ballerina.projects.ProjectKind;
-import io.ballerina.stdlib.websub.Constants;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * {@code BalProjectServicePathGenerator} generates unique-service-path for subscriber-service defined
@@ -32,14 +28,5 @@ public class BalProjectServicePathGenerator extends AbstractServicePathGenerator
     @Override
     public boolean isSupported(ProjectKind projectType) {
         return ProjectKind.BUILD_PROJECT.equals(projectType);
-    }
-
-    // for ballerina-project, intermediate `resources` directory will be created inside `<project-root>/target/bin`
-    @Override
-    protected Path retrieveResourcePath(Path projectRoot) {
-        return projectRoot
-                .resolve(Constants.TARGET_DIR_NAME)
-                .resolve(Paths.get(Constants.BIN_DIR_NAME, Constants.RESOURCES_DIR_NAME))
-                .resolve(Constants.PACKAGE_ORG).resolve(Constants.PACKAGE_NAME);
     }
 }

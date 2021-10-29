@@ -21,12 +21,12 @@ package io.ballerina.stdlib.websub.task.service.path;
 /**
  * {@code ServicePathGenerationException} will be thrown when an exception occurs in service-path generation.
  */
-public class ServicePathGenerationException extends Exception {
-    public ServicePathGenerationException(String message) {
+public class ServicePathGeneratorException extends Exception {
+    public ServicePathGeneratorException(String message) {
         super(message);
     }
 
-    public ServicePathGenerationException(String message, Throwable cause) {
+    public ServicePathGeneratorException(String message, Throwable cause) {
         super(message, cause);
     }
 }

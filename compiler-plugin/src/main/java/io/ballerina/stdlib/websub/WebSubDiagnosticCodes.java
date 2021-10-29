@@ -47,6 +47,9 @@ public enum WebSubDiagnosticCodes {
             DiagnosticSeverity.ERROR),
     WEBSUB_200("WEBSUB_200",
             "Error occurred while generating unique service path for websub:SubscriberService : {0}",
+            DiagnosticSeverity.ERROR),
+    WEBSUB_201("WEBSUB_201",
+            "Error occurred while packaging generated resources : {0}",
             DiagnosticSeverity.ERROR);
 
     private final String code;

@@ -18,51 +18,28 @@
 
 package io.ballerina.stdlib.websub.task.service.path;
 
-import io.ballerina.stdlib.websub.Constants;
-
-import java.io.File;
-import java.io.IOException;
+import io.ballerina.projects.PackageId;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Objects;
 import java.util.Random;
 
-import static io.ballerina.stdlib.websub.task.AnalyserUtils.writeFile;
+import static io.ballerina.stdlib.websub.task.service.path.ServicePathContextHandler.getContextHandler;
 
 /**
  * {@code AbstractServicePathGenerator} contains the basic utilities required for unique service-path generation.
  */
 public abstract class AbstractServicePathGenerator implements ServicePathGenerator {
-    private static final String SERVICE_INFO_FILE = "service-info.csv";
-    private static final String SERVICE_INFO_ENTRY_FORMAT = "%d, %s";
-
     @Override
-    public void generate(Path currentProjectRoot, int serviceId) throws ServicePathGenerationException {
+    public void generate(PackageId packageId, Path currentProjectRoot, int serviceId)
+            throws ServicePathGeneratorException {
         try {
-            // construct resource directory structure if not already exists
-            Path projectRoot = retrieveProjectRoot(currentProjectRoot);
-            Path resourcePath = retrieveResourcePath(projectRoot);
-            File resourceDirectory = resourcePath.toFile();
-            if (!resourceDirectory.exists()) {
-                boolean resourceCreatingSuccessful = resourceDirectory.mkdirs();
-                if (!resourceCreatingSuccessful) {
-                    throw new ServicePathGenerationException("could not create resources directory");
-                }
-            }
-
-            Path serviceInfoDoc = resourcePath.resolve(SERVICE_INFO_FILE);
             String generatedServicePath = generateRandomAlphaNumericString(10);
-            String serviceInfo = String.format(SERVICE_INFO_ENTRY_FORMAT, serviceId, generatedServicePath);
-            if (Objects.nonNull(serviceInfo) && !serviceInfo.isBlank()) {
-                writeFile(serviceInfoDoc, serviceInfo);
-            } else {
-                // throw an error if service-info is empty
-                throw new ServicePathGenerationException("could not find valid service-info");
-            }
-        } catch (IOException ex) {
+            ServicePathContext.ServicePathInformation servicePathDetails = new ServicePathContext
+                    .ServicePathInformation(serviceId, generatedServicePath);
+            getContextHandler().updateServicePathContext(packageId, currentProjectRoot, servicePathDetails);
+        } catch (Exception ex) {
             // throw an error if there is any error in service-info generation
             String errorMsg = String.format("service path generation failed due to %s", ex.getLocalizedMessage());
-            throw new ServicePathGenerationException(errorMsg, ex);
+            throw new ServicePathGeneratorException(errorMsg, ex);
         }
     }
 
@@ -83,21 +60,5 @@ public abstract class AbstractServicePathGenerator implements ServicePathGenerat
                 .limit(stringLength)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
-    }
-
-    protected Path retrieveProjectRoot(Path projectRoot) {
-        return projectRoot;
-    }
-
-    // current design for resources directory structure is as follows :
-    //  <executable.jar>
-    //      - [resources]
-    //          - [ballerina]
-    //              - [websub]
-    protected Path retrieveResourcePath(Path projectRoot) {
-        return projectRoot
-                .resolve(Constants.TARGET_DIR_NAME)
-                .resolve(Paths.get(Constants.BIN_DIR_NAME, Constants.RESOURCES_DIR_NAME))
-                .resolve(Constants.PACKAGE_ORG).resolve(Constants.PACKAGE_NAME);
     }
 }
