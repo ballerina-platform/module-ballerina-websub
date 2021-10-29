@@ -51,7 +51,12 @@ public class Listener {
         self.listenerConfig = self.httpListener.getConfig();
         self.port = self.httpListener.getPort();
         self.gracefulShutdownPeriod = config.gracefulShutdownPeriod;
+        check self.externInit();
     }
+
+    isolated function externInit() returns Error? = @java:Method {
+        'class: "io.ballerina.stdlib.websub.NativeWebSubListenerAdaptor"
+    } external;
 
     # Attaches the provided `websub:SubscriberService` to the `websub:Listener`.
     # ```ballerina

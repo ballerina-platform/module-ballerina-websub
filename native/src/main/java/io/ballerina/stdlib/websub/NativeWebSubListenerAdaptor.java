@@ -18,16 +18,29 @@
 
 package io.ballerina.stdlib.websub;
 
+import io.ballerina.runtime.api.Module;
+import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.ArrayType;
+import io.ballerina.runtime.api.types.ObjectType;
+import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
+import static io.ballerina.stdlib.websub.Constants.SERVICE_INFO_REGISTRY;
 import static io.ballerina.stdlib.websub.Constants.SERVICE_PATH;
 import static io.ballerina.stdlib.websub.Constants.SERVICE_REGISTRY;
 import static io.ballerina.stdlib.websub.Constants.SUBSCRIBER_CONFIG;
@@ -36,6 +49,69 @@ import static io.ballerina.stdlib.websub.Constants.SUBSCRIBER_CONFIG;
  * {@code NativeWebSubListenerAdaptor} is a wrapper object used to save/retrieve native data related to WebSub Listener.
  */
 public class NativeWebSubListenerAdaptor {
+    private static final String SERVICE_INFO_RESOURCE = "resources/ballerina/websub/service-info.csv";
+
+    public static Object externInit(BObject websubListener) {
+        try (InputStream inputStream = NativeWebSubListenerAdaptor.class.getClassLoader()
+                .getResourceAsStream(SERVICE_INFO_RESOURCE)) {
+            if (Objects.nonNull(inputStream)) {
+                Map<String, String> serviceInfoRegistry = retrieveServiceInfoRegistry(inputStream);
+                websubListener.addNativeData(SERVICE_INFO_REGISTRY, serviceInfoRegistry);
+            }
+        } catch (IOException ex) {
+            Module module = ModuleUtils.getModule();
+            BString errorMessage = StringUtils.fromString(
+                    String.format("Error retrieving Service Information: %s", ex.getMessage()));
+            throw ErrorCreator.createError(module, "Error", errorMessage, null, null);
+        }
+        return null;
+    }
+
+    private static Map<String, String> retrieveServiceInfoRegistry(InputStream inputStream) throws IOException {
+        Map<String, String> serviceInfoRegistry = new HashMap<>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] values = line.split(",");
+                if (values.length == 2) {
+                    String serviceId = values[0].trim();
+                    String servicePath = values[1].trim();
+                    serviceInfoRegistry.put(serviceId, servicePath);
+                }
+            }
+        }
+        return serviceInfoRegistry;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static BString getServicePath(BObject websubListener, BObject subscriberService) {
+        Object serviceInfoRegistryObj = websubListener.getNativeData(SERVICE_INFO_REGISTRY);
+        if (Objects.isNull(serviceInfoRegistryObj)) {
+            return null;
+        }
+
+        Map<String, String> serviceInfoRegistry = (Map<String, String>) serviceInfoRegistryObj;
+        Optional<String> serviceId = getServiceId(subscriberService);
+        if (serviceId.isEmpty()) {
+            return null;
+        }
+
+        return StringUtils.fromString(serviceInfoRegistry.get(serviceId.get()));
+    }
+
+    private static Optional<String> getServiceId(BObject subscriberService) {
+        ObjectType objType = subscriberService.getType();
+        if (Objects.nonNull(objType)) {
+            return objType.getAnnotations().entrySet().stream()
+                    .filter(e -> e.getKey().toString().contains(Constants.ANN_NAME_HTTP_INTROSPECTION_DOC_CONFIG))
+                    .findFirst()
+                    .map(Map.Entry::getValue)
+                    .filter(e -> e instanceof BMap)
+                    .map(e -> ((BMap) e).getStringValue(Constants.ANN_FIELD_DOC_NAME).getValue().trim());
+        }
+        return Optional.empty();
+    }
+
     public static void externAttach(BObject websubListener, BString servicePath,
                                     BObject subscriberService, BObject httpService,
                                     BMap<BString, Object> subscriberConfig) {
