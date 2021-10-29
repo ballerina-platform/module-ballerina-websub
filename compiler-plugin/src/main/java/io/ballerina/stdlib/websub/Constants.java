@@ -26,7 +26,7 @@ public interface Constants {
     String PACKAGE_NAME = "websub";
 
     String LISTENER_IDENTIFIER = "Listener";
-    String SERVICE_ANNOTATION_NAME = "SubscriberServiceConfig";
+    String SERVICE_ANNOTATION_NAME = "websub:SubscriberServiceConfig";
 
     String ON_SUBSCRIPTION_VALIDATION_DENIED = "onSubscriptionValidationDenied";
     String ON_SUBSCRIPTION_VERIFICATION = "onSubscriptionVerification";
