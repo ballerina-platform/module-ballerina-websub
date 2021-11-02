@@ -2,6 +2,10 @@
 org = "ballerina"
 name = "websub"
 version = "@toml.version@"
+authors = ["Ballerina"]
+keywords = ["websub", "subscriber", "service", "listener"]
+repository = "https://github.com/ballerina-platform/module-ballerina-websub"
+license = ["Apache-2.0"]
 distribution = "slbeta3"
 
 [[platform.java11.dependency]]
