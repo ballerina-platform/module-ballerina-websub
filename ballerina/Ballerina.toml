@@ -12,7 +12,7 @@ distribution = "slbeta3"
 path = "../native/build/libs/websub-native-2.0.1-SNAPSHOT.jar"
 
 [[platform.java11.dependency]]
-path = "./lib/http-native-2.0.1-20211102-115900-72290a3.jar"
+path = "./lib/http-native-2.0.1-20211102-135800-1276142.jar"
 
 [[platform.java11.dependency]]
 path = "./lib/netty-common-4.1.68.Final.jar"
