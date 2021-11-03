@@ -88,5 +88,5 @@ The proposed solution uses a separate file to store the generated service path a
 
 ## References
 
-[1] - [https://www.w3.org/TR/websub/#definitions](https://www.w3.org/TR/websub/#definitions)
+[1] - [https://www.w3.org/TR/websub/#definitions](https://www.w3.org/TR/websub/#definitions)  
 [2] - [https://www.w3.org/TR/websub/#subscriber-sends-subscription-request](https://www.w3.org/TR/websub/#subscriber-sends-subscription-request)
