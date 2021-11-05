@@ -99,9 +99,13 @@ function testSubscriberServiceAnnotationRetrievalFailure() returns @tainted erro
 @test:Config { 
     groups: ["servicePathRetrieval"]
 }
-isolated function testServicePathRetrievalForEmptyServicePath() returns @tainted error? {
-    string servicePath = retrieveServicePath(());
-    test:assertTrue(servicePath is string, "Service path retrieval failed for 'empty service path'");
+isolated function testServicePathRetrievalForEmptyServicePath() {
+    var servicePath = retrieveCompleteServicePath(());
+    if servicePath is error {
+        test:assertEquals(servicePath.message(), "Could not find the generated service path");
+    } else {
+        test:assertFail("Retrieved a service-path for a errorneous scenario");
+    }
 }
 
 @test:Config { 
@@ -109,7 +113,7 @@ isolated function testServicePathRetrievalForEmptyServicePath() returns @tainted
 }
 isolated function testCompleteServicePathRetrievalWithString() returns @tainted error? {
     string expectedServicePath = "subscriber";
-    string generatedServicePath = retrieveServicePath("subscriber");
+    string generatedServicePath = check retrieveCompleteServicePath("subscriber");
     test:assertEquals(generatedServicePath, expectedServicePath, "Generated service-path does not matched expected service-path"); 
 }
 
@@ -118,7 +122,7 @@ isolated function testCompleteServicePathRetrievalWithString() returns @tainted 
 }
 isolated function testCompleteServicePathRetrievalWithStringArray() returns @tainted error? {
     string expectedServicePath = "subscriber/foo/bar";
-    string generatedServicePath = retrieveServicePath(["subscriber", "foo", "bar"]);
+    string generatedServicePath = check retrieveCompleteServicePath(["subscriber", "foo", "bar"]);
     test:assertEquals(generatedServicePath, expectedServicePath, "Generated service-path does not matched expected service-path"); 
 }
 

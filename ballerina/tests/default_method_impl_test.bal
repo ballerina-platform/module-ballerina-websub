@@ -57,11 +57,3 @@ function testOnIntentVerificationSuccessDefaultImpl() returns @tainted error? {
     test:assertEquals(response.statusCode, 200);
     test:assertEquals(response.getTextPayload(), "1234");
 }
-
-@test:Config {
-    groups: ["defaultMethodImpl"]
-}
-isolated function testUniqueStringGeneration() returns @tainted error? {
-    string generatedString = generateUniqueUrlSegment();
-    test:assertEquals(generatedString.length(), 10);
-}

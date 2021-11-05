@@ -37,6 +37,6 @@ function afterOptionalTargetUrlTest() returns @tainted error? {
     groups: ["optionalSubscriberTarget"]
 }
 function testOptionalTargetUrl() returns @tainted error? {
-    check optionalTargetListener.attach(optionalSubscriberTarget);
+    check optionalTargetListener.attach(optionalSubscriberTarget, "/samples");
     check optionalTargetListener.'start();
 }

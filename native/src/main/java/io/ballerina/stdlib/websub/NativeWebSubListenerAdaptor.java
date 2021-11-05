@@ -84,19 +84,33 @@ public class NativeWebSubListenerAdaptor {
     }
 
     @SuppressWarnings("unchecked")
-    public static BString getServicePath(BObject websubListener, BObject subscriberService) {
+    public static Object retrieveGeneratedServicePath(BObject websubListener, BObject subscriberService) {
         Object serviceInfoRegistryObj = websubListener.getNativeData(SERVICE_INFO_REGISTRY);
         if (Objects.isNull(serviceInfoRegistryObj)) {
-            return null;
+            Module module = ModuleUtils.getModule();
+            BString errorMessage = StringUtils
+                    .fromString("Error retrieving Service Information: service path not found");
+            throw ErrorCreator.createError(module, "Error", errorMessage, null, null);
         }
 
         Map<String, String> serviceInfoRegistry = (Map<String, String>) serviceInfoRegistryObj;
         Optional<String> serviceId = getServiceId(subscriberService);
         if (serviceId.isEmpty()) {
-            return null;
+            Module module = ModuleUtils.getModule();
+            BString errorMessage = StringUtils
+                    .fromString("Error retrieving Service Information: service path not found");
+            throw ErrorCreator.createError(module, "Error", errorMessage, null, null);
         }
 
-        return StringUtils.fromString(serviceInfoRegistry.get(serviceId.get()));
+        String generatedServicePath = serviceInfoRegistry.get(serviceId.get());
+        if (Objects.isNull(generatedServicePath)) {
+            Module module = ModuleUtils.getModule();
+            BString errorMessage = StringUtils
+                    .fromString("Error retrieving Service Information: service path not found");
+            throw ErrorCreator.createError(module, "Error", errorMessage, null, null);
+        }
+
+        return StringUtils.fromString(generatedServicePath);
     }
 
     private static Optional<String> getServiceId(BObject subscriberService) {

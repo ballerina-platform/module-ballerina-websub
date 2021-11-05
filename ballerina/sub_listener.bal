@@ -100,15 +100,20 @@ public class Listener {
 
     isolated function executeAttach(SubscriberService 'service, SubscriberServiceConfiguration serviceConfig,
                                     string[]|string? name = ()) returns error? {
-        string completeSevicePath = retrieveServicePath(name);
-        boolean logGeneratedServicePath = name is () || (name is string[] && name.length() == 0);
+        boolean generateServicePath = shouldUseGeneratedServicePath(serviceConfig, name);
+        string[]|string? servicePath = generateServicePath ? check self.retrieveGeneratedServicePath('service): name;
+        string completeSevicePath = check retrieveCompleteServicePath(servicePath);
         string callback = constructCallbackUrl(serviceConfig, self.port, self.listenerConfig,
-                                                completeSevicePath, logGeneratedServicePath);
+                                                completeSevicePath, generateServicePath);
         HttpToWebsubAdaptor adaptor = new ('service);
         HttpService httpService = check new (adaptor, callback, serviceConfig?.secret);
         check self.httpListener.attach(httpService, completeSevicePath);
         self.externAttach(completeSevicePath, 'service, httpService, serviceConfig);
     }
+
+    isolated function retrieveGeneratedServicePath(SubscriberService subscriberService) returns string|Error = @java:Method {
+        'class: "io.ballerina.stdlib.websub.NativeWebSubListenerAdaptor"
+    } external;
 
     isolated function externAttach(string servicePath, SubscriberService subscriberService,
                                     HttpService httpService, SubscriberServiceConfiguration config) = @java:Method {
@@ -270,25 +275,30 @@ isolated function constructCallbackUrl(SubscriberServiceConfiguration subscriber
     }
 }
 
-isolated function retrieveServicePath(string[]|string? name) returns string {
-    if name is () {
-        return generateUniqueUrlSegment();
-    } else if name is string {
-        return name.startsWith("/") ? name.substring(1): name;
-    } else {
-        if name.length() == 0 {
-            return generateUniqueUrlSegment();
-        } else {
-            return strings:'join("/", ...name);
-        }
+isolated function shouldUseGeneratedServicePath(SubscriberServiceConfiguration subscriberConfig,
+                                                string[]|string? name) returns boolean {
+    if subscriberConfig?.callback is () && isEmptyServicePath(name) {
+        return true;
     }
+    return subscriberConfig?.callback is string 
+            && subscriberConfig.appendServicePath 
+            && isEmptyServicePath(name);
 }
 
-isolated function generateUniqueUrlSegment() returns string {
-    string|error generatedString = generateRandomString(10);
-    if generatedString is string {
-        return generatedString;
+isolated function isEmptyServicePath(string[]|string? name) returns boolean {
+    return name is () || (name is string[] && name.length() == 0);
+}
+
+isolated function retrieveCompleteServicePath(string[]|string? servicePath) returns string|Error {
+    if servicePath is () {
+        return error Error("Could not find the generated service path");
+    } else if servicePath is string {
+        return servicePath.startsWith("/") ? servicePath.substring(1): servicePath;
     } else {
-        return COMMON_SERVICE_PATH;
+        if servicePath.length() == 0 {
+            return error Error("Could not find the generated service path");
+        } else {
+            return strings:'join("/", ...servicePath);
+        }
     }
 }
