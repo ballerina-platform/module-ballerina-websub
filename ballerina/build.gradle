@@ -68,57 +68,6 @@ configurations {
     externalJars
 }
 
-dependencies {
-    externalJars(group: 'io.netty', name: 'netty-common', version: "${nettyVersion}") {
-        transitive = false
-    }
-    externalJars(group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}") {
-        transitive = false
-    }
-    externalJars(group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}") {
-        transitive = false
-    }
-    externalJars(group: 'io.netty', name: 'netty-resolver', version: "${nettyVersion}") {
-        transitive = false
-    }
-    externalJars(group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}") {
-        transitive = false
-    }
-    externalJars(group: 'io.netty', name: 'netty-codec-http', version: "${nettyVersion}") {
-        transitive = false
-    }
-    externalJars(group: 'io.netty', name: 'netty-codec', version: "${nettyVersion}") {
-        transitive = false
-    }
-    externalJars(group: 'io.netty', name: 'netty-handler-proxy', version: "${nettyVersion}") {
-        transitive = false
-    }
-    externalJars(group: 'io.netty', name: 'netty-codec-http2', version: "${nettyVersion}") {
-        transitive = false
-    }
-    externalJars(group: 'io.netty', name: 'netty-tcnative-boringssl-static', version: "${nettyTcnativeVersion}") {
-        transitive = false
-    }
-    externalJars(group: 'commons-pool.wso2', name: 'commons-pool', version: "${wso2CommonsPoolVersion}") {
-        transitive = false
-    }
-    externalJars(group: 'org.wso2.orbit.org.yaml', name: 'snakeyaml', version: "${wso2SnakeYamlVersion}") {
-        transitive = false
-    }
-    externalJars(group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: "${bouncycastleVersion}") {
-        transitive = false
-    }
-    externalJars(group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: "${bouncycastleVersion}") {
-        transitive = false
-    }
-    externalJars(group: 'org.wso2.carbon.metrics', name: 'org.wso2.carbon.metrics.core', version: "${wso2CarbonMetricsVersion}") {
-        transitive = false
-    }
-    externalJars(group: 'io.ballerina.stdlib', name: 'http-native', version: "${stdlibHttpVersion}") {
-        transitive = false
-    }
-}
-
 task updateTomlFiles {
     doLast {
         def stdlibDependentHttpVersion = stripBallerinaExtensionVersion(project.stdlibHttpVersion)
@@ -138,14 +87,6 @@ task updateTomlFiles {
         def newConfig = ballerinaTomlFilePlaceHolder.text.replace("@project.version@", project.version)
         newConfig = newConfig.replace("@toml.version@", tomlVersion)
 
-        // Dynamic version update of external dependencies
-        newConfig = newConfig.replace("@netty.version@", project.nettyVersion)
-        newConfig = newConfig.replace("@wso2commonspool.version@", project.wso2CommonsPoolVersion)
-        newConfig = newConfig.replace("@wso2snakeyaml.version@", project.wso2SnakeYamlVersion)
-        newConfig = newConfig.replace("@bouncycastle.version@", project.bouncycastleVersion)
-        newConfig = newConfig.replace("@nettytcnative.version@", project.nettyTcnativeVersion)
-        newConfig = newConfig.replace("@wso2carbonmetrics.version@", project.wso2CarbonMetricsVersion)
-        newConfig = newConfig.replace("@http.native.version@", project.stdlibHttpVersion)
         ballerinaTomlFile.text = newConfig
 
         def newPluginConfig = compilerPluginTomlFilePlaceHolder.text.replace("@project.version@", project.version)

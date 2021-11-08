@@ -31,25 +31,6 @@ dependencies {
     implementation (group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}") {
         transitive = false
     }
-    implementation group: 'io.ballerina.stdlib', name: 'http-native', version: "${stdlibHttpVersion}"
-    implementation group: 'io.ballerina.stdlib', name: 'mime-native', version: "${stdlibMimeVersion}"
-    implementation (group: 'io.ballerina.stdlib', name: 'io-native', version: "${stdlibIoVersion}") {
-        transitive = false
-    }
-    implementation (group: 'org.ballerinalang', name: 'value', version: "${ballerinaLangVersion}") {
-        transitive = false
-    }
-    implementation (group: 'org.ballerinalang', name: 'typedesc', version: "${ballerinaLangVersion}") {
-        transitive = false
-    }
-    implementation (group: 'org.ballerinalang', name: 'toml-parser', version: "${ballerinaTomlParserVersion}") {
-        transitive = false
-    }
-
-    implementation group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}"
-    implementation group: 'io.netty', name: 'netty-codec', version: "${nettyVersion}"
-    implementation group: 'io.netty', name: 'netty-codec-http', version: "${nettyVersion}"
-    implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: "${slf4jVersion}"
 }
 
 checkstyle {
