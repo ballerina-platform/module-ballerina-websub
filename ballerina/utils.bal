@@ -115,13 +115,13 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
 isolated function verifyContent(http:Request request, string secret, string payload) returns boolean|error {
     if secret.trim().length() > 0 {
         if request.hasHeader(X_HUB_SIGNATURE) {
-                var xHubSignature = request.getHeader(X_HUB_SIGNATURE);
-                if xHubSignature is http:HeaderNotFoundError || xHubSignature.trim().length() == 0 {
+                string xHubSignature = check request.getHeader(X_HUB_SIGNATURE);
+                if xHubSignature.trim().length() == 0 {
                     return false;
                 } else {
-                    string[] splitSignature = regex:split(<string>xHubSignature, "=");
+                    string[] splitSignature = regex:split(xHubSignature, "=");
                     string method = splitSignature[0];
-                    string signature = regex:replaceAll(<string>xHubSignature, method + "=", "");
+                    string signature = regex:replaceAll(xHubSignature, method + "=", "");
                     byte[] generatedSignature = check retrieveContentHash(method, secret, payload);
                     return signature == generatedSignature.toBase16(); 
                 }          
