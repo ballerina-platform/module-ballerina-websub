@@ -177,10 +177,22 @@ isolated function testServicePathGenerationEnabledWithCallbackAppendingAndServic
 }
 
 @test:Config { 
-    groups: ["servicePathRetrieval"]
+    groups: ["completeServicePathRetrieval"]
 }
 isolated function testServicePathRetrievalForEmptyServicePath() {
     var servicePath = retrieveCompleteServicePath(());
+    if servicePath is error {
+        test:assertEquals(servicePath.message(), "Could not find the generated service path");
+    } else {
+        test:assertFail("Retrieved a service-path for a errorneous scenario");
+    }
+}
+
+@test:Config { 
+    groups: ["completeServicePathRetrieval"]
+}
+isolated function testServicePathRetrievalForEmptyServicePathArr() {
+    var servicePath = retrieveCompleteServicePath([]);
     if servicePath is error {
         test:assertEquals(servicePath.message(), "Could not find the generated service path");
     } else {
