@@ -97,6 +97,86 @@ function testSubscriberServiceAnnotationRetrievalFailure() returns @tainted erro
 }
 
 @test:Config { 
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledForEmptyCallbackAndServicePathProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({}, ());
+    test:assertTrue(shouldGenerate);
+}
+
+@test:Config { 
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledForCallbackAndEmptyServicePathProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub" }, ());
+    test:assertFalse(shouldGenerate);
+}
+
+@test:Config { 
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledForNoCallbackAndEmptyServicePathArrProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({}, []);
+    test:assertTrue(shouldGenerate);
+}
+
+@test:Config { 
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledForCallbackAndEmptyServicePathArrProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub" }, []);
+    test:assertFalse(shouldGenerate);
+}
+
+@test:Config { 
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledWithCallbackAppendingAndEmptyServicePathProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub", appendServicePath: true }, ());
+    test:assertTrue(shouldGenerate);
+}
+
+@test:Config { 
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledWithoutCallbackAppendingAndEmptyServicePathProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub" }, ());
+    test:assertFalse(shouldGenerate);
+}
+
+@test:Config { 
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledWithCallbackAppendingAndEmptyServicePathArrProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub", appendServicePath: true }, []);
+    test:assertTrue(shouldGenerate);
+}
+
+@test:Config { 
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledWithoutCallbackAppendingAndEmptyServicePathArrProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub" }, []);
+    test:assertFalse(shouldGenerate);
+}
+
+@test:Config { 
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledWithCallbackAppendingAndServicePathProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub", appendServicePath: true }, "/sub");
+    test:assertFalse(shouldGenerate);
+}
+
+@test:Config { 
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledWithCallbackAppendingAndServicePathArrProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub", appendServicePath: true }, ["pub", "sub"]);
+    test:assertFalse(shouldGenerate);
+}
+
+@test:Config { 
     groups: ["servicePathRetrieval"]
 }
 isolated function testServicePathRetrievalForEmptyServicePath() {
