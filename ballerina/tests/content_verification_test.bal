@@ -96,6 +96,32 @@ function testOnEventNotificationSuccessForUrlEncodedForContentVerification() ret
     test:assertTrue(urlEncodedContentVerified);
 }
 
+@test:Config {
+    groups: ["contentVerification"]
+}
+function testOnEventNotificationSuccessWithoutContentSignature() returns @tainted error? {
+    http:Request request = new;
+    string payload = "param1=value1&param2=value2";
+    request.setTextPayload(payload);
+    check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
+    http:Response response = check contentVerificationClient->post("", request);
+    test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["contentVerification"]
+}
+function testOnEventNotificationSuccessWithEmptySignature() returns @tainted error? {
+    http:Request request = new;
+    string payload = "param1=value1&param2=value2";
+    request.setTextPayload(payload);
+    request.setHeader("X-Hub-Signature", "");
+    check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
+    http:Response response = check contentVerificationClient->post("", request);
+    test:assertEquals(response.statusCode, 202);
+    test:assertTrue(urlEncodedContentVerified);
+}
+
 isolated function retrievePayloadSignature(string 'key, string|xml|json|byte[] payload) returns byte[]|error {
     byte[] keyArr = 'key.toBytes();
     if (payload is byte[]) {
