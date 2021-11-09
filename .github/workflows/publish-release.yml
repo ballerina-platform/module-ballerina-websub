@@ -28,7 +28,8 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
-          scan-ref: '/github/workspace/ballerina/lib'
+          scan-ref: '/github/workspace/ballerina'
+          skip-dirs: 'build'
           format: 'table'
           timeout: '10m0s'
           exit-code: '1'
