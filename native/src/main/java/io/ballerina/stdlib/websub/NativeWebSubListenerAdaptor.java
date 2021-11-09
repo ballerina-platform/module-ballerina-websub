@@ -30,12 +30,7 @@ import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,15 +44,12 @@ import static io.ballerina.stdlib.websub.Constants.SUBSCRIBER_CONFIG;
  * {@code NativeWebSubListenerAdaptor} is a wrapper object used to save/retrieve native data related to WebSub Listener.
  */
 public class NativeWebSubListenerAdaptor {
-    private static final String SERVICE_INFO_RESOURCE = "resources/ballerina/websub/service-info.csv";
+    private static final String SERVICE_INFO_RESOURCE = "service-info.csv";
 
     public static Object externInit(BObject websubListener) {
-        try (InputStream inputStream = NativeWebSubListenerAdaptor.class.getClassLoader()
-                .getResourceAsStream(SERVICE_INFO_RESOURCE)) {
-            if (Objects.nonNull(inputStream)) {
-                Map<String, String> serviceInfoRegistry = retrieveServiceInfoRegistry(inputStream);
-                websubListener.addNativeData(SERVICE_INFO_REGISTRY, serviceInfoRegistry);
-            }
+        try {
+            Map<String, String> serviceInfoRegistry = ServiceInfoRetriever.retrieve(SERVICE_INFO_RESOURCE);
+            websubListener.addNativeData(SERVICE_INFO_REGISTRY, serviceInfoRegistry);
         } catch (IOException ex) {
             Module module = ModuleUtils.getModule();
             BString errorMessage = StringUtils.fromString(
@@ -65,22 +57,6 @@ public class NativeWebSubListenerAdaptor {
             throw ErrorCreator.createError(module, "Error", errorMessage, null, null);
         }
         return null;
-    }
-
-    private static Map<String, String> retrieveServiceInfoRegistry(InputStream inputStream) throws IOException {
-        Map<String, String> serviceInfoRegistry = new HashMap<>();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] values = line.split(",");
-                if (values.length == 2) {
-                    String serviceId = values[0].trim();
-                    String servicePath = values[1].trim();
-                    serviceInfoRegistry.put(serviceId, servicePath);
-                }
-            }
-        }
-        return serviceInfoRegistry;
     }
 
     @SuppressWarnings("unchecked")
