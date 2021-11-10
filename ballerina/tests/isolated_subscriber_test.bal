@@ -24,7 +24,7 @@ string[] receivedMsgs = [];
 
 @SubscriberServiceConfig {}
 service /subscriber on new Listener(9103) {
-    remote function onSubscriptionVerification(SubscriptionVerification msg) returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
+    isolated remote function onSubscriptionVerification(SubscriptionVerification msg) returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
         if (msg.hubTopic == "test1") {
             return SUBSCRIPTION_VERIFICATION_ERROR;
         } else {
