@@ -24,7 +24,7 @@ string[] receivedMsgs = [];
 
 @SubscriberServiceConfig {}
 service /subscriber on new Listener(9103) {
-    isolated remote function onSubscriptionVerification(SubscriptionVerification msg) returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
+    remote function onSubscriptionVerification(SubscriptionVerification msg) returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
         if (msg.hubTopic == "test1") {
             return SUBSCRIPTION_VERIFICATION_ERROR;
         } else {
@@ -97,6 +97,14 @@ function testOnEventNotificationSuccessTextWithIsolatedSub() returns error? {
     test:assertEquals(response.statusCode, 202);
 }
 
+@test:Config {
+    groups: ["isolatedSubscriber"],
+    dependsOn: [ testOnEventNotificationSuccessTextWithIsolatedSub ]
+ }
+function testReceivedValidContent() returns error? {
+    string validMsg = receivedMsgs.pop();
+    test:assertEquals(validMsg, "Hello, World...!");
+}
 
 @test:Config {
     groups: ["isolatedSubscriber"]
