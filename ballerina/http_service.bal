@@ -143,6 +143,7 @@ isolated service class HttpService {
                 }
                 return;
             }
+            log:printInfo("Unsubscribing from the hub...");
             check unsubscribe(config, self.callback);
         }
     }
