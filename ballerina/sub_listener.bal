@@ -169,7 +169,6 @@ public class Listener {
     public isolated function gracefulStop() returns Error? {
         HttpService[]? attachedServices = self.retrieveAttachedServices();
         if attachedServices is HttpService[] {
-            log:printInfo("Unsubscribing from the hub...");
             foreach HttpService 'service in attachedServices {
                 error? result = 'service.initiateUnsubscription();
                 if result is error {
