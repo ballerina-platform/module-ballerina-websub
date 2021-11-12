@@ -24,7 +24,7 @@ import ballerina/time;
 # Represents a Subscriber Service listener endpoint.
 public class Listener {
     private http:Listener httpListener;
-    private http:ListenerConfiguration listenerConfig;
+    private http:InferredListenerConfiguration listenerConfig;
     private int port;
     private decimal gracefulShutdownPeriod;
 
