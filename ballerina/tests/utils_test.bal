@@ -101,7 +101,7 @@ function testSubscriberServiceAnnotationRetrievalFailure() returns @tainted erro
 }
 isolated function testServicePathRetrievalForEmptyServicePath() returns @tainted error? {
     string servicePath = retrieveServicePath(());
-    test:assertTrue(servicePath is string, "Service path retrieval failed for 'empty service path'");
+    test:assertEquals(servicePath.length(), 10, "Retrieved invalid results for empty service path");
 }
 
 @test:Config { 

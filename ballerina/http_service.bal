@@ -50,10 +50,11 @@ isolated service class HttpService {
     }
 
     # Receives HTTP POST requests.
-    # 
+    #
     # + caller - The `http:Caller` reference for the current request
     # + request - Received `http:Request` instance
-    isolated resource function post .(http:Caller caller, http:Request request) {
+    # + return - An `websub:Error` if there is an error while responding to the request or else `()`
+    isolated resource function post .(http:Caller caller, http:Request request) returns Error? {
         http:Response response = new;
         response.statusCode = http:STATUS_ACCEPTED;
         if self.isEventNotificationAvailable {
@@ -66,20 +67,18 @@ isolated service class HttpService {
         } else {
             response.statusCode = http:STATUS_NOT_IMPLEMENTED;
         }
-
-        respondToRequest(caller, response);
+        check respondToRequest(caller, response);
     }
 
     # Receives HTTP GET requests.
     # 
     # + caller - The `http:Caller` reference for the current request
     # + request - Received `http:Request` instance
-    isolated resource function get .(http:Caller caller, http:Request request) {
+    # + return - An `websub:Error` if there is an error while responding to the request or else `()`
+    isolated resource function get .(http:Caller caller, http:Request request) returns Error? {
         http:Response response = new;
         response.statusCode = http:STATUS_OK;
-
         RequestQueryParams params = retrieveRequestQueryParams(request);
-
         match params?.hubMode {
             MODE_SUBSCRIBE | MODE_UNSUBSCRIBE => {
                 if params?.hubChallenge is () || params?.hubTopic is () {
@@ -102,8 +101,7 @@ isolated service class HttpService {
                 response.setTextPayload(errorMessage);
             }
         }
-
-        respondToRequest(caller, response);
+        check respondToRequest(caller, response);
     }
 
     isolated function processVerification(RequestQueryParams params, http:Caller caller, http:Response response) {
@@ -200,7 +198,6 @@ isolated function retrieveResourceDetails(SubscriberServiceConfiguration service
     string|[string, string]? target = serviceConfig?.target;
     if target is string {
         var discoveryConfig = serviceConfig?.discoveryConfig;
-        http:ClientConfiguration? discoveryHttpConfig = discoveryConfig?.httpConfig ?: ();
         string?|string[] expectedMediaTypes = discoveryConfig?.accept ?: ();
         string?|string[] expectedLanguageTypes = discoveryConfig?.acceptLanguage ?: ();
         DiscoveryService discoveryClient = check new (target, discoveryConfig?.httpConfig);
@@ -209,6 +206,7 @@ isolated function retrieveResourceDetails(SubscriberServiceConfiguration service
     } else if target is [string, string] {
         return target;
     }
+    return;
 }
 
 isolated function getSubscriberClient(string hubUrl, http:ClientConfiguration? config) returns SubscriptionClient|error {
