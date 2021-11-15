@@ -104,7 +104,8 @@ public class NativeHttpToWebsubAdaptor {
         StrandMetadata metadata = new StrandMetadata(module.getOrg(), module.getName(), module.getVersion(),
                 parentFunctionName);
         Object[] args = new Object[]{message, true};
-        if (bSubscriberService.getType().isIsolated(remoteFunctionName)) {
+        if (bSubscriberService.getType().isIsolated()
+                && bSubscriberService.getType().isIsolated(remoteFunctionName)) {
             env.getRuntime().invokeMethodAsyncConcurrently(
                     bSubscriberService, remoteFunctionName, null, metadata,
                     new SubscriberCallback(balFuture, module), null, PredefinedTypes.TYPE_NULL, args);
