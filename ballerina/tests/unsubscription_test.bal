@@ -81,7 +81,7 @@ service object {
 @test:Config { 
     groups: ["unsubscriptionViaGracefulstop"]
 }
-function testUnsubscriptionOnGracefulStop() returns @tainted error? {
+function testUnsubscriptionOnGracefulStop() returns error? {
     check unsubscriptionTestListener.attach(unsubscriptionTestSubscriber, "sub");
     check unsubscriptionTestListener.'start();
     check unsubscriptionTestListener.gracefulStop();

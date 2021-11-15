@@ -91,7 +91,7 @@ final http:Client contentVerificationClient = check new("http://localhost:9098/s
 @test:Config {
     groups: ["contentVerification"]
  }
-isolated function testOnEventNotificationSuccessForContentVerification() returns @tainted error? {
+isolated function testOnEventNotificationSuccessForContentVerification() returns error? {
     http:Request request = new;
     json payload =  {"action":"publish","mode":"remote-hub"};
     byte[] payloadHash = check retrievePayloadSignature(hashKey, payload);
@@ -106,7 +106,7 @@ isolated function testOnEventNotificationSuccessForContentVerification() returns
 @test:Config {
     groups: ["contentVerification"]
 }
-isolated function testOnEventNotificationSuccessXmlForContentVerification() returns @tainted error? {
+isolated function testOnEventNotificationSuccessXmlForContentVerification() returns error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
     byte[] payloadHash = check retrievePayloadSignature(hashKey, payload);
@@ -120,7 +120,7 @@ isolated function testOnEventNotificationSuccessXmlForContentVerification() retu
 @test:Config {
     groups: ["contentVerification"]
 }
-isolated function testOnEventNotificationSuccessForUrlEncodedForContentVerification() returns @tainted error? {
+isolated function testOnEventNotificationSuccessForUrlEncodedForContentVerification() returns error? {
     http:Request request = new;
     string payload = "param1=value1&param2=value2";
     byte[] payloadHash = check retrievePayloadSignature(hashKey, payload);

@@ -78,7 +78,7 @@ isolated function getServiceConfigwithRediects(string|[string, string] target) r
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-isolated function testSubscriptionInitiationWithRetrySuccess() returns @tainted error? {
+isolated function testSubscriptionInitiationWithRetrySuccess() returns error? {
     SubscriberServiceConfiguration config = getServiceConfigwithRediects([ HUB_REDIREC_SUCCESS_URL, COMMON_TOPIC ]);
     check subscribe(config, CALLBACK);
 }
@@ -86,7 +86,7 @@ isolated function testSubscriptionInitiationWithRetrySuccess() returns @tainted 
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-isolated function testSubscriptionInitiationWithRetryFailure() returns @tainted error? {
+isolated function testSubscriptionInitiationWithRetryFailure() returns error? {
     string expectedMsg = "Redirection response received for subscription change request made with " +
                                "followRedirects disabled or after maxCount exceeded: Hub [" + HUB_REDIREC_FAILURE_URL + "], Topic [" +
                                COMMON_TOPIC + "]";

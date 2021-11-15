@@ -29,13 +29,13 @@ var serviceWithPathGeneration = @SubscriberServiceConfig { target: "http://0.0.0
 };
 
 @test:AfterGroups { value:["servicePathGeneration"] }
-function afterPathGenerationTest() returns @tainted error? {
+function afterPathGenerationTest() returns error? {
     check pathGenerationListener.gracefulStop();
 }
 
 @test:Config { 
     groups: ["servicePathGeneration"]
 }
-function testServicePathGeneration() returns @tainted error? {
+function testServicePathGeneration() returns error? {
     check pathGenerationListener.attach(serviceWithPathGeneration);
 }

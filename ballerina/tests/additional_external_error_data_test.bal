@@ -52,12 +52,12 @@ var serviceWithAdditionalErrorDetails = @SubscriberServiceConfig {
 };
 
 @test:BeforeGroups { value:["service-with-additional-details"] }
-function beforeAdditionalErrorDetailsService() returns @tainted error? {
+function beforeAdditionalErrorDetailsService() returns error? {
     check additionalErrorDetailsListener.attach(serviceWithAdditionalErrorDetails, "subscriber");
 }
 
 @test:AfterGroups { value:["service-with-additional-details"] }
-function afterAdditionalErrorDetailsService() returns @tainted error? {
+function afterAdditionalErrorDetailsService() returns error? {
     check additionalErrorDetailsListener.gracefulStop();
 }
 
@@ -66,7 +66,7 @@ http:Client subscriberServiceErrorDetailsClientEp = check new ("http://localhost
 @test:Config { 
     groups: ["service-with-additional-details"]
 }
-function testOnIntentVerificationFailedErrorDetails() returns @tainted error? {
+function testOnIntentVerificationFailedErrorDetails() returns error? {
     http:Response response = check subscriberServiceErrorDetailsClientEp->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
@@ -77,7 +77,7 @@ function testOnIntentVerificationFailedErrorDetails() returns @tainted error? {
 @test:Config { 
     groups: ["service-with-additional-details"]
 }
-function testOnEventNotificationFailedErrorDetails() returns @tainted error? {
+function testOnEventNotificationFailedErrorDetails() returns error? {
     http:Request request = new;
     xml requestPayload = xml `<body><action>publish</action></body>`;
     request.setPayload(requestPayload);

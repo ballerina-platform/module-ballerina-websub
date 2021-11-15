@@ -56,7 +56,7 @@ final var websubServiceObj = service object {
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-isolated function testSubscriptionInitiationSuccessWithDiscoveryUrl() returns @tainted error? {
+isolated function testSubscriptionInitiationSuccessWithDiscoveryUrl() returns error? {
     SubscriberServiceConfiguration config = getServiceAnnotationConfig(DISCOVERY_SUCCESS_URL);
     check subscribe(config, "https://sample.com/sub1");
 }
@@ -64,7 +64,7 @@ isolated function testSubscriptionInitiationSuccessWithDiscoveryUrl() returns @t
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-isolated function testSubscriptionInitiationSuccessWithHubAndTopic() returns @tainted error? {
+isolated function testSubscriptionInitiationSuccessWithHubAndTopic() returns error? {
     SubscriberServiceConfiguration config = getServiceAnnotationConfig([ HUB_SUCCESS_URL, COMMON_TOPIC ]);
     check subscribe(config, "https://sample.com/sub1");
 }
@@ -72,7 +72,7 @@ isolated function testSubscriptionInitiationSuccessWithHubAndTopic() returns @ta
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-isolated function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @tainted error? {
+isolated function testSubscriptionInitiationFailureWithDiscoveryUrl() returns error? {
     SubscriberServiceConfiguration config = getServiceAnnotationConfig(DISCOVERY_FAILURE_URL);
     var response = subscribe(config, "https://sample.com/sub1");
     test:assertTrue(response is ResourceDiscoveryFailedError);
@@ -86,7 +86,7 @@ isolated function testSubscriptionInitiationFailureWithDiscoveryUrl() returns @t
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-isolated function testSubscriptionInitiationFailureWithHubAndTopic() returns @tainted error? {
+isolated function testSubscriptionInitiationFailureWithHubAndTopic() returns error? {
     SubscriberServiceConfiguration config = getServiceAnnotationConfig([ HUB_FAILURE_URL, COMMON_TOPIC ]);
     var response = subscribe(config, "https://sample.com/sub1");
     test:assertTrue(response is SubscriptionInitiationError);
@@ -174,7 +174,7 @@ listener Listener ls = new (9100);
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-function testSubInitFailedWithListenerForResourceDiscoveryFailure() returns @tainted error? {
+function testSubInitFailedWithListenerForResourceDiscoveryFailure() returns error? {
     var res = ls.attachWithConfig(websubServiceObj, getServiceAnnotationConfig(DISCOVERY_FAILURE_URL), "sub");
     if res is error {
         log:printError("[testSubInitFailedWithListenerForResourceDiscoveryFailure] error occurred ", 'error = res);
@@ -192,7 +192,7 @@ function testSubInitFailedWithListenerForResourceDiscoveryFailure() returns @tai
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-function testSubInitFailedWithListenerForSubFailure() returns @tainted error? {
+function testSubInitFailedWithListenerForSubFailure() returns error? {
     var res = ls.attachWithConfig(websubServiceObj, getServiceAnnotationConfig([ HUB_FAILURE_URL, COMMON_TOPIC ]), "sub");
     test:assertFalse(res is error);
     var startDetails = ls.'start();

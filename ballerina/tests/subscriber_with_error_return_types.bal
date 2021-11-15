@@ -36,12 +36,12 @@ var subscriberWithErrorReturns = @SubscriberServiceConfig { target: "http://0.0.
 };
 
 @test:BeforeGroups { value:["subscriberWithErrorReturns"] }
-function beforeSubscriberWithErrorReturnsTest() returns @tainted error? {
+function beforeSubscriberWithErrorReturnsTest() returns error? {
     check errorReturnsSubscriberListener.attach(subscriberWithErrorReturns, "subscriber");
 }
 
 @test:AfterGroups { value:["subscriberWithErrorReturns"] }
-function afterSubscriberWithErrorReturnsTest() returns @tainted error? {
+function afterSubscriberWithErrorReturnsTest() returns error? {
     check errorReturnsSubscriberListener.gracefulStop();
 }
 
@@ -50,7 +50,7 @@ http:Client SubscriberWithErrorReturnsClientEp = check new("http://localhost:909
 @test:Config { 
     groups: ["subscriberWithErrorReturns"]
 }
-function testOnSubscriptionValidationWithErrorReturnType() returns @tainted error? {
+function testOnSubscriptionValidationWithErrorReturnType() returns error? {
     http:Response response = check SubscriberWithErrorReturnsClientEp->get("/?hub.mode=denied&hub.reason=justToTest");
     test:assertEquals(response.statusCode, 200);
 }
@@ -58,7 +58,7 @@ function testOnSubscriptionValidationWithErrorReturnType() returns @tainted erro
 @test:Config {
     groups: ["subscriberWithErrorReturns"]
  }
-function testOnIntentVerificationSuccessWithErrorReturnType() returns @tainted error? {
+function testOnIntentVerificationSuccessWithErrorReturnType() returns error? {
     http:Response response = check SubscriberWithErrorReturnsClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234");
     test:assertEquals(response.statusCode, 404);
     test:assertEquals(response.getTextPayload(), "reason=Error occured while processing request");
@@ -67,7 +67,7 @@ function testOnIntentVerificationSuccessWithErrorReturnType() returns @tainted e
 @test:Config {
     groups: ["subscriberWithErrorReturns"]
 }
-function testOnEventNotificationSuccessXmlWithErrorReturnType() returns @tainted error? {
+function testOnEventNotificationSuccessXmlWithErrorReturnType() returns error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
     request.setPayload(payload);
@@ -78,7 +78,7 @@ function testOnEventNotificationSuccessXmlWithErrorReturnType() returns @tainted
 @test:Config {
     groups: ["subscriberWithErrorReturns"]
 }
-function testOnEventNotificationSuccessForUrlEncodedWithErrorReturnType() returns @tainted error? {
+function testOnEventNotificationSuccessForUrlEncodedWithErrorReturnType() returns error? {
     http:Request request = new;
     request.setTextPayload("param1=value1&param2=value2");
     check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
