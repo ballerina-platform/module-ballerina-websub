@@ -45,8 +45,8 @@ service /hub2 on new http:Listener(9194) {
 }
 
 service /hub3 on new http:Listener(9195) {
-    isolated resource function post redSuccess(http:Caller caller, http:Request request) {
-        http:ListenerError? resp = caller->respond();
+    isolated resource function post redSuccess(http:Caller caller, http:Request request) returns error? {
+        check caller->respond();
     }
 
     isolated resource function post redFailed(http:Caller caller, http:Request request) returns error? {
@@ -56,8 +56,8 @@ service /hub3 on new http:Listener(9195) {
 }
 
 service /hub4 on new http:Listener(9196) {
-    isolated resource function post redFailed(http:Caller caller, http:Request request) {
-        http:ListenerError? resp = caller->respond();
+    isolated resource function post redFailed(http:Caller caller, http:Request request) returns error? {
+        check caller->respond();
     }
 }
 

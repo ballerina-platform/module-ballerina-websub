@@ -50,9 +50,10 @@ isolated service class HttpService {
     }
 
     # Receives HTTP POST requests.
-    # 
+    #
     # + caller - The `http:Caller` reference for the current request
     # + request - Received `http:Request` instance
+    # + return - An `websub:Error` if there is an error while responding to the request or else `()`
     isolated resource function post .(http:Caller caller, http:Request request) returns Error? {
         http:Response response = new;
         response.statusCode = http:STATUS_ACCEPTED;
@@ -73,6 +74,7 @@ isolated service class HttpService {
     # 
     # + caller - The `http:Caller` reference for the current request
     # + request - Received `http:Request` instance
+    # + return - An `websub:Error` if there is an error while responding to the request or else `()`
     isolated resource function get .(http:Caller caller, http:Request request) returns Error? {
         http:Response response = new;
         response.statusCode = http:STATUS_OK;

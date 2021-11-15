@@ -231,7 +231,8 @@ isolated function updateResponseBody(http:Response response, anydata? messageBod
 # 
 # + caller - The `http:Caller` reference for the current request
 # + response - Updated `http:Response`
-isolated function respondToRequest(http:Caller caller, http:Response response) returns Error {
+# + return - An `websub:Error` if there is an error while responding to the request or else `()`
+isolated function respondToRequest(http:Caller caller, http:Response response) returns Error? {
     http:ListenerError? responseError = caller->respond(response);
     if responseError is http:ListenerError {
         return error Error("Error occurred while responding to the request");
