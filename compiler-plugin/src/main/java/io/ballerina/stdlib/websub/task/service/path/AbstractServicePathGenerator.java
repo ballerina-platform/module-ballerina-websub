@@ -31,7 +31,7 @@ import static io.ballerina.stdlib.websub.task.service.path.ServicePathContextHan
 public abstract class AbstractServicePathGenerator implements ServicePathGenerator {
     @Override
     public void generate(PackageId packageId, Path currentProjectRoot, int serviceId)
-            throws ServicePathGeneratorException {
+        throws ServicePathGeneratorException {
         try {
             String generatedServicePath = generateRandomAlphaNumericString(10);
             ServicePathContext.ServicePathInformation servicePathDetails = new ServicePathContext

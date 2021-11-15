@@ -51,7 +51,7 @@ public class Listener {
         self.listenerConfig = self.httpListener.getConfig();
         self.port = self.httpListener.getPort();
         self.gracefulShutdownPeriod = config.gracefulShutdownPeriod;
-        check self.externInit();
+        return self.externInit();
     }
 
     isolated function externInit() returns Error? = @java:Method {
