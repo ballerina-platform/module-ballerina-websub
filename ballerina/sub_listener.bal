@@ -240,7 +240,7 @@ isolated function retrieveSubscriberServiceAnnotations(SubscriberService service
 }
 
 isolated function constructCallbackUrl(SubscriberServiceConfiguration subscriberConfig, int port, 
-                                       http:ListenerConfiguration listenerConfig, string completeSevicePath, 
+                                       http:InferredListenerConfiguration listenerConfig, string completeSevicePath, 
                                        boolean logGeneratedServicePath) returns string {
     string? providedCallback = subscriberConfig?.callback;
     if providedCallback is string {
