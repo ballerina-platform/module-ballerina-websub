@@ -128,7 +128,7 @@ isolated function testCompleteServicePathRetrievalWithStringArray() returns @tai
 isolated function testCallbackUrlRetrievalWithNoCallback() returns @tainted error? {
     string expectedCallbackUrl = "http://0.0.0.0:9090/subscriber";
     SubscriberServiceConfiguration config = {};
-    string retrievedCallbackUrl = constructCallbackUrl(config, 9090, {}, "subscriber", false);
+    string retrievedCallbackUrl = constructCallbackUrl(config, 9090, retrieveInfrdListenerConfig({}), "subscriber", false);
     test:assertEquals(retrievedCallbackUrl, expectedCallbackUrl, "Retrieved callback url does not match expected callback url");
 }
 
@@ -140,7 +140,7 @@ isolated function testCallbackUrlRetrievalWithCallbackAppendingDisabled() return
     SubscriberServiceConfiguration config = {
         callback: "http://0.0.0.0:9090/subscriber"
     };
-    string retrievedCallbackUrl = constructCallbackUrl(config, 9090, {}, "subscriber", false);
+    string retrievedCallbackUrl = constructCallbackUrl(config, 9090, retrieveInfrdListenerConfig({}), "subscriber", false);
     test:assertEquals(retrievedCallbackUrl, expectedCallbackUrl, "Retrieved callback url does not match expected callback url");
 }
 
@@ -153,7 +153,7 @@ isolated function testCallbackUrlRetrievalWithCallbackAppendingEnabled() returns
         callback: "http://0.0.0.0:9090",
         appendServicePath: true
     };
-    string retrievedCallbackUrl = constructCallbackUrl(config, 9090, {}, "subscriber/foo", false);
+    string retrievedCallbackUrl = constructCallbackUrl(config, 9090, retrieveInfrdListenerConfig({}), "subscriber/foo", false);
     test:assertEquals(retrievedCallbackUrl, expectedCallbackUrl, "Retrieved callback url does not match expected callback url");
 }
 
@@ -171,7 +171,7 @@ isolated function testCallbackUrlGenerationHttpsWithNoHostConfig() returns @tain
     };
     SubscriberServiceConfiguration config = {};
     string expectedCallbackUrl = "https://0.0.0.0:9090/subscriber";
-    string generatedCallbackUrl = constructCallbackUrl(config, 9090, listenerConfig, "subscriber", false);
+    string generatedCallbackUrl = constructCallbackUrl(config, 9090, retrieveInfrdListenerConfig(listenerConfig), "subscriber", false);
     test:assertEquals(generatedCallbackUrl, expectedCallbackUrl, "Generated callback url does not match expected callback url");
 }
 
@@ -182,7 +182,7 @@ isolated function testCallbackUrlGenerationHttpWithNoHostConfig() returns @taint
     http:ListenerConfiguration listenerConfig = {};
     string expectedCallbackUrl = "http://0.0.0.0:9090/subscriber";
     SubscriberServiceConfiguration config = {};
-    string generatedCallbackUrl = constructCallbackUrl(config, 9090, listenerConfig, "subscriber", false);
+    string generatedCallbackUrl = constructCallbackUrl(config, 9090, retrieveInfrdListenerConfig(listenerConfig), "subscriber", false);
     test:assertEquals(generatedCallbackUrl, expectedCallbackUrl, "Generated callback url does not match expected callback url");
 }
 
@@ -201,7 +201,7 @@ isolated function testCallbackUrlGenerationHttpsWithHostConfig() returns @tainte
     };
     string expectedCallbackUrl = "https://192.168.1.1:9090/subscriber";
     SubscriberServiceConfiguration config = {};
-    string generatedCallbackUrl = constructCallbackUrl(config, 9090, listenerConfig, "subscriber", false);
+    string generatedCallbackUrl = constructCallbackUrl(config, 9090, retrieveInfrdListenerConfig(listenerConfig), "subscriber", false);
     test:assertEquals(generatedCallbackUrl, expectedCallbackUrl, "Generated callback url does not match expected callback url");
 }
 
@@ -214,7 +214,7 @@ isolated function testCallbackUrlGenerationHttpWithHostConfig() returns @tainted
     };
     string expectedCallbackUrl = "http://192.168.1.1:9090/subscriber";
     SubscriberServiceConfiguration config = {};
-    string generatedCallbackUrl = constructCallbackUrl(config, 9090, listenerConfig, "subscriber", false);
+    string generatedCallbackUrl = constructCallbackUrl(config, 9090, retrieveInfrdListenerConfig(listenerConfig), "subscriber", false);
     test:assertEquals(generatedCallbackUrl, expectedCallbackUrl, "Generated callback url does not match expected callback url");
 }
 
@@ -227,8 +227,20 @@ isolated function testCallbackUrlForArrayTypeServicePath() returns @tainted erro
     };
     string expectedCallbackUrl = "http://192.168.1.1:9090/subscriber/foo/bar";
     SubscriberServiceConfiguration config = {};
-    string generatedCallbackUrl = constructCallbackUrl(config, 9090, listenerConfig, "subscriber/foo/bar", false);
+    string generatedCallbackUrl = constructCallbackUrl(config, 9090, retrieveInfrdListenerConfig(listenerConfig), "subscriber/foo/bar", false);
     test:assertEquals(generatedCallbackUrl, expectedCallbackUrl, "Generated callback url does not match expected callback url");   
+}
+
+isolated function retrieveInfrdListenerConfig(http:ListenerConfiguration config) returns http:InferredListenerConfiguration {
+    return {
+        host: config.host,
+        http1Settings: config.http1Settings,
+        secureSocket: config.secureSocket,
+        httpVersion: config.httpVersion,
+        timeout: config.timeout,
+        server: config.server,
+        requestLimits: config.requestLimits
+    };
 }
 
 listener Listener utilTestListener = new (9101);
