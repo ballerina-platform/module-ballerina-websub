@@ -20,10 +20,46 @@ import ballerina/http;
 import ballerina/crypto;
 import ballerina/test;
 
-readonly & string hashKey = "testKey";
-boolean urlEncodedContentVerified = false;
-boolean jsonContentVerified = false;
-boolean xmlContentVerified = false;
+final string hashKey = "testKey";
+isolated boolean urlEncodedContentVerified = false;
+isolated boolean jsonContentVerified = false;
+isolated boolean xmlContentVerified = false;
+
+isolated function updateJsonContentVerified(boolean state) {
+    lock {
+        jsonContentVerified = state;
+    }
+}
+
+isolated function isJsonContentVerified() returns boolean {
+    lock {
+        return jsonContentVerified;
+    }
+}
+
+isolated function updateXmlContentVerified(boolean state) {
+    lock {
+        xmlContentVerified = state;
+    }
+}
+
+isolated function isXmlContentVerified() returns boolean {
+    lock {
+        return xmlContentVerified;
+    }
+}
+
+isolated function updateUrlEncodedContentVerified(boolean state) {
+    lock {
+        urlEncodedContentVerified = state;
+    }
+}
+
+isolated function isUrlEncodedContentVerified() returns boolean {
+    lock {
+        return urlEncodedContentVerified;
+    }
+}
 
 @SubscriberServiceConfig {
     secret: hashKey,
@@ -35,13 +71,13 @@ service /subscriber on new Listener(9098) {
         log:printInfo("[VERIFICATION] onEventNotification invoked ", contentDistributionMessage = event);
         match event.contentType {
             mime:APPLICATION_FORM_URLENCODED => {
-                urlEncodedContentVerified = true;
+                updateUrlEncodedContentVerified(true);
             }
             mime:APPLICATION_JSON => {
-                jsonContentVerified = true;
+                updateJsonContentVerified(true);
             }
             mime:APPLICATION_XML => {
-                xmlContentVerified = true;
+                updateXmlContentVerified(true);
             }
             _ => { }
         }
@@ -50,12 +86,12 @@ service /subscriber on new Listener(9098) {
     }
 }
 
-http:Client contentVerificationClient = check new("http://localhost:9098/subscriber");
+final http:Client contentVerificationClient = check new("http://localhost:9098/subscriber");
 
 @test:Config {
     groups: ["contentVerification"]
  }
-function testOnEventNotificationSuccessForContentVerification() returns @tainted error? {
+isolated function testOnEventNotificationSuccessForContentVerification() returns @tainted error? {
     http:Request request = new;
     json payload =  {"action":"publish","mode":"remote-hub"};
     byte[] payloadHash = check retrievePayloadSignature(hashKey, payload);
@@ -63,14 +99,14 @@ function testOnEventNotificationSuccessForContentVerification() returns @tainted
     request.setPayload(payload);
     http:Response response = check contentVerificationClient->post("/", request);
     test:assertEquals(response.statusCode, 202);
-    test:assertTrue(jsonContentVerified);
+    test:assertTrue(isJsonContentVerified());
 }
 
 
 @test:Config {
     groups: ["contentVerification"]
 }
-function testOnEventNotificationSuccessXmlForContentVerification() returns @tainted error? {
+isolated function testOnEventNotificationSuccessXmlForContentVerification() returns @tainted error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
     byte[] payloadHash = check retrievePayloadSignature(hashKey, payload);
@@ -78,13 +114,13 @@ function testOnEventNotificationSuccessXmlForContentVerification() returns @tain
     request.setPayload(payload);
     http:Response response = check contentVerificationClient->post("/", request);
     test:assertEquals(response.statusCode, 202);
-    test:assertTrue(xmlContentVerified);
+    test:assertTrue(isXmlContentVerified());
 }
 
 @test:Config {
     groups: ["contentVerification"]
 }
-function testOnEventNotificationSuccessForUrlEncodedForContentVerification() returns @tainted error? {
+isolated function testOnEventNotificationSuccessForUrlEncodedForContentVerification() returns @tainted error? {
     http:Request request = new;
     string payload = "param1=value1&param2=value2";
     byte[] payloadHash = check retrievePayloadSignature(hashKey, payload);
@@ -93,7 +129,7 @@ function testOnEventNotificationSuccessForUrlEncodedForContentVerification() ret
     check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
     http:Response response = check contentVerificationClient->post("", request);
     test:assertEquals(response.statusCode, 202);
-    test:assertTrue(urlEncodedContentVerified);
+    test:assertTrue(isUrlEncodedContentVerified());
 }
 
 isolated function retrievePayloadSignature(string 'key, string|xml|json|byte[] payload) returns byte[]|error {
