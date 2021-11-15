@@ -235,7 +235,7 @@ isolated function updateResponseBody(http:Response response, anydata? messageBod
 isolated function respondToRequest(http:Caller caller, http:Response response) returns Error? {
     http:ListenerError? responseError = caller->respond(response);
     if responseError is http:ListenerError {
-        return error Error("Error occurred while responding to the request");
+        return error Error("Error occurred while responding to the request ", responseError);
     }
 }
 
