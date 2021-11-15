@@ -18,7 +18,6 @@ import ballerina/http;
 import ballerina/regex;
 import ballerina/crypto;
 import ballerina/log;
-import ballerina/log;
 import ballerina/lang.'string as strings;
 import ballerina/random;
 
