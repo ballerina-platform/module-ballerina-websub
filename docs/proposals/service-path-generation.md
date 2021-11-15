@@ -1,9 +1,9 @@
 # Proposal: Compile time unique service path generation for `websub:SubscriberService`
 
 _Owners_: @shafreenAnfar @chamil321 @ayeshLK  
-_Reviewers_: @shafreenAnfar @chamil321
-_Created_: 2021/11/02  
-_Updated_: 2021/11/02  
+_Reviewers_: @shafreenAnfar @chamil321 
+_Created_: 2021/11/02 
+_Updated_: 2021/11/02 
 _Issue_: [#2253](https://github.com/ballerina-platform/ballerina-standard-library/issues/2253)
 
 ## Summary
