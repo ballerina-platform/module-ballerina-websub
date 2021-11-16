@@ -97,11 +97,107 @@ function testSubscriberServiceAnnotationRetrievalFailure() returns error? {
 }
 
 @test:Config { 
-    groups: ["servicePathRetrieval"]
+    groups: ["servicePathGenerationEnabled"]
 }
-isolated function testServicePathRetrievalForEmptyServicePath() returns error? {
-    string servicePath = retrieveServicePath(());
-    test:assertEquals(servicePath.length(), 10, "Retrieved invalid results for empty service path");
+isolated function testServicePathGenerationEnabledForEmptyCallbackAndServicePathProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({}, ());
+    test:assertTrue(shouldGenerate);
+}
+
+@test:Config {
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledForCallbackAndEmptyServicePathProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub" }, ());
+    test:assertFalse(shouldGenerate);
+}
+
+@test:Config {
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledForNoCallbackAndEmptyServicePathArrProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({}, []);
+    test:assertTrue(shouldGenerate);
+}
+
+@test:Config {
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledForCallbackAndEmptyServicePathArrProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub" }, []);
+    test:assertFalse(shouldGenerate);
+}
+
+@test:Config {
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledWithCallbackAppendingAndEmptyServicePathProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub", appendServicePath: true }, ());
+    test:assertTrue(shouldGenerate);
+}
+
+@test:Config {
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledWithoutCallbackAppendingAndEmptyServicePathProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub" }, ());
+    test:assertFalse(shouldGenerate);
+}
+
+@test:Config {
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledWithCallbackAppendingAndEmptyServicePathArrProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub", appendServicePath: true }, []);
+    test:assertTrue(shouldGenerate);
+}
+
+@test:Config {
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledWithoutCallbackAppendingAndEmptyServicePathArrProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub" }, []);
+    test:assertFalse(shouldGenerate);
+}
+
+@test:Config {
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledWithCallbackAppendingAndServicePathProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub", appendServicePath: true }, "/sub");
+    test:assertFalse(shouldGenerate);
+}
+
+@test:Config {
+    groups: ["servicePathGenerationEnabled"]
+}
+isolated function testServicePathGenerationEnabledWithCallbackAppendingAndServicePathArrProvided() {
+    boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub", appendServicePath: true }, ["pub", "sub"]);
+    test:assertFalse(shouldGenerate);
+}
+
+@test:Config {
+    groups: ["completeServicePathRetrieval"]
+}
+isolated function testServicePathRetrievalForEmptyServicePath() {
+    var servicePath = retrieveCompleteServicePath(());
+    if servicePath is error {
+        test:assertEquals(servicePath.message(), "Could not find the generated service path");
+    } else {
+        test:assertFail("Retrieved a service-path for a errorneous scenario");
+    }
+}
+
+@test:Config {
+    groups: ["completeServicePathRetrieval"]
+}
+isolated function testServicePathRetrievalForEmptyServicePathArr() {
+    var servicePath = retrieveCompleteServicePath([]);
+    if servicePath is error {
+        test:assertEquals(servicePath.message(), "Could not find the generated service path");
+    } else {
+        test:assertFail("Retrieved a service-path for a errorneous scenario");
+    }
 }
 
 @test:Config { 
@@ -109,7 +205,7 @@ isolated function testServicePathRetrievalForEmptyServicePath() returns error? {
 }
 isolated function testCompleteServicePathRetrievalWithString() returns error? {
     string expectedServicePath = "subscriber";
-    string generatedServicePath = retrieveServicePath("subscriber");
+    string generatedServicePath = check retrieveCompleteServicePath("subscriber");
     test:assertEquals(generatedServicePath, expectedServicePath, "Generated service-path does not matched expected service-path"); 
 }
 
@@ -118,7 +214,7 @@ isolated function testCompleteServicePathRetrievalWithString() returns error? {
 }
 isolated function testCompleteServicePathRetrievalWithStringArray() returns error? {
     string expectedServicePath = "subscriber/foo/bar";
-    string generatedServicePath = retrieveServicePath(["subscriber", "foo", "bar"]);
+    string generatedServicePath = check retrieveCompleteServicePath(["subscriber", "foo", "bar"]);
     test:assertEquals(generatedServicePath, expectedServicePath, "Generated service-path does not matched expected service-path"); 
 }
 

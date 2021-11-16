@@ -61,11 +61,29 @@ isolated function testSubscriptionInitiationSuccessWithDiscoveryUrl() returns er
     check subscribe(config, "https://sample.com/sub1");
 }
 
-@test:Config { 
+@test:Config {
+    groups: ["subscriptionInitiation"]
+}
+isolated function testSubscriptionInitiationSuccessWithDiscoveryUrlAndSecret() returns error? {
+    SubscriberServiceConfiguration config = getServiceAnnotationConfig(DISCOVERY_SUCCESS_URL);
+    config.secret = "test123#";
+    check subscribe(config, "https://sample.com/sub1");
+}
+
+@test:Config {
     groups: ["subscriptionInitiation"]
 }
 isolated function testSubscriptionInitiationSuccessWithHubAndTopic() returns error? {
     SubscriberServiceConfiguration config = getServiceAnnotationConfig([ HUB_SUCCESS_URL, COMMON_TOPIC ]);
+    check subscribe(config, "https://sample.com/sub1");
+}
+
+@test:Config {
+    groups: ["subscriptionInitiation"]
+}
+isolated function testSubscriptionInitiationSuccessWithHubAndTopicAndSecret() returns error? {
+    SubscriberServiceConfiguration config = getServiceAnnotationConfig([ HUB_SUCCESS_URL, COMMON_TOPIC ]);
+    config.secret = "test123#";
     check subscribe(config, "https://sample.com/sub1");
 }
 

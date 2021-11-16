@@ -26,7 +26,7 @@ public interface Constants {
     String PACKAGE_NAME = "websub";
 
     String LISTENER_IDENTIFIER = "Listener";
-    String SERVICE_ANNOTATION_NAME = "SubscriberServiceConfig";
+    String SERVICE_ANNOTATION_NAME = "websub:SubscriberServiceConfig";
 
     String ON_SUBSCRIPTION_VALIDATION_DENIED = "onSubscriptionValidationDenied";
     String ON_SUBSCRIPTION_VERIFICATION = "onSubscriptionVerification";
@@ -45,5 +45,14 @@ public interface Constants {
     String SUBSCRIPTION_DELETED_ERROR = "websub:SubscriptionDeletedError";
     String ERROR = "annotations:error";
 
+    String CALLBACK = "callback";
+    String APPEND_SERVICE_PATH = "appendServicePath";
+
     String OPTIONAL = "?";
+
+    // resource directory structure related constants
+    String TARGET_DIR_NAME = "target";
+    String BIN_DIR_NAME = "bin";
+    String RESOURCES_DIR_NAME = "resources";
+    String RESOURCE_DIR_NAME = "resource";
 }

@@ -118,9 +118,14 @@ public class ServiceDeclarationValidator {
                                                     ServiceDeclarationSymbol serviceDeclarationSymbol) {
         Optional<AnnotationSymbol> subscriberServiceAnnotationOptional = serviceDeclarationSymbol.annotations()
                 .stream()
-                .filter(annotationSymbol ->
-                        annotationSymbol.getName().orElse("").equals(Constants.SERVICE_ANNOTATION_NAME)
-                ).findFirst();
+                .filter(annotationSymbol -> {
+                            String moduleName = annotationSymbol.getModule()
+                                    .flatMap(ModuleSymbol::getName)
+                                    .orElse("");
+                            String type = annotationSymbol.getName().orElse("");
+                            String annotationName = getQualifiedType(type, moduleName);
+                            return annotationName.equals(Constants.SERVICE_ANNOTATION_NAME);
+                }).findFirst();
         if (subscriberServiceAnnotationOptional.isEmpty()) {
             WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_101;
             updateContext(context, errorCode, serviceNode.location());

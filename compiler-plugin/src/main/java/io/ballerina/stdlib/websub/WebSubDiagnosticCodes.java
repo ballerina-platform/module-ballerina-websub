@@ -44,6 +44,12 @@ public enum WebSubDiagnosticCodes {
     WEBSUB_108("WEBSUB_108", "{0} method should return {1} types", DiagnosticSeverity.ERROR),
     WEBSUB_109("WEBSUB_109",
             "websub:Listener should only take either http:Listener or websub:ListenerConfiguration",
+            DiagnosticSeverity.ERROR),
+    WEBSUB_200("WEBSUB_200",
+            "Error occurred while generating unique service path for websub:SubscriberService : {0}",
+            DiagnosticSeverity.ERROR),
+    WEBSUB_201("WEBSUB_201",
+            "Error occurred while packaging generated resources : {0}",
             DiagnosticSeverity.ERROR);
 
     private final String code;

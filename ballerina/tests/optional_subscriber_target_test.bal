@@ -37,6 +37,6 @@ function afterOptionalTargetUrlTest() returns error? {
     groups: ["optionalSubscriberTarget"]
 }
 function testOptionalTargetUrl() returns error? {
-    check optionalTargetListener.attach(optionalSubscriberTarget);
+    check optionalTargetListener.attach(optionalSubscriberTarget, "/samples");
     check optionalTargetListener.'start();
 }

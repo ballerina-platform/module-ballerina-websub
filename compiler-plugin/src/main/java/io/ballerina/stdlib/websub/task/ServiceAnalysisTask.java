@@ -28,6 +28,8 @@ import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 
 import java.util.Optional;
 
+import static io.ballerina.stdlib.websub.task.AnalyserUtils.isWebSubService;
+
 /**
  * {@code ServiceDeclarationValidator} validates whether websub service declaration is complying to current websub
  * package implementation.
@@ -56,9 +58,5 @@ public class ServiceAnalysisTask implements AnalysisTask<SyntaxNodeAnalysisConte
                 this.validator.validate(context, serviceNode, serviceDeclarationSymbol);
             }
         }
-    }
-
-    private boolean isWebSubService(ServiceDeclarationSymbol serviceDeclarationSymbol) {
-        return serviceDeclarationSymbol.listenerTypes().stream().anyMatch(AnalyserUtils::isWebSubListener);
     }
 }

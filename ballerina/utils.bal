@@ -19,30 +19,6 @@ import ballerina/regex;
 import ballerina/crypto;
 import ballerina/log;
 import ballerina/lang.'string as strings;
-import ballerina/random;
-
-# Generates a random string of the given length.
-# ```ballerina
-# string randomString = check generateRandomString(10);
-# ```
-# 
-# + length - required length of the generated string
-# + return - generated random `string` value or an `error` if any error occurred in the execution
-isolated function generateRandomString(int length) returns string|error {
-    int[] codePoints = [];
-    int leftLimit = 48; // numeral '0'
-    int rightLimit = 122; // letter 'z'
-    int iterator = 0;
-    while (iterator < length) {
-        int randomInt = check random:createIntInRange(leftLimit, rightLimit);
-        // character literals from 48 - 57 are numbers | 65 - 90 are capital letters | 97 - 122 are simple letters
-        if (randomInt <= 57 || randomInt >= 65) && (randomInt <= 90 || randomInt >= 97) {
-            codePoints.push(randomInt);
-            iterator += 1;
-        }
-    }
-    return strings:fromCodePointInts(codePoints);
-}
 
 # Generates the `websub:SubscriptionChangeRequest` from the configurations.
 # ```ballerina
@@ -137,13 +113,13 @@ isolated function retrieveRequestQueryParams(http:Request request) returns Reque
 isolated function verifyContent(http:Request request, string secret, string payload) returns boolean|error {
     if secret.trim().length() > 0 {
         if request.hasHeader(X_HUB_SIGNATURE) {
-                var xHubSignature = request.getHeader(X_HUB_SIGNATURE);
-                if xHubSignature is http:HeaderNotFoundError || xHubSignature.trim().length() == 0 {
+                string xHubSignature = check request.getHeader(X_HUB_SIGNATURE);
+                if xHubSignature.trim().length() == 0 {
                     return false;
                 } else {
-                    string[] splitSignature = regex:split(<string>xHubSignature, "=");
+                    string[] splitSignature = regex:split(xHubSignature, "=");
                     string method = splitSignature[0];
-                    string signature = regex:replaceAll(<string>xHubSignature, method + "=", "");
+                    string signature = regex:replaceAll(xHubSignature, method + "=", "");
                     byte[] generatedSignature = check retrieveContentHash(method, secret, payload);
                     return signature == generatedSignature.toBase16(); 
                 }          

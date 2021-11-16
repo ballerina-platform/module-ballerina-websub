@@ -24,6 +24,7 @@ import io.ballerina.compiler.api.symbols.FunctionSymbol;
 import io.ballerina.compiler.api.symbols.ModuleSymbol;
 import io.ballerina.compiler.api.symbols.ObjectTypeSymbol;
 import io.ballerina.compiler.api.symbols.Qualifier;
+import io.ballerina.compiler.api.symbols.ServiceDeclarationSymbol;
 import io.ballerina.compiler.api.symbols.TypeDescKind;
 import io.ballerina.compiler.api.symbols.TypeReferenceTypeSymbol;
 import io.ballerina.compiler.api.symbols.TypeSymbol;
@@ -36,6 +37,9 @@ import io.ballerina.tools.diagnostics.Diagnostic;
 import io.ballerina.tools.diagnostics.DiagnosticFactory;
 import io.ballerina.tools.diagnostics.DiagnosticInfo;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +53,10 @@ public final class AnalyserUtils {
                 errorCode.getCode(), errorCode.getDescription(), errorCode.getSeverity());
         Diagnostic diagnostic = DiagnosticFactory.createDiagnostic(diagnosticInfo, location, args);
         context.reportDiagnostic(diagnostic);
+    }
+
+    public static boolean isWebSubService(ServiceDeclarationSymbol serviceDeclarationSymbol) {
+        return serviceDeclarationSymbol.listenerTypes().stream().anyMatch(AnalyserUtils::isWebSubListener);
     }
 
     public static boolean isWebSubListener(TypeSymbol listenerType) {
@@ -123,5 +131,22 @@ public final class AnalyserUtils {
 
     public static boolean isRemoteMethod(FunctionSymbol functionSymbol) {
         return functionSymbol.qualifiers().contains(Qualifier.REMOTE);
+    }
+
+    /**
+     * Copy content of a file/directory into another location.
+     *
+     * @param inputStream stream from which the data is read
+     * @param outStream stream to which the data is written
+     * @throws IOException if there is any error while reading from a file or writing to a file
+     */
+    public static <T extends InputStream, E extends OutputStream> void copyContent(T inputStream, E outStream)
+            throws IOException {
+        byte[] data = new byte[1024];
+        int bytesRead = inputStream.read(data);
+        while (bytesRead != -1) {
+            outStream.write(data, 0, bytesRead);
+            bytesRead = inputStream.read(data);
+        }
     }
 }

@@ -16,18 +16,17 @@
  * under the License.
  */
 
-package io.ballerina.stdlib.websub;
+package io.ballerina.stdlib.websub.task.service.path;
 
-import io.ballerina.projects.plugins.CompilerPlugin;
-import io.ballerina.projects.plugins.CompilerPluginContext;
+import io.ballerina.projects.ProjectKind;
 
 /**
- * {@code WebSubCompilerPlugin} handles compile-time code analysis for WebSub based Services.
+ * {@code BalProjectServicePathGenerator} generates unique-service-path for subscriber-service defined
+ * in ballerina projects.
  */
-public class WebSubCompilerPlugin extends CompilerPlugin {
+public class BalProjectServicePathGenerator extends AbstractServicePathGenerator {
     @Override
-    public void init(CompilerPluginContext context) {
-        context.addCodeAnalyzer(new WebSubCodeAnalyzer());
-        context.addCompilerLifecycleListener(new WebSubLifeCycleListener());
+    public boolean isSupported(ProjectKind projectType) {
+        return ProjectKind.BUILD_PROJECT.equals(projectType);
     }
 }

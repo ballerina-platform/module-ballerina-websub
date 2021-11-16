@@ -25,7 +25,13 @@ var serviceWithDefaultImpl = @SubscriberServiceConfig { target: "http://0.0.0.0:
     isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
         log:printDebug("onEventNotification invoked ", contentDistributionMessage = event);
-        return ACKNOWLEDGEMENT;
+        Acknowledgement ack = {
+            headers: {
+                "header1": "value1-1",
+                "header-2": [ "value2-1", "value2-2"]
+            }
+        };
+        return ack;
     }
 };
 
@@ -56,12 +62,4 @@ function testOnIntentVerificationSuccessDefaultImpl() returns error? {
     http:Response response = check serviceWithDefaultImplClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234");
     test:assertEquals(response.statusCode, 200);
     test:assertEquals(response.getTextPayload(), "1234");
-}
-
-@test:Config {
-    groups: ["defaultMethodImpl"]
-}
-isolated function testUniqueStringGeneration() returns error? {
-    string generatedString = generateUniqueUrlSegment();
-    test:assertEquals(generatedString.length(), 10);
 }

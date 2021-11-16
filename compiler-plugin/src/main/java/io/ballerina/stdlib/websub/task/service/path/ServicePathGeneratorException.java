@@ -16,18 +16,17 @@
  * under the License.
  */
 
-package io.ballerina.stdlib.websub;
-
-import io.ballerina.projects.plugins.CompilerPlugin;
-import io.ballerina.projects.plugins.CompilerPluginContext;
+package io.ballerina.stdlib.websub.task.service.path;
 
 /**
- * {@code WebSubCompilerPlugin} handles compile-time code analysis for WebSub based Services.
+ * {@code ServicePathGenerationException} will be thrown when an exception occurs in service-path generation.
  */
-public class WebSubCompilerPlugin extends CompilerPlugin {
-    @Override
-    public void init(CompilerPluginContext context) {
-        context.addCodeAnalyzer(new WebSubCodeAnalyzer());
-        context.addCompilerLifecycleListener(new WebSubLifeCycleListener());
+public class ServicePathGeneratorException extends Exception {
+    public ServicePathGeneratorException(String message) {
+        super(message);
+    }
+
+    public ServicePathGeneratorException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
