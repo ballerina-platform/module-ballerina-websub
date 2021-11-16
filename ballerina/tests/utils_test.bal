@@ -23,7 +23,7 @@ const string HASH_KEY = "secret";
 @test:Config { 
     groups: ["contentHashRetrieval"]
 }
-isolated function testContentHashForSha1() returns @tainted error? {
+isolated function testContentHashForSha1() returns error? {
     byte[] hashedContent = check retrieveContentHash(SHA1, HASH_KEY, "This is sample content");
     test:assertTrue(hashedContent.length() > 0);
 }
@@ -31,7 +31,7 @@ isolated function testContentHashForSha1() returns @tainted error? {
 @test:Config { 
     groups: ["contentHashRetrieval"]
 }
-isolated function testContentHashForSha256() returns @tainted error? {
+isolated function testContentHashForSha256() returns error? {
     byte[] hashedContent = check retrieveContentHash(SHA_256, HASH_KEY, "This is sample content");
     test:assertTrue(hashedContent.length() > 0);
 }
@@ -39,7 +39,7 @@ isolated function testContentHashForSha256() returns @tainted error? {
 @test:Config { 
     groups: ["contentHashRetrieval"]
 }
-isolated function testContentHashForSha384() returns @tainted error? {
+isolated function testContentHashForSha384() returns error? {
     byte[] hashedContent = check retrieveContentHash(SHA_384, HASH_KEY, "This is sample content");
     test:assertTrue(hashedContent.length() > 0);
 }
@@ -47,7 +47,7 @@ isolated function testContentHashForSha384() returns @tainted error? {
 @test:Config { 
     groups: ["contentHashRetrieval"]
 }
-isolated function testContentHashForSha512() returns @tainted error? {
+isolated function testContentHashForSha512() returns error? {
     byte[] hashedContent = check retrieveContentHash(SHA_512, HASH_KEY, "This is sample content");
     test:assertTrue(hashedContent.length() > 0);
 }
@@ -55,7 +55,7 @@ isolated function testContentHashForSha512() returns @tainted error? {
 @test:Config { 
     groups: ["contentHashRetrieval"]
 }
-isolated function testContentHashError() returns @tainted error? {
+isolated function testContentHashError() returns error? {
     byte[]|error hashedContent = retrieveContentHash("xyz", HASH_KEY, "This is sample content");
     string expectedErrorMsg = "Unrecognized hashning-method [xyz] found";
     if (hashedContent is error) {
@@ -76,7 +76,7 @@ var validSubscriberServiceDeclaration = @SubscriberServiceConfig { target: "http
 @test:Config { 
     groups: ["serviceAnnotationRetrieval"]
 }
-function testSubscriberServiceAnnotationRetrievalSuccess() returns @tainted error? {
+function testSubscriberServiceAnnotationRetrievalSuccess() returns error? {
     SubscriberServiceConfiguration? configuration = retrieveSubscriberServiceAnnotations(validSubscriberServiceDeclaration);
     test:assertTrue(configuration is SubscriberServiceConfiguration, "service annotation retrieval failed for valid service declaration");
 }
@@ -91,7 +91,7 @@ var invalidSubscriberServiceDeclaration = service object {
 @test:Config { 
     groups: ["serviceAnnotationRetrieval"]
 }
-function testSubscriberServiceAnnotationRetrievalFailure() returns @tainted error? {
+function testSubscriberServiceAnnotationRetrievalFailure() returns error? {
     SubscriberServiceConfiguration? configuration = retrieveSubscriberServiceAnnotations(invalidSubscriberServiceDeclaration);
     test:assertTrue(configuration is (), "service annotation retrieval success for invalid service declaration");
 }
@@ -99,7 +99,7 @@ function testSubscriberServiceAnnotationRetrievalFailure() returns @tainted erro
 @test:Config { 
     groups: ["servicePathRetrieval"]
 }
-isolated function testServicePathRetrievalForEmptyServicePath() returns @tainted error? {
+isolated function testServicePathRetrievalForEmptyServicePath() returns error? {
     string servicePath = retrieveServicePath(());
     test:assertEquals(servicePath.length(), 10, "Retrieved invalid results for empty service path");
 }
@@ -107,7 +107,7 @@ isolated function testServicePathRetrievalForEmptyServicePath() returns @tainted
 @test:Config { 
     groups: ["completeServicePathRetrieval"]
 }
-isolated function testCompleteServicePathRetrievalWithString() returns @tainted error? {
+isolated function testCompleteServicePathRetrievalWithString() returns error? {
     string expectedServicePath = "subscriber";
     string generatedServicePath = retrieveServicePath("subscriber");
     test:assertEquals(generatedServicePath, expectedServicePath, "Generated service-path does not matched expected service-path"); 
@@ -116,7 +116,7 @@ isolated function testCompleteServicePathRetrievalWithString() returns @tainted 
 @test:Config { 
     groups: ["completeServicePathRetrieval"]
 }
-isolated function testCompleteServicePathRetrievalWithStringArray() returns @tainted error? {
+isolated function testCompleteServicePathRetrievalWithStringArray() returns error? {
     string expectedServicePath = "subscriber/foo/bar";
     string generatedServicePath = retrieveServicePath(["subscriber", "foo", "bar"]);
     test:assertEquals(generatedServicePath, expectedServicePath, "Generated service-path does not matched expected service-path"); 
@@ -125,7 +125,7 @@ isolated function testCompleteServicePathRetrievalWithStringArray() returns @tai
 @test:Config { 
     groups: ["retrieveCallbackUrl"]
 }
-isolated function testCallbackUrlRetrievalWithNoCallback() returns @tainted error? {
+isolated function testCallbackUrlRetrievalWithNoCallback() returns error? {
     string expectedCallbackUrl = "http://0.0.0.0:9090/subscriber";
     SubscriberServiceConfiguration config = {};
     string retrievedCallbackUrl = constructCallbackUrl(config, 9090, retrieveInfrdListenerConfig({}), "subscriber", false);
@@ -135,7 +135,7 @@ isolated function testCallbackUrlRetrievalWithNoCallback() returns @tainted erro
 @test:Config { 
     groups: ["retrieveCallbackUrl"]
 }
-isolated function testCallbackUrlRetrievalWithCallbackAppendingDisabled() returns @tainted error? {
+isolated function testCallbackUrlRetrievalWithCallbackAppendingDisabled() returns error? {
     string expectedCallbackUrl = "http://0.0.0.0:9090/subscriber";
     SubscriberServiceConfiguration config = {
         callback: "http://0.0.0.0:9090/subscriber"
@@ -147,7 +147,7 @@ isolated function testCallbackUrlRetrievalWithCallbackAppendingDisabled() return
 @test:Config { 
     groups: ["retrieveCallbackUrl"]
 }
-isolated function testCallbackUrlRetrievalWithCallbackAppendingEnabled() returns @tainted error? {
+isolated function testCallbackUrlRetrievalWithCallbackAppendingEnabled() returns error? {
     string expectedCallbackUrl = "http://0.0.0.0:9090/subscriber/foo";
     SubscriberServiceConfiguration config = {
         callback: "http://0.0.0.0:9090",
@@ -160,7 +160,7 @@ isolated function testCallbackUrlRetrievalWithCallbackAppendingEnabled() returns
 @test:Config { 
     groups: ["callbackUrlGeneration"]
 }
-isolated function testCallbackUrlGenerationHttpsWithNoHostConfig() returns @tainted error? {
+isolated function testCallbackUrlGenerationHttpsWithNoHostConfig() returns error? {
     http:ListenerConfiguration listenerConfig = {
         secureSocket: {
             key: {
@@ -178,7 +178,7 @@ isolated function testCallbackUrlGenerationHttpsWithNoHostConfig() returns @tain
 @test:Config { 
     groups: ["callbackUrlGeneration"]
 }
-isolated function testCallbackUrlGenerationHttpWithNoHostConfig() returns @tainted error? {
+isolated function testCallbackUrlGenerationHttpWithNoHostConfig() returns error? {
     http:ListenerConfiguration listenerConfig = {};
     string expectedCallbackUrl = "http://0.0.0.0:9090/subscriber";
     SubscriberServiceConfiguration config = {};
@@ -189,7 +189,7 @@ isolated function testCallbackUrlGenerationHttpWithNoHostConfig() returns @taint
 @test:Config { 
     groups: ["callbackUrlGeneration"]
 }
-isolated function testCallbackUrlGenerationHttpsWithHostConfig() returns @tainted error? {
+isolated function testCallbackUrlGenerationHttpsWithHostConfig() returns error? {
     http:ListenerConfiguration listenerConfig = {
         host: "192.168.1.1",
         secureSocket: {
@@ -208,7 +208,7 @@ isolated function testCallbackUrlGenerationHttpsWithHostConfig() returns @tainte
 @test:Config { 
     groups: ["callbackUrlGeneration"]
 }
-isolated function testCallbackUrlGenerationHttpWithHostConfig() returns @tainted error? {
+isolated function testCallbackUrlGenerationHttpWithHostConfig() returns error? {
     http:ListenerConfiguration listenerConfig = {
         host: "192.168.1.1"
     };
@@ -221,7 +221,7 @@ isolated function testCallbackUrlGenerationHttpWithHostConfig() returns @tainted
 @test:Config { 
     groups: ["callbackUrlGeneration"]
 }
-isolated function testCallbackUrlForArrayTypeServicePath() returns @tainted error? {
+isolated function testCallbackUrlForArrayTypeServicePath() returns error? {
     http:ListenerConfiguration listenerConfig = {
         host: "192.168.1.1"
     };
@@ -295,7 +295,7 @@ final http:Client headerUtilTestClient1 = check new ("http://localhost:9101/util
 @test:Config { 
     groups: ["requestHeader"]
 }
-isolated function testRequestHeaderRetrievalWithStandardHeadeName() returns @tainted error? {
+isolated function testRequestHeaderRetrievalWithStandardHeadeName() returns error? {
     http:Request request = new;
     request.setHeader("Custom-Header", "Custom Header Value");
     request.setTextPayload("This is a sample message");
@@ -310,7 +310,7 @@ isolated function testRequestHeaderRetrievalWithStandardHeadeName() returns @tai
 @test:Config { 
     groups: ["requestHeader"]
 }
-isolated function testRequestHeaderRetrievalWithNonStandardHeadeName() returns @tainted error? {
+isolated function testRequestHeaderRetrievalWithNonStandardHeadeName() returns error? {
     http:Request request = new;
     request.setHeader("custoM-HeaDer", "Custom Header Value");
     request.setTextPayload("This is a sample message");
@@ -325,7 +325,7 @@ isolated function testRequestHeaderRetrievalWithNonStandardHeadeName() returns @
 @test:Config { 
     groups: ["requestHeader"]
 }
-isolated function testRequestHeaderRetrievalWithoutHeaderValue() returns @tainted error? {
+isolated function testRequestHeaderRetrievalWithoutHeaderValue() returns error? {
     http:Request request = new;
     request.setTextPayload("This is a sample message");
     http:Response response = check headerUtilTestClient1->post("/", request);
@@ -341,7 +341,7 @@ final http:Client headerUtilTestClient2 = check new ("http://localhost:9101/util
 @test:Config { 
     groups: ["requestHeader"]
 }
-isolated function testRequestHeadersRetrievalWithStandardHeadeName() returns @tainted error? {
+isolated function testRequestHeadersRetrievalWithStandardHeadeName() returns error? {
     http:Request request = new;
     request.addHeader("Custom-Header", "Val1");
     request.addHeader("Custom-Header", "Val2");
@@ -358,7 +358,7 @@ isolated function testRequestHeadersRetrievalWithStandardHeadeName() returns @ta
 @test:Config { 
     groups: ["requestHeader"]
 }
-isolated function testRequestHeadersRetrievalWithNonStandardHeadeName() returns @tainted error? {
+isolated function testRequestHeadersRetrievalWithNonStandardHeadeName() returns error? {
     http:Request request = new;
     request.addHeader("custoM-HeaDer", "Val1");
     request.addHeader("custoM-HeaDer", "Val2");
@@ -375,7 +375,7 @@ isolated function testRequestHeadersRetrievalWithNonStandardHeadeName() returns 
 @test:Config { 
     groups: ["requestHeader"]
 }
-isolated function testRequestHeadersRetrievalWithoutHeaderValue() returns @tainted error? {
+isolated function testRequestHeadersRetrievalWithoutHeaderValue() returns error? {
     http:Request request = new;
     request.setTextPayload("This is a sample message");
     http:Response response = check headerUtilTestClient2->post("/", request);

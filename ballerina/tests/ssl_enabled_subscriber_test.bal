@@ -69,7 +69,7 @@ http:Client sslEnabledClient = check new("https://localhost:9095/subscriber", ht
 @test:Config { 
     groups: ["sslEnabledSubscriber"]
 }
-function testOnSubscriptionValidationWithSsl() returns @tainted error? {
+function testOnSubscriptionValidationWithSsl() returns error? {
     http:Response response = check sslEnabledClient->get("/?hub.mode=denied&hub.reason=justToTest");
     test:assertEquals(response.statusCode, 200);
 }
@@ -77,7 +77,7 @@ function testOnSubscriptionValidationWithSsl() returns @tainted error? {
 @test:Config {
     groups: ["sslEnabledSubscriber"]
  }
-function testOnIntentVerificationSuccessWithSsl() returns @tainted error? {
+function testOnIntentVerificationSuccessWithSsl() returns error? {
     http:Response response = check sslEnabledClient->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234");
     test:assertEquals(response.statusCode, 200);
     test:assertEquals(response.getTextPayload(), "1234");
@@ -86,7 +86,7 @@ function testOnIntentVerificationSuccessWithSsl() returns @tainted error? {
 @test:Config { 
     groups: ["sslEnabledSubscriber"]
 }
-function testOnIntentVerificationFailureWithSsl() returns @tainted error? {
+function testOnIntentVerificationFailureWithSsl() returns error? {
     http:Response response = check sslEnabledClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
@@ -97,7 +97,7 @@ function testOnIntentVerificationFailureWithSsl() returns @tainted error? {
 @test:Config {
     groups: ["sslEnabledSubscriber"]
  }
-function testOnEventNotificationSuccessWithSsl() returns @tainted error? {
+function testOnEventNotificationSuccessWithSsl() returns error? {
     http:Request request = new;
     json payload =  {"action": "publish", "mode": "remote-hub"};
     request.setPayload(payload);
@@ -110,7 +110,7 @@ function testOnEventNotificationSuccessWithSsl() returns @tainted error? {
 @test:Config {
     groups: ["sslEnabledSubscriber"]
 }
-function testOnEventNotificationSuccessXmlWithSsl() returns @tainted error? {
+function testOnEventNotificationSuccessXmlWithSsl() returns error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
     request.setPayload(payload);
@@ -122,7 +122,7 @@ function testOnEventNotificationSuccessXmlWithSsl() returns @tainted error? {
 @test:Config {
     groups: ["sslEnabledSubscriber"]
 }
-function testOnEventNotificationSuccessForUrlEncodedWithSsl() returns @tainted error? {
+function testOnEventNotificationSuccessForUrlEncodedWithSsl() returns error? {
     http:Request request = new;
     request.setTextPayload("param1=value1&param2=value2");
     check request.setContentType(mime:APPLICATION_FORM_URLENCODED);

@@ -33,11 +33,11 @@ var simpleHttpService = service object {
 };
 
 @test:BeforeSuite
-function beforeSuiteFunc() returns @tainted error? {
+function beforeSuiteFunc() returns error? {
     check simpleHttpServiceListener.attach(simpleHttpService, "/common");
 }
 
 @test:AfterSuite { }
-function afterSuiteFunc() returns @tainted error? {
+function afterSuiteFunc() returns error? {
     check simpleHttpServiceListener.gracefulStop();
 }
