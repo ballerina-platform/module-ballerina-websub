@@ -74,8 +74,6 @@ isolated function retrieveRequestHeaders(http:Request request) returns map<strin
 # + request - Original `http:Request` object
 # + return - The `websub:RequestQueryParams` instance containing the query parameter values
 isolated function retrieveRequestQueryParams(http:Request request) returns RequestQueryParams {
-    map<string[]> queryParams = request.getQueryParams();
-
     string? hubMode = request.getQueryParamValue(HUB_MODE);
     string? hubTopic = request.getQueryParamValue(HUB_TOPIC);
     string? hubChallenge = request.getQueryParamValue(HUB_CHALLENGE);
@@ -145,8 +143,6 @@ isolated function verifyContent(http:Request request, string secret, string payl
 isolated function retrieveContentHash(string method, string key, string payload) returns byte[]|error {
     byte[] keyArr = key.toBytes();
     byte[] contentPayload = payload.toBytes();
-    byte[] hashedContent = [];
-
     match method {
         SHA1 => {
             return crypto:hmacSha1(contentPayload, keyArr);
@@ -211,8 +207,12 @@ isolated function updateResponseBody(http:Response response, anydata? messageBod
 # 
 # + caller - The `http:Caller` reference for the current request
 # + response - Updated `http:Response`
-isolated function respondToRequest(http:Caller caller, http:Response response) {
+# + return - An `websub:Error` if there is an error while responding to the request or else `()`
+isolated function respondToRequest(http:Caller caller, http:Response response) returns Error? {
     http:ListenerError? responseError = caller->respond(response);
+    if responseError is http:ListenerError {
+        return error Error("Error occurred while responding to the request ", responseError);
+    }
 }
 
 # Checks whether the response is successful.

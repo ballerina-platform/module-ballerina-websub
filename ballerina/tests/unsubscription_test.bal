@@ -37,7 +37,7 @@ isolated function isVerified() returns boolean {
 service /common on new http:Listener(9197) {
     isolated resource function post hub(http:Caller caller, http:Request request) returns error? {        
         string mode = check getHubMode(request);
-        http:ListenerError? resp = caller->respond();
+        check caller->respond();
         if mode != MODE_UNSUBSCRIBE {
             return;
         }
@@ -81,7 +81,7 @@ service object {
 @test:Config { 
     groups: ["unsubscriptionViaGracefulstop"]
 }
-function testUnsubscriptionOnGracefulStop() returns @tainted error? {
+function testUnsubscriptionOnGracefulStop() returns error? {
     check unsubscriptionTestListener.attach(unsubscriptionTestSubscriber, "sub");
     check unsubscriptionTestListener.'start();
     check unsubscriptionTestListener.gracefulStop();

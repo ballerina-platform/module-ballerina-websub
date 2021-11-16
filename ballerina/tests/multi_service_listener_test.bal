@@ -79,7 +79,7 @@ http:Client clientForServiceTwo = check new ("http://localhost:9096/subscriberTw
 @test:Config { 
     groups: ["multiServiceListener"]
 }
-function testOnSubscriptionValidationWithServiceOne() returns @tainted error? {
+function testOnSubscriptionValidationWithServiceOne() returns error? {
     http:Response response = check clientForServiceOne->get("/?hub.mode=denied&hub.reason=justToTest");
     test:assertEquals(response.statusCode, 200);
 }
@@ -87,7 +87,7 @@ function testOnSubscriptionValidationWithServiceOne() returns @tainted error? {
 @test:Config { 
     groups: ["multiServiceListener"]
 }
-function testOnSubscriptionValidationWithServiceTwo() returns @tainted error? {
+function testOnSubscriptionValidationWithServiceTwo() returns error? {
     http:Response response = check clientForServiceTwo->get("/?hub.mode=denied&hub.reason=justToTest");
     test:assertEquals(response.statusCode, 200);
 }
@@ -95,7 +95,7 @@ function testOnSubscriptionValidationWithServiceTwo() returns @tainted error? {
 @test:Config { 
     groups: ["multiServiceListener"]
 }
-function testOnIntentVerificationFailureServiceOne() returns @tainted error? {
+function testOnIntentVerificationFailureServiceOne() returns error? {
     http:Response response = check clientForServiceOne->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
@@ -106,7 +106,7 @@ function testOnIntentVerificationFailureServiceOne() returns @tainted error? {
 @test:Config { 
     groups: ["multiServiceListener"]
 }
-function testOnIntentVerificationFailureServiceTwo() returns @tainted error? {
+function testOnIntentVerificationFailureServiceTwo() returns error? {
     http:Response response = check clientForServiceTwo->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
@@ -117,7 +117,7 @@ function testOnIntentVerificationFailureServiceTwo() returns @tainted error? {
 @test:Config {
     groups: ["multiServiceListener"]
  }
-function testOnEventNotificationSuccessServiceOne() returns @tainted error? {
+function testOnEventNotificationSuccessServiceOne() returns error? {
     http:Request request = new;
     json payload =  {"action": "publish", "mode": "remote-hub"};
     request.setPayload(payload);
@@ -129,7 +129,7 @@ function testOnEventNotificationSuccessServiceOne() returns @tainted error? {
 @test:Config {
     groups: ["multiServiceListener"]
  }
-function testOnEventNotificationSuccessServiceTwo() returns @tainted error? {
+function testOnEventNotificationSuccessServiceTwo() returns error? {
     http:Request request = new;
     json payload =  {"action": "publish", "mode": "remote-hub"};
     request.setPayload(payload);
@@ -141,7 +141,7 @@ function testOnEventNotificationSuccessServiceTwo() returns @tainted error? {
 @test:Config {
     groups: ["multiServiceListener"]
 }
-function testOnEventNotificationSuccessXmlServiceOne() returns @tainted error? {
+function testOnEventNotificationSuccessXmlServiceOne() returns error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
     request.setPayload(payload);
@@ -153,7 +153,7 @@ function testOnEventNotificationSuccessXmlServiceOne() returns @tainted error? {
 @test:Config {
     groups: ["multiServiceListener"]
 }
-function testOnEventNotificationSuccessXmlServiceTwo() returns @tainted error? {
+function testOnEventNotificationSuccessXmlServiceTwo() returns error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
     request.setPayload(payload);
@@ -165,7 +165,7 @@ function testOnEventNotificationSuccessXmlServiceTwo() returns @tainted error? {
 @test:Config {
     groups: ["multiServiceListener"]
 }
-function testOnEventNotificationSuccessForUrlEncodedServiceOne() returns @tainted error? {
+function testOnEventNotificationSuccessForUrlEncodedServiceOne() returns error? {
     http:Request request = new;
     request.setTextPayload("param1=value1&param2=value2");
     check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
@@ -176,7 +176,7 @@ function testOnEventNotificationSuccessForUrlEncodedServiceOne() returns @tainte
 @test:Config {
     groups: ["multiServiceListener"]
 }
-function testOnEventNotificationSuccessForUrlEncodedServiceTwo() returns @tainted error? {
+function testOnEventNotificationSuccessForUrlEncodedServiceTwo() returns error? {
     http:Request request = new;
     request.setTextPayload("param1=value1&param2=value2");
     check request.setContentType(mime:APPLICATION_FORM_URLENCODED);

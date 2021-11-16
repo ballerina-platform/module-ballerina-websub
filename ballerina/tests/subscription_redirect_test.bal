@@ -45,8 +45,8 @@ service /hub2 on new http:Listener(9194) {
 }
 
 service /hub3 on new http:Listener(9195) {
-    isolated resource function post redSuccess(http:Caller caller, http:Request request) {
-        http:ListenerError? resp = caller->respond();
+    isolated resource function post redSuccess(http:Caller caller, http:Request request) returns error? {
+        check caller->respond();
     }
 
     isolated resource function post redFailed(http:Caller caller, http:Request request) returns error? {
@@ -56,8 +56,8 @@ service /hub3 on new http:Listener(9195) {
 }
 
 service /hub4 on new http:Listener(9196) {
-    isolated resource function post redFailed(http:Caller caller, http:Request request) {
-        http:ListenerError? resp = caller->respond();
+    isolated resource function post redFailed(http:Caller caller, http:Request request) returns error? {
+        check caller->respond();
     }
 }
 
@@ -78,7 +78,7 @@ isolated function getServiceConfigwithRediects(string|[string, string] target) r
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-isolated function testSubscriptionInitiationWithRetrySuccess() returns @tainted error? {
+isolated function testSubscriptionInitiationWithRetrySuccess() returns error? {
     SubscriberServiceConfiguration config = getServiceConfigwithRediects([ HUB_REDIREC_SUCCESS_URL, COMMON_TOPIC ]);
     check subscribe(config, CALLBACK);
 }
@@ -86,7 +86,7 @@ isolated function testSubscriptionInitiationWithRetrySuccess() returns @tainted 
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
-isolated function testSubscriptionInitiationWithRetryFailure() returns @tainted error? {
+isolated function testSubscriptionInitiationWithRetryFailure() returns error? {
     string expectedMsg = "Redirection response received for subscription change request made with " +
                                "followRedirects disabled or after maxCount exceeded: Hub [" + HUB_REDIREC_FAILURE_URL + "], Topic [" +
                                COMMON_TOPIC + "]";

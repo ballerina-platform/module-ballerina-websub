@@ -24,7 +24,7 @@ final string HUB_THREE = "https://three.hub.ballerina.com";
 final string TOPIC_ONE = "https://topic.ballerina.com";
 
 @test:Config {}
-isolated function testTopicAndSingleHubAsSingleLinkHeader() returns @tainted error? {
+isolated function testTopicAndSingleHubAsSingleLinkHeader() returns error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\", <" + TOPIC_ONE + ">; rel=\"self\"");
     [string, string[]] results = check extractTopicAndHubUrls(response);
@@ -38,7 +38,7 @@ isolated function testTopicAndSingleHubAsSingleLinkHeader() returns @tainted err
 @test:Config {
     dependsOn: [testTopicAndSingleHubAsSingleLinkHeader]
 }
-isolated function testTopicAndSingleHubAsMultipleLinkHeaders() returns @tainted error? {
+isolated function testTopicAndSingleHubAsMultipleLinkHeaders() returns error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"self\"");
@@ -53,7 +53,7 @@ isolated function testTopicAndSingleHubAsMultipleLinkHeaders() returns @tainted 
 @test:Config {
     dependsOn: [testTopicAndSingleHubAsMultipleLinkHeaders]
 }
-isolated function testTopicAndMultipleHubsAsSingleLinkHeader() returns @tainted error? {
+isolated function testTopicAndMultipleHubsAsSingleLinkHeader() returns error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\", <" + HUB_TWO + ">; rel=\"hub\", <" + HUB_THREE +
             ">; rel=\"hub\", <" + TOPIC_ONE + ">; rel=\"self\"");
@@ -71,7 +71,7 @@ isolated function testTopicAndMultipleHubsAsSingleLinkHeader() returns @tainted 
 @test:Config {
     dependsOn: [testTopicAndMultipleHubsAsSingleLinkHeader]
 }
-isolated function testTopicAndMultipleHubsAsMultipleLinkHeaders() returns @tainted error? {
+isolated function testTopicAndMultipleHubsAsMultipleLinkHeaders() returns error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"self\"");
@@ -91,7 +91,7 @@ isolated function testTopicAndMultipleHubsAsMultipleLinkHeaders() returns @taint
 @test:Config {
     dependsOn: [testTopicAndMultipleHubsAsMultipleLinkHeaders]
 }
-isolated function testMissingTopicWithSingleLinkHeader() returns @tainted error? {
+isolated function testMissingTopicWithSingleLinkHeader() returns error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\", <" + TOPIC_ONE + ">; rel=\"not_self\"");
     [string, string[]]|error results = extractTopicAndHubUrls(response);
@@ -106,7 +106,7 @@ isolated function testMissingTopicWithSingleLinkHeader() returns @tainted error?
 @test:Config {
     dependsOn: [testMissingTopicWithSingleLinkHeader]
 }
-isolated function testMissingTopicWithMultipleLinkHeaders() returns @tainted error? {
+isolated function testMissingTopicWithMultipleLinkHeaders() returns error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"not_self\"");
@@ -122,7 +122,7 @@ isolated function testMissingTopicWithMultipleLinkHeaders() returns @tainted err
 @test:Config {
     dependsOn: [testMissingTopicWithMultipleLinkHeaders]
 }
-isolated function testMissingHubWithSingleLinkHeader() returns @tainted error? {
+isolated function testMissingHubWithSingleLinkHeader() returns error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\", <" + TOPIC_ONE + ">; rel=\"self\"");
     [string, string[]]|error results = extractTopicAndHubUrls(response);
@@ -137,7 +137,7 @@ isolated function testMissingHubWithSingleLinkHeader() returns @tainted error? {
 @test:Config {
     dependsOn: [testMissingHubWithSingleLinkHeader]
 }
-isolated function testMissingHubWithMultipleLinkHeaders() returns @tainted error? {
+isolated function testMissingHubWithMultipleLinkHeaders() returns error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"self\"");
@@ -153,7 +153,7 @@ isolated function testMissingHubWithMultipleLinkHeaders() returns @tainted error
 @test:Config {
     dependsOn: [testMissingHubWithMultipleLinkHeaders]
 }
-isolated function testMissingLinkHeader() returns @tainted error? {
+isolated function testMissingLinkHeader() returns error? {
     http:Response response = new;
     [string, string[]]|error results = extractTopicAndHubUrls(response);
     if (results is error) {
@@ -167,7 +167,7 @@ isolated function testMissingLinkHeader() returns @tainted error? {
 @test:Config {
     dependsOn: [testMissingLinkHeader]
 }
-isolated function testSingleLinkHeaderWithMultipleTopics() returns @tainted error? {
+isolated function testSingleLinkHeaderWithMultipleTopics() returns error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\", <" + TOPIC_ONE + ">; rel=\"self\", <" +
             HUB_TWO + ">; rel=\"self\"");
@@ -183,7 +183,7 @@ isolated function testSingleLinkHeaderWithMultipleTopics() returns @tainted erro
 @test:Config {
     dependsOn: [testSingleLinkHeaderWithMultipleTopics]
 }
-isolated function testMultipleLinkHeadersWithMultipleTopics() returns @tainted error? {
+isolated function testMultipleLinkHeadersWithMultipleTopics() returns error? {
     http:Response response = new;
     response.addHeader("Link", "<" + HUB_ONE + ">; rel=\"not_hub\"");
     response.addHeader("Link", "<" + TOPIC_ONE + ">; rel=\"self\"");

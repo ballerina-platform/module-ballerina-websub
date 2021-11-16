@@ -29,14 +29,14 @@ var optionalSubscriberTarget = @SubscriberServiceConfig { leaseSeconds: 36000, s
 };
 
 @test:AfterGroups { value:["optionalSubscriberTarget"] }
-function afterOptionalTargetUrlTest() returns @tainted error? {
+function afterOptionalTargetUrlTest() returns error? {
     check optionalTargetListener.gracefulStop();
 }
 
 @test:Config { 
     groups: ["optionalSubscriberTarget"]
 }
-function testOptionalTargetUrl() returns @tainted error? {
+function testOptionalTargetUrl() returns error? {
     check optionalTargetListener.attach(optionalSubscriberTarget, "/samples");
     check optionalTargetListener.'start();
 }

@@ -24,7 +24,7 @@ import ballerina/time;
 # Represents a Subscriber Service listener endpoint.
 public class Listener {
     private http:Listener httpListener;
-    private http:ListenerConfiguration listenerConfig;
+    private http:InferredListenerConfiguration listenerConfig;
     private int port;
     private decimal gracefulShutdownPeriod;
 
@@ -179,7 +179,6 @@ public class Listener {
     public isolated function gracefulStop() returns Error? {
         HttpService[]? attachedServices = self.retrieveAttachedServices();
         if attachedServices is HttpService[] {
-            log:printInfo("Unsubscribing from the hub...");
             foreach HttpService 'service in attachedServices {
                 error? result = 'service.initiateUnsubscription();
                 if result is error {
@@ -251,7 +250,7 @@ isolated function retrieveSubscriberServiceAnnotations(SubscriberService service
 }
 
 isolated function constructCallbackUrl(SubscriberServiceConfiguration subscriberConfig, int port, 
-                                       http:ListenerConfiguration listenerConfig, string completeSevicePath, 
+                                       http:InferredListenerConfiguration listenerConfig, string completeSevicePath, 
                                        boolean logGeneratedServicePath) returns string {
     string? providedCallback = subscriberConfig?.callback;
     if providedCallback is string {

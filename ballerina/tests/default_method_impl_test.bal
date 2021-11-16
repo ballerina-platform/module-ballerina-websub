@@ -36,12 +36,12 @@ var serviceWithDefaultImpl = @SubscriberServiceConfig { target: "http://0.0.0.0:
 };
 
 @test:BeforeGroups { value:["defaultMethodImpl"] }
-function beforeGroupTwo() returns @tainted error? {
+function beforeGroupTwo() returns error? {
     check serviceWithDefaultImplListener.attach(serviceWithDefaultImpl, "subscriber");
 }
 
 @test:AfterGroups { value:["defaultMethodImpl"] }
-function afterGroupTwo() returns @tainted error? {
+function afterGroupTwo() returns error? {
     check serviceWithDefaultImplListener.gracefulStop();
 }
 
@@ -50,7 +50,7 @@ http:Client serviceWithDefaultImplClientEp = check new("http://localhost:9091/su
 @test:Config { 
     groups: ["defaultMethodImpl"]
 }
-function testOnSubscriptionValidationDefaultImpl() returns @tainted error? {
+function testOnSubscriptionValidationDefaultImpl() returns error? {
     http:Response response = check serviceWithDefaultImplClientEp->get("/?hub.mode=denied&hub.reason=justToTest");
     test:assertEquals(response.statusCode, 200);
 }
@@ -58,7 +58,7 @@ function testOnSubscriptionValidationDefaultImpl() returns @tainted error? {
 @test:Config {
     groups: ["defaultMethodImpl"]
  }
-function testOnIntentVerificationSuccessDefaultImpl() returns @tainted error? {
+function testOnIntentVerificationSuccessDefaultImpl() returns error? {
     http:Response response = check serviceWithDefaultImplClientEp->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234");
     test:assertEquals(response.statusCode, 200);
     test:assertEquals(response.getTextPayload(), "1234");

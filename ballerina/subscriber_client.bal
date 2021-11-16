@@ -119,7 +119,7 @@ isolated function buildSubscriptionChangeRequest(string mode,
 # + subscriptionChangeRequest - The request containing the subscription/unsubscription details
 # + response - Original response received from the `hub` as `http:Response`,`http:PayloadType`, or an `error`
 # + return - The `websub:SubscriptionChangeResponse` if the requested subscription action is successfull or else an `error`
-isolated function processHubResponse(string hub, @untainted string mode, 
+isolated function processHubResponse(string hub, string mode, 
                                      SubscriptionChangeRequest subscriptionChangeRequest,
                                      http:Response|http:PayloadType|error response) returns SubscriptionChangeResponse|SubscriptionInitiationError {
 
