@@ -19,7 +19,7 @@ import ballerina/http;
 
 listener http:Listener simpleHttpServiceListener = new (9191);
 
-var simpleHttpService = service object {
+http:Service simpleHttpService = service object {
     isolated resource function get discovery(http:Caller caller, http:Request request) returns error? {
         http:Response response = new;
         response.addHeader("Link", "<http://127.0.0.1:9191/common/hub>; rel=\"hub\"");
