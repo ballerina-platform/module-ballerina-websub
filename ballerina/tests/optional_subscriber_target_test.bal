@@ -19,7 +19,7 @@ import ballerina/test;
 
 listener Listener optionalTargetListener = new (9094);
 
-var optionalSubscriberTarget = @SubscriberServiceConfig { leaseSeconds: 36000, secret: "Kslk30SNF2AChs2", unsubscribeOnShutdown: false } 
+SubscriberService optionalSubscriberTarget = @SubscriberServiceConfig { leaseSeconds: 36000, secret: "Kslk30SNF2AChs2", unsubscribeOnShutdown: false } 
                               service object {
     isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement | SubscriptionDeletedError? {

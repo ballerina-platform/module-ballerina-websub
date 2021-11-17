@@ -20,7 +20,7 @@ import ballerina/mime;
 
 listener Listener errorReturnsSubscriberListener = new (9099);
 
-var subscriberWithErrorReturns = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, unsubscribeOnShutdown: false } 
+SubscriberService subscriberWithErrorReturns = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, unsubscribeOnShutdown: false } 
                               service object {
     isolated remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns error? {
         return error ("Error occured while processing request");

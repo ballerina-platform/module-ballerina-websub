@@ -66,7 +66,7 @@ isolated function notifySubscriber(string url, string mode) returns error? {
 
 listener Listener unsubscriptionTestListener = new (9102);
 
-var unsubscriptionTestSubscriber = @SubscriberServiceConfig {
+SubscriberService unsubscriptionTestSubscriber = @SubscriberServiceConfig {
     target: ["http://127.0.0.1:9197/common/hub", "test"], 
     leaseSeconds: 36000,
     unsubscribeOnShutdown: true

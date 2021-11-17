@@ -46,7 +46,7 @@ isolated function getServiceAnnotationConfig(string|[string, string] target) ret
     };
 }
 
-final var websubServiceObj = service object {
+final SubscriberService websubServiceObj = service object {
     isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement {        
         return ACKNOWLEDGEMENT;

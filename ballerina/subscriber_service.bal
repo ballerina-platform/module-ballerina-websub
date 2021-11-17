@@ -15,7 +15,7 @@
 // under the License.
 
 # The WebSub service type
-public type SubscriberService service object {
+public type SubscriberService distinct service object {
 
 //  remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement|error?;
 
