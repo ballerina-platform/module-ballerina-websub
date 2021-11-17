@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - [Generated unique-service-path should not be changed after compilation](https://github.com/ballerina-platform/ballerina-standard-library/issues/1813)
+- [Mark WebSubHub Service type as distinct](https://github.com/ballerina-platform/ballerina-standard-library/issues/2398)
 
 ## [2.0.0] - 2021-10-09
 
