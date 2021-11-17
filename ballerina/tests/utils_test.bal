@@ -65,7 +65,7 @@ isolated function testContentHashError() returns error? {
     }
 }
 
-var validSubscriberServiceDeclaration = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, unsubscribeOnShutdown: false } 
+SubscriberService validSubscriberServiceDeclaration = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, unsubscribeOnShutdown: false } 
                               service object {
     isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
@@ -81,7 +81,7 @@ function testSubscriberServiceAnnotationRetrievalSuccess() returns error? {
     test:assertTrue(configuration is SubscriberServiceConfiguration, "service annotation retrieval failed for valid service declaration");
 }
 
-var invalidSubscriberServiceDeclaration = service object {
+SubscriberService invalidSubscriberServiceDeclaration = service object {
     isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
         return ACKNOWLEDGEMENT;

@@ -20,6 +20,8 @@ import ballerina/jballerina.java;
 
 # Represents an underlying HTTP Service.
 isolated service class HttpService {
+    *http:Service;
+    
     private final HttpToWebsubAdaptor adaptor;
     private final string callback;
     private final string? secretKey;
