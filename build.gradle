@@ -109,7 +109,7 @@ task build {
     dependsOn(':websub-native:build')
     dependsOn('websub-ballerina:build')
     dependsOn(':websub-compiler-plugin:build')
-    dependsOn(':websub-compiler-plugin-test:build')
+    dependsOn(':websub-compiler-plugin-tests:build')
 }
 
 publishToMavenLocal.dependsOn build
