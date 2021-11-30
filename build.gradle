@@ -106,5 +106,11 @@ release {
 }
 
 task build {
+    dependsOn(':websub-native:build')
     dependsOn('websub-ballerina:build')
+    dependsOn(':websub-compiler-plugin:build')
+    dependsOn(':websub-compiler-plugin-test:build')
 }
+
+publishToMavenLocal.dependsOn build
+publish.dependsOn build
