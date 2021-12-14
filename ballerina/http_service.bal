@@ -93,6 +93,7 @@ isolated service class HttpService {
                 if self.isSubscriptionValidationDeniedAvailable {
                     processSubscriptionDenial(caller, response, params, self.adaptor);
                 } else {
+                    log:printWarn("Subscription is denied by the hub");
                     response.statusCode = http:STATUS_OK;
                     updateResponseBody(response, ACKNOWLEDGEMENT["body"], ACKNOWLEDGEMENT["headers"]);
                 }
