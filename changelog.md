@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- [Notify user of Subscription denial from the `hub` when `onSubscriptionDenied` is not implemented](https://github.com/ballerina-platform/ballerina-standard-library/issues/2448)  
+
+## [2.0.1] - 2021-11-19
+
 ### Changed
 - [Generated unique-service-path should not be changed after compilation](https://github.com/ballerina-platform/ballerina-standard-library/issues/1813)
 - [Mark WebSub Service type as distinct](https://github.com/ballerina-platform/ballerina-standard-library/issues/2398)
