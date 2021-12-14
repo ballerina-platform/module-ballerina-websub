@@ -84,7 +84,8 @@ service object {
 function testUnsubscriptionOnGracefulStop() returns error? {
     check unsubscriptionTestListener.attach(unsubscriptionTestSubscriber, "sub");
     check unsubscriptionTestListener.'start();
-    check unsubscriptionTestListener.gracefulStop();
     runtime:sleep(1);
+    check unsubscriptionTestListener.gracefulStop();
+    runtime:sleep(5);
     test:assertTrue(isVerified());
 }
