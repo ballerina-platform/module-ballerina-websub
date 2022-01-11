@@ -58,9 +58,9 @@ isolated function notifySubscriber(string url, string mode) returns error? {
     string challenge = uuid:createType4AsString();
     string queryParams = string`?${HUB_MODE}=${mode}&${HUB_TOPIC}=test&${HUB_CHALLENGE}=${challenge}&${HUB_LEASE_SECONDS}=100000`;
     http:Client httpClient = check  new(url);
-    log:printInfo("[UNSUB_VER] Sending verification", challenge);
+    log:printInfo("[UNSUB_VER] Sending verification", message = challenge);
     string response = check httpClient->get(queryParams);
-    log:printInfo("[UNSUB_VER] Received verification", response);
+    log:printInfo("[UNSUB_VER] Received verification", response = response);
     if challenge == response {
         log:printInfo("[UNSUB_VER] Updating verification status");
         updateVerificationState(true);
