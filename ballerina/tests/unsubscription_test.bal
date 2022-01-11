@@ -79,14 +79,13 @@ service object {
 };
 
 @test:Config { 
-    groups: ["unsubscriptionViaGracefulstop"],
-    enable: false
+    groups: ["unsubscriptionViaGracefulstop"]
 }
 function testUnsubscriptionOnGracefulStop() returns error? {
     check unsubscriptionTestListener.attach(unsubscriptionTestSubscriber, "sub");
     check unsubscriptionTestListener.'start();
-    runtime:sleep(1);
-    check unsubscriptionTestListener.gracefulStop();
     runtime:sleep(5);
+    check unsubscriptionTestListener.gracefulStop();
+    runtime:sleep(2);
     test:assertTrue(isVerified());
 }
