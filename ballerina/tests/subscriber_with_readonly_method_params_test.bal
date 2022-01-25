@@ -34,6 +34,15 @@ service /subscriber on new Listener(9104) {
         }
     }
 
+    remote function onUnsubscriptionVerification(readonly & UnsubscriptionVerification msg)
+                    returns UnsubscriptionVerificationSuccess|UnsubscriptionVerificationError {
+        if (msg.hubTopic == "test1") {
+            return UNSUBSCRIPTION_VERIFICATION_ERROR;
+        } else {
+            return UNSUBSCRIPTION_VERIFICATION_SUCCESS;
+        }
+    }
+
     isolated remote function onEventNotification(readonly & ContentDistributionMessage event)
                         returns Acknowledgement|SubscriptionDeletedError? {
         match event.contentType {
@@ -78,4 +87,13 @@ function testOnEventNotificationSuccessWithReadonly() returns error? {
     request.setPayload(payload);
     http:Response response = check readonlyParamTestClient->post("/", request);
     test:assertEquals(response.statusCode, 202);
+}
+
+@test:Config {
+    groups: ["subscriberWithReadonlyParams"]
+}
+function testUnsubscriptionIntentVerificationSuccessWithReadonly() returns error? {
+    http:Response response = check readonlyParamTestClient->get("/?hub.mode=unsubscribe&hub.topic=test&hub.challenge=1234");
+    test:assertEquals(response.statusCode, 200);
+    test:assertEquals(response.getTextPayload(), "1234");
 }
