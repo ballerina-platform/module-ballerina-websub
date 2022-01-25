@@ -29,7 +29,6 @@ public interface Constants {
     String PACKAGE_NAME = "websub";
 
     String SERVICE_OBJECT = "WEBSUB_SERVICE_OBJECT";
-    String PARAM_TYPES = "PARAMETER_TYPES";
     String HTTP_REQUEST = "HTTP_REQUEST";
 
     String SERVICE_PATH = "SERVICE_PATH";
@@ -41,11 +40,6 @@ public interface Constants {
     String ON_UNSUBSCRIPTION_VERIFICATION = "onUnsubscriptionVerification";
     String ON_SUBSCRIPTION_VALIDATION_DENIED = "onSubscriptionValidationDenied";
     String ON_EVENT_NOTIFICATION = "onEventNotification";
-
-    String SUBSCRIPTION_DENIED_ERROR = "SubscriptionDeniedError";
-    String SUBSCRIPTION_VERIFICATION = "SubscriptionVerification";
-    String UNSUBSCRIPTION_VERIFICATION = "UnsubscriptionVerification";
-    String CONTENT_DISTRIBUTION_MSG = "ContentDistributionMessage";
 
     String ANN_NAME_HTTP_INTROSPECTION_DOC_CONFIG = "IntrospectionDocConfig";
     BString ANN_FIELD_DOC_NAME = StringUtils.fromString("name");
