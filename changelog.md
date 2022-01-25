@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [WebSub/WebSubHub should support `readonly` parameters for remote methods](https://github.com/ballerina-platform/ballerina-standard-library/issues/2604)
+
+## [2.1.0] - 2021-12-14
+
 ### Fixed
 - [Notify user of Subscription denial from the `hub` when `onSubscriptionDenied` is not implemented](https://github.com/ballerina-platform/ballerina-standard-library/issues/2448)  
 
