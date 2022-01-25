@@ -22,11 +22,13 @@ import ballerina/http;
 @SubscriberServiceConfig {}
 service /subscriber on new Listener(9104) {
     isolated remote function onSubscriptionValidationDenied(readonly & SubscriptionDeniedError msg) returns Acknowledgement? {
+        test:assertTrue(msg is readonly);
         return ACKNOWLEDGEMENT;
     }
 
     isolated remote function onSubscriptionVerification(readonly & SubscriptionVerification msg)
                         returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
+        test:assertTrue(msg is readonly);
         if (msg.hubTopic == "test1") {
             return SUBSCRIPTION_VERIFICATION_ERROR;
         } else {
@@ -36,6 +38,7 @@ service /subscriber on new Listener(9104) {
 
     remote function onUnsubscriptionVerification(readonly & UnsubscriptionVerification msg)
                     returns UnsubscriptionVerificationSuccess|UnsubscriptionVerificationError {
+        test:assertTrue(msg is readonly);
         if (msg.hubTopic == "test1") {
             return UNSUBSCRIPTION_VERIFICATION_ERROR;
         } else {
@@ -45,6 +48,7 @@ service /subscriber on new Listener(9104) {
 
     isolated remote function onEventNotification(readonly & ContentDistributionMessage event)
                         returns Acknowledgement|SubscriptionDeletedError? {
+        test:assertTrue(msg is readonly);
         match event.contentType {
             mime:APPLICATION_FORM_URLENCODED => {
                 map<string> content = <map<string>>event.content;
