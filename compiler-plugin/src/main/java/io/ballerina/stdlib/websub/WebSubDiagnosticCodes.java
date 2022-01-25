@@ -50,7 +50,8 @@ public enum WebSubDiagnosticCodes {
             DiagnosticSeverity.ERROR),
     WEBSUB_201("WEBSUB_201",
             "Error occurred while packaging generated resources : {0}",
-            DiagnosticSeverity.ERROR);
+            DiagnosticSeverity.ERROR),
+    WEBSUB_202("WEBSUB_202", "Template generation for empty service", DiagnosticSeverity.INTERNAL);
 
     private final String code;
     private final String description;
