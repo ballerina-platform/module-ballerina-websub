@@ -48,7 +48,7 @@ service /subscriber on new Listener(9104) {
 
     isolated remote function onEventNotification(readonly & ContentDistributionMessage event)
                         returns Acknowledgement|SubscriptionDeletedError? {
-        test:assertTrue(msg is readonly);
+        test:assertTrue(event is readonly);
         match event.contentType {
             mime:APPLICATION_FORM_URLENCODED => {
                 map<string> content = <map<string>>event.content;
