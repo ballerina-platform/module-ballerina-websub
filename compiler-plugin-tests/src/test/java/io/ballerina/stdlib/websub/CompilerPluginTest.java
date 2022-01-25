@@ -375,6 +375,17 @@ public class CompilerPluginTest {
         Assert.assertEquals(errorDiagnostics.size(), 0);
     }
 
+    @Test
+    public void testValidWebsubServiceDeclarationWithIntersectionTypes() {
+        Package currentPackage = loadPackage("sample_23");
+        PackageCompilation compilation = currentPackage.getCompilation();
+        DiagnosticResult diagnosticResult = compilation.diagnosticResult();
+        List<Diagnostic> errorDiagnostics = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(errorDiagnostics.size(), 0);
+    }
+
     private Package loadPackage(String path) {
         Path projectDirPath = RESOURCE_DIRECTORY.resolve(path);
         BuildProject project = BuildProject.load(getEnvironmentBuilder(), projectDirPath);
