@@ -58,8 +58,11 @@ isolated function notifySubscriber(string url, string mode) returns error? {
     string challenge = uuid:createType4AsString();
     string queryParams = string`?${HUB_MODE}=${mode}&${HUB_TOPIC}=test&${HUB_CHALLENGE}=${challenge}&${HUB_LEASE_SECONDS}=100000`;
     http:Client httpClient = check  new(url);
+    log:printInfo("[UNSUB_VER] Sending verification", message = challenge);
     string response = check httpClient->get(queryParams);
+    log:printInfo("[UNSUB_VER] Received verification", response = response);
     if challenge == response {
+        log:printInfo("[UNSUB_VER] Updating verification status");
         updateVerificationState(true);
     }
 }
@@ -84,8 +87,11 @@ service object {
 function testUnsubscriptionOnGracefulStop() returns error? {
     check unsubscriptionTestListener.attach(unsubscriptionTestSubscriber, "sub");
     check unsubscriptionTestListener.'start();
-    runtime:sleep(1);
+    log:printInfo("[UNSUB_VER] Starting Subscriber");
+    runtime:sleep(5);
+    log:printInfo("[UNSUB_VER] Invoking graceful stop");
     check unsubscriptionTestListener.gracefulStop();
     runtime:sleep(5);
+    log:printInfo("[UNSUB_VER] Verifying shutdown");
     test:assertTrue(isVerified());
 }
