@@ -88,7 +88,7 @@ function testUnsubscriptionOnGracefulStop() returns error? {
     check unsubscriptionTestListener.attach(unsubscriptionTestSubscriber, "sub");
     check unsubscriptionTestListener.'start();
     log:printInfo("[UNSUB_VER] Starting Subscriber");
-    runtime:sleep(5);
+    runtime:sleep(10);
     log:printInfo("[UNSUB_VER] Invoking graceful stop");
     check unsubscriptionTestListener.gracefulStop();
     runtime:sleep(5);
