@@ -204,7 +204,6 @@ public class Listener {
         while !self.isVerificationCompleted(availableServices) && time:utcDiffSeconds(timeout, time:utcNow()) > 0D {
             runtime:sleep(2);
         }
-        log:printInfo("[UNSUB_TEST] ", verified = self.isVerificationCompleted(availableServices), timeOut = time:utcDiffSeconds(timeout, time:utcNow()) > 0D);
     }
 
     isolated function isVerificationCompleted(HttpService[] availableServices) returns boolean {

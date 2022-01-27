@@ -83,7 +83,6 @@ isolated service class HttpService {
         RequestQueryParams params = retrieveRequestQueryParams(request);
         match params?.hubMode {
             MODE_SUBSCRIBE | MODE_UNSUBSCRIBE => {
-                log:printInfo("Received Sub/Unsub verification", params = params);
                 if params?.hubChallenge is () || params?.hubTopic is () {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                 } else {
