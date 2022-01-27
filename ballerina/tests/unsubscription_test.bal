@@ -38,10 +38,6 @@ service /common on new http:Listener(9197) {
     isolated resource function post hub(http:Caller caller, http:Request request) returns error? {        
         string mode = check getHubMode(request);
         check caller->respond();
-        if mode != MODE_UNSUBSCRIBE {
-            return;
-        }
-
         error? result = notifySubscriber("http://0.0.0.0:9102/sub", mode);
         if result is error {
             log:printError("[UNSUB_TEST] Error occurred while verifying unsubscription", result);
@@ -63,7 +59,6 @@ isolated function notifySubscriber(string url, string mode) returns error? {
     log:printInfo("[UNSUB_VER] Received verification", response = response);
     if challenge == response {
         log:printInfo("[UNSUB_VER] Updating verification status");
-        updateVerificationState(true);
     }
 }
 
@@ -79,6 +74,11 @@ service object {
                         returns Acknowledgement|SubscriptionDeletedError? {
         return ACKNOWLEDGEMENT;
     }
+
+    isolated remote function onUnsubscriptionVerification(UnsubscriptionVerification msg) returns UnsubscriptionVerificationSuccess {
+        updateVerificationState(true);
+        return UNSUBSCRIPTION_VERIFICATION_SUCCESS;
+    }
 };
 
 @test:Config { 
@@ -88,7 +88,7 @@ function testUnsubscriptionOnGracefulStop() returns error? {
     check unsubscriptionTestListener.attach(unsubscriptionTestSubscriber, "sub");
     check unsubscriptionTestListener.'start();
     log:printInfo("[UNSUB_VER] Starting Subscriber");
-    runtime:sleep(10);
+    runtime:sleep(5);
     log:printInfo("[UNSUB_VER] Invoking graceful stop");
     check unsubscriptionTestListener.gracefulStop();
     runtime:sleep(5);
