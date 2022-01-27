@@ -19,15 +19,6 @@ import ballerina/mime;
 import ballerina/log;
 import ballerina/url;
 
-# Processes the subscription/unsubscription intent verification requests received from the `hub`.
-# ```ballerina
-# processSubscriptionVerification(httpCaller, httpResponse, queryParams, adaptor);
-# ```
-# 
-# + caller - The `http:Caller` reference for the current request
-# + response - The `http:Response`, which should be returned 
-# + params - Query parameters retrieved from the `http:Request`
-# + adaptor - Current `websub:HttpToWebsubAdaptor` instance
 isolated function processSubscriptionVerification(http:Caller caller, http:Response response, 
                                                   RequestQueryParams params, HttpToWebsubAdaptor adaptor) {
     SubscriptionVerification message = {
@@ -74,15 +65,6 @@ isolated function processUnsubscriptionVerification(http:Caller caller, http:Res
     }
 }
 
-# Processes the subscription/unsubscription denial requests from the `hub`.
-# ```ballerina
-# processSubscriptionDenial(httpCaller, httpResponse, queryParams, adaptor);
-# ```
-# 
-# + caller - The `http:Caller` reference for the current request
-# + response - The `http:Response`, which should be returned 
-# + params - Query parameters retrieved from the `http:Request`
-# + adaptor - Current `websub:HttpToWebsubAdaptor` instance
 isolated function processSubscriptionDenial(http:Caller caller, http:Response response,
                                             RequestQueryParams params, HttpToWebsubAdaptor adaptor) {
     var reason = params?.hubReason is () ? "" : <string>params?.hubReason;
@@ -96,17 +78,6 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
     }
 }
 
-# Processes the content distribution requests from the `hub`.
-# ```ballerina
-# check processEventNotification(httpCaller, httpRequest, httpResponse, queryParams, adaptor, serviceKey);
-# ```
-# 
-# + caller - The `http:Caller` reference for the current request
-# + request - The original `http:Request`
-# + response - The `http:Response`, which should be returned 
-# + adaptor - Current `websub:HttpToWebsubAdaptor` instance
-# + secretKey - The `secretKey` value to be used to verify the content distribution message
-# + return - An `error` if there is any exception in the execution or else `()`
 isolated function processEventNotification(http:Caller caller, http:Request request, 
                                            http:Response response, HttpToWebsubAdaptor adaptor,
                                            string secretKey) returns error? {

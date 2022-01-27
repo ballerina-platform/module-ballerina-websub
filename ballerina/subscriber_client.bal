@@ -69,17 +69,6 @@ public isolated client class SubscriptionClient {
 
 }
 
-# Generates an `http:Request` with the provided `websub:subscriptionChangeRequest`.
-# ```ballerina
-# http:Request subscriptionRequest = buildSubscriptionChangeRequest("subscribe", { 
-#           topic: "https://sample.topic.com", 
-#           callback: "https://sample.subscriber.com" 
-# });
-# ```
-# 
-# + mode - Mode of subscription (subscribe/unsubscribe)
-# + subscriptionChangeRequest - The request payload containing the subscription/unsubscription details
-# + return - An `http:Request` to be sent to the hub to subscribe/unsubscribe
 isolated function buildSubscriptionChangeRequest(string mode, 
                                                  SubscriptionChangeRequest subscriptionChangeRequest) 
                                                  returns http:Request {
@@ -106,19 +95,6 @@ isolated function buildSubscriptionChangeRequest(string mode,
     return request;
 }
 
-# Processes the response received from the `hub`.
-# ```ballerina
-# websub:SubscriptionChangeResponse subscriptionResponse = check processHubResponse("https://sample.hub.com", "subscribe", { 
-#           topic: "https://sample.topic.com", 
-#           callback: "https://sample.subscriber.com" 
-# }, httpResponse);
-# ```
-# 
-# + hub - The `hub` to which the subscription/unsubscription request was sent
-# + mode - Mode of subscription (subscribe/unsubscribe)
-# + subscriptionChangeRequest - The request containing the subscription/unsubscription details
-# + response - Original response received from the `hub` as `http:Response`,`http:PayloadType`, or an `error`
-# + return - The `websub:SubscriptionChangeResponse` if the requested subscription action is successfull or else an `error`
 isolated function processHubResponse(string hub, string mode, 
                                      SubscriptionChangeRequest subscriptionChangeRequest,
                                      http:Response|http:PayloadType|error response) returns SubscriptionChangeResponse|SubscriptionInitiationError {
