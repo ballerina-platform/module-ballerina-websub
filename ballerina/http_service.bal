@@ -89,13 +89,6 @@ isolated service class HttpService {
     }
 
     isolated function processVerification(RequestQueryParams params, http:Caller caller, http:Response response) {
-        // if the received verification event is unsubscription, then update the internal state
-        if params?.hubMode == MODE_UNSUBSCRIBE {
-            lock {
-                self.unsubscriptionVerified = true;
-            }
-        }
-        
         if params?.hubMode == MODE_SUBSCRIBE && self.isSubscriptionVerificationAvailable {
             processSubscriptionVerification(caller, response, params, self.adaptor);
         } else if params?.hubMode == MODE_UNSUBSCRIBE && self.isUnsubscriptionVerificationAvailable {
@@ -103,6 +96,13 @@ isolated service class HttpService {
         } else {
             response.statusCode = http:STATUS_OK;
             response.setTextPayload(<string>params?.hubChallenge);
+        }
+
+        // if the received verification event is unsubscription, then update the internal state
+        if params?.hubMode == MODE_UNSUBSCRIBE {
+            lock {
+                self.unsubscriptionVerified = true;
+            }
         }
     }
 
