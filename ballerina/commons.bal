@@ -150,20 +150,20 @@ type RequestQueryParams record {|
     string hubReason?;
 |};
 
-# Common response which could be used for `websub:Acknowledgement`.
+# Common response, which could be used for `websub:Acknowledgement`.
 public final readonly & Acknowledgement ACKNOWLEDGEMENT = {};
 
-# Common response which could be used for `websub:SubscriptionVerificationSuccess`.
+# Common response, which could be used for `websub:SubscriptionVerificationSuccess`.
 public final readonly & SubscriptionVerificationSuccess SUBSCRIPTION_VERIFICATION_SUCCESS = {};
 
-# Common response which could be used for `websub:SubscriptionVerificationError`.
+# Common response, which could be used for `websub:SubscriptionVerificationError`.
 public final SubscriptionVerificationError SUBSCRIPTION_VERIFICATION_ERROR = error SubscriptionVerificationError("Subscription verification failed");
 
-# Common response which could be used for `websub:UnsubscriptionVerificationSuccess`.
+# Common response, which could be used for `websub:UnsubscriptionVerificationSuccess`.
 public final readonly & UnsubscriptionVerificationSuccess UNSUBSCRIPTION_VERIFICATION_SUCCESS = {};
 
-# Common response which could be used for `websub:UnsubscriptionVerificationError`.
+# Common response, which could be used for `websub:UnsubscriptionVerificationError`.
 public final UnsubscriptionVerificationError UNSUBSCRIPTION_VERIFICATION_ERROR = error UnsubscriptionVerificationError("Unsubscription verification failed");
 
-# Common response which could be used for `websub:SubscriptionDeletedError`.
+# Common response, which could be used for `websub:SubscriptionDeletedError`.
 public final SubscriptionDeletedError SUBSCRIPTION_DELETED_ERROR = error SubscriptionDeletedError("Subscription deleted");
