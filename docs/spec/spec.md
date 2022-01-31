@@ -1,4 +1,4 @@
-# Specification: Ballerina WebSubHub Library
+# Specification: Ballerina WebSub Library
 
 _Owners_: @shafreenAnfar @chamil321 @ayeshLK    
 _Reviewers_: @shafreenAnfar    
