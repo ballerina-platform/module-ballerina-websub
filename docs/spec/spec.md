@@ -20,6 +20,12 @@ cloud that makes it easier to use, combine, and create network services.
       * 2.1.2. [Initialization](#212-initialization)
       * 2.1.3. [Methods](#213-methods)
     * 2.2 [Subscriber Service](#22-subscriber-service)
+      * 2.2.1. [Methods](#221-methods)
+        * 2.2.1.1. [onSubscriptionValidationDenied](#2211-onsubscriptionvalidationdenied)
+        * 2.2.1.2. [onSubscriptionVerification](#2212-onsubscriptionverification)
+        * 2.2.1.3. [onUnsubscriptionVerification](#2213-onunsubscriptionverification)
+        * 2.2.1.1. [onEventNotification](#2214-oneventnotification)
+      * 2.2.2. [Annotation](#222-annotation)
 
 ## 1. Overview
 
@@ -193,5 +199,92 @@ public type SubscriberService distinct service object {
     remote function onEventNotification(websub:ContentDistributionMessage event)
         returns websub:Acknowledgement|websub:SubscriptionDeletedError|error?;
 };
+```
 
+#### 2.2.1. Methods
+
+##### 2.2.1.1. onSubscriptionValidationDenied
+
+This remote method is invoked when the `hub` sends a request to notify that the subscription request is denied.
+```ballerina
+# Notifies that the subscription request is denied by the `hub`.
+# 
+# + msg - Details related to the subscription denial
+# + return - `error` if there is any error when processing the reuqest or else `websub:Acknowledgement` or `()`
+remote function onSubscriptionValidationDenied(websub:SubscriptionDeniedError msg) returns websub:Acknowledgement|error?;
+```
+
+##### 2.2.1.2. onSubscriptionVerification
+
+This remote method is invoked when the `hub` sends a subscription verification request to the `subscriber`.
+```ballerina
+# Verifies the subscription attempt.
+# 
+# + msg - Details related to the subscription verificaiton
+# + return - `websub:SubscriptionVerificationSuccess` if the subscription is verified successfully, 
+#           `websub:SubscriptionVerificationError` if the subscription verification is unsuccessful or else `error` if 
+#           there is an exception while executing the method
+remote function onSubscriptionVerification(websub:SubscriptionVerification msg) 
+    returns websub:SubscriptionVerificationSuccess|websub:SubscriptionVerificationError|error;
+```
+
+##### 2.2.1.3. onUnsubscriptionVerification
+
+This remote method is invoked when the `hub` sends the unsubscription verification request to the `subscriber`.
+```ballerina
+# Verifies the unsubscription attempt.
+# 
+# + msg - Details related to the unsubscription verificaiton
+# + return - `websub:UnsubscriptionVerificationSuccess` if the unsubscription is verified successfully, 
+#           `websub:UnsubscriptionVerificationError` if the unsubscription verification is unsuccessful or else `error` if 
+#           there is an exception while executing the method
+remote function onUnsubscriptionVerification(websub:UnsubscriptionVerification msg) 
+    returns websub:UnsubscriptionVerificationSuccess|websub:UnsubscriptionVerificationError|error;
+```
+
+##### 2.2.1.4. onEventNotification
+
+This remote method is invoked when the `hub` sends the content-distribution request to the `subscriber`.
+```ballerina
+# Notifies the content distribution.
+# 
+# + msg - Received content distribution message
+# + return - `websub:Acknowledgement` if the content received successfully, `websub:SubscriptionDeletedError` if the 
+#           subscriber does not need any content updates in the future, `error` if  there is an exception while 
+#           executing the method or else `()`
+remote function onEventNotification(websub:ContentDistributionMessage event) 
+    returns websub:Acknowledgement|websub:SubscriptionDeletedError|error?;
+```
+
+#### 2.2.2. Annotation 
+
+Apart from the listener level configurations a `subscriber` will require few additional configurations. Hence, there 
+should be `websub:SubscriberServiceConfig` a service-level-annotation for `websub:SubscriberService` which contains
+`websubhub:SubscriberServiceConfiguration` record.
+```ballerina
+# Configuration for a WebSubSubscriber service.
+#
+# + target - The `string` resource URL for which discovery will be initiated to identify the hub and topic,
+#            or a tuple `[hub, topic]` representing a discovered hub and a topic
+# + leaseSeconds - The period for which the subscription is expected to be active
+# + callback - The callback URL for subscriber-service
+# + secret - The secret to be used for authenticated content distribution
+# + appendServicePath - This flag notifies whether or not to append service-path to callback-url
+# + unsubscribeOnShutdown - This flag notifies whether or not to initiate unsubscription when the service is shutting down
+# + httpConfig - The configuration for the hub client used to interact with the discovered/specified hub
+# + discoveryConfig - HTTP client configurations for resource discovery
+public type SubscriberServiceConfiguration record {|
+    string|[string, string] target?;
+    int leaseSeconds?;
+    string callback?;
+    string secret?;
+    boolean appendServicePath = false;
+    boolean unsubscribeOnShutdown = false;
+    http:ClientConfiguration httpConfig?;
+    record {|
+        string|string[] accept?;
+        string|string[] acceptLanguage?;
+        http:ClientConfiguration httpConfig?;
+    |} discoveryConfig?;
+|};
 ```
