@@ -47,7 +47,7 @@ WebSub compliant `subscriber` services.
 
 ## 2. Subscriber
 
-WebSub `subscriber` will subscribe to `hub` to receive content updates for a `topic`.  
+WebSub `subscriber` will subscribe to a `hub` to receive content updates for a `topic`.  
 
 It has the following capabilities:
 * Discover the `hub` and the `topic` given a resource URL
@@ -112,8 +112,7 @@ public isolated function attach(websub:SubscriberService 'service, string[]|stri
 ```
 
 Following APIs should be available in the `websub:Listener` to dynamically attach `websub:SubscriberService` objects 
-along with `websub:SubscriberServiceConfiguration`. This is useful when the `subscriber` is implemented using 
-`websub:SubscriberService` service class.
+along with `websub:SubscriberServiceConfiguration`. This is useful when the `subscriber` is implemented using a service class.
 ```ballerina
 # Attaches the provided Service to the `websub:Listener` with custom `websub:SubscriberServiceConfiguration`.
 # ```ballerina
@@ -233,7 +232,7 @@ remote function onSubscriptionVerification(websub:SubscriptionVerification msg)
 
 ##### 2.2.1.3. onUnsubscriptionVerification
 
-This remote method is invoked when the `hub` sends the unsubscription verification request to the `subscriber`.
+This remote method is invoked when the `hub` sends a unsubscription verification request to the `subscriber`.
 ```ballerina
 # Verifies the unsubscription attempt.
 # 
@@ -247,7 +246,7 @@ remote function onUnsubscriptionVerification(websub:UnsubscriptionVerification m
 
 ##### 2.2.1.4. onEventNotification
 
-This remote method is invoked when the `hub` sends the content-distribution request to the `subscriber`.
+This remote method is invoked when the `hub` sends a content-distribution request to the `subscriber`.
 ```ballerina
 # Notifies the content distribution.
 # 
@@ -298,10 +297,7 @@ As per the [WebSub specification](https://www.w3.org/TR/websub/#subscriber-sends
 callback URL could be used as an identity of a `subscriber` at the `hub` level, and it should be unguessable and unique 
 for a subscription.
 
-Since the developer should have the control over the callback URL to be used when subscribing to a `hub`, 
-`websub:SubscriberServiceConfig` annotation contains an optional configuration(`callback`) to be used to provide a 
-callback URL. If the `callback` is not configured, `websub:SubscriberService` should be able to construct the callback 
-URL using the provided `websub:ListenerConfiguration` and service path.  
+Since the developer should have the control over the callback URL to be used when subscribing to a `hub`, `websub:SubscriberServiceConfig` annotation contains an optional configuration(`callback`) to be used to provide a callback URL. If the `callback` is not configured, `websub:SubscriberService` should be able to construct the callback URL using the provided `websub:ListenerConfiguration` and service path.  
 
 ##### 2.2.3.1. Service Path Generation
 
