@@ -260,7 +260,7 @@ remote function onEventNotification(websub:ContentDistributionMessage event)
 
 Apart from the listener level configurations a `subscriber` will require few additional configurations. Hence, there 
 should be `websub:SubscriberServiceConfig` a service-level-annotation for `websub:SubscriberService` which contains
-`websubhub:SubscriberServiceConfiguration` record.
+`websub:SubscriberServiceConfiguration` record.
 ```ballerina
 # Configuration for a WebSubSubscriber service.
 #
