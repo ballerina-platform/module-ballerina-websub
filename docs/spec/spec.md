@@ -26,6 +26,9 @@ cloud that makes it easier to use, combine, and create network services.
         * 2.2.1.3. [onUnsubscriptionVerification](#2213-onunsubscriptionverification)
         * 2.2.1.1. [onEventNotification](#2214-oneventnotification)
       * 2.2.2. [Annotation](#222-annotation)
+      * 2.2.3. [Callback URL Generation](#223-callback-url-generation)
+        * 2.2.3.1 [Service Path Generation](#2231-service-path-generation)
+      * 2.2.4. [Unsubscribing from the `hub`](#224-unsubscribing-from-the-hub)
 
 ## 1. Overview
 
@@ -288,3 +291,44 @@ public type SubscriberServiceConfiguration record {|
     |} discoveryConfig?;
 |};
 ```
+
+#### 2.2.3. Callback URL Generation 
+
+As per the [WebSub specification](https://www.w3.org/TR/websub/#subscriber-sends-subscription-request) subscriber 
+callback URL could be used as an identity of a `subscriber` at the `hub` level, and it should be unguessable and unique 
+for a subscription.
+
+Since the developer should have the control over the callback URL to be used when subscribing to a `hub`, 
+`websub:SubscriberServiceConfig` annotation contains an optional configuration(`callback`) to be used to provide a 
+callback URL. If the `callback` is not configured, `websub:SubscriberService` should be able to construct the callback 
+URL using the provided `websub:ListenerConfiguration` and service path.  
+
+##### 2.2.3.1. Service Path Generation
+
+In ballerina service declaration, service path is an optional configuration. Hence, developers could declare 
+`websub:SubscriberService` by omitting the service path. Since, service path is required for constructing the callback 
+URL `websub:SubscriberService` should be able to generate a unique, unguessable URL segment to be used as its service 
+path.
+
+Service path generation should be implemented with following guidelines:  
+- Service path should be generated only if;
+  - Service path and callback URL is not provided for the `websub:SubscriberService`.
+  - callback URL is provided, `appendServicePath` configuration is enabled and service path is not provided.
+- WebSub compiler plugin should generate the unique service path for the `websub:SubscriberService`.
+- Generated service path should be saved in relation to service ID in `service-info.csv`.
+- `service-info.csv` file should be added to `resources/ballerina/websub` directory inside the executable JAR as well as the thin JAR.
+- If there is an error while generating the service path, then it should result in a compile-time error since this feature is required to generate a callback URL and without it subscriber service could not be used.
+
+#### 2.2.4. Unsubscribing from the `hub`
+
+As per the WebSub Specification a `subscriber` should be able to subscribe to a particular `topic` in a specific `hub`. 
+As the counterpart subscriber should be able to unsubscribe from a previously subscribed `topic` in a specific `hub`. 
+Even though the specification does not clearly define when this unsubscription should happen, it is obvious that this 
+should happen whenever `subscriber` is terminated.  
+
+The key functionalities expected from the unsubscription flow as follows:  
+- Developer should manually enable this feature by configuring `unsubscribeOnShutdown` in `websub:SubscriberServiceConfig` annotation.
+- Developer should be able to configure unsubscription verification time-out using `gracefulShutdownPeriod` configuration in `websub:ListenerConfiguration`.
+- Unsubscription flow should initiate whenever graceful stop is invoked in `websub:Listener`.
+- If multiple `websub:SubscriberService` instances are attached to one `websub:Listener`, all the subscriber instances which has enabled `unsubscribeOnShutdown` should initiate unsubscription on listener shutdown.  
+- Unsubscription flow should initiate only if `graceful stop` is invoked, and for `immediate stop` this will not be executed.  
