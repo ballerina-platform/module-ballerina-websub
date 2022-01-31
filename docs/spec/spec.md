@@ -165,3 +165,33 @@ public isolated function immediateStop() returns websub:Error?
 ```
 
 ### 2.2. Subscriber Service
+
+`websub:SubscriberService` is responsible for handling the received events. Underlying `http:Service` will receive the 
+original request, and then it will trigger the WebSub dispatcher which will invoke the respective remote method with the 
+event details.
+
+Following is the type-definition for `websub:SubscriberService`.
+```ballerina
+public type SubscriberService distinct service object {
+    // Sample GET request hub.mode=denied&hub.reason=unauthorized
+    // Sample 200 OK response
+    remote function onSubscriptionValidationDenied(websub:SubscriptionDeniedError msg)
+        returns websub:Acknowledgement|error?;
+
+    // Sample GET request hub.mode=subscribe&hub.topic=test&hub.challenge=1234
+    // Sample 200 OK response with text payload containing received `hub.challenge` parameter or 404 NOT FOUND
+    remote function onSubscriptionVerification(websub:SubscriptionVerification msg)
+        returns websub:SubscriptionVerificationSuccess|websub:SubscriptionVerificationError|error;
+
+    // Sample GET request hub.mode=unsubscribe&hub.topic=test&hub.challenge=1234
+    // Sample 200 OK response with text payload containing received `hub.challenge` parameter or 404 NOT FOUND
+    remote function onUnsubscriptionVerification(websub:UnsubscriptionVerification msg)
+        returns websub:UnsubscriptionVerificationSuccess|websub:UnsubscriptionVerificationError|error;
+
+    // Sample POST request with string/json/xml payload
+    // Sample 202 ACCEPTED response or 410 GONE
+    remote function onEventNotification(websub:ContentDistributionMessage event)
+        returns websub:Acknowledgement|websub:SubscriptionDeletedError|error?;
+};
+
+```
