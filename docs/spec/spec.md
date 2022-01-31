@@ -16,6 +16,9 @@ cloud that makes it easier to use, combine, and create network services.
 1. [Overview](#1-overview)
 2. [Subscriber](#2-subscriber)
     * 2.1. [Listener](#21-listener)
+      * 2.1.1. [Configuration](#211-configuration)
+      * 2.1.2. [Initialization](#212-initialization)
+      * 2.1.3. [Methods](#213-methods)
     * 2.2 [Subscriber Service](#22-subscriber-service)
 
 ## 1. Overview
