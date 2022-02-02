@@ -56,7 +56,7 @@ It has the following capabilities:
 
 The `subscriber` is designed in the form of `listener` and `Subscriber Service`.
 - `websub:Listener`: A listener end-point to which `websub:SubscriberService` could be attached.
-- `websub:SubscriberService`: An API service, which receives WebSub events.
+- `websub:SubscriberService`: An API service, which receives events.
 
 ### 2.1. Listener
 
@@ -101,9 +101,7 @@ Following APIs should be available in the `websub:Listener` to dynamically attac
 it.
 ```ballerina
 # Attaches the provided `websub:SubscriberService` to the `websub:Listener`.
-# ```ballerina
 # check websubListenerEp.attach('service, "/subscriber");
-# ```
 # 
 # + service - The `websub:SubscriberService` object to attach
 # + name - The path of the Service to be hosted
