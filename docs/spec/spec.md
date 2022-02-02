@@ -24,7 +24,7 @@ cloud that makes it easier to use, combine, and create network services.
         * 2.2.1.1. [onSubscriptionValidationDenied](#2211-onsubscriptionvalidationdenied)
         * 2.2.1.2. [onSubscriptionVerification](#2212-onsubscriptionverification)
         * 2.2.1.3. [onUnsubscriptionVerification](#2213-onunsubscriptionverification)
-        * 2.2.1.1. [onEventNotification](#2214-oneventnotification)
+        * 2.2.1.4. [onEventNotification](#2214-oneventnotification)
       * 2.2.2. [Annotation](#222-annotation)
       * 2.2.3. [Callback URL Generation](#223-callback-url-generation)
         * 2.2.3.1 [Service Path Generation](#2231-service-path-generation)
