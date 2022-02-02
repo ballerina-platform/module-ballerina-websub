@@ -303,7 +303,7 @@ Since the developer should have the control over the callback URL to be used whe
 
 In ballerina service declaration, service path is an optional configuration. Hence, developers could declare 
 `websub:SubscriberService` by omitting the service path. Since, service path is required for constructing the callback 
-URL `websub:SubscriberService` should be able to generate a unique, unguessable URL segment to be used as its service 
+URL, `websub:SubscriberService` should be able to generate a unique, unguessable URL segment to be used as its service 
 path.
 
 Service path generation should be implemented with following guidelines:  
@@ -325,6 +325,6 @@ should happen whenever `subscriber` is terminated.
 The key functionalities expected from the unsubscription flow as follows:  
 - Developer should manually enable this feature by configuring `unsubscribeOnShutdown` in `websub:SubscriberServiceConfig` annotation.
 - Developer should be able to configure unsubscription verification time-out using `gracefulShutdownPeriod` configuration in `websub:ListenerConfiguration`.
-- Unsubscription flow should initiate whenever graceful stop is invoked in `websub:Listener`.
+- Unsubscription flow should be initiated whenever the graceful stop is invoked in `websub:Listener`.
 - If multiple `websub:SubscriberService` instances are attached to one `websub:Listener`, all the subscriber instances which has enabled `unsubscribeOnShutdown` should initiate unsubscription on listener shutdown.  
-- Unsubscription flow should initiate only if `graceful stop` is invoked, and for `immediate stop` this will not be executed.  
+- Unsubscription flow should be initiated only if `graceful stop` is invoked, and will not be executed for `immediate stop` .  
