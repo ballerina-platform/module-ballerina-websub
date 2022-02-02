@@ -1,9 +1,9 @@
 # Specification: Ballerina WebSub Library
 
 _Owners_: @shafreenAnfar @chamil321 @ayeshLK    
-_Reviewers_: @shafreenAnfar    
+_Reviewers_: @chamil321    
 _Created_: 2022/01/31  
-_Updated_: 2022/01/31  
+_Updated_: 2022/02/02  
 _Issue_: [#786](https://github.com/ballerina-platform/ballerina-standard-library/issues/786)
 
 # Introduction
