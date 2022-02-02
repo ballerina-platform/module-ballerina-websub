@@ -85,7 +85,7 @@ The `websub:Listener` could be initialized by providing either a port with `webs
 providing an `http:Listener`.
 ```ballerina
 # Initiliazes `websub:Listener` instance.
-# ```ballerina
+# ```
 # listener websub:Listener websubListenerEp = check new (9090);
 # ```
 #
@@ -101,7 +101,9 @@ Following APIs should be available in the `websub:Listener` to dynamically attac
 it.
 ```ballerina
 # Attaches the provided `websub:SubscriberService` to the `websub:Listener`.
+# ```
 # check websubListenerEp.attach('service, "/subscriber");
+# ```
 # 
 # + service - The `websub:SubscriberService` object to attach
 # + name - The path of the Service to be hosted
@@ -113,7 +115,7 @@ Following APIs should be available in the `websub:Listener` to dynamically attac
 along with `websub:SubscriberServiceConfiguration`. This is useful when the `subscriber` is implemented using a service class.
 ```ballerina
 # Attaches the provided Service to the `websub:Listener` with custom `websub:SubscriberServiceConfiguration`.
-# ```ballerina
+# ```
 # check websubListenerEp.attachWithConfig('service, {
 #    target: "http://0.0.0.0:9191/common/discovery",
 #    leaseSeconds: 36000
@@ -131,7 +133,7 @@ Following APIs should be available in the `websub:Listener` to dynamically detac
 from it.
 ```ballerina
 # Detaches the provided `websub:SubscriberService` from the `websub:Listener`.
-# ```ballerina
+# ```
 # check websubListenerEp.detach('service);
 # ```
 # 
@@ -143,7 +145,7 @@ public isolated function detach(websub:SubscriberService 'service) returns websu
 Following APIs should be available to dynamically start the `websub:Listener`.
 ```ballerina
 # Starts the registered service programmatically..
-# ```ballerina
+# ```
 # check websubListenerEp.'start();
 # ```
 # 
@@ -154,7 +156,7 @@ public isolated function 'start() returns websub:Error?
 Following APIs should be available to dynamically stop the `websub:Listener`.
 ```ballerina
 # Stops the service listener gracefully. Already-accepted requests will be served before connection closure.
-# ```ballerina
+# ```
 # check websubListenerEp.gracefulStop();
 # ```
 # 
@@ -162,7 +164,7 @@ Following APIs should be available to dynamically stop the `websub:Listener`.
 public isolated function gracefulStop() returns websub:Error?
 
 # Stops the service listener immediately.
-# ```ballerina
+# ```
 # check websubListenerEp.immediateStop();
 # ```
 # 
