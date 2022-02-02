@@ -326,5 +326,5 @@ The key functionalities expected from the unsubscription flow as follows:
 - Developer should manually enable this feature by configuring `unsubscribeOnShutdown` in `websub:SubscriberServiceConfig` annotation.
 - Developer should be able to configure unsubscription verification time-out using `gracefulShutdownPeriod` configuration in `websub:ListenerConfiguration`.
 - Unsubscription flow should be initiated whenever the graceful stop is invoked in `websub:Listener`.
-- If multiple `websub:SubscriberService` instances are attached to one `websub:Listener`, all the subscriber instances which has enabled `unsubscribeOnShutdown` should initiate unsubscription on listener shutdown.  
+- If multiple `websub:SubscriberService` instances are attached to one `websub:Listener`, all the subscriber instances which have enabled `unsubscribeOnShutdown` should initiate unsubscription on listener shutdown.  
 - Unsubscription flow should be initiated only if `graceful stop` is invoked, and will not be executed for `immediate stop` .  
