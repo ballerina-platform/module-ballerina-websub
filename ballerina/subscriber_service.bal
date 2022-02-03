@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-# The WebSub service type
+# The WebSub service type.
 public type SubscriberService distinct service object {
 
 //  remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement|error?;

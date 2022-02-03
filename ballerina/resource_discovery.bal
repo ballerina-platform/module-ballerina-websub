@@ -89,13 +89,6 @@ public client class DiscoveryService {
     }
 }
 
-# Retrieves the hub and topic URLs from the `http:response` (from a publisher) for a discovery request.
-# ```ballerina
-# [string, string[]] topicAndHubDetails = check extractTopicAndHubUrls(httpResponse);
-# ```
-# 
-# + response - Received `http:Response` instance
-# + return - Tuple `(topic, hubs)` if parsing and extraction is successful or else an `error`
 isolated function extractTopicAndHubUrls(http:Response response) returns [string, string[]]|error {
     string[] linkHeaders = [];
     if response.hasHeader("Link") {
