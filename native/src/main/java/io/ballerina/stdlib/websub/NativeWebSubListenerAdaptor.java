@@ -18,6 +18,7 @@
 
 package io.ballerina.stdlib.websub;
 
+import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Module;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
@@ -46,9 +47,11 @@ import static io.ballerina.stdlib.websub.Constants.SUBSCRIBER_CONFIG;
 public class NativeWebSubListenerAdaptor {
     private static final String SERVICE_INFO_RESOURCE = "service-info.csv";
 
-    public static Object externInit(BObject websubListener) {
+    public static Object externInit(Environment env, BObject websubListener) {
         try {
-            Map<String, String> serviceInfoRegistry = ServiceInfoRetriever.retrieve(SERVICE_INFO_RESOURCE);
+            Module websubModule = env.getCurrentModule();
+            Map<String, String> serviceInfoRegistry = ServiceInfoRetriever
+                    .retrieve(SERVICE_INFO_RESOURCE, websubModule);
             websubListener.addNativeData(SERVICE_INFO_REGISTRY, serviceInfoRegistry);
         } catch (IOException ex) {
             Module module = ModuleUtils.getModule();

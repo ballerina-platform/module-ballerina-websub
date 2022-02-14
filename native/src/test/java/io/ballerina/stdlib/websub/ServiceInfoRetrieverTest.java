@@ -18,6 +18,7 @@
 
 package io.ballerina.stdlib.websub;
 
+import io.ballerina.runtime.api.Module;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -28,16 +29,20 @@ import java.util.Map;
  * This class includes tests for Service-Info retrieval.
  */
 public class ServiceInfoRetrieverTest {
+    private static final Module websubModule = new Module("ballerina", "websub", "1");
+
     @Test
     public void testServiceInfoRetrievalSuccess() throws IOException {
-        Map<String, String> serviceInfoRegistry = ServiceInfoRetriever.retrieve("service-info.csv");
+        Map<String, String> serviceInfoRegistry = ServiceInfoRetriever
+                .retrieve("service-info.csv", websubModule);
         Assert.assertFalse(serviceInfoRegistry.isEmpty());
         Assert.assertEquals(serviceInfoRegistry.size(), 2);
     }
 
     @Test
     public void testServiceInfoRetrievalFailure() throws IOException {
-        Map<String, String> serviceInfoRegistry = ServiceInfoRetriever.retrieve("service-info-1.csv");
+        Map<String, String> serviceInfoRegistry = ServiceInfoRetriever
+                .retrieve("service-info-1.csv", websubModule);
         Assert.assertTrue(serviceInfoRegistry.isEmpty());
     }
 }

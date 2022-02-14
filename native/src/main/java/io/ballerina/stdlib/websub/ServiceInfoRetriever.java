@@ -18,6 +18,8 @@
 
 package io.ballerina.stdlib.websub;
 
+import io.ballerina.runtime.api.Module;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,11 +34,18 @@ import java.util.Objects;
  * {@code ServiceInfoRetriever} is a utility class used to retrieve service-info from resources.
  */
 public final class ServiceInfoRetriever {
-    private static final String RESOURCES_PATH = "resources/ballerina/websub/%s";
+    private static final String RESOURCES_PATH = "resources/%s/%s/%s/%s";
 
-    public static Map<String, String> retrieve(String resourceName) throws IOException {
-        try (InputStream inputStream = ServiceInfoRetriever.class.getClassLoader().getResourceAsStream(
-                String.format(RESOURCES_PATH, resourceName))) {
+    public static Map<String, String> retrieve(String resourceName, Module websubModule) throws IOException {
+        if (Objects.isNull(websubModule)) {
+            return Collections.emptyMap();
+        }
+        String moduleOrg = websubModule.getOrg();
+        String moduleName = websubModule.getName();
+        String moduleVersion = websubModule.getMajorVersion();
+        String resourcePath = String.format(RESOURCES_PATH,
+                        moduleOrg, moduleName, moduleVersion, resourceName);
+        try (InputStream inputStream = ServiceInfoRetriever.class.getClassLoader().getResourceAsStream(resourcePath)) {
             if (Objects.nonNull(inputStream)) {
                 return retrieveServiceInfoRegistry(inputStream);
             }
