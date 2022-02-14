@@ -28,6 +28,6 @@ public class WebSubCompilerPlugin extends CompilerPlugin {
     @Override
     public void init(CompilerPluginContext context) {
         context.addCodeAnalyzer(new WebSubCodeAnalyzer());
-        context.addCompilerLifecycleListener(new WebSubLifeCycleListener());
+        context.addCodeGenerator(new WebSubServiceInfoGenerator());
     }
 }
