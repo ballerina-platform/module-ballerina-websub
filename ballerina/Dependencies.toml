@@ -86,7 +86,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "io"
-version = "1.2.0"
+version = "1.2.1"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "lang.value"}
@@ -277,7 +277,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "time"
-version = "2.2.0"
+version = "2.2.1"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
@@ -314,7 +314,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "websub"
-version = "2.2.0"
+version = "2.2.1"
 dependencies = [
 	{org = "ballerina", name = "crypto"},
 	{org = "ballerina", name = "http"},
