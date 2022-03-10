@@ -22,9 +22,13 @@ import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.Module;
 import io.ballerina.runtime.api.PredefinedTypes;
+import io.ballerina.runtime.api.TypeTags;
 import io.ballerina.runtime.api.async.StrandMetadata;
 import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.types.IntersectionType;
 import io.ballerina.runtime.api.types.MethodType;
+import io.ballerina.runtime.api.types.Parameter;
+import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
@@ -33,9 +37,14 @@ import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static io.ballerina.stdlib.websub.Constants.HTTP_REQUEST;
+import static io.ballerina.stdlib.websub.Constants.ON_EVENT_NOTIFICATION;
+import static io.ballerina.stdlib.websub.Constants.ON_SUBSCRIPTION_VALIDATION_DENIED;
+import static io.ballerina.stdlib.websub.Constants.ON_SUBSCRIPTION_VERIFICATION;
+import static io.ballerina.stdlib.websub.Constants.ON_UNSUBSCRIPTION_VERIFICATION;
 import static io.ballerina.stdlib.websub.Constants.SERVICE_OBJECT;
 import static io.ballerina.stdlib.websub.Constants.SUBSCRIBER_CONFIG;
 
@@ -68,29 +77,58 @@ public class NativeHttpToWebsubAdaptor {
     public static Object callOnSubscriptionVerificationMethod(Environment env, BObject adaptor,
                                                               BMap<BString, Object> message) {
         BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
+        boolean isReadOnly = isReadOnlyParam(serviceObj, ON_SUBSCRIPTION_VERIFICATION);
+        if (isReadOnly) {
+            message.freezeDirect();
+        }
         return invokeRemoteFunction(env, serviceObj, message,
-                "callOnSubscriptionVerificationMethod", "onSubscriptionVerification");
+                "callOnSubscriptionVerificationMethod", ON_SUBSCRIPTION_VERIFICATION);
     }
     
     public static Object callOnUnsubscriptionVerificationMethod(Environment env, BObject adaptor,
                                                                 BMap<BString, Object> message) {
         BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
+        boolean isReadOnly = isReadOnlyParam(serviceObj, ON_UNSUBSCRIPTION_VERIFICATION);
+        if (isReadOnly) {
+            message.freezeDirect();
+        }
         return invokeRemoteFunction(env, serviceObj, message,
-                "callOnUnsubscriptionVerificationMethod", "onUnsubscriptionVerification");
+                "callOnUnsubscriptionVerificationMethod", ON_UNSUBSCRIPTION_VERIFICATION);
     }
 
     public static Object callOnSubscriptionDeniedMethod(Environment env, BObject adaptor, BError message) {
         BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
         return invokeRemoteFunction(env, serviceObj, message,
-                "callOnSubscriptionDeniedMethod", "onSubscriptionValidationDenied");
+                "callOnSubscriptionDeniedMethod", ON_SUBSCRIPTION_VALIDATION_DENIED);
     }
 
     public static Object callOnEventNotificationMethod(Environment env, BObject adaptor,
                                                        BMap<BString, Object> message, BObject bHttpRequest) {
         message.addNativeData(HTTP_REQUEST, bHttpRequest);
         BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
+        boolean isReadOnly = isReadOnlyParam(serviceObj, ON_EVENT_NOTIFICATION);
+        if (isReadOnly) {
+            message.freezeDirect();
+        }
         return invokeRemoteFunction(env, serviceObj, message,
-                "callOnEventNotificationMethod", "onEventNotification");
+                "callOnEventNotificationMethod", ON_EVENT_NOTIFICATION);
+    }
+
+    private static boolean isReadOnlyParam(BObject serviceObj, String remoteMethod) {
+        for (MethodType method : serviceObj.getType().getMethods()) {
+            if (method.getName().equals(remoteMethod)) {
+                Parameter[] parameters = method.getParameters();
+                if (parameters.length >= 1) {
+                    Parameter parameter = parameters[0];
+                    Type paramType = parameter.type;
+                    if (paramType instanceof IntersectionType) {
+                        List<Type> constituentTypes = ((IntersectionType) paramType).getConstituentTypes();
+                        return constituentTypes.stream().anyMatch(t -> TypeTags.READONLY_TAG == t.getTag());
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public static BObject retrieveHttpRequest(BMap<BString, Object> message) {

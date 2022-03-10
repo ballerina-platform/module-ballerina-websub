@@ -150,7 +150,7 @@ service /subscriber on new websub:Listener(9090, listenerConfigs)  {
 }
 ``` 
 
-# Returning Errors from Remote Methods
+#### Returning Errors from Remote Methods
 
 * Remote functions in `websub:SubscriberService` can return `error` type.
 ```ballerina

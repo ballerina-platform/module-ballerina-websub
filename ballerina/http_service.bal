@@ -18,7 +18,6 @@ import ballerina/http;
 import ballerina/log;
 import ballerina/jballerina.java;
 
-# Represents an underlying HTTP Service.
 isolated service class HttpService {
     *http:Service;
     
@@ -31,14 +30,6 @@ isolated service class HttpService {
     private final boolean isEventNotificationAvailable;
     private boolean unsubscriptionVerified;
 
-    # Initializes `websub:HttpService` endpoint.
-    # ```ballerina
-    # websub:HttpService httpServiceEp = check new (adaptor, "sercretKey1");
-    # ```
-    # 
-    # + adaptor - The `websub:HttpToWebsubAdaptor` instance which used as a wrapper to execute service methods
-    # + callback - Callback URL to be used in subscription/unsubscription verificaton
-    # + secretKey - Optional `secretKey` value to be used in the content distribution verification
     isolated function init(HttpToWebsubAdaptor adaptor, string callback, string? secretKey) returns error? {
         self.adaptor = adaptor;
         self.callback = callback;
@@ -51,11 +42,6 @@ isolated service class HttpService {
         self.isEventNotificationAvailable = isMethodAvailable("onEventNotification", methodNames);
     }
 
-    # Receives HTTP POST requests.
-    #
-    # + caller - The `http:Caller` reference for the current request
-    # + request - Received `http:Request` instance
-    # + return - An `websub:Error` if there is an error while responding to the request or else `()`
     isolated resource function post .(http:Caller caller, http:Request request) returns Error? {
         http:Response response = new;
         response.statusCode = http:STATUS_ACCEPTED;
@@ -72,11 +58,6 @@ isolated service class HttpService {
         check respondToRequest(caller, response);
     }
 
-    # Receives HTTP GET requests.
-    # 
-    # + caller - The `http:Caller` reference for the current request
-    # + request - Received `http:Request` instance
-    # + return - An `websub:Error` if there is an error while responding to the request or else `()`
     isolated resource function get .(http:Caller caller, http:Request request) returns Error? {
         http:Response response = new;
         response.statusCode = http:STATUS_OK;
@@ -108,13 +89,6 @@ isolated service class HttpService {
     }
 
     isolated function processVerification(RequestQueryParams params, http:Caller caller, http:Response response) {
-        // if the received verification event is unsubscription, then update the internal state
-        if params?.hubMode == MODE_UNSUBSCRIBE {
-            lock {
-                self.unsubscriptionVerified = true;
-            }
-        }
-        
         if params?.hubMode == MODE_SUBSCRIBE && self.isSubscriptionVerificationAvailable {
             processSubscriptionVerification(caller, response, params, self.adaptor);
         } else if params?.hubMode == MODE_UNSUBSCRIBE && self.isUnsubscriptionVerificationAvailable {
@@ -122,6 +96,13 @@ isolated service class HttpService {
         } else {
             response.statusCode = http:STATUS_OK;
             response.setTextPayload(<string>params?.hubChallenge);
+        }
+
+        // if the received verification event is unsubscription, then update the internal state
+        if params?.hubMode == MODE_UNSUBSCRIBE {
+            lock {
+                self.unsubscriptionVerified = true;
+            }
         }
     }
 
@@ -220,11 +201,6 @@ isolated function getSubscriberClient(string hubUrl, http:ClientConfiguration? c
     }
 }
 
-# Retrieves whether the particular remote method is available.
-# 
-# + methodName - Name of the required method
-# + methods - All available methods
-# + return - `true` if method available or else `false`
 isolated function isMethodAvailable(string methodName, string[] methods) returns boolean {
     return methods.indexOf(methodName) is int;
 }
