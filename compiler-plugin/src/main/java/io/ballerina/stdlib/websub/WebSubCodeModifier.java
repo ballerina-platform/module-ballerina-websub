@@ -19,19 +19,19 @@
 package io.ballerina.stdlib.websub;
 
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
-import io.ballerina.projects.plugins.CodeGenerator;
-import io.ballerina.projects.plugins.CodeGeneratorContext;
+import io.ballerina.projects.plugins.CodeModifier;
+import io.ballerina.projects.plugins.CodeModifierContext;
+import io.ballerina.stdlib.websub.task.ServiceMetaInfoUpdatorTask;
 import io.ballerina.stdlib.websub.task.WebSubServiceInfoGeneratorTask;
-import io.ballerina.stdlib.websub.task.service.path.ServiceInfoResourceGeneratorTask;
 
 /**
- * {@code WebSubServiceInfoGenerator} service-info generation for `websub:SubscriberService`.
+ * {@code WebSubCodeModifier} handles required code-modification for WebSub Services.
  */
-public class WebSubServiceInfoGenerator extends CodeGenerator {
+public class WebSubCodeModifier extends CodeModifier {
     @Override
-    public void init(CodeGeneratorContext codeGeneratorContext) {
-        codeGeneratorContext.addSyntaxNodeAnalysisTask(new WebSubServiceInfoGeneratorTask(),
-                SyntaxKind.SERVICE_DECLARATION);
-        codeGeneratorContext.addSourceGeneratorTask(new ServiceInfoResourceGeneratorTask());
+    public void init(CodeModifierContext codeModifierContext) {
+        codeModifierContext.addSyntaxNodeAnalysisTask(
+                new WebSubServiceInfoGeneratorTask(), SyntaxKind.SERVICE_DECLARATION);
+        codeModifierContext.addSourceModifierTask(new ServiceMetaInfoUpdatorTask());
     }
 }
