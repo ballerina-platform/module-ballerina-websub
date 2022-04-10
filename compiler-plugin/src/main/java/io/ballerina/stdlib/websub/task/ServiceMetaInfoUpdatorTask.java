@@ -18,14 +18,28 @@
 
 package io.ballerina.stdlib.websub.task;
 
+import io.ballerina.compiler.api.SemanticModel;
+import io.ballerina.compiler.syntax.tree.AbstractNodeFactory;
 import io.ballerina.compiler.syntax.tree.AnnotationNode;
+import io.ballerina.compiler.syntax.tree.BasicLiteralNode;
+import io.ballerina.compiler.syntax.tree.ExpressionNode;
+import io.ballerina.compiler.syntax.tree.IdentifierToken;
+import io.ballerina.compiler.syntax.tree.MappingConstructorExpressionNode;
+import io.ballerina.compiler.syntax.tree.MappingFieldNode;
 import io.ballerina.compiler.syntax.tree.MetadataNode;
+import io.ballerina.compiler.syntax.tree.MinutiaeList;
 import io.ballerina.compiler.syntax.tree.ModuleMemberDeclarationNode;
 import io.ballerina.compiler.syntax.tree.ModulePartNode;
+import io.ballerina.compiler.syntax.tree.Node;
 import io.ballerina.compiler.syntax.tree.NodeFactory;
 import io.ballerina.compiler.syntax.tree.NodeList;
+import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
+import io.ballerina.compiler.syntax.tree.SimpleNameReferenceNode;
+import io.ballerina.compiler.syntax.tree.SpecificFieldNode;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
+import io.ballerina.compiler.syntax.tree.SyntaxTree;
+import io.ballerina.compiler.syntax.tree.Token;
 import io.ballerina.projects.Document;
 import io.ballerina.projects.DocumentId;
 import io.ballerina.projects.Module;
@@ -35,7 +49,9 @@ import io.ballerina.projects.plugins.SourceModifierContext;
 import io.ballerina.stdlib.websub.task.service.path.ServicePathContext;
 import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static io.ballerina.stdlib.websub.task.service.path.ServicePathContextHandler.getContextHandler;
@@ -57,6 +73,7 @@ public class ServiceMetaInfoUpdatorTask implements ModifierTask<SourceModifierCo
 
         for (ModuleId modId : context.currentPackage().moduleIds()) {
             Module currentModule = context.currentPackage().module(modId);
+            SemanticModel semanticModel = context.compilation().getSemanticModel(modId);
             for (DocumentId docId : currentModule.documentIds()) {
                 Optional<ServicePathContext> servicePathContextOpt = getContextHandler().retrieveContext(modId, docId);
                 // if the shared service-path generation context not found, do not proceed
@@ -71,31 +88,98 @@ public class ServiceMetaInfoUpdatorTask implements ModifierTask<SourceModifierCo
 
                 Document currentDoc = currentModule.document(docId);
                 ModulePartNode rootNode = currentDoc.syntaxTree().rootNode();
-                NodeList<ModuleMemberDeclarationNode> members = rootNode.members();
-                for (ModuleMemberDeclarationNode memberNode : members) {
-                    if (memberNode.kind() != SyntaxKind.SERVICE_DECLARATION) {
-                        return;
-                    }
-                    ServiceDeclarationNode serviceNode = (ServiceDeclarationNode) memberNode;
-                    Optional<MetadataNode> metadata = serviceNode.metadata();
-                    if (metadata.isEmpty()) {
-                        return;
-                    }
-                    MetadataNode metadataNode = metadata.get();
-                    NodeList<AnnotationNode> oldAnnotations = metadataNode.annotations();
-                    MetadataNode.MetadataNodeModifier modifier = metadataNode.modify();
-                    // todo: implement annotation generation logic here
-                    AnnotationNode newAnnotation = NodeFactory.createAnnotationNode(null, null, null);
-                    modifier.withAnnotations(oldAnnotations.add(newAnnotation));
-                    MetadataNode updatedMetadataNode = modifier.apply();
-                    ServiceDeclarationNode.ServiceDeclarationNodeModifier serviceDecModifier = serviceNode.modify();
-                    serviceDecModifier.withMetadata(updatedMetadataNode);
-                    ServiceDeclarationNode updatedServiceDecNode = serviceDecModifier.apply();
-                    if (updatedServiceDecNode != null) {
-                        return;
-                    }
-                }
+                NodeList<ModuleMemberDeclarationNode> newMembers = updateMemberNodes(
+                        rootNode.members(), servicePathDetails, semanticModel);
+                ModulePartNode newModulePart =
+                        rootNode.modify(rootNode.imports(), newMembers, rootNode.eofToken());
+                SyntaxTree updatedSyntaxTree = currentDoc.syntaxTree().modifyWith(newModulePart);
+                context.modifySourceFile(updatedSyntaxTree.textDocument(), docId);
             }
         }
+    }
+
+    private NodeList<ModuleMemberDeclarationNode> updateMemberNodes(NodeList<ModuleMemberDeclarationNode> oldMembers,
+                                                                    List<ServicePathContext.ServicePathInformation> sd,
+                                                                    SemanticModel semanticModel) {
+        List<ModuleMemberDeclarationNode> updatedMembers = new LinkedList<>();
+        for (ModuleMemberDeclarationNode memberNode : oldMembers) {
+            if (memberNode.kind() != SyntaxKind.SERVICE_DECLARATION) {
+                updatedMembers.add(memberNode);
+                continue;
+            }
+            ServiceDeclarationNode serviceNode = (ServiceDeclarationNode) memberNode;
+            Optional<ServicePathContext.ServicePathInformation> servicePathInfoOpt = semanticModel.symbol(serviceNode)
+                    .flatMap(symbol ->
+                            sd.stream()
+                                    .filter(service -> service.getServiceId() == symbol.hashCode())
+                                    .findFirst());
+            if (servicePathInfoOpt.isEmpty()) {
+                updatedMembers.add(memberNode);
+                continue;
+            }
+            ServicePathContext.ServicePathInformation servicePathInfo = servicePathInfoOpt.get();
+            Optional<MetadataNode> metadata = serviceNode.metadata();
+            if (metadata.isEmpty()) {
+                updatedMembers.add(memberNode);
+                continue;
+            }
+            MetadataNode metadataNode = metadata.get();
+            NodeList<AnnotationNode> oldAnnotations = metadataNode.annotations();
+            MetadataNode.MetadataNodeModifier modifier = metadataNode.modify();
+            AnnotationNode newAnnotation = createAnnotationNode(servicePathInfo.getServicePath());
+            modifier.withAnnotations(oldAnnotations.add(newAnnotation));
+            MetadataNode updatedMetadataNode = modifier.apply();
+            ServiceDeclarationNode.ServiceDeclarationNodeModifier serviceDecModifier = serviceNode.modify();
+            serviceDecModifier.withMetadata(updatedMetadataNode);
+            ServiceDeclarationNode updatedServiceDecNode = serviceDecModifier.apply();
+            updatedMembers.add(updatedServiceDecNode);
+        }
+        return AbstractNodeFactory.createNodeList(updatedMembers);
+    }
+
+    private AnnotationNode createAnnotationNode(String generatedServicePath) {
+        Token atToken = AbstractNodeFactory.createToken(SyntaxKind.AT_TOKEN);
+        IdentifierToken identifierToken = AbstractNodeFactory.createIdentifierToken("MetaInfo");
+        SimpleNameReferenceNode nameRef = NodeFactory.createSimpleNameReferenceNode(identifierToken);
+        MappingConstructorExpressionNode mappingConstructor = crateMappingConstructor(
+                Map.of("servicePath", generatedServicePath));
+        return NodeFactory.createAnnotationNode(atToken, nameRef, mappingConstructor);
+    }
+
+    private MappingConstructorExpressionNode crateMappingConstructor(Map<String, String> fields) {
+        Token openBraceToken = AbstractNodeFactory.createToken(SyntaxKind.OPEN_BRACE_TOKEN, emptyML(), singleNLML());
+        Token closeBraceToken = AbstractNodeFactory.createToken(SyntaxKind.CLOSE_BRACE_TOKEN);
+        List<Node> mappingFields = new LinkedList<>();
+        for (Map.Entry<String, String> entry : fields.entrySet()) {
+            mappingFields.add(createSpecificFieldNode(entry.getKey(), entry.getValue()));
+            mappingFields.add(AbstractNodeFactory.createToken(SyntaxKind.COMMA_TOKEN));
+        }
+        if (mappingFields.size() > 1) {
+            mappingFields.remove(mappingFields.size() - 1);
+        }
+        SeparatedNodeList<MappingFieldNode> fieldsNodeList = AbstractNodeFactory.createSeparatedNodeList(mappingFields);
+        return NodeFactory.createMappingConstructorExpressionNode(openBraceToken, fieldsNodeList, closeBraceToken);
+    }
+
+    private static MinutiaeList emptyML() {
+        return AbstractNodeFactory.createEmptyMinutiaeList();
+    }
+
+    private static MinutiaeList singleNLML() {
+        String newLine = System.getProperty("line.separator");
+        return emptyML().add(AbstractNodeFactory.createEndOfLineMinutiae(newLine));
+    }
+
+    private static SpecificFieldNode createSpecificFieldNode(String name, String value) {
+        IdentifierToken fieldName = AbstractNodeFactory.createIdentifierToken(name);
+        Token colonToken = AbstractNodeFactory.createToken(SyntaxKind.COLON_TOKEN);
+        ExpressionNode expressionNode = createBasicLiteralNode(value);
+        return NodeFactory.createSpecificFieldNode(null, fieldName, colonToken, expressionNode);
+    }
+
+    private static BasicLiteralNode createBasicLiteralNode(String value) {
+        Token valueToken = AbstractNodeFactory.createLiteralValueToken(SyntaxKind.STRING_LITERAL_TOKEN,
+                "\"" + value + "\"", emptyML(), emptyML());
+        return NodeFactory.createBasicLiteralNode(SyntaxKind.STRING_LITERAL, valueToken);
     }
 }
