@@ -33,9 +33,9 @@ import io.ballerina.compiler.syntax.tree.ModulePartNode;
 import io.ballerina.compiler.syntax.tree.Node;
 import io.ballerina.compiler.syntax.tree.NodeFactory;
 import io.ballerina.compiler.syntax.tree.NodeList;
+import io.ballerina.compiler.syntax.tree.QualifiedNameReferenceNode;
 import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
-import io.ballerina.compiler.syntax.tree.SimpleNameReferenceNode;
 import io.ballerina.compiler.syntax.tree.SpecificFieldNode;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
 import io.ballerina.compiler.syntax.tree.SyntaxTree;
@@ -119,7 +119,7 @@ public class ServiceMetaInfoUpdatorTask implements ModifierTask<SourceModifierCo
             }
             ServicePathContext.ServicePathInformation servicePathInfo = servicePathInfoOpt.get();
             Optional<MetadataNode> metadata = serviceNode.metadata();
-            if (metadata.isEmpty()) {
+            if (metadata.isPresent()) {
                 updatedMembers.add(memberNode);
                 continue;
             }
@@ -139,8 +139,11 @@ public class ServiceMetaInfoUpdatorTask implements ModifierTask<SourceModifierCo
 
     private AnnotationNode createAnnotationNode(String generatedServicePath) {
         Token atToken = AbstractNodeFactory.createToken(SyntaxKind.AT_TOKEN);
+        IdentifierToken websubModulePrefix = AbstractNodeFactory.createIdentifierToken("websub");
+        Token colonToken = AbstractNodeFactory.createToken(SyntaxKind.COLON_TOKEN);
         IdentifierToken identifierToken = AbstractNodeFactory.createIdentifierToken("MetaInfo");
-        SimpleNameReferenceNode nameRef = NodeFactory.createSimpleNameReferenceNode(identifierToken);
+        QualifiedNameReferenceNode nameRef = NodeFactory
+                .createQualifiedNameReferenceNode(websubModulePrefix, colonToken, identifierToken);
         MappingConstructorExpressionNode mappingConstructor = crateMappingConstructor(
                 Map.of("servicePath", generatedServicePath));
         return NodeFactory.createAnnotationNode(atToken, nameRef, mappingConstructor);
@@ -176,6 +179,16 @@ public class ServiceMetaInfoUpdatorTask implements ModifierTask<SourceModifierCo
         ExpressionNode expressionNode = createBasicLiteralNode(value);
         return NodeFactory.createSpecificFieldNode(null, fieldName, colonToken, expressionNode);
     }
+
+//    private static ByteArrayLiteralNode createBasicLiteralNode(String value) {
+//        Token typeDescriptor = AbstractNodeFactory.createToken(SyntaxKind.ARRAY_TYPE_DESC);
+//        Token openBracketToken = AbstractNodeFactory.createToken(SyntaxKind.OPEN_BRACKET_TOKEN);
+//        Token closeBracketToken = AbstractNodeFactory.createToken(SyntaxKind.CLOSE_BRACKET_TOKEN);
+//        LiteralValueToken byteArrayValue = AbstractNodeFactory.createLiteralValueToken(
+//                SyntaxKind.BYTE_ARRAY_LITERAL, value, emptyML(), emptyML());
+//        return NodeFactory.createByteArrayLiteralNode(
+//                typeDescriptor, openBracketToken, byteArrayValue, closeBracketToken);
+//    }
 
     private static BasicLiteralNode createBasicLiteralNode(String value) {
         Token valueToken = AbstractNodeFactory.createLiteralValueToken(SyntaxKind.STRING_LITERAL_TOKEN,
