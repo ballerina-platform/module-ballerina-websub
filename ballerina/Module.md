@@ -25,7 +25,7 @@ the verification
 
 5. The hub delivers the identified content to the subscribers of the topic.
 
-#### Subscribing
+#### Subscribe to a `hub`
 
 * The WebSub Subscriber provides the mechanism to subscribe in a `hub` to a given `topic URL`. 
 ```ballerina
@@ -59,7 +59,7 @@ service /subscriber on new websub:Listener(9090) {
 }
 ```
 
-#### Resource Discovery
+#### Resource discovery
 
 * The WebSub Subscriber also provides the mechanism to discover the `hub` and `topic URL` resources dynamically via the provided `resource URL` and initiates the subscription.
 ```ballerina
@@ -78,7 +78,7 @@ service /subscriber on new websub:Listener(9090) {
 }
 ```
 
-#### Dynamic URI Generation
+#### Dynamic URI generation
 
 * The service path for a WebSub Subscriber is optional. The WebSub Subscriber service has the capability to generate the service path dynamically.
 ```ballerina
@@ -97,7 +97,7 @@ service on new websub:Listener(9090) {
 }
 ```
 
-#### Running Subscriber Service Locally
+#### Run a `websub:SubscriberService` locally
 
 * [**ngrok**](https://ngrok.com/) is a TCP Tunneling software, which is used to expose services running locally in the public network.
 * If you want to run the subscriber service in your local machine, you could use **ngrok** to expose it to the public network.
@@ -125,7 +125,7 @@ service on new websub:Listener(9090) {
 }
 ```
 
-#### Unsubscribing from the Hub
+#### Unsubscribe from the `hub`
 
 * The WebSub Subscriber has the capability to initiate unsubscription flow on Subscriber termination.
 ```ballerina
@@ -150,7 +150,7 @@ service /subscriber on new websub:Listener(9090, listenerConfigs)  {
 }
 ``` 
 
-#### Returning Errors from Remote Methods
+#### Return errors from remote methods
 
 * Remote functions in `websub:SubscriberService` can return `error` type.
 ```ballerina

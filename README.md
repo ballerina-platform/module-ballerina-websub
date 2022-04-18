@@ -32,7 +32,7 @@ the verification
 
 5. The hub delivers the identified content to the subscribers of the topic.
 
-#### Subscribing
+#### Subscribe to a `hub`
 
 * The WebSub Subscriber provides the mechanism to subscribe in a `hub` to a given `topic URL`. 
 ```ballerina
@@ -66,7 +66,7 @@ service /subscriber on new websub:Listener(9090) {
 }
 ```
 
-#### Resource Discovery
+#### Resource discovery
 
 * The WebSub Subscriber also provides the mechanism to discover the `hub` and `topic URL` resources dynamically via the provided `resource URL` and initiates the subscription.
 ```ballerina
@@ -85,7 +85,7 @@ service /subscriber on new websub:Listener(9090) {
 }
 ```
 
-#### Dynamic URI Generation
+#### Dynamic URI generation
 
 * The service path for a WebSub Subscriber is optional. The WebSub Subscriber service has the capability to generate the service path dynamically.
 ```ballerina
@@ -104,7 +104,7 @@ service on new websub:Listener(9090) {
 }
 ```
 
-#### Running Subscriber Service Locally
+#### Run a `websub:SubscriberService` locally
 
 * [**ngrok**](https://ngrok.com/) is a TCP Tunneling software, which is used to expose services running locally in the public network.
 * If you want to run the subscriber service in your local machine, you could use **ngrok** to expose it to the public network.
@@ -132,7 +132,7 @@ service on new websub:Listener(9090) {
 }
 ```
 
-#### Unsubscribing from the Hub
+#### Unsubscribe from the `hub`
 
 * The WebSub Subscriber has the capability to initiate unsubscription flow on Subscriber termination.
 ```ballerina
@@ -157,7 +157,7 @@ service /subscriber on new websub:Listener(9090, listenerConfigs)  {
 }
 ``` 
 
-#### Returning Errors from Remote Methods
+#### Return errors from remote methods
 
 * Remote functions in `websub:SubscriberService` can return `error` type.
 ```ballerina
@@ -195,15 +195,15 @@ function validateRequest(websub:ContentDistributionMessage event) returns boolea
 | onUnsubscriptionVerification | Unsubscription verification failure|
 | onEventNotification | Successfull acknowledgement|
 
-## Issues and Projects
+## Issues and projects 
 
 Issues and Projects tabs are disabled for this repository as this is part of the Ballerina Standard Library. To report bugs, request new features, start new discussions, view project boards, etc., go to the [Ballerina Standard Library parent repository](https://github.com/ballerina-platform/ballerina-standard-library).
 
 This repository only contains the source code for the package.
 
-## Building from the Source
+## Build from the source
 
-### Setting Up the Prerequisites
+### Set up the prerequisites
 
 * Download and install Java SE Development Kit (JDK) version 11 (from one of the following locations).
 
@@ -213,7 +213,7 @@ This repository only contains the source code for the package.
    
         > **Note:** Set the JAVA_HOME environment variable to the path name of the directory into which you installed JDK.
      
-### Building the Source
+### Build the source
 
 Execute the commands below to build from source.
 
@@ -251,17 +251,17 @@ Execute the commands below to build from source.
     ./gradlew clean build -PpublishToCentral=true
     ```
 
-## Contributing to Ballerina
+## Contribute to Ballerina
 
 As an open source project, Ballerina welcomes contributions from the community.
 
 For more information, go to the [contribution guidelines](https://github.com/ballerina-platform/ballerina-lang/blob/master/CONTRIBUTING.md).
 
-## Code of Conduct
+## Code of conduct
 
 All contributors are encouraged to read the [Ballerina Code of Conduct](https://ballerina.io/code-of-conduct).
 
-## Useful Links
+## Useful links
 
 * For more information, go to the [`websub` module](https://lib.ballerina.io/ballerina/websub/latest).
 * For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/learn/by-example/).
