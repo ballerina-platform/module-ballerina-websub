@@ -177,6 +177,8 @@ public class ServiceMetaInfoUpdatorTask implements ModifierTask<SourceModifierCo
         IdentifierToken fieldName = AbstractNodeFactory.createIdentifierToken(name);
         Token colonToken = AbstractNodeFactory.createToken(SyntaxKind.COLON_TOKEN);
         ExpressionNode expressionNode = createBasicLiteralNode(value);
+//        NodeParser.parseExpression("Base64" + value)
+        // base64 `2323142`
         return NodeFactory.createSpecificFieldNode(null, fieldName, colonToken, expressionNode);
     }
 
