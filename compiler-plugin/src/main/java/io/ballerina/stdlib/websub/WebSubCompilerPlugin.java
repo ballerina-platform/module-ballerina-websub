@@ -20,7 +20,7 @@ package io.ballerina.stdlib.websub;
 
 import io.ballerina.projects.plugins.CompilerPlugin;
 import io.ballerina.projects.plugins.CompilerPluginContext;
-import io.ballerina.stdlib.websub.action.EmptySubscriberServiceTemplateGenerateAction;
+import io.ballerina.stdlib.websub.action.SubscriberServiceTemplateGenerationAction;
 
 /**
  * {@code WebSubCompilerPlugin} handles compile-time code analysis for WebSub based Services.
@@ -30,6 +30,6 @@ public class WebSubCompilerPlugin extends CompilerPlugin {
     public void init(CompilerPluginContext context) {
         context.addCodeAnalyzer(new WebSubCodeAnalyzer());
         context.addCompilerLifecycleListener(new WebSubLifeCycleListener());
-        context.addCodeAction(new EmptySubscriberServiceTemplateGenerateAction());
+        context.addCodeAction(new SubscriberServiceTemplateGenerationAction());
     }
 }

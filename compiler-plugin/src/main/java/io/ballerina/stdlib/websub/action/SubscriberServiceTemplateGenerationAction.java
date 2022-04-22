@@ -47,13 +47,13 @@ import static io.ballerina.stdlib.websub.action.CodeActionUtil.findNode;
 /**
  * {@code EmptySubscriberServiceTemplateGenerateAction} generates empty `websub:SubscriberService` code-snippet.
  */
-public class EmptySubscriberServiceTemplateGenerateAction implements CodeAction {
+public class SubscriberServiceTemplateGenerationAction implements CodeAction {
     private static final String NODE_LOCATION = "node.location";
     private static final String CODE_ACTION_TITLE = "Add subscriber service";
 
     private final Service websubServiceSnippet;
 
-    public EmptySubscriberServiceTemplateGenerateAction() {
+    public SubscriberServiceTemplateGenerationAction() {
         this.websubServiceSnippet = CodeActionUtil.constructSubscriberService();
     }
 
