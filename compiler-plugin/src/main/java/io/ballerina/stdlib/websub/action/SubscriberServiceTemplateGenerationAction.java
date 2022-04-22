@@ -42,15 +42,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static io.ballerina.stdlib.websub.Constants.ADD_SUBSCRIBER_SERVICE_ACTION;
+import static io.ballerina.stdlib.websub.Constants.NODE_LOCATION;
 import static io.ballerina.stdlib.websub.action.CodeActionUtil.findNode;
 
 /**
  * {@code EmptySubscriberServiceTemplateGenerateAction} generates empty `websub:SubscriberService` code-snippet.
  */
 public class SubscriberServiceTemplateGenerationAction implements CodeAction {
-    private static final String NODE_LOCATION = "node.location";
-    private static final String CODE_ACTION_TITLE = "Add subscriber service";
-
     private final Service websubServiceSnippet;
 
     public SubscriberServiceTemplateGenerationAction() {
@@ -71,7 +70,7 @@ public class SubscriberServiceTemplateGenerationAction implements CodeAction {
 
     private CodeActionInfo constructCodeActionInfo(Diagnostic diagnostic) {
         CodeActionArgument locationArg = CodeActionArgument.from(NODE_LOCATION, diagnostic.location().lineRange());
-        return CodeActionInfo.from(CODE_ACTION_TITLE, List.of(locationArg));
+        return CodeActionInfo.from(ADD_SUBSCRIBER_SERVICE_ACTION, List.of(locationArg));
     }
 
     @Override

@@ -57,6 +57,9 @@ public interface Constants {
     String RESOURCE_DIR_NAME = "resource";
 
     // code action related constants
+    String NODE_LOCATION = "node.location";
+    String ADD_SUBSCRIBER_SERVICE_ACTION = "Add subscriber service";
+
     String SERVICE_CONFIG_ANNOTATTION = "SubscriberServiceConfig";
     String CONTENT_DISTRIBUTION_MESSAGE_TYPE = "ContentDistributionMessage";
     String CONTENT_DISTRIBUTION_MESSAGE_PARAM_NAME = "message";

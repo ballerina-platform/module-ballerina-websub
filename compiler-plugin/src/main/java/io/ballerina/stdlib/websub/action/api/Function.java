@@ -21,6 +21,7 @@ package io.ballerina.stdlib.websub.action.api;
 import io.ballerina.stdlib.websub.Constants;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * {@code Function} code snippet for ballerina function.
@@ -52,8 +53,8 @@ public class Function implements CodeSnippet {
     @Override
     public String snippetAsAString() {
         String functionArgs = this.args.stream()
-                .map(arg -> String.format("%s %s", arg.type.snippetAsAString(), arg.name))
-                .reduce("", (a, b) -> String.format("%s ,%s", a, b));
+                .map(FunctionArg::snippetAsAString)
+                .collect(Collectors.joining(" ,"));
         String returnTypes = constructReturnTypes();
         return String.format("\t%s %s %s(%s) returns %s {%s%s\t}",
                 this.type, "function", this.name, functionArgs, returnTypes, Constants.LS, Constants.LS);
@@ -62,7 +63,7 @@ public class Function implements CodeSnippet {
     private String constructReturnTypes() {
         String providedReturnTypes = this.returnTypes.stream()
                 .map(Type::snippetAsAString)
-                .reduce("", (a, b) -> String.format("%s|%s", a, b));
+                .collect(Collectors.joining("|"));
         if (optionalReturnTypes) {
             return String.format("%s?", providedReturnTypes);
         }
@@ -72,13 +73,18 @@ public class Function implements CodeSnippet {
     /**
      * {@code FunctionArg} which represents an argument to a ballerina function.
      */
-    public static class FunctionArg {
+    public static class FunctionArg implements CodeSnippet {
         private final Type type;
         private final String name;
 
         public FunctionArg(Type type, String name) {
             this.type = type;
             this.name = name;
+        }
+
+        @Override
+        public String snippetAsAString() {
+            return String.format("%s %s", type.snippetAsAString(), name);
         }
     }
 }

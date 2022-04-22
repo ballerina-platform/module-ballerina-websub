@@ -22,6 +22,7 @@ import io.ballerina.stdlib.websub.Constants;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * {@code Annotation} code snippet for ballerina annotation.
@@ -46,7 +47,7 @@ public class Annotation implements CodeSnippet {
     public String snippetAsAString() {
         String fields = this.fields.stream()
                 .map(field -> String.format("\t%s: %s", field.name, field.value))
-                .reduce("", (a, b) -> String.format("%s%s%s", a, Constants.LS, b));
+                .collect(Collectors.joining(Constants.LS));
         String annotationType = String.format("@%s", this.type.snippetAsAString());
         return String.format("%s {%s%s%s}", annotationType, Constants.LS, fields, Constants.LS);
     }
