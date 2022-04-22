@@ -21,9 +21,16 @@ package io.ballerina.stdlib.websub.action;
 import io.ballerina.compiler.syntax.tree.ModulePartNode;
 import io.ballerina.compiler.syntax.tree.NonTerminalNode;
 import io.ballerina.compiler.syntax.tree.SyntaxTree;
+import io.ballerina.stdlib.websub.Constants;
+import io.ballerina.stdlib.websub.action.api.Annotation;
+import io.ballerina.stdlib.websub.action.api.Function;
+import io.ballerina.stdlib.websub.action.api.Service;
+import io.ballerina.stdlib.websub.action.api.Type;
 import io.ballerina.tools.text.LineRange;
 import io.ballerina.tools.text.TextDocument;
 import io.ballerina.tools.text.TextRange;
+
+import java.util.List;
 
 /**
  * {@code CodeActionUtil} contains utility functions related to code-actions.
@@ -42,5 +49,36 @@ public final class CodeActionUtil {
         int end = textDocument.textPositionFrom(lineRange.endLine());
         return ((ModulePartNode) syntaxTree.rootNode())
                 .findNode(TextRange.from(start, end - start), true);
+    }
+
+    public static Service constructSubscriberService() {
+        Annotation subscriberConfigAnnotation = Annotation
+                .getEmptyAnnotation(Constants.PACKAGE_NAME, Constants.SERVICE_CONFIG_ANNOTATTION);
+        List<Function> mandatoryFunctions = constructMandatoryFunctions();
+        return new Service(List.of(subscriberConfigAnnotation), mandatoryFunctions);
+    }
+
+    private static List<Function> constructMandatoryFunctions() {
+        // only mandatory function is `onEventNotification`
+        List<Function.FunctionArg> functionArgs = constructFunctionArgs();
+        List<Type> returnTypes = constructReturnTypes();
+        Function onEventNotificationFunction = Function.remoteFunctionWithOptionalReturnTypes(
+                Constants.ON_EVENT_NOTIFICATION, functionArgs, returnTypes);
+        return List.of(onEventNotificationFunction);
+    }
+
+    private static List<Function.FunctionArg> constructFunctionArgs() {
+        Type contentDistributionMessage = Type.from(
+                Constants.PACKAGE_NAME, Constants.CONTENT_DISTRIBUTION_MESSAGE_TYPE);
+        Function.FunctionArg message = new Function.FunctionArg(
+                contentDistributionMessage, Constants.CONTENT_DISTRIBUTION_MESSAGE_PARAM_NAME);
+        return List.of(message);
+    }
+
+    private static List<Type> constructReturnTypes() {
+        Type acknowledgement = Type.from(Constants.PACKAGE_NAME, Constants.ACKNOWLEDGEMENT_TYPE);
+        Type subscriptionDeletedError = Type.from(Constants.PACKAGE_NAME, Constants.SUBSCRIPTION_DELETED_ERROR_TYPE);
+        Type error = Type.from(Constants.BALLERINA_ERROR_PACKAGE, Constants.BALLERINA_ERROR_TYPE);
+        return List.of(acknowledgement, subscriptionDeletedError, error);
     }
 }

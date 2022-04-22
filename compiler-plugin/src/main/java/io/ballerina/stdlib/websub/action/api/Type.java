@@ -18,20 +18,29 @@
 
 package io.ballerina.stdlib.websub.action.api;
 
-public class Type {
+import io.ballerina.stdlib.websub.Constants;
+
+/**
+ * {@code Type} code snippet for ballerina type.
+ */
+public class Type implements CodeSnippet {
     private final String module;
     private final String name;
 
-    public Type(String module, String name) {
+    private Type(String module, String name) {
         this.module = module;
         this.name = name;
     }
 
-    public String getModule() {
-        return module;
+    public static Type from(String module, String name) {
+        return new Type(module, name);
     }
 
-    public String getName() {
-        return name;
+    @Override
+    public String snippetAsAString() {
+        if (Constants.BALLERINA_ERROR_PACKAGE.equals(this.module)) {
+            return this.name;
+        }
+        return String.format("%s:%s", module, name);
     }
 }

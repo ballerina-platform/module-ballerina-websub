@@ -18,7 +18,6 @@
 
 package io.ballerina.stdlib.websub.action;
 
-import io.ballerina.compiler.syntax.tree.ModulePartNode;
 import io.ballerina.compiler.syntax.tree.NonTerminalNode;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.compiler.syntax.tree.SyntaxTree;
@@ -28,15 +27,16 @@ import io.ballerina.projects.plugins.codeaction.CodeActionContext;
 import io.ballerina.projects.plugins.codeaction.CodeActionExecutionContext;
 import io.ballerina.projects.plugins.codeaction.CodeActionInfo;
 import io.ballerina.projects.plugins.codeaction.DocumentEdit;
+import io.ballerina.stdlib.websub.Constants;
 import io.ballerina.stdlib.websub.WebSubDiagnosticCodes;
+import io.ballerina.stdlib.websub.action.api.Service;
 import io.ballerina.tools.diagnostics.Diagnostic;
 import io.ballerina.tools.text.LineRange;
-import io.ballerina.tools.text.TextDocument;
 import io.ballerina.tools.text.TextDocumentChange;
 import io.ballerina.tools.text.TextEdit;
 import io.ballerina.tools.text.TextRange;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -50,6 +50,13 @@ import static io.ballerina.stdlib.websub.action.CodeActionUtil.findNode;
 public class EmptySubscriberServiceTemplateGenerateAction implements CodeAction {
     private static final String NODE_LOCATION = "node.location";
     private static final String CODE_ACTION_TITLE = "Add subscriber service";
+
+    private final Service websubServiceSnippet;
+
+    public EmptySubscriberServiceTemplateGenerateAction() {
+        this.websubServiceSnippet = CodeActionUtil.constructSubscriberService();
+    }
+
     @Override
     public List<String> supportedDiagnosticCodes() {
         WebSubDiagnosticCodes templateGenerationCode = WebSubDiagnosticCodes.WEBSUB_202;
@@ -77,19 +84,28 @@ public class EmptySubscriberServiceTemplateGenerateAction implements CodeAction 
         if (lineRangeOpt.isEmpty()) {
             return Collections.emptyList();
         }
-
         LineRange lineRange = lineRangeOpt.get();
         SyntaxTree syntaxTree = executionContext.currentDocument().syntaxTree();
         NonTerminalNode node = findNode(syntaxTree, lineRange);
         if (!(node instanceof ServiceDeclarationNode)) {
             return Collections.emptyList();
         }
+        List<TextEdit> textEdits = retrieveRequiredTextEdits((ServiceDeclarationNode) node);
+        TextDocumentChange change = TextDocumentChange.from(textEdits.toArray(new TextEdit[0]));
+        return Collections.singletonList(
+                new DocumentEdit(executionContext.fileUri(), SyntaxTree.from(syntaxTree, change)));
+    }
 
-        ServiceDeclarationNode serviceDeclarationNode = (ServiceDeclarationNode) node;
-        serviceDeclarationNode.serviceKeyword().textRange().startOffset();
-        TextRange resourceTextRange = TextRange.from(serviceDeclarationNode.openBraceToken().textRange().endOffset(),
-                0);
-        return null;
+    private List<TextEdit> retrieveRequiredTextEdits(ServiceDeclarationNode serviceDeclarationNode) {
+        TextRange annotationTextRange = TextRange.from(
+                serviceDeclarationNode.serviceKeyword().textRange().startOffset(), 0);
+        TextEdit annotationsEdit = TextEdit.from(
+                annotationTextRange, String.format("%s%s", websubServiceSnippet.getAnnotationSnippet(), Constants.LS));
+        TextRange functionTextRange = TextRange.from(
+                serviceDeclarationNode.openBraceToken().textRange().endOffset(), 0);
+        TextEdit functionsEdit = TextEdit.from(
+                functionTextRange, String.format("%s%s", websubServiceSnippet.getFunctionSnippet(), Constants.LS));
+        return Arrays.asList(annotationsEdit, functionsEdit);
     }
 
     @Override

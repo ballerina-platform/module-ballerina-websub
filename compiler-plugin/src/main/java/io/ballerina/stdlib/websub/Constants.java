@@ -55,4 +55,15 @@ public interface Constants {
     String BIN_DIR_NAME = "bin";
     String RESOURCES_DIR_NAME = "resources";
     String RESOURCE_DIR_NAME = "resource";
+
+    // code action related constants
+    String SERVICE_CONFIG_ANNOTATTION = "SubscriberServiceConfig";
+    String CONTENT_DISTRIBUTION_MESSAGE_TYPE = "ContentDistributionMessage";
+    String CONTENT_DISTRIBUTION_MESSAGE_PARAM_NAME = "message";
+    String ACKNOWLEDGEMENT_TYPE = "Acknowledgement";
+    String SUBSCRIPTION_DELETED_ERROR_TYPE = "SubscriptionDeletedError";
+    String BALLERINA_ERROR_PACKAGE = "annotations";
+    String BALLERINA_ERROR_TYPE = "error";
+
+    String LS = System.lineSeparator();
 }
