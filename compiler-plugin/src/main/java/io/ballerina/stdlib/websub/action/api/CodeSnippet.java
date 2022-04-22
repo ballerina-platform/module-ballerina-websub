@@ -22,5 +22,10 @@ package io.ballerina.stdlib.websub.action.api;
  * {@code CodeSnippet} maker interface for code-snippets.
  */
 public interface CodeSnippet {
+    /**
+     * Returns the code-snippet as a string.
+     *
+     * @return {@code String} representation of the code-snippet
+     */
     String snippetAsAString();
 }
