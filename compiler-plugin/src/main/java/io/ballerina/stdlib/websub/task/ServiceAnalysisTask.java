@@ -23,12 +23,14 @@ import io.ballerina.compiler.api.symbols.Symbol;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.projects.plugins.AnalysisTask;
 import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
+import io.ballerina.stdlib.websub.WebSubDiagnosticCodes;
 import io.ballerina.stdlib.websub.task.validator.ServiceDeclarationValidator;
 import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 
 import java.util.Optional;
 
 import static io.ballerina.stdlib.websub.task.AnalyserUtils.isWebSubService;
+import static io.ballerina.stdlib.websub.task.AnalyserUtils.updateContext;
 
 /**
  * {@code ServiceDeclarationValidator} validates whether websub service declaration is complying to current websub
@@ -55,6 +57,10 @@ public class ServiceAnalysisTask implements AnalysisTask<SyntaxNodeAnalysisConte
         if (serviceDeclarationOpt.isPresent()) {
             ServiceDeclarationSymbol serviceDeclarationSymbol = (ServiceDeclarationSymbol) serviceDeclarationOpt.get();
             if (isWebSubService(serviceDeclarationSymbol)) {
+                if (serviceNode.members().isEmpty()) {
+                    WebSubDiagnosticCodes codeActionDiagnostic = WebSubDiagnosticCodes.WEBSUB_202;
+                    updateContext(context, codeActionDiagnostic, serviceNode.location());
+                }
                 this.validator.validate(context, serviceNode, serviceDeclarationSymbol);
             }
         }
