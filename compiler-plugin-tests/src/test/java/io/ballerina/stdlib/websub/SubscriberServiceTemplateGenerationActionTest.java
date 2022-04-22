@@ -26,7 +26,7 @@ import org.testng.annotations.DataProvider;
 
 import java.util.List;
 
-import static io.ballerina.stdlib.websub.Constants.ADD_SUBSCRIBER_SERVICE_ACTION;
+import static io.ballerina.stdlib.websub.Constants.ADD_MANDATORY_FUNCTION_ACTION;
 import static io.ballerina.stdlib.websub.Constants.NODE_LOCATION;
 
 /**
@@ -45,7 +45,7 @@ public class SubscriberServiceTemplateGenerationActionTest extends AbstractCodeA
         LineRange lineRange = LineRange.from("service.bal", LinePosition.from(2, 0),
                 LinePosition.from(2, 44));
         CodeActionArgument locationArg = CodeActionArgument.from(NODE_LOCATION, lineRange);
-        CodeActionInfo codeAction = CodeActionInfo.from(ADD_SUBSCRIBER_SERVICE_ACTION, List.of(locationArg));
+        CodeActionInfo codeAction = CodeActionInfo.from(ADD_MANDATORY_FUNCTION_ACTION, List.of(locationArg));
         codeAction.setProviderName("WEBSUB_202/ballerina/websub/ADD_SUBSCRIBER_SERVICE_CODE_SNIPPET");
         return codeAction;
     }

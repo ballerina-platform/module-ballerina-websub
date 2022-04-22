@@ -29,31 +29,33 @@ import io.ballerina.projects.plugins.codeaction.CodeActionInfo;
 import io.ballerina.projects.plugins.codeaction.DocumentEdit;
 import io.ballerina.stdlib.websub.Constants;
 import io.ballerina.stdlib.websub.WebSubDiagnosticCodes;
-import io.ballerina.stdlib.websub.action.api.Service;
+import io.ballerina.stdlib.websub.action.api.Function;
 import io.ballerina.tools.diagnostics.Diagnostic;
 import io.ballerina.tools.text.LineRange;
 import io.ballerina.tools.text.TextDocumentChange;
 import io.ballerina.tools.text.TextEdit;
 import io.ballerina.tools.text.TextRange;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static io.ballerina.stdlib.websub.Constants.ADD_SUBSCRIBER_SERVICE_ACTION;
+import static io.ballerina.stdlib.websub.Constants.ADD_MANDATORY_FUNCTION_ACTION;
 import static io.ballerina.stdlib.websub.Constants.NODE_LOCATION;
+import static io.ballerina.stdlib.websub.action.CodeActionUtil.constructMandatoryFunctions;
 import static io.ballerina.stdlib.websub.action.CodeActionUtil.findNode;
 
 /**
- * {@code EmptySubscriberServiceTemplateGenerateAction} generates empty `websub:SubscriberService` code-snippet.
+ * {@code MandatoryFunctionsGenerationAction} generates code-snippets related to mandatory remote functions of a
+ * `websub:SubscriberService`.
  */
-public class SubscriberServiceTemplateGenerationAction implements CodeAction {
-    private final Service websubServiceSnippet;
+public class MandatoryFunctionsGenerationAction implements CodeAction {
+    private final List<Function> mandatoryFunctions;
 
-    public SubscriberServiceTemplateGenerationAction() {
-        this.websubServiceSnippet = CodeActionUtil.constructSubscriberService();
+    public MandatoryFunctionsGenerationAction() {
+        this.mandatoryFunctions = constructMandatoryFunctions();
     }
 
     @Override
@@ -70,7 +72,7 @@ public class SubscriberServiceTemplateGenerationAction implements CodeAction {
 
     private CodeActionInfo constructCodeActionInfo(Diagnostic diagnostic) {
         CodeActionArgument locationArg = CodeActionArgument.from(NODE_LOCATION, diagnostic.location().lineRange());
-        return CodeActionInfo.from(ADD_SUBSCRIBER_SERVICE_ACTION, List.of(locationArg));
+        return CodeActionInfo.from(ADD_MANDATORY_FUNCTION_ACTION, List.of(locationArg));
     }
 
     @Override
@@ -95,19 +97,18 @@ public class SubscriberServiceTemplateGenerationAction implements CodeAction {
     }
 
     private List<TextEdit> retrieveRequiredTextEdits(ServiceDeclarationNode serviceDeclarationNode) {
-        TextRange annotationTextRange = TextRange.from(
-                serviceDeclarationNode.serviceKeyword().textRange().startOffset(), 0);
-        TextEdit annotationsEdit = TextEdit.from(
-                annotationTextRange, String.format("%s%s", websubServiceSnippet.getAnnotationSnippet(), Constants.LS));
         TextRange functionTextRange = TextRange.from(
                 serviceDeclarationNode.openBraceToken().textRange().endOffset(), 0);
+        String functionCodeSnippet = mandatoryFunctions.stream()
+                .map(Function::snippetAsAString)
+                .collect(Collectors.joining(Constants.LS));
         TextEdit functionsEdit = TextEdit.from(
-                functionTextRange, String.format("%s%s", websubServiceSnippet.getFunctionSnippet(), Constants.LS));
-        return Arrays.asList(annotationsEdit, functionsEdit);
+                functionTextRange, String.format("%s%s", functionCodeSnippet, Constants.LS));
+        return List.of(functionsEdit);
     }
 
     @Override
     public String name() {
-        return "ADD_SUBSCRIBER_SERVICE_CODE_SNIPPET";
+        return "ADD_MANDATORY_FUNCTION_CODE_SNIPPET";
     }
 }

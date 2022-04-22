@@ -22,9 +22,7 @@ import io.ballerina.compiler.syntax.tree.ModulePartNode;
 import io.ballerina.compiler.syntax.tree.NonTerminalNode;
 import io.ballerina.compiler.syntax.tree.SyntaxTree;
 import io.ballerina.stdlib.websub.Constants;
-import io.ballerina.stdlib.websub.action.api.Annotation;
 import io.ballerina.stdlib.websub.action.api.Function;
-import io.ballerina.stdlib.websub.action.api.Service;
 import io.ballerina.stdlib.websub.action.api.Type;
 import io.ballerina.tools.text.LineRange;
 import io.ballerina.tools.text.TextDocument;
@@ -51,14 +49,7 @@ public final class CodeActionUtil {
                 .findNode(TextRange.from(start, end - start), true);
     }
 
-    public static Service constructSubscriberService() {
-        Annotation subscriberConfigAnnotation = Annotation
-                .getEmptyAnnotation(Constants.PACKAGE_NAME, Constants.SERVICE_CONFIG_ANNOTATTION);
-        List<Function> mandatoryFunctions = constructMandatoryFunctions();
-        return new Service(List.of(subscriberConfigAnnotation), mandatoryFunctions);
-    }
-
-    private static List<Function> constructMandatoryFunctions() {
+    public static List<Function> constructMandatoryFunctions() {
         // only mandatory function is `onEventNotification`
         List<Function.FunctionArg> functionArgs = constructFunctionArgs();
         List<Type> returnTypes = constructReturnTypes();

@@ -58,7 +58,8 @@ public interface Constants {
 
     // code action related constants
     String NODE_LOCATION = "node.location";
-    String ADD_SUBSCRIBER_SERVICE_ACTION = "Add subscriber service";
+    String ADD_SERVICE_ANNOTATION_CONFIGS_ACTION = "Add service annotation configs";
+    String ADD_MANDATORY_FUNCTION_ACTION = "Add mandatory function";
 
     String SERVICE_CONFIG_ANNOTATTION = "SubscriberServiceConfig";
     String CONTENT_DISTRIBUTION_MESSAGE_TYPE = "ContentDistributionMessage";
