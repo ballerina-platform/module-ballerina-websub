@@ -19,9 +19,14 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="BallerinaWebSubCompilerPluginTests">
-    <test name="UnitTests">
+    <test name="ValidationTests">
         <classes>
             <class name="io.ballerina.stdlib.websub.CompilerPluginTest"/>
+        </classes>
+    </test>
+    <test name="CodeActionTests">
+        <classes>
+            <class name="io.ballerina.stdlib.websub.SubscriberServiceTemplateGenerationActionTest"/>
         </classes>
     </test>
 </suite>
