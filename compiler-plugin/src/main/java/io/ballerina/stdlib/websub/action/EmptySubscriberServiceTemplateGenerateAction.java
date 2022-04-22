@@ -59,8 +59,7 @@ public class EmptySubscriberServiceTemplateGenerateAction implements CodeAction 
 
     @Override
     public List<String> supportedDiagnosticCodes() {
-        WebSubDiagnosticCodes templateGenerationCode = WebSubDiagnosticCodes.WEBSUB_202;
-        return List.of(templateGenerationCode.getCode());
+        return List.of(WebSubDiagnosticCodes.WEBSUB_202.getCode());
     }
 
     @Override
