@@ -23,9 +23,9 @@ import io.ballerina.stdlib.websub.Constants;
 import java.util.List;
 
 /**
- * {@code Service} code snippet for ballerina `websub:SubscriberService`.
+ * {@code Service} wrapper class to hold `websub:SubscriberService` related code-snippets.
  */
-public class Service implements CodeSnippet {
+public class Service {
     private final List<Annotation> annotations;
     private final List<Function> functions;
 
@@ -44,11 +44,5 @@ public class Service implements CodeSnippet {
         return functions.stream()
                 .map(Function::snippetAsAString)
                 .reduce("", (a, b) -> String.format("%s%s%s", a, Constants.LS, b));
-    }
-
-    @Override
-    // todo: implement this method properly
-    public String snippetAsAString() {
-        return null;
     }
 }
