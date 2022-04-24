@@ -23,6 +23,7 @@
         <classes>
             <class name="io.ballerina.stdlib.websub.CompilerPluginTest"/>
             <class name="io.ballerina.stdlib.websub.codeaction.AnnotationConfigsGenerationActionTest"/>
+            <class name="io.ballerina.stdlib.websub.codeaction.MandatoryFunctionsGenerationActionTest"/>
         </classes>
     </test>
 </suite>
