@@ -22,11 +22,7 @@
     <test name="ValidationTests">
         <classes>
             <class name="io.ballerina.stdlib.websub.CompilerPluginTest"/>
-        </classes>
-    </test>
-    <test name="CodeActionTests">
-        <classes>
-            <class name="io.ballerina.stdlib.websub.SubscriberServiceTemplateGenerationActionTest"/>
+            <class name="io.ballerina.stdlib.websub.codeaction.AnnotationConfigsGenerationActionTest"/>
         </classes>
     </test>
 </suite>

@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package io.ballerina.stdlib.websub;
+package io.ballerina.stdlib.websub.codeaction;
 
 import io.ballerina.projects.plugins.codeaction.CodeActionArgument;
 import io.ballerina.projects.plugins.codeaction.CodeActionInfo;
@@ -26,35 +26,38 @@ import org.testng.annotations.DataProvider;
 
 import java.util.List;
 
-import static io.ballerina.stdlib.websub.Constants.ADD_MANDATORY_FUNCTION_ACTION;
+import static io.ballerina.stdlib.websub.Constants.ADD_SERVICE_ANNOTATION_CONFIGS_ACTION;
 import static io.ballerina.stdlib.websub.Constants.NODE_LOCATION;
 
 /**
- * {@code SubscriberServiceTemplateGenerationActionTest} contains the test cases related to subscriber-service
- * generation code-action.
+ * {@code AnnotationConfigsGenerationActionTest} contains the test cases related to service annotation
+ * config generation.
  */
-public class SubscriberServiceTemplateGenerationActionTest extends AbstractCodeActionTest {
+public class AnnotationConfigsGenerationActionTest extends AbstractCodeActionTest {
     @DataProvider
     protected Object[][] testDataProvider() {
         return new Object[][]{
-                {"service.bal", 2, 8, getExpectedCodeAction(), "result.bal"}
+                {"service.bal", 18, 8, "result.bal"}
         };
     }
 
-    private CodeActionInfo getExpectedCodeAction() {
-        LineRange lineRange = LineRange.from("service.bal", LinePosition.from(2, 0),
-                LinePosition.from(2, 44));
+    @Override
+    protected CodeActionInfo getExpectedCodeAction() {
+        LineRange lineRange = LineRange.from("service.bal", LinePosition.from(18, 0),
+                LinePosition.from(22, 1));
         CodeActionArgument locationArg = CodeActionArgument.from(NODE_LOCATION, lineRange);
-        CodeActionInfo codeAction = CodeActionInfo.from(ADD_MANDATORY_FUNCTION_ACTION, List.of(locationArg));
-        codeAction.setProviderName("WEBSUB_202/ballerina/websub/ADD_SUBSCRIBER_SERVICE_CODE_SNIPPET");
+        CodeActionInfo codeAction = CodeActionInfo.from(ADD_SERVICE_ANNOTATION_CONFIGS_ACTION, List.of(locationArg));
+        codeAction.setProviderName("WEBSUB_202/ballerina/websub/ADD_SERVICE_ANNOTATION_CODE_SNIPPET");
         return codeAction;
     }
 
+    @Override
     protected String getTestPackage() {
-        return "sample_24";
+        return "sample_code_action_1";
     }
 
+    @Override
     protected String getConfigDir() {
-        return "subscriber_service_template_generation";
+        return "service_annotation_generation";
     }
 }

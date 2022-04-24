@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package io.ballerina.stdlib.websub;
+package io.ballerina.stdlib.websub.codeaction;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -56,26 +56,29 @@ public abstract class AbstractCodeActionTest {
     private static final Gson GSON = new Gson();
 
     @Test(dataProvider = "testDataProvider")
-    public void testCodeActions(String srcFile, int line, int offset, CodeActionInfo expected, String resultFile)
+    public void testCodeActions(String srcFile, int line, int offset, String resultFile)
             throws IOException {
         Path srcPath = getResourcePath("ballerina_sources", getTestPackage(), srcFile);
         Path targetPath = getResourcePath("codeaction", getConfigDir(), resultFile);
-        performTest(srcPath, LinePosition.from(line, offset), expected, targetPath);
+        performTest(srcPath, LinePosition.from(line, offset), targetPath);
     }
 
     @DataProvider
     protected abstract Object[][] testDataProvider();
 
+    protected abstract CodeActionInfo getExpectedCodeAction();
+
     protected abstract String getTestPackage();
 
     protected abstract String getConfigDir();
 
-    private void performTest(Path filePath, LinePosition cursorPos, CodeActionInfo expected, Path expectedSrc)
+    private void performTest(Path filePath, LinePosition cursorPos, Path expectedSrc)
             throws IOException {
         Project project = ProjectLoader.loadProject(filePath, getEnvironmentBuilder());
         List<CodeActionInfo> codeActions = getCodeActions(filePath, cursorPos, project);
         Assert.assertTrue(codeActions.size() > 0, "Expect atleast 1 code action");
 
+        CodeActionInfo expected = getExpectedCodeAction();
         JsonObject expectedCodeAction = GSON.toJsonTree(expected).getAsJsonObject();
         Optional<CodeActionInfo> found = codeActions.stream()
                 .filter(codeActionInfo -> {
