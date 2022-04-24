@@ -18,50 +18,26 @@
 
 package io.ballerina.stdlib.websub.action.api;
 
-import io.ballerina.stdlib.websub.Constants;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * {@code Annotation} code snippet for ballerina annotation.
  */
 public class Annotation implements CodeSnippet {
     private final Type type;
-    private final List<AnnotationField> fields;
 
-    private Annotation(Type type, List<AnnotationField> fields) {
+    private Annotation(Type type) {
         this.type = type;
-        this.fields = fields;
     }
 
     public static Annotation getEmptyAnnotation(String module, String name) {
         Type type = Type.from(module, name);
-        return new Annotation(type, Collections.emptyList());
+        return new Annotation(type);
     }
 
-    // Generated function snippet template does look like following:
-    //      "@websub:SubscriberServiceConfig {LS + LS}" +
+    // Generated annotation snippet template does look like following:
+    //      "@websub:SubscriberServiceConfig { }"
     @Override
     public String snippetAsAString() {
-        String fields = this.fields.stream()
-                .map(field -> String.format("\t%s: %s", field.name, field.value))
-                .collect(Collectors.joining(Constants.LS));
         String annotationType = String.format("@%s", this.type.snippetAsAString());
-        return String.format("%s {%s%s%s}", annotationType, Constants.LS, fields, Constants.LS);
-    }
-
-    /**
-     * {@code AnnotationField} which represents a field of a ballerina annotation.
-     */
-    public static class AnnotationField {
-        private final String name;
-        private final String value;
-
-        public AnnotationField(String name, String value) {
-            this.name = name;
-            this.value = value;
-        }
+        return String.format("%s { }", annotationType);
     }
 }
