@@ -20,11 +20,7 @@ package io.ballerina.stdlib.websub.action;
 
 import io.ballerina.compiler.api.SemanticModel;
 import io.ballerina.compiler.api.symbols.AnnotationSymbol;
-import io.ballerina.compiler.api.symbols.ModuleSymbol;
-import io.ballerina.compiler.api.symbols.Symbol;
-import io.ballerina.compiler.syntax.tree.AnnotationNode;
-import io.ballerina.compiler.syntax.tree.MetadataNode;
-import io.ballerina.compiler.syntax.tree.NodeList;
+import io.ballerina.compiler.api.symbols.ServiceDeclarationSymbol;
 import io.ballerina.compiler.syntax.tree.NonTerminalNode;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.compiler.syntax.tree.SyntaxTree;
@@ -49,8 +45,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static io.ballerina.stdlib.websub.CommonUtil.extractSubscriberServiceConfig;
 import static io.ballerina.stdlib.websub.action.CodeActionUtil.findNode;
-import static io.ballerina.stdlib.websub.task.AnalyserUtils.getQualifiedType;
 
 /**
  * {@code AnnotationConfigsGenerationAction} generates code-snippets related to annotation config on
@@ -97,8 +93,14 @@ public class AnnotationConfigsGenerationAction implements CodeAction {
         if (!(node instanceof ServiceDeclarationNode)) {
             return Collections.emptyList();
         }
+        ServiceDeclarationNode serviceNode = (ServiceDeclarationNode) node;
+        Optional<AnnotationSymbol> serviceAnnotation = executionContext.currentSemanticModel().symbol(serviceNode)
+                .flatMap(service -> extractSubscriberServiceConfig((ServiceDeclarationSymbol) service));
+        if (serviceAnnotation.isPresent()) {
+            return Collections.emptyList();
+        }
         List<TextEdit> textEdits = retrieveRequiredTextEdits(
-                (ServiceDeclarationNode) node, executionContext.currentSemanticModel());
+                serviceNode, executionContext.currentSemanticModel());
         if (textEdits.isEmpty()) {
             return Collections.emptyList();
         }
@@ -108,10 +110,6 @@ public class AnnotationConfigsGenerationAction implements CodeAction {
     }
 
     private List<TextEdit> retrieveRequiredTextEdits(ServiceDeclarationNode serviceNode, SemanticModel semanticModel) {
-        boolean serviceAnnotationExists = serviceAnnotationExists(serviceNode, semanticModel);
-        if (serviceAnnotationExists) {
-            return Collections.emptyList();
-        }
         TextRange annotationTextRange = TextRange.from(
                 serviceNode.serviceKeyword().textRange().startOffset(), 0);
         String annotationCodeSnippet = serviceAnnotations.stream()
@@ -120,29 +118,6 @@ public class AnnotationConfigsGenerationAction implements CodeAction {
         TextEdit annotationsEdit = TextEdit.from(
                 annotationTextRange, String.format("%s%s", annotationCodeSnippet, Constants.LS));
         return List.of(annotationsEdit);
-    }
-
-    private boolean serviceAnnotationExists(ServiceDeclarationNode serviceNode, SemanticModel semanticModel) {
-        Optional<NodeList<AnnotationNode>> annotationsOpt = serviceNode.metadata().map(MetadataNode::annotations);
-        if (annotationsOpt.isEmpty()) {
-            return false;
-        }
-        for (AnnotationNode annotation: annotationsOpt.get()) {
-            Optional<Symbol> symbolOpt = semanticModel.symbol(annotation);
-            if (symbolOpt.isEmpty()) {
-                continue;
-            }
-            Symbol symbol = symbolOpt.get();
-            if (!(symbol instanceof AnnotationSymbol)) {
-                continue;
-            }
-            AnnotationSymbol annotationSymbol = (AnnotationSymbol) symbol;
-            String moduleName = annotationSymbol.getModule().flatMap(ModuleSymbol::getName).orElse("");
-            String type = annotationSymbol.getName().orElse("");
-            String annotationName = getQualifiedType(type, moduleName);
-            return Constants.SERVICE_ANNOTATION_NAME.equals(annotationName);
-        }
-        return false;
     }
 
     @Override
