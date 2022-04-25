@@ -18,9 +18,6 @@
 
 package io.ballerina.stdlib.websub;
 
-import io.ballerina.runtime.api.utils.StringUtils;
-import io.ballerina.runtime.api.values.BString;
-
 /**
  * {@code Constants} contains the public constants to be used.
  */
@@ -33,14 +30,10 @@ public interface Constants {
 
     String SERVICE_PATH = "SERVICE_PATH";
     String SERVICE_REGISTRY = "SERVICE_REGISTRY";
-    String SERVICE_INFO_REGISTRY = "SERVICE_INFO_REGISTRY";
     String SUBSCRIBER_CONFIG = "SUBSCRIBER_CONFIG";
 
     String ON_SUBSCRIPTION_VERIFICATION = "onSubscriptionVerification";
     String ON_UNSUBSCRIPTION_VERIFICATION = "onUnsubscriptionVerification";
     String ON_SUBSCRIPTION_VALIDATION_DENIED = "onSubscriptionValidationDenied";
     String ON_EVENT_NOTIFICATION = "onEventNotification";
-
-    String ANN_NAME_HTTP_INTROSPECTION_DOC_CONFIG = "IntrospectionDocConfig";
-    BString ANN_FIELD_DOC_NAME = StringUtils.fromString("name");
 }
