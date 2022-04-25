@@ -96,7 +96,7 @@ public class Listener {
     isolated function executeAttach(SubscriberService 'service, SubscriberServiceConfiguration serviceConfig,
                                     string[]|string? name = ()) returns error? {
         boolean generateServicePath = shouldUseGeneratedServicePath(serviceConfig, name);
-        string[]|string? servicePath = generateServicePath ? check self.retrieveGeneratedServicePath('service): name;
+        string[]|string? servicePath = generateServicePath ? check self.retrieveGeneratedServicePath(serviceConfig): name;
         string completeSevicePath = check retrieveCompleteServicePath(servicePath);
         string callback = constructCallbackUrl(serviceConfig, self.port, self.listenerConfig,
                                                 completeSevicePath, generateServicePath);
@@ -106,17 +106,16 @@ public class Listener {
         self.externAttach(completeSevicePath, 'service, httpService, serviceConfig);
     }
 
-    isolated function retrieveGeneratedServicePath(SubscriberService subscriberService) returns string|Error {
-        MetaInformation? metaInfo = retrieveServiceMetaInfo(subscriberService);
-        if (metaInfo is MetaInformation) {
-            string|error servicePath = strings:fromBytes(metaInfo.servicePath);
-            if servicePath is error {
-                return error Error("Error retrieving Service Information", servicePath);
-            }
-            return servicePath;
-        } else {
-            return error Error("Error retrieving Service Information: service path not found");
+    isolated function retrieveGeneratedServicePath(SubscriberServiceConfiguration serviceConfig) returns string|Error {
+        byte[] servicePathInfo = serviceConfig.servicePath;
+        if servicePathInfo.length() == 0 {
+            return error Error("Error retrieving service information: service path not found");
         }
+        string|error servicePath = strings:fromBytes(serviceConfig.servicePath);
+        if servicePath is error {
+            return error Error("Error retrieving service information", servicePath);
+        }
+        return servicePath;
     }
 
     isolated function externAttach(string servicePath, SubscriberService subscriberService,
@@ -251,11 +250,6 @@ isolated function retrieveHttpListenerConfig(ListenerConfiguration config) retur
 isolated function retrieveSubscriberServiceAnnotations(SubscriberService serviceType) returns SubscriberServiceConfiguration? {
     typedesc<any> serviceTypedesc = typeof serviceType;
     return serviceTypedesc.@SubscriberServiceConfig;
-}
-
-isolated function retrieveServiceMetaInfo(SubscriberService serviceType) returns MetaInformation? {
-    typedesc<any> serviceTypedesc = typeof serviceType;
-    return serviceTypedesc.@MetaInfo;
 }
 
 isolated function constructCallbackUrl(SubscriberServiceConfiguration subscriberConfig, int port, 

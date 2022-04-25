@@ -50,14 +50,9 @@ public interface Constants {
 
     String OPTIONAL = "?";
 
-    // resource directory structure related constants
-    String TARGET_DIR_NAME = "target";
-    String BIN_DIR_NAME = "bin";
-    String RESOURCES_DIR_NAME = "resources";
-    String RESOURCE_DIR_NAME = "resource";
-
-    String META_INFO_ANNOTATION_NAME = "MetaInfo";
-    String SERVICE_PATH = "servicePath";
+    // unique service path generation related constants
+    String SERVICE_ANNOTATION_IDENTIFIER = "SubscriberServiceConfig";
+    String SERVICE_PATH_FIELD = "servicePath";
 
     String LS = System.getProperty("line.separator");
 }

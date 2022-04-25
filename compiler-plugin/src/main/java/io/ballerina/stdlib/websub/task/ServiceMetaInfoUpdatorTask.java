@@ -26,7 +26,6 @@ import io.ballerina.compiler.syntax.tree.IdentifierToken;
 import io.ballerina.compiler.syntax.tree.MappingConstructorExpressionNode;
 import io.ballerina.compiler.syntax.tree.MappingFieldNode;
 import io.ballerina.compiler.syntax.tree.MetadataNode;
-import io.ballerina.compiler.syntax.tree.MinutiaeList;
 import io.ballerina.compiler.syntax.tree.ModuleMemberDeclarationNode;
 import io.ballerina.compiler.syntax.tree.ModulePartNode;
 import io.ballerina.compiler.syntax.tree.Node;
@@ -51,10 +50,10 @@ import io.ballerina.stdlib.websub.task.service.path.ServicePathContext;
 import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static io.ballerina.stdlib.websub.task.service.path.ServicePathContextHandler.getContextHandler;
@@ -124,10 +123,10 @@ public class ServiceMetaInfoUpdatorTask implements ModifierTask<SourceModifierCo
             Optional<MetadataNode> metadata = serviceNode.metadata();
             if (metadata.isPresent()) {
                 MetadataNode metadataNode = metadata.get();
-                NodeList<AnnotationNode> oldAnnotations = metadataNode.annotations();
                 MetadataNode.MetadataNodeModifier modifier = metadataNode.modify();
-                AnnotationNode newAnnotation = createAnnotationNode(servicePathInfo.getServicePath());
-                modifier.withAnnotations(oldAnnotations.add(newAnnotation));
+                NodeList<AnnotationNode> updatedAnnotations = updateAnnotations(
+                        metadataNode.annotations(), servicePathInfo.getServicePath());
+                modifier.withAnnotations(updatedAnnotations);
                 MetadataNode updatedMetadataNode = modifier.apply();
                 ServiceDeclarationNode.ServiceDeclarationNodeModifier serviceDecModifier = serviceNode.modify();
                 serviceDecModifier.withMetadata(updatedMetadataNode);
@@ -138,47 +137,54 @@ public class ServiceMetaInfoUpdatorTask implements ModifierTask<SourceModifierCo
         return AbstractNodeFactory.createNodeList(updatedMembers);
     }
 
-    private AnnotationNode createAnnotationNode(String generatedServicePath) {
-        Token atToken = AbstractNodeFactory.createToken(SyntaxKind.AT_TOKEN);
-        IdentifierToken websubModulePrefix = AbstractNodeFactory.createIdentifierToken(Constants.PACKAGE_NAME);
-        Token colonToken = AbstractNodeFactory.createToken(SyntaxKind.COLON_TOKEN);
-        IdentifierToken identifierToken = AbstractNodeFactory.createIdentifierToken(
-                Constants.META_INFO_ANNOTATION_NAME);
-        QualifiedNameReferenceNode nameRef = NodeFactory
-                .createQualifiedNameReferenceNode(websubModulePrefix, colonToken, identifierToken);
-        MappingConstructorExpressionNode mappingConstructor = crateMappingConstructor(
-                Map.of(Constants.SERVICE_PATH, generatedServicePath));
-        return NodeFactory.createAnnotationNode(atToken, nameRef, mappingConstructor);
-    }
-
-    private MappingConstructorExpressionNode crateMappingConstructor(Map<String, String> fields) {
-        Token openBraceToken = AbstractNodeFactory.createToken(SyntaxKind.OPEN_BRACE_TOKEN, emptyML(), singleNLML());
-        Token closeBraceToken = AbstractNodeFactory.createToken(SyntaxKind.CLOSE_BRACE_TOKEN);
-        List<Node> mappingFields = new LinkedList<>();
-        for (Map.Entry<String, String> entry : fields.entrySet()) {
-            mappingFields.add(createSpecificFieldNode(entry.getKey(), entry.getValue()));
-            mappingFields.add(AbstractNodeFactory.createToken(SyntaxKind.COMMA_TOKEN));
+    private NodeList<AnnotationNode> updateAnnotations(NodeList<AnnotationNode> currentAnnotations,
+                                                       String servicePath) {
+        NodeList<AnnotationNode> updatedAnnotations = NodeFactory.createNodeList();
+        for (AnnotationNode annotation: currentAnnotations) {
+            if (isSubscriberServiceConfig(annotation)) {
+                SeparatedNodeList<MappingFieldNode> updatedFields = getUpdatedFields(annotation, servicePath);
+                MappingConstructorExpressionNode annotationValue =
+                        NodeFactory.createMappingConstructorExpressionNode(
+                                NodeFactory.createToken(SyntaxKind.OPEN_BRACE_TOKEN), updatedFields,
+                                NodeFactory.createToken(SyntaxKind.CLOSE_BRACE_TOKEN));
+                annotation = annotation.modify().withAnnotValue(annotationValue).apply();
+            }
+            updatedAnnotations = updatedAnnotations.add(annotation);
         }
-        if (mappingFields.size() > 1) {
-            mappingFields.remove(mappingFields.size() - 1);
+        return updatedAnnotations;
+    }
+
+    private SeparatedNodeList<MappingFieldNode> getUpdatedFields(AnnotationNode annotation, String servicePath) {
+        Optional<MappingConstructorExpressionNode> annotationValueOpt = annotation.annotValue();
+        if (annotationValueOpt.isEmpty()) {
+            return NodeFactory.createSeparatedNodeList(createServicePathField(servicePath));
         }
-        SeparatedNodeList<MappingFieldNode> fieldsNodeList = AbstractNodeFactory.createSeparatedNodeList(mappingFields);
-        return NodeFactory.createMappingConstructorExpressionNode(openBraceToken, fieldsNodeList, closeBraceToken);
+        List<Node> fields = new ArrayList<>();
+        MappingConstructorExpressionNode annotationValue = annotationValueOpt.get();
+        SeparatedNodeList<MappingFieldNode> existingFields = annotationValue.fields();
+        Token separator = NodeFactory.createToken(SyntaxKind.COMMA_TOKEN);
+        for (MappingFieldNode field : existingFields) {
+            fields.add(field);
+            fields.add(separator);
+        }
+        fields.add(createServicePathField(servicePath));
+        return NodeFactory.createSeparatedNodeList(fields);
     }
 
-    private static MinutiaeList emptyML() {
-        return AbstractNodeFactory.createEmptyMinutiaeList();
-    }
-
-    private static MinutiaeList singleNLML() {
-        return emptyML().add(AbstractNodeFactory.createEndOfLineMinutiae(Constants.LS));
-    }
-
-    private static SpecificFieldNode createSpecificFieldNode(String name, String value) {
-        IdentifierToken fieldName = AbstractNodeFactory.createIdentifierToken(name);
+    private static SpecificFieldNode createServicePathField(String value) {
+        IdentifierToken fieldName = AbstractNodeFactory.createIdentifierToken(Constants.SERVICE_PATH_FIELD);
         Token colonToken = AbstractNodeFactory.createToken(SyntaxKind.COLON_TOKEN);
         String encodedValue = Base64.getEncoder().encodeToString(value.getBytes(Charset.defaultCharset()));
-        ExpressionNode expressionNode = NodeParser.parseExpression(String.format("base64 `%s`", encodedValue));
+        ExpressionNode expressionNode = NodeParser.parseExpression(
+                String.format("base64 `%s`.cloneReadOnly()", encodedValue));
         return NodeFactory.createSpecificFieldNode(null, fieldName, colonToken, expressionNode);
+    }
+
+    private boolean isSubscriberServiceConfig(AnnotationNode annotationNode) {
+        QualifiedNameReferenceNode referenceNode = ((QualifiedNameReferenceNode) annotationNode.annotReference());
+        if (!Constants.PACKAGE_NAME.equals(referenceNode.modulePrefix().text())) {
+            return false;
+        }
+        return Constants.SERVICE_ANNOTATION_IDENTIFIER.equals(referenceNode.identifier().text());
     }
 }
