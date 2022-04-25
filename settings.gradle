@@ -18,12 +18,14 @@ include ':websub-native'
 include ':websub-ballerina'
 include ':websub-compiler-plugin'
 include ':websub-compiler-plugin-tests'
+include ':websub-integration-tests'
 
 project(':checkstyle').projectDir = file("build-config${File.separator}checkstyle")
 project(':websub-native').projectDir = file("native")
 project(':websub-compiler-plugin').projectDir = file("compiler-plugin")
 project(':websub-ballerina').projectDir = file("ballerina")
 project(':websub-compiler-plugin-tests').projectDir = file("compiler-plugin-tests")
+project(':websub-integration-tests').projectDir = file("integration-tests")
 
 gradleEnterprise {
     buildScan {

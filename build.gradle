@@ -112,6 +112,7 @@ task build {
     dependsOn('websub-ballerina:build')
     dependsOn(':websub-compiler-plugin:build')
     dependsOn(':websub-compiler-plugin-tests:build')
+    dependsOn(':websub-integration-tests')
 }
 
 publishToMavenLocal.dependsOn build
