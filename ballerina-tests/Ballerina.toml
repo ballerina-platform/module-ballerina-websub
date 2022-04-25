@@ -1,6 +1,6 @@
 [package]
 org = "ballerina"
-name = "websub_integration_tests"
+name = "websub_tests"
 version = "2.2.2"
 
 [[platform.java11.dependency]]
