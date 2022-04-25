@@ -59,10 +59,10 @@ import java.util.Optional;
 import static io.ballerina.stdlib.websub.task.service.path.ServicePathContextHandler.getContextHandler;
 
 /**
- * {@code serviceMetaInfoUpdatorTask} modifies the source by adding required meta-info for the websub service
+ * {@code ServiceMetaInfoUpdaterTask} modifies the source by adding required meta-info for the websub service
  * declarations.
  */
-public class ServiceMetaInfoUpdatorTask implements ModifierTask<SourceModifierContext> {
+public class ServiceMetaInfoUpdaterTask implements ModifierTask<SourceModifierContext> {
     @Override
     public void modify(SourceModifierContext context) {
         boolean erroneousCompilation = context.compilation().diagnosticResult()

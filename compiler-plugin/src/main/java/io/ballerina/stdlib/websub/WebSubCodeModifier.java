@@ -21,7 +21,7 @@ package io.ballerina.stdlib.websub;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
 import io.ballerina.projects.plugins.CodeModifier;
 import io.ballerina.projects.plugins.CodeModifierContext;
-import io.ballerina.stdlib.websub.task.ServiceMetaInfoUpdatorTask;
+import io.ballerina.stdlib.websub.task.ServiceMetaInfoUpdaterTask;
 import io.ballerina.stdlib.websub.task.WebSubServiceInfoGeneratorTask;
 
 /**
@@ -32,6 +32,6 @@ public class WebSubCodeModifier extends CodeModifier {
     public void init(CodeModifierContext codeModifierContext) {
         codeModifierContext.addSyntaxNodeAnalysisTask(
                 new WebSubServiceInfoGeneratorTask(), SyntaxKind.SERVICE_DECLARATION);
-        codeModifierContext.addSourceModifierTask(new ServiceMetaInfoUpdatorTask());
+        codeModifierContext.addSourceModifierTask(new ServiceMetaInfoUpdaterTask());
     }
 }
