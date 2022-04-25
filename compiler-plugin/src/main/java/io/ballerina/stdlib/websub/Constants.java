@@ -55,4 +55,9 @@ public interface Constants {
     String BIN_DIR_NAME = "bin";
     String RESOURCES_DIR_NAME = "resources";
     String RESOURCE_DIR_NAME = "resource";
+
+    String META_INFO_ANNOTATION_NAME = "MetaInfo";
+    String SERVICE_PATH = "servicePath";
+
+    String LS = System.getProperty("line.separator");
 }

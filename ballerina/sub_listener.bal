@@ -51,12 +51,7 @@ public class Listener {
         self.listenerConfig = self.httpListener.getConfig();
         self.port = self.httpListener.getPort();
         self.gracefulShutdownPeriod = config.gracefulShutdownPeriod;
-        return self.externInit();
     }
-
-    isolated function externInit() returns Error? = @java:Method {
-        'class: "io.ballerina.stdlib.websub.NativeWebSubListenerAdaptor"
-    } external;
 
     # Attaches the provided `websub:SubscriberService` to the `websub:Listener`.
     # ```ballerina
@@ -111,9 +106,18 @@ public class Listener {
         self.externAttach(completeSevicePath, 'service, httpService, serviceConfig);
     }
 
-    isolated function retrieveGeneratedServicePath(SubscriberService subscriberService) returns string|Error = @java:Method {
-        'class: "io.ballerina.stdlib.websub.NativeWebSubListenerAdaptor"
-    } external;
+    isolated function retrieveGeneratedServicePath(SubscriberService subscriberService) returns string|Error {
+        MetaInformation? metaInfo = retrieveServiceMetaInfo(subscriberService);
+        if (metaInfo is MetaInformation) {
+            string|error servicePath = strings:fromBytes(metaInfo.servicePath);
+            if servicePath is error {
+                return error Error("Error retrieving Service Information", servicePath);
+            }
+            return servicePath;
+        } else {
+            return error Error("Error retrieving Service Information: service path not found");
+        }
+    }
 
     isolated function externAttach(string servicePath, SubscriberService subscriberService,
                                     HttpService httpService, SubscriberServiceConfiguration config) = @java:Method {
@@ -247,6 +251,11 @@ isolated function retrieveHttpListenerConfig(ListenerConfiguration config) retur
 isolated function retrieveSubscriberServiceAnnotations(SubscriberService serviceType) returns SubscriberServiceConfiguration? {
     typedesc<any> serviceTypedesc = typeof serviceType;
     return serviceTypedesc.@SubscriberServiceConfig;
+}
+
+isolated function retrieveServiceMetaInfo(SubscriberService serviceType) returns MetaInformation? {
+    typedesc<any> serviceTypedesc = typeof serviceType;
+    return serviceTypedesc.@MetaInfo;
 }
 
 isolated function constructCallbackUrl(SubscriberServiceConfiguration subscriberConfig, int port, 

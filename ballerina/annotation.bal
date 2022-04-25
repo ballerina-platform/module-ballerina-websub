@@ -46,7 +46,7 @@ public type SubscriberServiceConfiguration record {|
 public annotation SubscriberServiceConfiguration SubscriberServiceConfig on service;
 
 public type MetaInformation record {|
-    string servicePath;
+    byte[] servicePath;
 |};
 
 public annotation MetaInformation MetaInfo on service;
