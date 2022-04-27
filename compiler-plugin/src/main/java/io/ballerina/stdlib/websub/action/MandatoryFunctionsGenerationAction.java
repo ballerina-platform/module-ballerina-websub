@@ -103,7 +103,7 @@ public class MandatoryFunctionsGenerationAction implements CodeAction {
                 .map(Function::snippetAsAString)
                 .collect(Collectors.joining(Constants.LS));
         TextEdit functionsEdit = TextEdit.from(
-                functionTextRange, String.format("%s%s", functionCodeSnippet, Constants.LS));
+                functionTextRange, String.format("%s%s%s", Constants.LS, functionCodeSnippet, Constants.LS));
         return List.of(functionsEdit);
     }
 
