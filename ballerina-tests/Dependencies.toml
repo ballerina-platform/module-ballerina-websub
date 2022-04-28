@@ -82,6 +82,9 @@ dependencies = [
 	{org = "ballerina", name = "time"},
 	{org = "ballerina", name = "url"}
 ]
+modules = [
+	{org = "ballerina", packageName = "http", moduleName = "http"}
+]
 
 [[package]]
 org = "ballerina"
@@ -200,6 +203,9 @@ dependencies = [
 	{org = "ballerina", name = "lang.value"},
 	{org = "ballerina", name = "observe"}
 ]
+modules = [
+	{org = "ballerina", packageName = "log", moduleName = "log"}
+]
 
 [[package]]
 org = "ballerina"
@@ -291,6 +297,9 @@ scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
+modules = [
+	{org = "ballerina", packageName = "url", moduleName = "url"}
+]
 
 [[package]]
 org = "ballerina"
@@ -319,8 +328,11 @@ org = "ballerina"
 name = "websub_tests"
 version = "2.2.2"
 dependencies = [
+	{org = "ballerina", name = "http"},
 	{org = "ballerina", name = "lang.runtime"},
+	{org = "ballerina", name = "log"},
 	{org = "ballerina", name = "test"},
+	{org = "ballerina", name = "url"},
 	{org = "ballerina", name = "websub"}
 ]
 modules = [
