@@ -98,6 +98,33 @@ public class ServiceMetaInfoUpdaterTask implements ModifierTask<SourceModifierCo
                 context.modifySourceFile(updatedSyntaxTree.textDocument(), docId);
             }
         }
+
+        // for test files
+        for (ModuleId modId : context.currentPackage().moduleIds()) {
+            Module currentModule = context.currentPackage().module(modId);
+            SemanticModel semanticModel = context.compilation().getSemanticModel(modId);
+            for (DocumentId docId : currentModule.testDocumentIds()) {
+                Optional<ServicePathContext> servicePathContextOpt = getContextHandler().retrieveContext(modId, docId);
+                // if the shared service-path generation context not found, do not proceed
+                if (servicePathContextOpt.isEmpty()) {
+                    continue;
+                }
+                List<ServicePathContext.ServicePathInformation> servicePathDetails = servicePathContextOpt.get()
+                        .getServicePathDetails();
+                if (servicePathDetails.isEmpty()) {
+                    continue;
+                }
+
+                Document currentDoc = currentModule.document(docId);
+                ModulePartNode rootNode = currentDoc.syntaxTree().rootNode();
+                NodeList<ModuleMemberDeclarationNode> newMembers = updateMemberNodes(
+                        rootNode.members(), servicePathDetails, semanticModel);
+                ModulePartNode newModulePart =
+                        rootNode.modify(rootNode.imports(), newMembers, rootNode.eofToken());
+                SyntaxTree updatedSyntaxTree = currentDoc.syntaxTree().modifyWith(newModulePart);
+                context.modifyTestFile(updatedSyntaxTree.textDocument(), docId);
+            }
+        }
     }
 
     private NodeList<ModuleMemberDeclarationNode> updateMemberNodes(NodeList<ModuleMemberDeclarationNode> oldMembers,
