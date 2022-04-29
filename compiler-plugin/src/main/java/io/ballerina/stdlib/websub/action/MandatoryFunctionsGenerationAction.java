@@ -18,6 +18,7 @@
 
 package io.ballerina.stdlib.websub.action;
 
+import io.ballerina.compiler.syntax.tree.Node;
 import io.ballerina.compiler.syntax.tree.NonTerminalNode;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
 import io.ballerina.compiler.syntax.tree.SyntaxTree;
@@ -96,15 +97,26 @@ public class MandatoryFunctionsGenerationAction implements CodeAction {
                 new DocumentEdit(executionContext.fileUri(), SyntaxTree.from(syntaxTree, change)));
     }
 
-    private List<TextEdit> retrieveRequiredTextEdits(ServiceDeclarationNode serviceDeclarationNode) {
-        TextRange functionTextRange = TextRange.from(
-                serviceDeclarationNode.openBraceToken().textRange().endOffset(), 0);
+    private List<TextEdit> retrieveRequiredTextEdits(ServiceDeclarationNode serviceNode) {
+        TextRange functionTextRange = getTextRange(serviceNode);
         String functionCodeSnippet = mandatoryFunctions.stream()
                 .map(Function::snippetAsAString)
                 .collect(Collectors.joining(Constants.LS));
         TextEdit functionsEdit = TextEdit.from(
                 functionTextRange, String.format("%s%s%s", Constants.LS, functionCodeSnippet, Constants.LS));
         return List.of(functionsEdit);
+    }
+
+    private TextRange getTextRange(ServiceDeclarationNode serviceNode) {
+        if (serviceNode.members().isEmpty()) {
+            int length = serviceNode.closeBraceToken().textRange().startOffset() -
+                    serviceNode.openBraceToken().textRange().endOffset();
+            return TextRange.from(serviceNode.openBraceToken().textRange().endOffset(), length);
+        } else {
+            Node lastMember = serviceNode.members().get(serviceNode.members().size() - 1);
+            int length = serviceNode.closeBraceToken().textRange().startOffset() - lastMember.textRange().endOffset();
+            return TextRange.from(lastMember.textRange().endOffset(), length);
+        }
     }
 
     @Override
