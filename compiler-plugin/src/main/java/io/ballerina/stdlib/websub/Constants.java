@@ -50,22 +50,22 @@ public interface Constants {
 
     String OPTIONAL = "?";
 
-    // code action related constants
-    String NODE_LOCATION = "node.location";
-    String ADD_SERVICE_ANNOTATION_CONFIGS_ACTION = "Add service annotation configs";
-    String ADD_MANDATORY_FUNCTION_ACTION = "Add mandatory function";
-
-    String SERVICE_CONFIG_ANNOTATTION = "SubscriberServiceConfig";
+    String LS = System.getProperty("line.separator");
+    
+    // WebSub Types related config
+    String SERVICE_CONFIG_ANNOTATTION_TYPE = "SubscriberServiceConfig";
     String CONTENT_DISTRIBUTION_MESSAGE_TYPE = "ContentDistributionMessage";
-    String CONTENT_DISTRIBUTION_MESSAGE_PARAM_NAME = "message";
     String ACKNOWLEDGEMENT_TYPE = "Acknowledgement";
     String SUBSCRIPTION_DELETED_ERROR_TYPE = "SubscriptionDeletedError";
     String BALLERINA_ERROR_PACKAGE = "annotations";
     String BALLERINA_ERROR_TYPE = "error";
 
-    // unique service path generation related constants
-    String SERVICE_ANNOTATION_IDENTIFIER = "SubscriberServiceConfig";
-    String SERVICE_PATH_FIELD = "servicePath";
+    // code action related constants
+    String CONTENT_DISTRIBUTION_MESSAGE_PARAM_NAME = "message";
+    String NODE_LOCATION = "node.location";
+    String ADD_SERVICE_ANNOTATION_CONFIGS_ACTION = "Add service annotation configs";
+    String ADD_MANDATORY_FUNCTION_ACTION = "Add mandatory function";
 
-    String LS = System.getProperty("line.separator");
+    // unique service path generation related constants
+    String SERVICE_PATH_FIELD = "servicePath";
 }

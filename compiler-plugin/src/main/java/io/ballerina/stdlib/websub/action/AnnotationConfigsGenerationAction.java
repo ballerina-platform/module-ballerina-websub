@@ -57,7 +57,7 @@ public class AnnotationConfigsGenerationAction implements CodeAction {
 
     public AnnotationConfigsGenerationAction() {
         this.serviceAnnotations = List.of(
-                Annotation.getEmptyAnnotation(Constants.PACKAGE_NAME, Constants.SERVICE_CONFIG_ANNOTATTION));
+                Annotation.getEmptyAnnotation(Constants.PACKAGE_NAME, Constants.SERVICE_CONFIG_ANNOTATTION_TYPE));
     }
 
     @Override
