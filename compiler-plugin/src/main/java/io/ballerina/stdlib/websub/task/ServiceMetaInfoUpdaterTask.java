@@ -122,7 +122,7 @@ public class ServiceMetaInfoUpdaterTask implements ModifierTask<SourceModifierCo
                 ModulePartNode newModulePart =
                         rootNode.modify(rootNode.imports(), newMembers, rootNode.eofToken());
                 SyntaxTree updatedSyntaxTree = currentDoc.syntaxTree().modifyWith(newModulePart);
-                context.modifyTestFile(updatedSyntaxTree.textDocument(), docId);
+                context.modifyTestSourceFile(updatedSyntaxTree.textDocument(), docId);
             }
         }
     }
