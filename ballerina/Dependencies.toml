@@ -315,7 +315,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "websub"
-version = "2.2.3"
+version = "2.2.2"
 dependencies = [
 	{org = "ballerina", name = "crypto"},
 	{org = "ballerina", name = "http"},
