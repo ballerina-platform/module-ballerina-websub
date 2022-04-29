@@ -30,7 +30,7 @@ public class WebSubCompilerPlugin extends CompilerPlugin {
     @Override
     public void init(CompilerPluginContext context) {
         context.addCodeAnalyzer(new WebSubCodeAnalyzer());
-        context.addCompilerLifecycleListener(new WebSubLifeCycleListener());
+        context.addCodeModifier(new WebSubCodeModifier());
         context.addCodeAction(new AnnotationConfigsGenerationAction());
         context.addCodeAction(new MandatoryFunctionsGenerationAction());
     }

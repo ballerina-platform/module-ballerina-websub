@@ -16,9 +16,8 @@
 
 package io.ballerina.stdlib.websub.task.service.path;
 
-import io.ballerina.projects.Package;
-import io.ballerina.projects.PackageId;
 import io.ballerina.projects.Project;
+import io.ballerina.projects.plugins.SyntaxNodeAnalysisContext;
 
 import java.util.List;
 
@@ -34,12 +33,11 @@ public final class ServicePathGeneratorManager {
                 new SingleFileServicePathGenerator(), new BalProjectServicePathGenerator());
     }
 
-    public void generate(Package currentPackage, int serviceId) throws ServicePathGeneratorException {
-        Project currentProject = currentPackage.project();
+    public void generate(SyntaxNodeAnalysisContext context, int serviceId) throws ServicePathGeneratorException {
+        Project currentProject = context.currentPackage().project();
         for (ServicePathGenerator servicePathGenerator: servicePathGenerators) {
             if (servicePathGenerator.isSupported(currentProject.kind())) {
-                PackageId packageId = currentPackage.packageId();
-                servicePathGenerator.generate(packageId, currentProject.sourceRoot(), serviceId);
+                servicePathGenerator.generate(context.moduleId(), context.documentId(), serviceId);
                 return;
             }
         }

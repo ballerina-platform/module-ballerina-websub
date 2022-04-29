@@ -16,9 +16,9 @@
 
 package io.ballerina.stdlib.websub.task.service.path;
 
-import io.ballerina.projects.PackageId;
+import io.ballerina.projects.DocumentId;
+import io.ballerina.projects.ModuleId;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,22 +27,22 @@ import java.util.List;
  * {@code ServicePathContext} contains details related to compile-time service path generation.
  */
 public class ServicePathContext {
-    private final PackageId packageId;
-    private final Path sourcePath;
+    private final ModuleId moduleId;
+    private final DocumentId documentId;
     private final List<ServicePathInformation> servicePathDetails;
 
-    public ServicePathContext(PackageId packageId, Path sourcePath) {
-        this.packageId = packageId;
-        this.sourcePath = sourcePath;
+    public ServicePathContext(ModuleId moduleId, DocumentId documentId) {
+        this.moduleId = moduleId;
+        this.documentId = documentId;
         this.servicePathDetails = new ArrayList<>();
     }
 
-    public PackageId getPackageId() {
-        return packageId;
+    public ModuleId getModuleId() {
+        return moduleId;
     }
 
-    public Path getSourcePath() {
-        return sourcePath;
+    public DocumentId getDocumentId() {
+        return documentId;
     }
 
     public List<ServicePathInformation> getServicePathDetails() {

@@ -27,6 +27,7 @@ import ballerina/http;
 # + unsubscribeOnShutdown - This flag notifies whether or not to initiate unsubscription when the service is shutting down
 # + httpConfig - The configuration for the hub client used to interact with the discovered/specified hub
 # + discoveryConfig - HTTP client configurations for resource discovery
+# + servicePath - The generated service-path if the service-path is not provided. This is auto-generated at the compile-time.
 public type SubscriberServiceConfiguration record {|
     string|[string, string] target?;
     int leaseSeconds?;
@@ -40,6 +41,7 @@ public type SubscriberServiceConfiguration record {|
         string|string[] acceptLanguage?;
         http:ClientConfiguration httpConfig?;
     |} discoveryConfig?;
+    readonly byte[] servicePath = [];
 |};
 
 # WebSub Subscriber Configuration for the service, indicating subscription related parameters.

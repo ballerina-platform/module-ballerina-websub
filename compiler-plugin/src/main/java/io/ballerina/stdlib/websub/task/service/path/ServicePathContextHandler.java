@@ -16,9 +16,9 @@
 
 package io.ballerina.stdlib.websub.task.service.path;
 
-import io.ballerina.projects.PackageId;
+import io.ballerina.projects.DocumentId;
+import io.ballerina.projects.ModuleId;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -51,9 +51,9 @@ public final class ServicePathContextHandler {
         }
     }
 
-    public void updateServicePathContext(PackageId packageId, Path srcRoot,
+    public void updateServicePathContext(ModuleId moduleId, DocumentId documentId,
                                          ServicePathContext.ServicePathInformation servicePathInformation) {
-        Optional<ServicePathContext> contextOpt = retrieveContext(packageId, srcRoot);
+        Optional<ServicePathContext> contextOpt = retrieveContext(moduleId, documentId);
         if (contextOpt.isPresent()) {
             ServicePathContext context = contextOpt.get();
             synchronized (context) {
@@ -61,19 +61,19 @@ public final class ServicePathContextHandler {
             }
             return;
         }
-        ServicePathContext context = new ServicePathContext(packageId, srcRoot);
+        ServicePathContext context = new ServicePathContext(moduleId, documentId);
         context.updateServicePathDetails(servicePathInformation);
         addContext(context);
     }
 
-    public Optional<ServicePathContext> retrieveContext(PackageId packageId, Path srcRoot) {
+    public Optional<ServicePathContext> retrieveContext(ModuleId moduleId, DocumentId documentId) {
         return this.contexts.stream()
-                .filter(ctx -> equals(ctx, packageId, srcRoot))
+                .filter(ctx -> equals(ctx, moduleId, documentId))
                 .findFirst();
     }
 
-    private boolean equals(ServicePathContext context, PackageId packageId, Path srcRoot) {
-        int hashCodeForCurrentContext = Objects.hash(context.getPackageId(), context.getSourcePath());
-        return hashCodeForCurrentContext == Objects.hash(packageId, srcRoot);
+    private boolean equals(ServicePathContext context, ModuleId moduleId, DocumentId documentId) {
+        int hashCodeForCurrentContext = Objects.hash(context.getModuleId(), context.getDocumentId());
+        return hashCodeForCurrentContext == Objects.hash(moduleId, documentId);
     }
 }

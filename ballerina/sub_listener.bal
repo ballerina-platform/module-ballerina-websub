@@ -51,12 +51,7 @@ public class Listener {
         self.listenerConfig = self.httpListener.getConfig();
         self.port = self.httpListener.getPort();
         self.gracefulShutdownPeriod = config.gracefulShutdownPeriod;
-        return self.externInit();
     }
-
-    isolated function externInit() returns Error? = @java:Method {
-        'class: "io.ballerina.stdlib.websub.NativeWebSubListenerAdaptor"
-    } external;
 
     # Attaches the provided `websub:SubscriberService` to the `websub:Listener`.
     # ```ballerina
@@ -101,7 +96,7 @@ public class Listener {
     isolated function executeAttach(SubscriberService 'service, SubscriberServiceConfiguration serviceConfig,
                                     string[]|string? name = ()) returns error? {
         boolean generateServicePath = shouldUseGeneratedServicePath(serviceConfig, name);
-        string[]|string? servicePath = generateServicePath ? check self.retrieveGeneratedServicePath('service): name;
+        string[]|string? servicePath = generateServicePath ? check self.retrieveGeneratedServicePath(serviceConfig): name;
         string completeSevicePath = check retrieveCompleteServicePath(servicePath);
         string callback = constructCallbackUrl(serviceConfig, self.port, self.listenerConfig,
                                                 completeSevicePath, generateServicePath);
@@ -111,9 +106,17 @@ public class Listener {
         self.externAttach(completeSevicePath, 'service, httpService, serviceConfig);
     }
 
-    isolated function retrieveGeneratedServicePath(SubscriberService subscriberService) returns string|Error = @java:Method {
-        'class: "io.ballerina.stdlib.websub.NativeWebSubListenerAdaptor"
-    } external;
+    isolated function retrieveGeneratedServicePath(SubscriberServiceConfiguration serviceConfig) returns string|Error {
+        byte[] servicePathInfo = serviceConfig.servicePath;
+        if servicePathInfo.length() == 0 {
+            return error Error("Error retrieving service information: service path not found");
+        }
+        string|error servicePath = strings:fromBytes(serviceConfig.servicePath);
+        if servicePath is error {
+            return error Error("Error retrieving service information", servicePath);
+        }
+        return servicePath;
+    }
 
     isolated function externAttach(string servicePath, SubscriberService subscriberService,
                                     HttpService httpService, SubscriberServiceConfiguration config) = @java:Method {

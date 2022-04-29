@@ -16,24 +16,4 @@
   ~ under the License.
   -->
 <FindBugsFilter>
-    <Match>
-        <Class name="io.ballerina.stdlib.websub.ServiceInfoRetriever"/>
-        <Method name="retrieve"/>
-        <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
-    </Match>
-    <Match>
-        <Class name="io.ballerina.stdlib.websub.task.WebSubServiceInfoPackagingTask"/>
-        <Method name="updateResources"/>
-        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
-    </Match>
-    <Match>
-        <Class name="io.ballerina.stdlib.websub.task.WebSubServiceInfoPackagingTask"/>
-        <Method name="getThinJar"/>
-        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
-    </Match>
-    <Match>
-        <Class name="io.ballerina.stdlib.websub.task.service.path.ResourcePackagingService"/>
-        <Method name="generateUpdatedJar"/>
-        <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
-    </Match>
 </FindBugsFilter>

@@ -24,7 +24,6 @@ import io.ballerina.projects.plugins.CodeAnalyzer;
 import io.ballerina.stdlib.websub.task.CheckExpAnalysisTask;
 import io.ballerina.stdlib.websub.task.ListenerInitAnalysisTask;
 import io.ballerina.stdlib.websub.task.ServiceAnalysisTask;
-import io.ballerina.stdlib.websub.task.WebSubServiceInfoGeneratorTask;
 
 import java.util.List;
 
@@ -38,8 +37,6 @@ public class WebSubCodeAnalyzer extends CodeAnalyzer {
         codeAnalysisContext.addSyntaxNodeAnalysisTask(new ListenerInitAnalysisTask(),
                 List.of(SyntaxKind.IMPLICIT_NEW_EXPRESSION, SyntaxKind.EXPLICIT_NEW_EXPRESSION));
         codeAnalysisContext.addSyntaxNodeAnalysisTask(new ServiceAnalysisTask(),
-                SyntaxKind.SERVICE_DECLARATION);
-        codeAnalysisContext.addSyntaxNodeAnalysisTask(new WebSubServiceInfoGeneratorTask(),
                 SyntaxKind.SERVICE_DECLARATION);
     }
 }
