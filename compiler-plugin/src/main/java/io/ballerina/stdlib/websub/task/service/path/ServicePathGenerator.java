@@ -18,10 +18,9 @@
 
 package io.ballerina.stdlib.websub.task.service.path;
 
-import io.ballerina.projects.PackageId;
+import io.ballerina.projects.DocumentId;
+import io.ballerina.projects.ModuleId;
 import io.ballerina.projects.ProjectKind;
-
-import java.nio.file.Path;
 
 /**
  * {@code ServicePathGenerator} generates unique service path for subscriber service and saves into a resource file.
@@ -30,12 +29,12 @@ public interface ServicePathGenerator {
     /**
      * Generates the service-path for the provided `websub:SubscriberService`.
      *
-     * @param packageId - PackageId of the current ballerina project
-     * @param currentProjectRoot - Project source root path
+     * @param moduleId - ModuleId of the current ballerina module
+     * @param documentId - DocumentId of the current ballerina file
      * @param serviceId - ServiceId of the curreng `websub:SubscriberService`
      * @throws ServicePathGeneratorException - If there is any runtime exception while generating the service-path
      */
-    void generate(PackageId packageId, Path currentProjectRoot, int serviceId) throws ServicePathGeneratorException;
+    void generate(ModuleId moduleId, DocumentId documentId, int serviceId) throws ServicePathGeneratorException;
 
     /**
      * Checks whether current {@code ServicePathGenerator} instance supports the provided ballerina project-type.

@@ -18,9 +18,9 @@
 
 package io.ballerina.stdlib.websub.task.service.path;
 
-import io.ballerina.projects.PackageId;
+import io.ballerina.projects.DocumentId;
+import io.ballerina.projects.ModuleId;
 
-import java.nio.file.Path;
 import java.util.Random;
 
 import static io.ballerina.stdlib.websub.task.service.path.ServicePathContextHandler.getContextHandler;
@@ -30,13 +30,13 @@ import static io.ballerina.stdlib.websub.task.service.path.ServicePathContextHan
  */
 public abstract class AbstractServicePathGenerator implements ServicePathGenerator {
     @Override
-    public void generate(PackageId packageId, Path currentProjectRoot, int serviceId)
+    public void generate(ModuleId moduleId, DocumentId documentId, int serviceId)
         throws ServicePathGeneratorException {
         try {
             String generatedServicePath = generateRandomAlphaNumericString(10);
             ServicePathContext.ServicePathInformation servicePathDetails = new ServicePathContext
                     .ServicePathInformation(serviceId, generatedServicePath);
-            getContextHandler().updateServicePathContext(packageId, currentProjectRoot, servicePathDetails);
+            getContextHandler().updateServicePathContext(moduleId, documentId, servicePathDetails);
         } catch (Exception ex) {
             // throw an error if there is any error in service-info generation
             String errorMsg = String.format("service path generation failed due to %s", ex.getLocalizedMessage());
