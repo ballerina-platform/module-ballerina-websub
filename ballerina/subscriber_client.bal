@@ -95,33 +95,32 @@ isolated function buildSubscriptionChangeRequest(string mode,
     return request;
 }
 
-isolated function processHubResponse(string hub, string mode, 
-                                     SubscriptionChangeRequest subscriptionChangeRequest,
-                                     http:Response|http:PayloadType|error response) returns SubscriptionChangeResponse|SubscriptionInitiationError {
+isolated function processHubResponse(string hub, string mode,
+                                    SubscriptionChangeRequest subscriptionChangeRequest,
+                                    http:Response|error response) returns SubscriptionChangeResponse|SubscriptionInitiationError {
 
     string topic = subscriptionChangeRequest.topic;
     if response is error {
-        return error SubscriptionInitiationError("Error occurred for request: Mode[" + mode+ "] at Hub[" + hub + "] - " + response.message());
-    } else {
-        http:Response hubResponse = <http:Response> response;
-        int responseStatusCode = hubResponse.statusCode;
-        if responseStatusCode == http:STATUS_TEMPORARY_REDIRECT
+        return error SubscriptionInitiationError("Error occurred for request: Mode[" + mode + "] at Hub[" + hub + "] - " + response.message());
+    }
+    http:Response hubResponse = response;
+    int responseStatusCode = hubResponse.statusCode;
+    if responseStatusCode == http:STATUS_TEMPORARY_REDIRECT
                 || responseStatusCode == http:STATUS_PERMANENT_REDIRECT {
-            return error SubscriptionInitiationError("Redirection response received for subscription change request made with " +
-                               "followRedirects disabled or after maxCount exceeded: Hub [" + hub + "], Topic [" +
-                               subscriptionChangeRequest.topic + "]");
-        } else if !isSuccessStatusCode(responseStatusCode) {
-            var responsePayload = hubResponse.getTextPayload();
-            string errorMessage = "Error in request: Mode[" + mode + "] at Hub[" + hub + "]";
-            if responsePayload is string {
-                errorMessage = errorMessage + " - " + responsePayload;
-            } else {
-                errorMessage = errorMessage + " - Error occurred identifying cause: " + responsePayload.message();
-            }
-            return error SubscriptionInitiationError(errorMessage);
+        return error SubscriptionInitiationError("Redirection response received for subscription change request made with " +
+                                "followRedirects disabled or after maxCount exceeded: Hub [" + hub + "], Topic [" +
+                                subscriptionChangeRequest.topic + "]");
+    } else if !isSuccessStatusCode(responseStatusCode) {
+        var responsePayload = hubResponse.getTextPayload();
+        string errorMessage = "Error in request: Mode[" + mode + "] at Hub[" + hub + "]";
+        if responsePayload is string {
+            errorMessage = errorMessage + " - " + responsePayload;
         } else {
-            SubscriptionChangeResponse subscriptionChangeResponse = {hub:hub, topic:topic, response:hubResponse};
-            return subscriptionChangeResponse;
+            errorMessage = errorMessage + " - Error occurred identifying cause: " + responsePayload.message();
         }
+        return error SubscriptionInitiationError(errorMessage);
+    } else {
+        SubscriptionChangeResponse subscriptionChangeResponse = {hub: hub, topic: topic, response: hubResponse};
+        return subscriptionChangeResponse;
     }
 }
