@@ -18,7 +18,6 @@
 
 package io.ballerina.stdlib.websub.task;
 
-import io.ballerina.compiler.api.symbols.AnnotationSymbol;
 import io.ballerina.compiler.api.symbols.ServiceDeclarationSymbol;
 import io.ballerina.compiler.api.symbols.Symbol;
 import io.ballerina.compiler.syntax.tree.ServiceDeclarationNode;
@@ -30,7 +29,6 @@ import io.ballerina.tools.diagnostics.DiagnosticSeverity;
 
 import java.util.Optional;
 
-import static io.ballerina.stdlib.websub.CommonUtil.extractSubscriberServiceConfig;
 import static io.ballerina.stdlib.websub.task.AnalyserUtils.isWebSubService;
 import static io.ballerina.stdlib.websub.task.AnalyserUtils.updateContext;
 
@@ -59,21 +57,15 @@ public class ServiceAnalysisTask implements AnalysisTask<SyntaxNodeAnalysisConte
         if (serviceDeclarationOpt.isPresent()) {
             ServiceDeclarationSymbol serviceDeclarationSymbol = (ServiceDeclarationSymbol) serviceDeclarationOpt.get();
             if (isWebSubService(serviceDeclarationSymbol)) {
-                invokeCodeActions(context, serviceNode, serviceDeclarationSymbol);
+                invokeCodeActions(context, serviceNode);
                 this.validator.validate(context, serviceNode, serviceDeclarationSymbol);
             }
         }
     }
 
-    private void invokeCodeActions(SyntaxNodeAnalysisContext context, ServiceDeclarationNode serviceNode,
-                                   ServiceDeclarationSymbol serviceSymbol) {
-        Optional<AnnotationSymbol> annotationSymbolOpt = extractSubscriberServiceConfig(serviceSymbol);
-        if (annotationSymbolOpt.isEmpty()) {
-            WebSubDiagnosticCodes codeActionDiagnostic = WebSubDiagnosticCodes.WEBSUB_202;
-            updateContext(context, codeActionDiagnostic, serviceNode.location());
-        }
+    private void invokeCodeActions(SyntaxNodeAnalysisContext context, ServiceDeclarationNode serviceNode) {
         if (serviceNode.members().isEmpty()) {
-            WebSubDiagnosticCodes codeActionDiagnostic = WebSubDiagnosticCodes.WEBSUB_203;
+            WebSubDiagnosticCodes codeActionDiagnostic = WebSubDiagnosticCodes.WEBSUB_202;
             updateContext(context, codeActionDiagnostic, serviceNode.location());
         }
     }

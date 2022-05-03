@@ -43,17 +43,17 @@ public class MandatoryFunctionsGenerationActionTest extends AbstractCodeActionTe
 
     @Override
     protected CodeActionInfo getExpectedCodeAction() {
-        LineRange lineRange = LineRange.from("service.bal", LinePosition.from(19, 0),
+        LineRange lineRange = LineRange.from("service.bal", LinePosition.from(18, 0),
                 LinePosition.from(19, 44));
         CodeActionArgument locationArg = CodeActionArgument.from(NODE_LOCATION, lineRange);
         CodeActionInfo codeAction = CodeActionInfo.from(ADD_MANDATORY_FUNCTION_ACTION, List.of(locationArg));
-        codeAction.setProviderName("WEBSUB_203/ballerina/websub/ADD_MANDATORY_FUNCTION_CODE_SNIPPET");
+        codeAction.setProviderName("WEBSUB_202/ballerina/websub/ADD_MANDATORY_FUNCTION_CODE_SNIPPET");
         return codeAction;
     }
 
     @Override
     protected String getTestPackage() {
-        return "sample_code_action_2";
+        return "sample_code_action_1";
     }
 
     @Override

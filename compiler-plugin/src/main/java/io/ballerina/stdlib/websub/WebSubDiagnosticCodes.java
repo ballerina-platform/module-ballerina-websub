@@ -51,8 +51,7 @@ public enum WebSubDiagnosticCodes {
     WEBSUB_201("WEBSUB_201",
             "Error occurred while packaging generated resources : {0}",
             DiagnosticSeverity.ERROR),
-    WEBSUB_202("WEBSUB_202", "Service annotation generation", DiagnosticSeverity.INTERNAL),
-    WEBSUB_203("WEBSUB_203", "Mandatory service method generation", DiagnosticSeverity.INTERNAL);
+    WEBSUB_202("WEBSUB_202", "Mandatory service method generation", DiagnosticSeverity.INTERNAL);
 
     private final String code;
     private final String description;

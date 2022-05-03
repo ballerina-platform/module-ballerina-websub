@@ -61,7 +61,7 @@ public class MandatoryFunctionsGenerationAction implements CodeAction {
 
     @Override
     public List<String> supportedDiagnosticCodes() {
-        return List.of(WebSubDiagnosticCodes.WEBSUB_203.getCode());
+        return List.of(WebSubDiagnosticCodes.WEBSUB_202.getCode());
     }
 
     @Override
