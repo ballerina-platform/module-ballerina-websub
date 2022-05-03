@@ -52,7 +52,8 @@ public final class CodeActionUtil {
     public static List<Function> constructMandatoryFunctions() {
         // only mandatory function is `onEventNotification`
         List<Function.FunctionArg> functionArgs = constructFunctionArgs();
-        List<Type> returnTypes = constructReturnTypes();
+        Type error = Type.from(Constants.BALLERINA_ERROR_PACKAGE, Constants.BALLERINA_ERROR_TYPE);
+        List<Type> returnTypes = List.of(error);
         Function onEventNotificationFunction = Function.remoteFunctionWithOptionalReturnTypes(
                 Constants.ON_EVENT_NOTIFICATION, functionArgs, returnTypes);
         return List.of(onEventNotificationFunction);
@@ -64,12 +65,5 @@ public final class CodeActionUtil {
         Function.FunctionArg message = new Function.FunctionArg(
                 contentDistributionMessage, Constants.CONTENT_DISTRIBUTION_MESSAGE_PARAM_NAME);
         return List.of(message);
-    }
-
-    private static List<Type> constructReturnTypes() {
-        Type acknowledgement = Type.from(Constants.PACKAGE_NAME, Constants.ACKNOWLEDGEMENT_TYPE);
-        Type subscriptionDeletedError = Type.from(Constants.PACKAGE_NAME, Constants.SUBSCRIPTION_DELETED_ERROR_TYPE);
-        Type error = Type.from(Constants.BALLERINA_ERROR_PACKAGE, Constants.BALLERINA_ERROR_TYPE);
-        return List.of(acknowledgement, subscriptionDeletedError, error);
     }
 }
