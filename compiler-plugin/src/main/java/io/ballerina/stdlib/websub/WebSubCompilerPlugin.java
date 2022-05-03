@@ -20,7 +20,6 @@ package io.ballerina.stdlib.websub;
 
 import io.ballerina.projects.plugins.CompilerPlugin;
 import io.ballerina.projects.plugins.CompilerPluginContext;
-import io.ballerina.stdlib.websub.action.AnnotationConfigsGenerationAction;
 import io.ballerina.stdlib.websub.action.MandatoryFunctionsGenerationAction;
 
 /**
@@ -31,7 +30,6 @@ public class WebSubCompilerPlugin extends CompilerPlugin {
     public void init(CompilerPluginContext context) {
         context.addCodeAnalyzer(new WebSubCodeAnalyzer());
         context.addCodeModifier(new WebSubCodeModifier());
-        context.addCodeAction(new AnnotationConfigsGenerationAction());
         context.addCodeAction(new MandatoryFunctionsGenerationAction());
     }
 }
