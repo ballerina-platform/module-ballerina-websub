@@ -97,7 +97,7 @@ isolated function buildSubscriptionChangeRequest(string mode,
 
 isolated function processHubResponse(string hub, string mode, 
                                      SubscriptionChangeRequest subscriptionChangeRequest,
-                                     http:Response|http:PayloadType|error response) returns SubscriptionChangeResponse|SubscriptionInitiationError {
+                                     http:Response|error response) returns SubscriptionChangeResponse|SubscriptionInitiationError {
 
     string topic = subscriptionChangeRequest.topic;
     if response is error {
