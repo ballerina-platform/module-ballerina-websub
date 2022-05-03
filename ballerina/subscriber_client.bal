@@ -103,7 +103,7 @@ isolated function processHubResponse(string hub, string mode,
     if response is error {
         return error SubscriptionInitiationError("Error occurred for request: Mode[" + mode+ "] at Hub[" + hub + "] - " + response.message());
     } else {
-        http:Response hubResponse = <http:Response> response;
+        http:Response hubResponse = response;
         int responseStatusCode = hubResponse.statusCode;
         if responseStatusCode == http:STATUS_TEMPORARY_REDIRECT
                 || responseStatusCode == http:STATUS_PERMANENT_REDIRECT {
