@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static io.ballerina.stdlib.websub.CommonUtil.extractSubscriberServiceConfig;
 import static io.ballerina.stdlib.websub.task.AnalyserUtils.getQualifiedType;
 import static io.ballerina.stdlib.websub.task.AnalyserUtils.getTypeDescription;
 import static io.ballerina.stdlib.websub.task.AnalyserUtils.isRemoteMethod;
@@ -115,17 +116,8 @@ public class ServiceDeclarationValidator {
 
     private void executeServiceAnnotationValidation(SyntaxNodeAnalysisContext context,
                                                     ServiceDeclarationNode serviceNode,
-                                                    ServiceDeclarationSymbol serviceDeclarationSymbol) {
-        Optional<AnnotationSymbol> subscriberServiceAnnotationOptional = serviceDeclarationSymbol.annotations()
-                .stream()
-                .filter(annotationSymbol -> {
-                            String moduleName = annotationSymbol.getModule()
-                                    .flatMap(ModuleSymbol::getName)
-                                    .orElse("");
-                            String type = annotationSymbol.getName().orElse("");
-                            String annotationName = getQualifiedType(type, moduleName);
-                            return annotationName.equals(Constants.SERVICE_ANNOTATION_NAME);
-                }).findFirst();
+                                                    ServiceDeclarationSymbol serviceSymbol) {
+        Optional<AnnotationSymbol> subscriberServiceAnnotationOptional = extractSubscriberServiceConfig(serviceSymbol);
         if (subscriberServiceAnnotationOptional.isEmpty()) {
             WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_101;
             updateContext(context, errorCode, serviceNode.location());

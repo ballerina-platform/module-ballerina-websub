@@ -212,6 +212,6 @@ public class ServiceMetaInfoUpdaterTask implements ModifierTask<SourceModifierCo
         if (!Constants.PACKAGE_NAME.equals(referenceNode.modulePrefix().text())) {
             return false;
         }
-        return Constants.SERVICE_ANNOTATION_IDENTIFIER.equals(referenceNode.identifier().text());
+        return Constants.SERVICE_CONFIG_ANNOTATTION_TYPE.equals(referenceNode.identifier().text());
     }
 }

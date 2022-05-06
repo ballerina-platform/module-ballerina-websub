@@ -20,6 +20,7 @@ package io.ballerina.stdlib.websub;
 
 import io.ballerina.projects.plugins.CompilerPlugin;
 import io.ballerina.projects.plugins.CompilerPluginContext;
+import io.ballerina.stdlib.websub.action.MandatoryFunctionsGenerationAction;
 
 /**
  * {@code WebSubCompilerPlugin} handles compile-time code analysis for WebSub based Services.
@@ -29,5 +30,6 @@ public class WebSubCompilerPlugin extends CompilerPlugin {
     public void init(CompilerPluginContext context) {
         context.addCodeAnalyzer(new WebSubCodeAnalyzer());
         context.addCodeModifier(new WebSubCodeModifier());
+        context.addCodeAction(new MandatoryFunctionsGenerationAction());
     }
 }
