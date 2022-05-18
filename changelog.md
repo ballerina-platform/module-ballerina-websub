@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - [Incorporate compiler-plugin code-generators to unique service path generation logic](https://github.com/ballerina-platform/ballerina-standard-library/issues/2487)
+- [Cannot run `websub:SubscriberService` by providing the callback URL without providing the service-path](https://github.com/ballerina-platform/ballerina-standard-library/issues/2932)
 
 ## [2.2.0] - 2022-01-29
 
