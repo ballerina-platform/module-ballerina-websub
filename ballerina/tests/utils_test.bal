@@ -180,24 +180,16 @@ isolated function testServicePathGenerationEnabledWithCallbackAppendingAndServic
     groups: ["completeServicePathRetrieval"]
 }
 isolated function testServicePathRetrievalForEmptyServicePath() {
-    var servicePath = retrieveCompleteServicePath(());
-    if servicePath is error {
-        test:assertEquals(servicePath.message(), "Could not find the generated service path");
-    } else {
-        test:assertFail("Retrieved a service-path for a errorneous scenario");
-    }
+    string servicePath = retrieveCompleteServicePath(());
+    test:assertEquals(servicePath, COMMON_SERVICE_PATH);
 }
 
 @test:Config {
     groups: ["completeServicePathRetrieval"]
 }
 isolated function testServicePathRetrievalForEmptyServicePathArr() {
-    var servicePath = retrieveCompleteServicePath([]);
-    if servicePath is error {
-        test:assertEquals(servicePath.message(), "Could not find the generated service path");
-    } else {
-        test:assertFail("Retrieved a service-path for a errorneous scenario");
-    }
+    string servicePath = retrieveCompleteServicePath([]);
+    test:assertEquals(servicePath, COMMON_SERVICE_PATH);
 }
 
 @test:Config { 
@@ -205,7 +197,7 @@ isolated function testServicePathRetrievalForEmptyServicePathArr() {
 }
 isolated function testCompleteServicePathRetrievalWithString() returns error? {
     string expectedServicePath = "subscriber";
-    string generatedServicePath = check retrieveCompleteServicePath("subscriber");
+    string generatedServicePath = retrieveCompleteServicePath("subscriber");
     test:assertEquals(generatedServicePath, expectedServicePath, "Generated service-path does not matched expected service-path"); 
 }
 
@@ -214,7 +206,7 @@ isolated function testCompleteServicePathRetrievalWithString() returns error? {
 }
 isolated function testCompleteServicePathRetrievalWithStringArray() returns error? {
     string expectedServicePath = "subscriber/foo/bar";
-    string generatedServicePath = check retrieveCompleteServicePath(["subscriber", "foo", "bar"]);
+    string generatedServicePath = retrieveCompleteServicePath(["subscriber", "foo", "bar"]);
     test:assertEquals(generatedServicePath, expectedServicePath, "Generated service-path does not matched expected service-path"); 
 }
 
