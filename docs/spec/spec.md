@@ -319,7 +319,7 @@ Service path generation should be implemented with following guidelines:
   - callback URL is provided, `appendServicePath` configuration is enabled and service path is not provided.
 - WebSub compiler plugin will generate unique service path for the `websub:SubscriberService` and populate `servicePath` field in `websub:SubscriberServiceConfig` annotation.
 - If there is an error while generating the service path, then it should result in a compile-time error since this feature is required to generate a callback URL and without it subscriber service could not be used.
-- If the developer has provided the callback URL without providing the service path then the `websub:SubscriberService` will be attached to the default service path which is `/`.
+- If the callback URL is provided without the service path then the `websub:SubscriberService` will be attached to the default service path which is `/`.
 
 #### 2.2.4. Unsubscribing from the `hub`
 
