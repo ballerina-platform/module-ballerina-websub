@@ -280,6 +280,7 @@ should be `websub:SubscriberServiceConfig` a service-level-annotation for `websu
 # + unsubscribeOnShutdown - This flag notifies whether or not to initiate unsubscription when the service is shutting down
 # + httpConfig - The configuration for the hub client used to interact with the discovered/specified hub
 # + discoveryConfig - HTTP client configurations for resource discovery
+# + servicePath - The generated service-path if the service-path is not provided. This is auto-generated at the compile-time
 public type SubscriberServiceConfiguration record {|
     string|[string, string] target?;
     int leaseSeconds?;
@@ -293,6 +294,7 @@ public type SubscriberServiceConfiguration record {|
         string|string[] acceptLanguage?;
         http:ClientConfiguration httpConfig?;
     |} discoveryConfig?;
+    readonly byte[] servicePath = [];
 |};
 ```
 
@@ -315,9 +317,7 @@ Service path generation should be implemented with following guidelines:
 - Service path should be generated only if;
   - Service path and callback URL is not provided for the `websub:SubscriberService`.
   - callback URL is provided, `appendServicePath` configuration is enabled and service path is not provided.
-- WebSub compiler plugin should generate the unique service path for the `websub:SubscriberService`.
-- Generated service path should be saved in relation to service ID in `service-info.csv`.
-- `service-info.csv` file should be added to `resources/ballerina/websub` directory inside the executable JAR as well as the thin JAR.
+- WebSub compiler plugin will generate unique service path for the `websub:SubscriberService` and populate `servicePath` field in `websub:SubscriberServiceConfig` annotation.
 - If there is an error while generating the service path, then it should result in a compile-time error since this feature is required to generate a callback URL and without it subscriber service could not be used.
 
 #### 2.2.4. Unsubscribing from the `hub`
