@@ -17,21 +17,24 @@
 import ballerina/test;
 import ballerina/websub;
 
-listener websub:Listener testListener = new (10001);
+listener websub:Listener pathGenDisabledListener1 = new (10002);
 
-@websub:SubscriberServiceConfig {} 
-service on testListener {
+@websub:SubscriberServiceConfig {
+    callback: "http://localhost:10002"
+}
+service on pathGenDisabledListener1 {
     remote function onEventNotification(websub:ContentDistributionMessage message)
                 returns websub:Acknowledgement|websub:SubscriptionDeletedError? {
         return websub:ACKNOWLEDGEMENT;
     }
 }
 
+listener websub:Listener pathGenDisabledListener2 = new (10003);
+
 @websub:SubscriberServiceConfig {
-    callback: "http://localhost:10001",
-    appendServicePath: true
+    callback: "http://localhost:10003"
 }
-service on testListener {
+service / on pathGenDisabledListener2 {
     remote function onEventNotification(websub:ContentDistributionMessage message)
                 returns websub:Acknowledgement|websub:SubscriptionDeletedError? {
         return websub:ACKNOWLEDGEMENT;
@@ -41,6 +44,7 @@ service on testListener {
 @test:Config { 
     groups: ["integrationTest"]
 }
-function testServicePathAutoGeneration() returns error? {
-    check testListener.gracefulStop();
+function testServicePathAutoGenerationDisabled() returns error? {
+    check pathGenDisabledListener1.gracefulStop();
+    check pathGenDisabledListener2.gracefulStop();
 }
