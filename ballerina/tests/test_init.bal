@@ -16,7 +16,6 @@
 
 import ballerina/test;
 import ballerina/http;
-import ballerina/log;
 
 listener http:Listener simpleHttpServiceListener = new (9191);
 
