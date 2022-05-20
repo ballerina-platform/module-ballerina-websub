@@ -319,6 +319,7 @@ Service path generation should be implemented with following guidelines:
 - Generated service path should be saved in relation to service ID in `service-info.csv`.
 - `service-info.csv` file should be added to `resources/ballerina/websub` directory inside the executable JAR as well as the thin JAR.
 - If there is an error while generating the service path, then it should result in a compile-time error since this feature is required to generate a callback URL and without it subscriber service could not be used.
+- If the callback URL is provided without the service path then the `websub:SubscriberService` will be attached to the default service path which is `/`.
 
 #### 2.2.4. Unsubscribing from the `hub`
 
