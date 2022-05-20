@@ -16,11 +16,13 @@
 
 import ballerina/test;
 import ballerina/http;
+import ballerina/log;
 
 listener http:Listener simpleHttpServiceListener = new (9191);
 
 http:Service simpleHttpService = service object {
     isolated resource function get discovery(http:Caller caller, http:Request request) returns error? {
+        log:printInfo("Received discovery request");
         http:Response response = new;
         response.addHeader("Link", "<http://127.0.0.1:9191/common/hub>; rel=\"hub\"");
         response.addHeader("Link", "<https://sample.topic.com>; rel=\"self\"");
@@ -28,12 +30,20 @@ http:Service simpleHttpService = service object {
     }
 
     isolated resource function post hub(http:Caller caller, http:Request request) returns error? {
+        log:printInfo("Received subscription request", details = request.getQueryParams());
+        string? callbackUrl = request.getQueryParamValue(HUB_CALLBACK);
         check caller->respond();
+        if callbackUrl is string {
+            http:Client httpClient = check new (callbackUrl);
+            http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=https://sample.topic.com&hub.challenge=1234");
+            log:printInfo("Response received", status = response.statusCode);
+        }
     }
 };
 
 @test:BeforeSuite
 function beforeSuiteFunc() returns error? {
+    log:printInfo("Initializing discovery service");
     check simpleHttpServiceListener.attach(simpleHttpService, "/common");
 }
 
