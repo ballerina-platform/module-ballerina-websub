@@ -31,8 +31,8 @@ http:Service simpleHttpService = service object {
 
     isolated resource function post hub(http:Caller caller, http:Request request) returns error? {
         log:printInfo("Received subscription request", details = request.getQueryParams());
-        string? callbackUrl = request.getQueryParamValue(HUB_CALLBACK);
         check caller->respond();
+        string? callbackUrl = request.getQueryParamValue(HUB_CALLBACK);
         if callbackUrl is string {
             http:Client httpClient = check new (callbackUrl);
             http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=https://sample.topic.com&hub.challenge=1234");
@@ -45,6 +45,7 @@ http:Service simpleHttpService = service object {
 function beforeSuiteFunc() returns error? {
     log:printInfo("Initializing discovery service");
     check simpleHttpServiceListener.attach(simpleHttpService, "/common");
+    check simpleHttpServiceListener.'start();
 }
 
 @test:AfterSuite { }
