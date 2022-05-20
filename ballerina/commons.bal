@@ -32,7 +32,7 @@ const string ACCEPT_LANGUAGE_HEADER = "Accept-Language";
 const string CONTENT_TYPE = "Content-Type";
 const string X_HUB_SIGNATURE = "X-Hub-Signature";
 
-const string COMMON_SERVICE_PATH = "subscriber";
+const string COMMON_SERVICE_PATH = "/";
 
 const string SHA1 = "sha1";
 const string SHA_256 = "sha256";
