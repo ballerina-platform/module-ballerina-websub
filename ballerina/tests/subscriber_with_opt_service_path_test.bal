@@ -45,7 +45,6 @@ service object {
 @test:BeforeGroups { value:["subscriberWithoutServicePath"] }
 function beforeSubscriberWithoutServicePathTest() returns error? {
     runtime:sleep(5);
-    log:printInfo("Initializing subscriber service");
     check subscriberWithoutServicePathListener.attach(subscriberWithoutServicePath, ());
     check subscriberWithoutServicePathListener.'start();
 }
