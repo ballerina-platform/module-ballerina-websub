@@ -97,7 +97,7 @@ public class Listener {
                                     string[]|string? name = ()) returns error? {
         boolean generateServicePath = shouldUseGeneratedServicePath(serviceConfig, name);
         string[]|string? servicePath = generateServicePath ? check self.retrieveGeneratedServicePath(serviceConfig): name;
-        string completeSevicePath = check retrieveCompleteServicePath(servicePath);
+        string completeSevicePath = retrieveCompleteServicePath(servicePath);
         string callback = constructCallbackUrl(serviceConfig, self.port, self.listenerConfig,
                                                 completeSevicePath, generateServicePath);
         HttpToWebsubAdaptor adaptor = new ('service);
@@ -291,14 +291,14 @@ isolated function isEmptyServicePath(string[]|string? name) returns boolean {
     return name is () || (name is string[] && name.length() == 0);
 }
 
-isolated function retrieveCompleteServicePath(string[]|string? servicePath) returns string|Error {
+isolated function retrieveCompleteServicePath(string[]|string? servicePath) returns string {
     if servicePath is () {
-        return error Error("Could not find the generated service path");
+        return COMMON_SERVICE_PATH;
     } else if servicePath is string {
         return servicePath.startsWith("/") ? servicePath.substring(1): servicePath;
     } else {
         if servicePath.length() == 0 {
-            return error Error("Could not find the generated service path");
+            return COMMON_SERVICE_PATH;
         } else {
             return strings:'join("/", ...servicePath);
         }
