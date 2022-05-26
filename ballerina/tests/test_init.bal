@@ -28,13 +28,18 @@ http:Service simpleHttpService = service object {
     }
 
     isolated resource function post hub(http:Caller caller, http:Request request) returns error? {
+        map<string> params = check request.getFormParams();
         check caller->respond();
+        string callbackUrl = params.get(HUB_CALLBACK);
+        http:Client httpClient = check new (callbackUrl);
+        http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=https://sample.topic.com&hub.challenge=1234");
     }
 };
 
 @test:BeforeSuite
 function beforeSuiteFunc() returns error? {
     check simpleHttpServiceListener.attach(simpleHttpService, "/common");
+    check simpleHttpServiceListener.'start();
 }
 
 @test:AfterSuite { }
