@@ -5,9 +5,8 @@ _Reviewers_: @chamil321
 _Created_: 2022/01/31  
 _Updated_: 2022/05/23  
 _Edition_: Swan Lake  
-_Issue_: [#786](https://github.com/ballerina-platform/ballerina-standard-library/issues/786)
 
-# Introduction 
+## Introduction 
 
 This is the specification for the WebSub standard library of [Ballerina language](https://ballerina.io/), which provides WebSub compliant `subscriber` related functionalities.
 
@@ -17,7 +16,7 @@ If you have any feedback or suggestions about the library, start a discussion vi
 
 The conforming implementation of the specification is released and included in the distribution. Any deviation from the specification is considered a bug.
 
-# Content
+## Content
 1. [Overview](#1-overview)
 2. [Subscriber](#2-subscriber)
     * 2.1. [Listener](#21-listener)
