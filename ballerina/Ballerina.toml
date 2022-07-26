@@ -1,13 +1,16 @@
 [package]
 org = "ballerina"
 name = "websub"
-version = "2.3.0"
+version = "2.4.0"
 authors = ["Ballerina"]
 keywords = ["websub", "subscriber", "service", "listener"]
 repository = "https://github.com/ballerina-platform/module-ballerina-websub"
 icon = "icon.png"
 license = ["Apache-2.0"]
-distribution = "2201.1.0"
+distribution = "2201.2.0"
 
 [[platform.java11.dependency]]
-path = "../native/build/libs/websub-native-2.3.0.jar"
+groupId = "io.ballerina.stdlib"
+artifactId = "websub-native"
+version = "2.4.0"
+path = "../native/build/libs/websub-native-2.4.0-SNAPSHOT.jar"
