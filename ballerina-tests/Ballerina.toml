@@ -4,4 +4,4 @@ name = "websub_tests"
 version = "2.4.0"
 
 [[platform.java11.dependency]]
-path = "../native/build/libs/websub-native-2.4.0-SNAPSHOT.jar"
+path = "../native/build/libs/websub-native-2.4.0.jar"
