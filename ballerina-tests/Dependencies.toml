@@ -9,7 +9,7 @@ dependencies-toml-version = "2"
 [[package]]
 org = "ballerina"
 name = "auth"
-version = "2.4.0"
+version = "2.4.1"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "crypto"},
@@ -23,9 +23,10 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "cache"
-version = "3.2.2"
+version = "3.3.0"
 scope = "testOnly"
 dependencies = [
+	{org = "ballerina", name = "constraint"},
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "task"},
 	{org = "ballerina", name = "time"}
@@ -43,7 +44,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "crypto"
-version = "2.2.2"
+version = "2.2.3"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
@@ -53,7 +54,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "file"
-version = "1.4.0"
+version = "1.4.1"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "io"},
@@ -112,7 +113,7 @@ scope = "testOnly"
 [[package]]
 org = "ballerina"
 name = "jwt"
-version = "2.4.0"
+version = "2.4.1"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "cache"},
@@ -199,7 +200,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "log"
-version = "2.4.0"
+version = "2.4.1"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "io"},
@@ -222,7 +223,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "oauth2"
-version = "2.4.0"
+version = "2.4.1"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "cache"},
@@ -244,7 +245,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "os"
-version = "1.4.0"
+version = "1.4.1"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "io"},
@@ -264,7 +265,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "task"
-version = "2.2.2"
+version = "2.2.3"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
@@ -304,7 +305,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "websub"
-version = "2.4.0"
+version = "2.4.1"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "crypto"},
@@ -326,7 +327,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "websub_tests"
-version = "2.4.0"
+version = "2.4.1"
 dependencies = [
 	{org = "ballerina", name = "test"},
 	{org = "ballerina", name = "websub"}
