@@ -47,8 +47,8 @@ public isolated client class SubscriptionClient {
     isolated remote function subscribe(SubscriptionChangeRequest subscriptionRequest)
             returns SubscriptionChangeResponse|SubscriptionInitiationError {
         http:Client httpClient = self.httpClient;
-        http:Request builtSubscriptionRequest = buildSubscriptionChangeRequest(MODE_SUBSCRIBE, subscriptionRequest);
-        http:Response|error response = httpClient->post("", builtSubscriptionRequest);
+        map<string> request = buildSubscriptionRequest(MODE_SUBSCRIBE, subscriptionRequest);
+        http:Response|error response = httpClient->post("", request, mediaType = mime:APPLICATION_FORM_URLENCODED);
         return processHubResponse(self.url, MODE_SUBSCRIBE, subscriptionRequest, response);
     }
 
@@ -62,37 +62,27 @@ public isolated client class SubscriptionClient {
     isolated remote function unsubscribe(SubscriptionChangeRequest unsubscriptionRequest)
             returns SubscriptionChangeResponse|SubscriptionInitiationError {
         http:Client httpClient = self.httpClient;
-        http:Request builtUnsubscriptionRequest = buildSubscriptionChangeRequest(MODE_UNSUBSCRIBE, unsubscriptionRequest);
-        http:Response|error response = httpClient->post("", builtUnsubscriptionRequest);
+        map<string> request = buildSubscriptionRequest(MODE_UNSUBSCRIBE, unsubscriptionRequest);
+        http:Response|error response = httpClient->post("", request, mediaType = mime:APPLICATION_FORM_URLENCODED);
         return processHubResponse(self.url, MODE_UNSUBSCRIBE, unsubscriptionRequest, response);
     }
 
 }
 
-isolated function buildSubscriptionChangeRequest(string mode, 
-                                                 SubscriptionChangeRequest subscriptionChangeRequest) 
-                                                 returns http:Request {
-    http:Request request = new;
-    string callback = subscriptionChangeRequest.callback;
-    var encodedCallback = url:encode(callback, "UTF-8");
-    if encodedCallback is string {
-        callback = encodedCallback;
-    }
-
-    string body = HUB_MODE + "=" + mode
-        + "&" + HUB_TOPIC + "=" + subscriptionChangeRequest.topic
-        + "&" + HUB_CALLBACK + "=" + callback;
+isolated function buildSubscriptionRequest(string mode, SubscriptionChangeRequest subscriptionReq) returns map<string> {
+    map<string> formParams = {};
+    formParams[HUB_MODE] = mode;
+    formParams[HUB_TOPIC] = subscriptionReq.topic;
+    formParams[HUB_CALLBACK] = subscriptionReq.callback;
     if mode == MODE_SUBSCRIBE {
-        if subscriptionChangeRequest.secret.trim() != "" {
-            body = body + "&" + HUB_SECRET + "=" + subscriptionChangeRequest.secret;
+        if subscriptionReq.secret.trim() != "" {
+            formParams[HUB_SECRET] = subscriptionReq.secret;
         }
-        if subscriptionChangeRequest.leaseSeconds != 0 {
-            body = body + "&" + HUB_LEASE_SECONDS + "=" + subscriptionChangeRequest.leaseSeconds.toString();
+        if subscriptionReq.leaseSeconds != 0 {
+            formParams[HUB_LEASE_SECONDS] = subscriptionReq.leaseSeconds.toString();
         }
     }
-    request.setTextPayload(body);
-    request.setHeader(CONTENT_TYPE, mime:APPLICATION_FORM_URLENCODED);
-    return request;
+    return formParams;
 }
 
 isolated function processHubResponse(string hub, string mode,
