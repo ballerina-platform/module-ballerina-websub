@@ -48,7 +48,7 @@ public isolated client class SubscriptionClient {
         http:Client httpClient = self.httpClient;
         SubscriptionPayload payload = buildSubscriptionPayload(MODE_SUBSCRIBE, subscriptionRequest);
         http:Response|error response = httpClient->post("", payload, mediaType = mime:APPLICATION_FORM_URLENCODED);
-        return processHubResponse(self.url, MODE_SUBSCRIBE, subscriptionRequest, response);
+        return processHubResponse(self.url, MODE_SUBSCRIBE, subscriptionRequest.topic, response);
     }
 
     # Sends an unsubscription request to a WebSub Hub.
@@ -63,7 +63,7 @@ public isolated client class SubscriptionClient {
         http:Client httpClient = self.httpClient;
         SubscriptionPayload payload = buildSubscriptionPayload(MODE_UNSUBSCRIBE, unsubscriptionRequest);
         http:Response|error response = httpClient->post("", payload, mediaType = mime:APPLICATION_FORM_URLENCODED);
-        return processHubResponse(self.url, MODE_UNSUBSCRIBE, unsubscriptionRequest, response);
+        return processHubResponse(self.url, MODE_UNSUBSCRIBE, unsubscriptionRequest.topic, response);
     }
 
 }
@@ -93,11 +93,8 @@ isolated function buildSubscriptionPayload(string mode, SubscriptionChangeReques
     return payload;
 }
 
-isolated function processHubResponse(string hub, string mode,
-                                    SubscriptionChangeRequest subscriptionChangeRequest,
-                                    http:Response|error response) returns SubscriptionChangeResponse|SubscriptionInitiationError {
-
-    string topic = subscriptionChangeRequest.topic;
+isolated function processHubResponse(string hub, string mode, string topic,
+        http:Response|error response) returns SubscriptionChangeResponse|SubscriptionInitiationError {
     if response is error {
         return error SubscriptionInitiationError("Error occurred for request: Mode[" + mode + "] at Hub[" + hub + "] - " + response.message());
     }
@@ -106,8 +103,7 @@ isolated function processHubResponse(string hub, string mode,
     if responseStatusCode == http:STATUS_TEMPORARY_REDIRECT
                 || responseStatusCode == http:STATUS_PERMANENT_REDIRECT {
         return error SubscriptionInitiationError("Redirection response received for subscription change request made with " +
-                                "followRedirects disabled or after maxCount exceeded: Hub [" + hub + "], Topic [" +
-                                subscriptionChangeRequest.topic + "]");
+                                "followRedirects disabled or after maxCount exceeded: Hub [" + hub + "], Topic [" + topic + "]");
     } else if !isSuccessStatusCode(responseStatusCode) {
         var responsePayload = hubResponse.getTextPayload();
         string errorMessage = "Error in request: Mode[" + mode + "] at Hub[" + hub + "]";
