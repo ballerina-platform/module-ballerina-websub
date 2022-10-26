@@ -46,7 +46,7 @@ public isolated client class SubscriptionClient {
     isolated remote function subscribe(SubscriptionChangeRequest subscriptionRequest)
             returns SubscriptionChangeResponse|SubscriptionInitiationError {
         http:Client httpClient = self.httpClient;
-        map<string> request = buildSubscriptionRequest(MODE_SUBSCRIBE, subscriptionRequest);
+        map<string> request = buildSubscriptionPayload(MODE_SUBSCRIBE, subscriptionRequest);
         http:Response|error response = httpClient->post("", request, mediaType = mime:APPLICATION_FORM_URLENCODED);
         return processHubResponse(self.url, MODE_SUBSCRIBE, subscriptionRequest, response);
     }
@@ -61,14 +61,14 @@ public isolated client class SubscriptionClient {
     isolated remote function unsubscribe(SubscriptionChangeRequest unsubscriptionRequest)
             returns SubscriptionChangeResponse|SubscriptionInitiationError {
         http:Client httpClient = self.httpClient;
-        map<string> request = buildSubscriptionRequest(MODE_UNSUBSCRIBE, unsubscriptionRequest);
+        map<string> request = buildSubscriptionPayload(MODE_UNSUBSCRIBE, unsubscriptionRequest);
         http:Response|error response = httpClient->post("", request, mediaType = mime:APPLICATION_FORM_URLENCODED);
         return processHubResponse(self.url, MODE_UNSUBSCRIBE, unsubscriptionRequest, response);
     }
 
 }
 
-isolated function buildSubscriptionRequest(string mode, SubscriptionChangeRequest subscriptionReq) returns map<string> {
+isolated function buildSubscriptionPayload(string mode, SubscriptionChangeRequest subscriptionReq) returns map<string> {
     map<string> formParams = {};
     formParams[HUB_MODE] = mode;
     formParams[HUB_TOPIC] = subscriptionReq.topic;

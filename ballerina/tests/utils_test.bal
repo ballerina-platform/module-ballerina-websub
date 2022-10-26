@@ -506,7 +506,7 @@ isolated function testBuildSubscriptionRequest() returns error? {
         topic: "https://sample.topic.com",
         callback: "https://sample.subscriber.com"
     };
-    map<string> subscriptionRequest = buildSubscriptionRequest(MODE_SUBSCRIBE, changeRequest);
+    map<string> subscriptionRequest = buildSubscriptionPayload(MODE_SUBSCRIBE, changeRequest);
     map<string> expectedRequest = {
         "hub.mode": MODE_SUBSCRIBE,
         "hub.topic": "https://sample.topic.com",
@@ -525,7 +525,7 @@ isolated function testBuildSubscriptionRequestWithAdditionalParams() returns err
         secret: "test123",
         leaseSeconds: 86000
     };
-    map<string> subscriptionRequest = buildSubscriptionRequest(MODE_SUBSCRIBE, changeRequest);
+    map<string> subscriptionRequest = buildSubscriptionPayload(MODE_SUBSCRIBE, changeRequest);
     map<string> expectedRequest = {
         "hub.mode": MODE_SUBSCRIBE,
         "hub.topic": "https://sample.topic.com",
@@ -544,7 +544,7 @@ isolated function testBuildUnsubscriptionRequest() returns error? {
         topic: "https://sample.topic.com",
         callback: "https://sample.subscriber.com"
     };
-    map<string> subscriptionRequest = buildSubscriptionRequest(MODE_UNSUBSCRIBE, changeRequest);
+    map<string> subscriptionRequest = buildSubscriptionPayload(MODE_UNSUBSCRIBE, changeRequest);
     map<string> expectedRequest = {
         "hub.mode": MODE_UNSUBSCRIBE,
         "hub.topic": "https://sample.topic.com",
