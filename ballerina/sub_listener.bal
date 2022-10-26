@@ -96,6 +96,7 @@ public class Listener {
     isolated function executeAttach(SubscriberService 'service, SubscriberServiceConfiguration serviceConfig,
                                     string[]|string? name = ()) returns error? {
         boolean generateServicePath = shouldUseGeneratedServicePath(serviceConfig, name);
+        log:printInfo("Service path details", servicePath = name, shouldGenerate = generateServicePath);
         string[]|string? servicePath = generateServicePath ? check self.retrieveGeneratedServicePath(serviceConfig): name;
         string completeSevicePath = retrieveCompleteServicePath(servicePath);
         string callback = constructCallbackUrl(serviceConfig, self.port, self.listenerConfig,
