@@ -115,9 +115,9 @@ isolated function testServicePathGenerationEnabledForCallbackAndEmptyServicePath
 @test:Config {
     groups: ["servicePathGenerationEnabled"]
 }
-isolated function testServicePathGenerationEnabledForNoCallbackAndEmptyServicePathArrProvided() {
+isolated function testServicePathGenerationDisabledForNoCallbackAndEmptyServicePathArrProvided() {
     boolean shouldGenerate = shouldUseGeneratedServicePath({}, []);
-    test:assertTrue(shouldGenerate);
+    test:assertFalse(shouldGenerate);
 }
 
 @test:Config {
@@ -147,9 +147,9 @@ isolated function testServicePathGenerationEnabledWithoutCallbackAppendingAndEmp
 @test:Config {
     groups: ["servicePathGenerationEnabled"]
 }
-isolated function testServicePathGenerationEnabledWithCallbackAppendingAndEmptyServicePathArrProvided() {
+isolated function testServicePathGenerationDisabledWithCallbackAppendingAndEmptyServicePathArrProvided() {
     boolean shouldGenerate = shouldUseGeneratedServicePath({ callback: "https://sample.com/sub", appendServicePath: true }, []);
-    test:assertTrue(shouldGenerate);
+    test:assertFalse(shouldGenerate);
 }
 
 @test:Config {
