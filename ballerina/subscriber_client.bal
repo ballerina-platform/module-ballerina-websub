@@ -46,8 +46,8 @@ public isolated client class SubscriptionClient {
     isolated remote function subscribe(SubscriptionChangeRequest subscriptionRequest)
             returns SubscriptionChangeResponse|SubscriptionInitiationError {
         http:Client httpClient = self.httpClient;
-        map<string> request = buildSubscriptionPayload(MODE_SUBSCRIBE, subscriptionRequest);
-        http:Response|error response = httpClient->post("", request, mediaType = mime:APPLICATION_FORM_URLENCODED);
+        SubscriptionPayload payload = buildSubscriptionPayload(MODE_SUBSCRIBE, subscriptionRequest);
+        http:Response|error response = httpClient->post("", payload, mediaType = mime:APPLICATION_FORM_URLENCODED);
         return processHubResponse(self.url, MODE_SUBSCRIBE, subscriptionRequest, response);
     }
 
@@ -61,27 +61,36 @@ public isolated client class SubscriptionClient {
     isolated remote function unsubscribe(SubscriptionChangeRequest unsubscriptionRequest)
             returns SubscriptionChangeResponse|SubscriptionInitiationError {
         http:Client httpClient = self.httpClient;
-        map<string> request = buildSubscriptionPayload(MODE_UNSUBSCRIBE, unsubscriptionRequest);
-        http:Response|error response = httpClient->post("", request, mediaType = mime:APPLICATION_FORM_URLENCODED);
+        SubscriptionPayload payload = buildSubscriptionPayload(MODE_UNSUBSCRIBE, unsubscriptionRequest);
+        http:Response|error response = httpClient->post("", payload, mediaType = mime:APPLICATION_FORM_URLENCODED);
         return processHubResponse(self.url, MODE_UNSUBSCRIBE, unsubscriptionRequest, response);
     }
 
 }
 
-isolated function buildSubscriptionPayload(string mode, SubscriptionChangeRequest subscriptionReq) returns map<string> {
-    map<string> formParams = {};
-    formParams[HUB_MODE] = mode;
-    formParams[HUB_TOPIC] = subscriptionReq.topic;
-    formParams[HUB_CALLBACK] = subscriptionReq.callback;
+type SubscriptionPayload record {
+    string hub\.mode;
+    string hub\.topic;
+    string hub\.callback;
+    string hub\.secret?;
+    string hub\.lease_seconds?;
+};
+
+isolated function buildSubscriptionPayload(string mode, SubscriptionChangeRequest subscriptionReq) returns SubscriptionPayload {
+    SubscriptionPayload payload = {
+        hub\.mode: mode,
+        hub\.topic: subscriptionReq.topic,
+        hub\.callback: subscriptionReq.callback
+    };
     if mode == MODE_SUBSCRIBE {
         if subscriptionReq.secret.trim() != "" {
-            formParams[HUB_SECRET] = subscriptionReq.secret;
+            payload.hub\.secret = subscriptionReq.secret;
         }
         if subscriptionReq.leaseSeconds != 0 {
-            formParams[HUB_LEASE_SECONDS] = subscriptionReq.leaseSeconds.toString();
+            payload.hub\.lease_seconds = subscriptionReq.leaseSeconds.toString();
         }
     }
-    return formParams;
+    return payload;
 }
 
 isolated function processHubResponse(string hub, string mode,
