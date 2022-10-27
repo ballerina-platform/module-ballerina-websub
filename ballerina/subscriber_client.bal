@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/url;
 import ballerina/http;
 import ballerina/mime;
 
@@ -47,9 +46,9 @@ public isolated client class SubscriptionClient {
     isolated remote function subscribe(SubscriptionChangeRequest subscriptionRequest)
             returns SubscriptionChangeResponse|SubscriptionInitiationError {
         http:Client httpClient = self.httpClient;
-        http:Request builtSubscriptionRequest = buildSubscriptionChangeRequest(MODE_SUBSCRIBE, subscriptionRequest);
-        http:Response|error response = httpClient->post("", builtSubscriptionRequest);
-        return processHubResponse(self.url, MODE_SUBSCRIBE, subscriptionRequest, response);
+        SubscriptionPayload payload = buildSubscriptionPayload(MODE_SUBSCRIBE, subscriptionRequest);
+        http:Response|error response = httpClient->post("", payload, mediaType = mime:APPLICATION_FORM_URLENCODED);
+        return processHubResponse(self.url, MODE_SUBSCRIBE, subscriptionRequest.topic, response);
     }
 
     # Sends an unsubscription request to a WebSub Hub.
@@ -62,44 +61,40 @@ public isolated client class SubscriptionClient {
     isolated remote function unsubscribe(SubscriptionChangeRequest unsubscriptionRequest)
             returns SubscriptionChangeResponse|SubscriptionInitiationError {
         http:Client httpClient = self.httpClient;
-        http:Request builtUnsubscriptionRequest = buildSubscriptionChangeRequest(MODE_UNSUBSCRIBE, unsubscriptionRequest);
-        http:Response|error response = httpClient->post("", builtUnsubscriptionRequest);
-        return processHubResponse(self.url, MODE_UNSUBSCRIBE, unsubscriptionRequest, response);
+        SubscriptionPayload payload = buildSubscriptionPayload(MODE_UNSUBSCRIBE, unsubscriptionRequest);
+        http:Response|error response = httpClient->post("", payload, mediaType = mime:APPLICATION_FORM_URLENCODED);
+        return processHubResponse(self.url, MODE_UNSUBSCRIBE, unsubscriptionRequest.topic, response);
     }
 
 }
 
-isolated function buildSubscriptionChangeRequest(string mode, 
-                                                 SubscriptionChangeRequest subscriptionChangeRequest) 
-                                                 returns http:Request {
-    http:Request request = new;
-    string callback = subscriptionChangeRequest.callback;
-    var encodedCallback = url:encode(callback, "UTF-8");
-    if encodedCallback is string {
-        callback = encodedCallback;
-    }
+type SubscriptionPayload record {
+    string hub\.mode;
+    string hub\.topic;
+    string hub\.callback;
+    string hub\.secret?;
+    string hub\.lease_seconds?;
+};
 
-    string body = HUB_MODE + "=" + mode
-        + "&" + HUB_TOPIC + "=" + subscriptionChangeRequest.topic
-        + "&" + HUB_CALLBACK + "=" + callback;
+isolated function buildSubscriptionPayload(string mode, SubscriptionChangeRequest subscriptionReq) returns SubscriptionPayload {
+    SubscriptionPayload payload = {
+        hub\.mode: mode,
+        hub\.topic: subscriptionReq.topic,
+        hub\.callback: subscriptionReq.callback
+    };
     if mode == MODE_SUBSCRIBE {
-        if subscriptionChangeRequest.secret.trim() != "" {
-            body = body + "&" + HUB_SECRET + "=" + subscriptionChangeRequest.secret;
+        if subscriptionReq.secret.trim() != "" {
+            payload.hub\.secret = subscriptionReq.secret;
         }
-        if subscriptionChangeRequest.leaseSeconds != 0 {
-            body = body + "&" + HUB_LEASE_SECONDS + "=" + subscriptionChangeRequest.leaseSeconds.toString();
+        if subscriptionReq.leaseSeconds != 0 {
+            payload.hub\.lease_seconds = subscriptionReq.leaseSeconds.toString();
         }
     }
-    request.setTextPayload(body);
-    request.setHeader(CONTENT_TYPE, mime:APPLICATION_FORM_URLENCODED);
-    return request;
+    return payload;
 }
 
-isolated function processHubResponse(string hub, string mode,
-                                    SubscriptionChangeRequest subscriptionChangeRequest,
-                                    http:Response|error response) returns SubscriptionChangeResponse|SubscriptionInitiationError {
-
-    string topic = subscriptionChangeRequest.topic;
+isolated function processHubResponse(string hub, string mode, string topic,
+        http:Response|error response) returns SubscriptionChangeResponse|SubscriptionInitiationError {
     if response is error {
         return error SubscriptionInitiationError("Error occurred for request: Mode[" + mode + "] at Hub[" + hub + "] - " + response.message());
     }
@@ -108,8 +103,7 @@ isolated function processHubResponse(string hub, string mode,
     if responseStatusCode == http:STATUS_TEMPORARY_REDIRECT
                 || responseStatusCode == http:STATUS_PERMANENT_REDIRECT {
         return error SubscriptionInitiationError("Redirection response received for subscription change request made with " +
-                                "followRedirects disabled or after maxCount exceeded: Hub [" + hub + "], Topic [" +
-                                subscriptionChangeRequest.topic + "]");
+                                "followRedirects disabled or after maxCount exceeded: Hub [" + hub + "], Topic [" + topic + "]");
     } else if !isSuccessStatusCode(responseStatusCode) {
         var responsePayload = hubResponse.getTextPayload();
         string errorMessage = "Error in request: Mode[" + mode + "] at Hub[" + hub + "]";
