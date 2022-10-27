@@ -497,3 +497,58 @@ isolated function testRetrieveHttpClientWithoutConfig() {
     var clientEp = retrieveHttpClient("https://test.com/sample", ());
     test:assertTrue(clientEp is http:Client);
 }
+
+@test:Config {
+    groups: ["buildSubscriptionRequest"]
+}
+isolated function testBuildSubscriptionRequest() returns error? {
+    SubscriptionChangeRequest changeRequest = {
+        topic: "https://sample.topic.com",
+        callback: "https://sample.subscriber.com"
+    };
+    SubscriptionPayload subscriptionRequest = buildSubscriptionPayload(MODE_SUBSCRIBE, changeRequest);
+    SubscriptionPayload expectedRequest = {
+        hub\.mode: MODE_SUBSCRIBE,
+        hub\.topic: "https://sample.topic.com",
+        hub\.callback: "https://sample.subscriber.com"
+    };
+    test:assertEquals(subscriptionRequest, expectedRequest);
+}
+
+@test:Config {
+    groups: ["buildSubscriptionRequest"]
+}
+isolated function testBuildSubscriptionRequestWithAdditionalParams() returns error? {
+    SubscriptionChangeRequest changeRequest = {
+        topic: "https://sample.topic.com",
+        callback: "https://sample.subscriber.com",
+        secret: "test123",
+        leaseSeconds: 86000
+    };
+    SubscriptionPayload subscriptionRequest = buildSubscriptionPayload(MODE_SUBSCRIBE, changeRequest);
+    SubscriptionPayload expectedRequest = {
+        hub\.mode: MODE_SUBSCRIBE,
+        hub\.topic: "https://sample.topic.com",
+        hub\.callback: "https://sample.subscriber.com",
+        hub\.secret: "test123",
+        hub\.lease_seconds: "86000"
+    };
+    test:assertEquals(subscriptionRequest, expectedRequest);
+}
+
+@test:Config {
+    groups: ["buildSubscriptionRequest"]
+}
+isolated function testBuildUnsubscriptionRequest() returns error? {
+    SubscriptionChangeRequest changeRequest = {
+        topic: "https://sample.topic.com",
+        callback: "https://sample.subscriber.com"
+    };
+    SubscriptionPayload subscriptionRequest = buildSubscriptionPayload(MODE_UNSUBSCRIBE, changeRequest);
+    SubscriptionPayload expectedRequest = {
+        hub\.mode: MODE_UNSUBSCRIBE,
+        hub\.topic: "https://sample.topic.com",
+        hub\.callback: "https://sample.subscriber.com"
+    };
+    test:assertEquals(subscriptionRequest, expectedRequest);
+}
