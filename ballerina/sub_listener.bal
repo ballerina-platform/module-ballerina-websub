@@ -278,17 +278,16 @@ isolated function constructCallbackUrl(SubscriberServiceConfiguration subscriber
 }
 
 isolated function shouldUseGeneratedServicePath(SubscriberServiceConfiguration subscriberConfig,
-                                                string[]|string? name) returns boolean {
-    if subscriberConfig?.callback is () && isEmptyServicePath(name) {
+                                                string[]|string? servicePath) returns boolean {
+    // if the provided service-path is `()` it is considered as an empty service-path.
+    // if the provided service-path is an empty-array that means the absolute-service path is set to `/`
+    // For more information refer: https://github.com/ballerina-platform/ballerina-spec/issues/810
+    if subscriberConfig?.callback is () && servicePath is () {
         return true;
     }
     return subscriberConfig?.callback is string 
             && subscriberConfig.appendServicePath 
-            && isEmptyServicePath(name);
-}
-
-isolated function isEmptyServicePath(string[]|string? name) returns boolean {
-    return name is () || (name is string[] && name.length() == 0);
+            && servicePath is ();
 }
 
 isolated function retrieveCompleteServicePath(string[]|string? servicePath) returns string {
