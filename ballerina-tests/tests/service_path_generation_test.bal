@@ -38,6 +38,14 @@ service on testListener {
     }
 }
 
+@websub:SubscriberServiceConfig {}
+service / on testListener {
+    remote function onEventNotification(websub:ContentDistributionMessage message)
+                returns websub:Acknowledgement|websub:SubscriptionDeletedError? {
+        return websub:ACKNOWLEDGEMENT;
+    }
+}
+
 @test:Config { 
     groups: ["integrationTest"]
 }
