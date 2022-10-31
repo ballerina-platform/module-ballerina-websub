@@ -23,7 +23,6 @@ import io.ballerina.compiler.api.symbols.ErrorTypeSymbol;
 import io.ballerina.compiler.api.symbols.FunctionSymbol;
 import io.ballerina.compiler.api.symbols.IntersectionTypeSymbol;
 import io.ballerina.compiler.api.symbols.ModuleSymbol;
-import io.ballerina.compiler.api.symbols.ObjectTypeSymbol;
 import io.ballerina.compiler.api.symbols.Qualifier;
 import io.ballerina.compiler.api.symbols.ServiceDeclarationSymbol;
 import io.ballerina.compiler.api.symbols.TypeDescKind;
@@ -45,7 +44,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * {@code ValidatorUtils} contains utility functions required for {@code websub:SubscriberService} validation.
+ * {@code AnalyserUtils} contains utility functions required for {@code websub:SubscriberService} validation.
  */
 public final class AnalyserUtils {
     public static void updateContext(SyntaxNodeAnalysisContext context, WebSubDiagnosticCodes errorCode,
@@ -65,23 +64,23 @@ public final class AnalyserUtils {
             return ((UnionTypeSymbol) listenerType).memberTypeDescriptors().stream()
                     .filter(typeDescriptor -> typeDescriptor instanceof TypeReferenceTypeSymbol)
                     .map(typeReferenceTypeSymbol -> (TypeReferenceTypeSymbol) typeReferenceTypeSymbol)
-                    .anyMatch(typeReferenceTypeSymbol ->
-                            typeReferenceTypeSymbol.getModule().isPresent()
-                                    && isWebSub(typeReferenceTypeSymbol.getModule().get()
-                            ));
+                    .anyMatch(AnalyserUtils::isWebSubListenerType);
         }
-
         if (listenerType.typeKind() == TypeDescKind.TYPE_REFERENCE) {
-            Optional<ModuleSymbol> moduleOpt = ((TypeReferenceTypeSymbol) listenerType).typeDescriptor().getModule();
-            return moduleOpt.isPresent() && isWebSub(moduleOpt.get());
+            return isWebSubListenerType((TypeReferenceTypeSymbol) listenerType);
         }
-
         if (listenerType.typeKind() == TypeDescKind.OBJECT) {
-            Optional<ModuleSymbol> moduleOpt = ((ObjectTypeSymbol) listenerType).getModule();
+            Optional<ModuleSymbol> moduleOpt = listenerType.getModule();
             return moduleOpt.isPresent() && isWebSub(moduleOpt.get());
         }
-
         return false;
+    }
+
+    private static boolean isWebSubListenerType(TypeReferenceTypeSymbol typeSymbol) {
+        if (typeSymbol.getName().isEmpty() || !Constants.LISTENER_IDENTIFIER.equals(typeSymbol.getName().get())) {
+            return false;
+        }
+        return typeSymbol.getModule().isPresent() && isWebSub(typeSymbol.getModule().get());
     }
 
     public static boolean isWebSub(ModuleSymbol moduleSymbol) {
