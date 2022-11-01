@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - [`topic` URL is not properly encoded when sending the subscription request](https://github.com/ballerina-platform/ballerina-standard-library/issues/2941)
 - [WebSub subscriber service results in panic with `service path not found`](https://github.com/ballerina-platform/ballerina-standard-library/issues/2882)
-- [Compiler Plugin Allows Passing an HTTP Listener with Configs to Listener Init](https://github.com/ballerina-platform/ballerina-standard-library/issues/2782)
+- [Compiler plugin allows passing an HTTP listener with configs to listener init](https://github.com/ballerina-platform/ballerina-standard-library/issues/2782)
 
 ### Changed
 - [API Docs Updated](https://github.com/ballerina-platform/ballerina-standard-library/issues/3463)
