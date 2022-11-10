@@ -71,6 +71,7 @@ def disableGroups = ""
 def debugParams = ""
 def balJavaDebugParam = ""
 def testParams = ""
+def nativeFlag = ""
 
 task initializeVariables {
     if (project.hasProperty("groups")) {
@@ -85,6 +86,19 @@ task initializeVariables {
     if (project.hasProperty("balJavaDebug")) {
         balJavaDebugParam = "BAL_JAVA_DEBUG=${project.findProperty("balJavaDebug")}"
     }
+    if (project.hasProperty('balNativeTest')) {
+        nativeFlag = '--native'
+    }
+
+    gradle.taskGraph.whenReady { graph ->
+        if (graph.hasTask(":${packageName}-${packageOrg}:test")) {
+            if (!project.hasProperty('balNativeTest')) {
+                testParams = "${testCoverageParam}"
+            }
+        } else {
+            testParams = "--skip-tests"
+        }
+    }
 }
 
 task ballerinaTest {
@@ -98,9 +112,9 @@ task ballerinaTest {
             workingDir project.projectDir
             environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "${balJavaDebugParam} ${distributionBinPath}/bal.bat test ${testParams} ${groupParams} ${disableGroups} ${debugParams} && exit %%ERRORLEVEL%%"
+                commandLine 'cmd', '/c', "${balJavaDebugParam} ${distributionBinPath}/bal.bat test ${nativeFlag} ${testParams} ${groupParams} ${disableGroups} ${debugParams} && exit %%ERRORLEVEL%%"
             } else {
-                commandLine 'sh', '-c', "${balJavaDebugParam} ${distributionBinPath}/bal test ${testParams} ${groupParams} ${disableGroups} ${debugParams}"
+                commandLine 'sh', '-c', "${balJavaDebugParam} ${distributionBinPath}/bal test ${nativeFlag} ${testParams} ${groupParams} ${disableGroups} ${debugParams}"
             }
         }
     }
@@ -110,5 +124,5 @@ test {
     dependsOn(ballerinaTest)
 }
 
-build.dependsOn ":${packageName}-ballerina:build"
-test.dependsOn ":${packageName}-ballerina:build"
+build.dependsOn ":${packageName}-${packageOrg}:build"
+test.dependsOn ":${packageName}-${packageOrg}:build"
