@@ -91,11 +91,7 @@ task initializeVariables {
     }
 
     gradle.taskGraph.whenReady { graph ->
-        if (graph.hasTask(":${packageName}-${packageOrg}:test")) {
-            if (!project.hasProperty('balNativeTest')) {
-                testParams = "${testCoverageParam}"
-            }
-        } else {
+        if (!graph.hasTask(":${packageName}-${packageOrg}:test")) {
             testParams = "--skip-tests"
         }
     }
