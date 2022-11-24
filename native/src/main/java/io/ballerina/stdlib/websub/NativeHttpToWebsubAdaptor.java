@@ -27,9 +27,11 @@ import io.ballerina.runtime.api.async.StrandMetadata;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.IntersectionType;
 import io.ballerina.runtime.api.types.MethodType;
+import io.ballerina.runtime.api.types.ObjectType;
 import io.ballerina.runtime.api.types.Parameter;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
@@ -68,7 +70,8 @@ public class NativeHttpToWebsubAdaptor {
     public static BArray getServiceMethodNames(BObject adaptor) {
         BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
         ArrayList<BString> methodNamesList = new ArrayList<>();
-        for (MethodType method : serviceObj.getType().getMethods()) {
+        ObjectType objectType = (ObjectType) TypeUtils.getReferredType(serviceObj.getType());
+        for (MethodType method : objectType.getMethods()) {
             methodNamesList.add(StringUtils.fromString(method.getName()));
         }
         return ValueCreator.createArrayValue(methodNamesList.toArray(BString[]::new));
@@ -115,7 +118,8 @@ public class NativeHttpToWebsubAdaptor {
     }
 
     private static boolean isReadOnlyParam(BObject serviceObj, String remoteMethod) {
-        for (MethodType method : serviceObj.getType().getMethods()) {
+        ObjectType objectType = (ObjectType) TypeUtils.getReferredType(serviceObj.getType());
+        for (MethodType method : objectType.getMethods()) {
             if (method.getName().equals(remoteMethod)) {
                 Parameter[] parameters = method.getParameters();
                 if (parameters.length >= 1) {
@@ -142,8 +146,9 @@ public class NativeHttpToWebsubAdaptor {
         StrandMetadata metadata = new StrandMetadata(module.getOrg(), module.getName(), module.getVersion(),
                 parentFunctionName);
         Object[] args = new Object[]{message, true};
-        if (bSubscriberService.getType().isIsolated()
-                && bSubscriberService.getType().isIsolated(remoteFunctionName)) {
+        ObjectType serviceType = (ObjectType) TypeUtils.getReferredType(bSubscriberService.getType());
+        if (serviceType.isIsolated()
+                && serviceType.isIsolated(remoteFunctionName)) {
             env.getRuntime().invokeMethodAsyncConcurrently(
                     bSubscriberService, remoteFunctionName, null, metadata,
                     new SubscriberCallback(balFuture, module), null, PredefinedTypes.TYPE_NULL, args);
