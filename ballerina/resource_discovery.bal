@@ -16,7 +16,6 @@
 
 import ballerina/http;
 import ballerina/lang.'string as strings;
-import ballerina/regex;
 
 # Represents resource-discovery service which identify the `hub` and `topic` from `resource-URL`.
 public client class DiscoveryService {
@@ -108,17 +107,17 @@ isolated function extractTopicAndHubUrls(http:Response response) returns [string
     string topic = "";
     string[] linkHeaderConstituents = [];
     if linkHeaders.length() == 1 {
-        linkHeaderConstituents = regex:split(linkHeaders[0], ",");
+        linkHeaderConstituents = re `,`.split(linkHeaders[0]);
     } else {
         linkHeaderConstituents = linkHeaders;
     }
 
     foreach var link in linkHeaderConstituents {
-        string[] linkConstituents = regex:split(link, ";");
+        string[] linkConstituents = re `;`.split(link);
         if linkConstituents[1] != "" {
             string url = linkConstituents[0].trim();
-            url = regex:replaceAll(url, "<", "");
-            url = regex:replaceAll(url, ">", "");
+            url = re `<`.replaceAll(url, "");
+            url = re `>`.replaceAll(url, "");
             if strings:includes(linkConstituents[1], "rel=\"hub\"") {
                 hubs[hubIndex] = url;
                 hubIndex += 1;
