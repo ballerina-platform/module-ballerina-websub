@@ -15,7 +15,6 @@
 // under the License.
 
 import ballerina/http;
-import ballerina/regex;
 import ballerina/crypto;
 import ballerina/log;
 import ballerina/lang.'string as strings;
@@ -117,9 +116,9 @@ isolated function verifyContent(http:Request request, string secret, string payl
                 if xHubSignature.trim().length() == 0 {
                     return false;
                 } else {
-                    string[] splitSignature = regex:split(xHubSignature, "=");
+                    string[] splitSignature = re `=`.split(xHubSignature);
                     string method = splitSignature[0];
-                    string signature = regex:replaceAll(xHubSignature, method + "=", "");
+                    string signature = re `${method}=`.replaceAll(xHubSignature, "");
                     byte[] generatedSignature = check retrieveContentHash(method, secret, payload);
                     return signature == generatedSignature.toBase16(); 
                 }          
