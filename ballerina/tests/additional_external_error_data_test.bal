@@ -15,8 +15,8 @@
 // under the License.
 
 import ballerina/log;
-import ballerina/http;
-import ballerina/regex;   
+import ballerina/http;   
+// import ballerina/io;
 import ballerina/test;
 
 listener Listener additionalErrorDetailsListener = new (9093);
@@ -92,9 +92,9 @@ function testOnEventNotificationFailedErrorDetails() returns error? {
 isolated function decodeResponseBody(string payload) returns map<string> {
     map<string> body = {};
     if (payload.length() > 0) {
-        string[] splittedPayload = regex:split(payload, "&");
+        string[] splittedPayload = re `&`.split(payload);
         foreach string bodyPart in splittedPayload {
-            string[] responseComponent =  regex:split(bodyPart, "=");
+            string[] responseComponent =  re `=`.split(bodyPart);
             if (responseComponent.length() == 2) {
                 body[responseComponent[0]] = responseComponent[1];
             }
