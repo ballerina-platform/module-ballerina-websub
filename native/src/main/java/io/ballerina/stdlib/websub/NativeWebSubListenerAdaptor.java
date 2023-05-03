@@ -21,6 +21,7 @@ package io.ballerina.stdlib.websub;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.ArrayType;
+import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
@@ -73,7 +74,7 @@ public class NativeWebSubListenerAdaptor {
             ServiceRegistry serviceRegistry = (ServiceRegistry) serviceRegistryObj;
             BObject[] attachedServices = serviceRegistry.getAttachedServices();
             if (attachedServices.length > 0) {
-                ArrayType arrType = TypeCreator.createArrayType(attachedServices[0].getType());
+                ArrayType arrType = TypeCreator.createArrayType(TypeUtils.getType(attachedServices[0]));
                 return ValueCreator.createArrayValue(attachedServices, arrType);
             }
             return null;
