@@ -3,5 +3,8 @@ org = "ballerina"
 name = "websub_tests"
 version = "2.9.0"
 
+[platform.java11]
+graalvmCompatible = true
+
 [[platform.java11.dependency]]
 path = "../native/build/libs/websub-native-2.9.0-SNAPSHOT.jar"
