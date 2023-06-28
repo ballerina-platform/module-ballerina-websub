@@ -16,4 +16,14 @@
   ~ under the License.
   -->
 <FindBugsFilter>
+    <Match>
+        <Class name="io.ballerina.stdlib.websub.task.service.path.AbstractServicePathGenerator"/>
+        <Method name="generateRandomAlphaNumericString"/>
+        <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+    </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.websub.task.service.path.ServicePathContextHandler"/>
+        <Method name="getContextHandler"/>
+        <Bug pattern="MS_EXPOSE_REP"/>
+    </Match>
 </FindBugsFilter>
