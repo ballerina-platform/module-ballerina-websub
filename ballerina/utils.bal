@@ -227,11 +227,10 @@ isolated function isSuccessStatusCode(int statusCode) returns boolean {
 
 isolated function retrieveHttpClient(string url, http:ClientConfiguration config) returns http:Client|Error {
     http:Client|error clientEp = new (url, config);
-    if (clientEp is http:Client) {
+    if clientEp is http:Client {
         return clientEp;
-    } else {
-        return error Error("Client initialization failed", clientEp);
     }
+    return error Error("Client initialization failed", clientEp);
 }
 
 # Returns the value of the specified header. If the specified header key maps to multiple values, the first of
