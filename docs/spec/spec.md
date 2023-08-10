@@ -33,6 +33,7 @@ The conforming implementation of the specification is released and included in t
       * 2.2.3. [Callback URL Generation](#223-callback-url-generation)
         * 2.2.3.1 [Service Path Generation](#2231-service-path-generation)
       * 2.2.4. [Unsubscribing from the `hub`](#224-unsubscribing-from-the-hub)
+3. [Common Client Configuration](#3-common-client-configuration)
 
 ## 1. Overview
 
@@ -287,11 +288,11 @@ public type SubscriberServiceConfiguration record {|
     string secret?;
     boolean appendServicePath = false;
     boolean unsubscribeOnShutdown = false;
-    http:ClientConfiguration httpConfig?;
+    ClientConfiguration httpConfig?;
     record {|
         string|string[] accept?;
         string|string[] acceptLanguage?;
-        http:ClientConfiguration httpConfig?;
+        ClientConfiguration httpConfig?;
     |} discoveryConfig?;
     readonly byte[] servicePath = [];
 |};
@@ -333,3 +334,35 @@ The key functionalities expected from the unsubscription flow as follows:
 - Unsubscription flow should be initiated whenever the graceful stop is invoked in `websub:Listener`.
 - If multiple `websub:SubscriberService` instances are attached to one `websub:Listener`, all the subscriber instances which have enabled `unsubscribeOnShutdown` should initiate unsubscription on listener shutdown.  
 - Unsubscription flow should be initiated only if `graceful stop` is invoked, and will not be executed for `immediate stop` .  
+
+### 3. Common Client Configuration
+
+Websub library provides following client configurations to be used when initializing `websub:SubscriptionClient`/`websub:DiscoveryService`.
+```ballerina
+# Record to represent the client configuration for the SubscriptionClient/DiscoveryService.
+# 
+# + httpVersion - The HTTP version understood by the client
+# + http1Settings - Configurations related to HTTP/1.x protocol
+# + http2Settings - Configurations related to HTTP/2 protocol
+# + timeout - The maximum time to wait (in seconds) for a response before closing the connection
+# + followRedirects - Configurations associated with Redirection
+# + poolConfig - Configurations associated with request pooling
+# + auth - Configurations related to client authentication
+# + retryConfig - Configurations associated with retrying
+# + responseLimits - Configurations associated with inbound response size limits
+# + secureSocket - SSL/TLS related options
+# + circuitBreaker - Configurations associated with the behaviour of the Circuit Breaker
+public type ClientConfiguration record {|
+    http:HttpVersion httpVersion = http:HTTP_2_0;
+    http:ClientHttp1Settings http1Settings = {};
+    http:ClientHttp2Settings http2Settings = {};
+    decimal timeout = 60;
+    http:FollowRedirects followRedirects?;
+    http:PoolConfiguration poolConfig?;
+    http:ClientAuthConfig auth?;
+    http:RetryConfig retryConfig?;
+    http:ResponseLimitConfigs responseLimits = {};
+    http:ClientSecureSocket secureSocket?;
+    http:CircuitBreakerConfig circuitBreaker?;
+|};
+```

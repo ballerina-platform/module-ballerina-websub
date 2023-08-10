@@ -168,7 +168,7 @@ public final UnsubscriptionVerificationError UNSUBSCRIPTION_VERIFICATION_ERROR =
 # Common response, which could be used for `websub:SubscriptionDeletedError`.
 public final SubscriptionDeletedError SUBSCRIPTION_DELETED_ERROR = error SubscriptionDeletedError("Subscription deleted");
 
-# Record to represent the client configuration for the SubscriberClient/DiscoveryClient.
+# Record to represent the client configuration for the SubscriptionClient/DiscoveryService.
 # 
 # + httpVersion - The HTTP version understood by the client
 # + http1Settings - Configurations related to HTTP/1.x protocol
