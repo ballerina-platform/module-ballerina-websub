@@ -167,3 +167,46 @@ public final UnsubscriptionVerificationError UNSUBSCRIPTION_VERIFICATION_ERROR =
 
 # Common response, which could be used for `websub:SubscriptionDeletedError`.
 public final SubscriptionDeletedError SUBSCRIPTION_DELETED_ERROR = error SubscriptionDeletedError("Subscription deleted");
+
+# Record to represent the client configuration for the SubscriberClient/DiscoveryClient.
+# 
+# + httpVersion - The HTTP version understood by the client
+# + http1Settings - Configurations related to HTTP/1.x protocol
+# + http2Settings - Configurations related to HTTP/2 protocol
+# + timeout - The maximum time to wait (in seconds) for a response before closing the connection
+# + followRedirects - Configurations associated with Redirection
+# + poolConfig - Configurations associated with request pooling
+# + auth - Configurations related to client authentication
+# + retryConfig - Configurations associated with retrying
+# + responseLimits - Configurations associated with inbound response size limits
+# + secureSocket - SSL/TLS related options
+# + circuitBreaker - Configurations associated with the behaviour of the Circuit Breaker
+public type ClientConfiguration record {|
+    http:HttpVersion httpVersion = http:HTTP_2_0;
+    http:ClientHttp1Settings http1Settings = {};
+    http:ClientHttp2Settings http2Settings = {};
+    decimal timeout = 60;
+    http:FollowRedirects followRedirects?;
+    http:PoolConfiguration poolConfig?;
+    http:ClientAuthConfig auth?;
+    http:RetryConfig retryConfig?;
+    http:ResponseLimitConfigs responseLimits = {};
+    http:ClientSecureSocket secureSocket?;
+    http:CircuitBreakerConfig circuitBreaker?;
+|};
+
+isolated function retrieveHttpClientConfig(ClientConfiguration config) returns http:ClientConfiguration {
+    return {
+        httpVersion: config.httpVersion,
+        http1Settings: config.http1Settings,
+        http2Settings: config.http2Settings,
+        timeout: config.timeout,
+        followRedirects: config?.followRedirects,
+        poolConfig: config?.poolConfig,
+        auth: config?.auth,
+        retryConfig: config?.retryConfig,
+        responseLimits: config.responseLimits,
+        secureSocket: config?.secureSocket,
+        circuitBreaker: config?.circuitBreaker
+    };
+}
