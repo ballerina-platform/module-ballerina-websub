@@ -23,7 +23,7 @@
 # + secret - The secret to be used for authenticated content distribution
 # + appendServicePath - This flag notifies whether or not to append service-path to callback-url
 # + unsubscribeOnShutdown - This flag notifies whether or not to initiate unsubscription when the service is shutting down
-# + httpConfig - The configuration for the hub client used to interact with the discovered/specified hub
+# + httpConfig - The configuration for the subscriber client used to interact with the discovered/specified hub
 # + discoveryConfig - HTTP client configurations for resource discovery
 # + servicePath - The generated service-path if the service-path is not provided. This is auto-generated at the compile-time.
 public type SubscriberServiceConfiguration record {|
