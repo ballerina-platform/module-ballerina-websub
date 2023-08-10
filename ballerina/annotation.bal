@@ -14,8 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/http;
-
 # Configuration for a WebSubSubscriber service.
 #
 # + target - The `string` resource URL for which discovery will be initiated to identify the hub and topic,
@@ -35,11 +33,11 @@ public type SubscriberServiceConfiguration record {|
     string secret?;
     boolean appendServicePath = false;
     boolean unsubscribeOnShutdown = false;
-    http:ClientConfiguration httpConfig?;
+    ClientConfiguration httpConfig?;
     record {|
         string|string[] accept?;
         string|string[] acceptLanguage?;
-        http:ClientConfiguration httpConfig?;
+        ClientConfiguration httpConfig?;
     |} discoveryConfig?;
     readonly byte[] servicePath = [];
 |};

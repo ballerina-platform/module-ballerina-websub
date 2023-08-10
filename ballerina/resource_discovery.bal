@@ -28,11 +28,12 @@ public client class DiscoveryService {
     # ```
     # 
     # + resourceUrl - User-provided resource URL
-    # + publisherClientConfig - Optional `http:ClientConfiguration` to be used in the underlying `http:Client`
+    # + publisherClientConfig - Optional `ClientConfiguration` to be used in the underlying `http:Client`
     # + return - The `websub:DiscoveryService` or an `websub:Error` if the initialization failed
-    public isolated function init(string discoveryUrl, http:ClientConfiguration? config) returns Error? {
+    public isolated function init(string discoveryUrl, *ClientConfiguration config) returns Error? {
         self.resourceUrl = discoveryUrl;
-        self.discoveryClientEp = check retrieveHttpClient(self.resourceUrl, config);
+        http:ClientConfiguration clientConfig = retrieveHttpClientConfig(config);
+        self.discoveryClientEp = check retrieveHttpClient(self.resourceUrl, clientConfig);
     }
 
     # Discovers the URLs of the hub and topic defined by a resource URL.

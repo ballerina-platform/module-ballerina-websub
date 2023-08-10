@@ -28,11 +28,12 @@ public isolated client class SubscriptionClient {
     # ```
     # 
     # + url    - The URL at which the subscription should be changed
-    # + config - Optional `http:ClientConfiguration` for the underlying client
+    # + config - Optional `ClientConfiguration` for the underlying client
     # + return - The `websub:SubscriptionClient` or an `websub:Error` if the initialization failed
-    public isolated function init(string url, *http:ClientConfiguration config) returns Error? {
+    public isolated function init(string url, *ClientConfiguration config) returns Error? {
         self.url = url;
-        self.httpClient = check retrieveHttpClient(self.url, config);
+        http:ClientConfiguration clientConfig = retrieveHttpClientConfig(config);
+        self.httpClient = check retrieveHttpClient(self.url, clientConfig);
     }
 
     # Sends a subscription request to the provided `hub`.
