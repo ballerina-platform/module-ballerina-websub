@@ -490,14 +490,6 @@ isolated function testRetrieveHttpClientWithConfig() {
     test:assertTrue(clientEp is http:Client);
 }
 
-@test:Config { 
-    groups: ["httpClientRetrieval"]
-}
-isolated function testRetrieveHttpClientWithoutConfig() {
-    var clientEp = retrieveHttpClient("https://test.com/sample", ());
-    test:assertTrue(clientEp is http:Client);
-}
-
 @test:Config {
     groups: ["buildSubscriptionRequest"]
 }

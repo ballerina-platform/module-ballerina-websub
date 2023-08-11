@@ -184,7 +184,7 @@ isolated function retrieveResourceDetails(SubscriberServiceConfiguration service
         var discoveryConfig = serviceConfig?.discoveryConfig;
         string?|string[] expectedMediaTypes = discoveryConfig?.accept ?: ();
         string?|string[] expectedLanguageTypes = discoveryConfig?.acceptLanguage ?: ();
-        DiscoveryService discoveryClient = check new (target, discoveryConfig?.httpConfig);
+        DiscoveryService discoveryClient = check getDiscoveryClient(target, discoveryConfig?.httpConfig);
         [string, string] resourceDetails = check discoveryClient->discoverResourceUrls(expectedMediaTypes, expectedLanguageTypes);
         return resourceDetails;
     } else if target is [string, string] {
@@ -193,11 +193,19 @@ isolated function retrieveResourceDetails(SubscriberServiceConfiguration service
     return;
 }
 
-isolated function getSubscriberClient(string hubUrl, http:ClientConfiguration? config) returns SubscriptionClient|error {
-    if config is http:ClientConfiguration {
+isolated function getSubscriberClient(string hubUrl, ClientConfiguration? config) returns SubscriptionClient|error {
+    if config is ClientConfiguration {
         return check new SubscriptionClient(hubUrl, config); 
     } else {
         return check new SubscriptionClient(hubUrl);
+    }
+}
+
+isolated function getDiscoveryClient(string discoveryUrl, ClientConfiguration? config) returns DiscoveryService|error {
+    if config is ClientConfiguration {
+        return check new DiscoveryService(discoveryUrl, config);
+    } else {
+        return check new DiscoveryService(discoveryUrl);
     }
 }
 
