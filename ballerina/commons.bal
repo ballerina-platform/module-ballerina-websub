@@ -117,8 +117,8 @@ public type ListenerConfiguration record {|
 # + callback - The callback which should be registered/unregistered for the subscription/unsubscription request sent  
 # + leaseSeconds - The lease period for which the subscription is expected to be active  
 # + secret - The secret to be used for authenticated content distribution with this subscription  
-# + customParams - Additional parameters which needs to be sent with the subscription request
-# + customHeaders - Additional HTTP headers which needs to be sent with the subscription request
+# + customParams - Additional parameters which need to be sent with the subscription request
+# + customHeaders - Additional HTTP headers which need to be sent with the subscription request
 public type SubscriptionChangeRequest record {|
     string topic = "";
     string callback = "";

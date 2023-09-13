@@ -27,8 +27,8 @@ import ballerina/http;
 # + unsubscribeOnShutdown - This flag notifies whether or not to initiate unsubscription when the service is shutting down  
 # + httpConfig - The configuration for the hub client used to interact with the discovered/specified hub  
 # + discoveryConfig - HTTP client configurations for resource discovery  
-# + customParams - Additional parameters which needs to be sent with the subscription request
-# + customHeaders - Additional HTTP headers which needs to be sent with the subscription request
+# + customParams - Additional parameters which need to be sent with the subscription request
+# + customHeaders - Additional HTTP headers which need to be sent with the subscription request
 # + servicePath - The generated service-path if the service-path is not provided. This is auto-generated at the compile-time.
 public type SubscriberServiceConfiguration record {|
     string|[string, string] target?;
