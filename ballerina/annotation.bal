@@ -18,15 +18,17 @@ import ballerina/http;
 
 # Configuration for a WebSubSubscriber service.
 #
-# + target - The `string` resource URL for which discovery will be initiated to identify the hub and topic,
-#            or a tuple `[hub, topic]` representing a discovered hub and a topic
-# + leaseSeconds - The period for which the subscription is expected to be active
-# + callback - The callback URL for subscriber-service
-# + secret - The secret to be used for authenticated content distribution
-# + appendServicePath - This flag notifies whether or not to append service-path to callback-url
-# + unsubscribeOnShutdown - This flag notifies whether or not to initiate unsubscription when the service is shutting down
-# + httpConfig - The configuration for the hub client used to interact with the discovered/specified hub
-# + discoveryConfig - HTTP client configurations for resource discovery
+# + target - The `string` resource URL for which discovery will be initiated to identify the hub and topic,  
+# or a tuple `[hub, topic]` representing a discovered hub and a topic  
+# + leaseSeconds - The period for which the subscription is expected to be active  
+# + callback - The callback URL for subscriber-service  
+# + secret - The secret to be used for authenticated content distribution  
+# + appendServicePath - This flag notifies whether or not to append service-path to callback-url  
+# + unsubscribeOnShutdown - This flag notifies whether or not to initiate unsubscription when the service is shutting down  
+# + httpConfig - The configuration for the hub client used to interact with the discovered/specified hub  
+# + discoveryConfig - HTTP client configurations for resource discovery  
+# + customParams - Additional parameters which need to be sent with the subscription request
+# + customHeaders - Additional HTTP headers which need to be sent with the subscription request
 # + servicePath - The generated service-path if the service-path is not provided. This is auto-generated at the compile-time.
 public type SubscriberServiceConfiguration record {|
     string|[string, string] target?;
@@ -41,6 +43,8 @@ public type SubscriberServiceConfiguration record {|
         string|string[] acceptLanguage?;
         http:ClientConfiguration httpConfig?;
     |} discoveryConfig?;
+    map<string> customParams?;
+    map<string> customHeaders?;
     readonly byte[] servicePath = [];
 |};
 

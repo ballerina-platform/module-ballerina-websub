@@ -41,6 +41,14 @@ isolated function retrieveSubscriptionRequest(string topicUrl, SubscriberService
         request.secret = secret;
     }
 
+    map<string>? customParams = config.customParams;
+    if customParams is map<string> {
+        request.customParams = customParams;
+    }
+    map<string>? customHeaders = config.customHeaders;
+    if customHeaders is map<string> {
+        request.customHeaders = customHeaders;
+    }
     return request;
 }
 
