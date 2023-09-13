@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- [Add support to send additional parameters in the subscription request](https://github.com/ballerina-platform/ballerina-standard-library/issues/4795)
+- [Add support to send custom parameters in the subscription request](https://github.com/ballerina-platform/ballerina-standard-library/issues/4795)
 
 ## [2.5.0] - 2022-11-30
 
