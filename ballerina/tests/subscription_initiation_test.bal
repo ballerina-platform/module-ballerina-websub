@@ -26,6 +26,13 @@ const string HUB_FAILURE_URL = "http://127.0.0.1:9192/common/failed";
 const string COMMON_TOPIC = "https://sample.topic.com";
 
 service /common on new http:Listener(9192) {
+    private final readonly & [string, string][] expectedAdditionalParams = [
+        ["param1", "value1"], ["param2", "value2"]
+    ];
+    private final readonly & [string, string][] expectedAdditionalHeaders = [
+        ["head1", "headValue1"], ["head2", "headValue2"]
+    ];
+
     isolated resource function get discovery(http:Caller caller, http:Request request) returns error? {
         http:Response response = new;
         response.addHeader("Link", "<http://127.0.0.1:9192/common/hub>; rel=\"hub\"");
@@ -34,6 +41,30 @@ service /common on new http:Listener(9192) {
     }
 
     isolated resource function post hub(http:Caller caller, http:Request request) returns error? {
+        check caller->respond();
+    }
+
+    isolated resource function post hub/additional(http:Caller caller, http:Request request) returns error? {
+        map<string> params = check request.getFormParams();
+        foreach var ['key, value] in self.expectedAdditionalParams {
+            test:assertTrue(params.hasKey('key), "expected additional parameter not present");
+            test:assertEquals(params.get('key), value, "expected parameter value not present");
+        }
+        foreach var [header, headerValue] in self.expectedAdditionalHeaders {
+            test:assertTrue(request.hasHeader(header), "expected additional header not present");
+            test:assertEquals(check request.getHeader(header), headerValue, "expected header value not present");
+        }
+        check caller->respond();
+    }
+
+    isolated resource function post hub/additional/unsub(http:Caller caller, http:Request request) returns error? {
+        map<string> params = check request.getFormParams();
+        foreach var ['key, _] in self.expectedAdditionalParams {
+            test:assertTrue(!params.hasKey('key), "unexpected additional parameter present");
+        }
+        foreach var [header, _] in self.expectedAdditionalHeaders {
+            test:assertTrue(!request.hasHeader(header), "unexpected additional header present");
+        }
         check caller->respond();
     }
 }
@@ -115,6 +146,22 @@ isolated function testSubscriptionInitiationFailureWithHubAndTopic() returns err
     }
 }
 
+@test:Config {
+    groups: ["subscriptionInitiation"]
+}
+isolated function testSubscriptionInitiationSuccessWithAdditionalParams() returns error? {
+    SubscriberServiceConfiguration config = getServiceAnnotationConfig([ "http://127.0.0.1:9192/common/hub/additional", COMMON_TOPIC ]);
+    config.additionalParams = {
+        "param1": "value1",
+        "param2": "value2"
+    };
+    config.additionalHeaders = {
+        "head1": "headValue1",
+        "head2": "headValue2"
+    };
+    check subscribe(config, "https://sample.com/sub1");
+}
+
 @test:Config { 
     groups: ["unSubscriptionInitiation"]
 }
@@ -184,6 +231,27 @@ isolated function testUnSubscriptionInitiationSuccessWithHubAndTopic() returns e
 }
 isolated function testUnSubscriptionInitiationDisable() returns error? {
     SubscriberServiceConfiguration config = getServiceAnnotationConfig([ HUB_SUCCESS_URL, COMMON_TOPIC ]);
+    check unsubscribe(config, "https://sample.com/sub1");
+}
+
+@test:Config { 
+    groups: ["unSubscriptionInitiation"]
+}
+isolated function testUnSubscriptionInitiationSuccessWithAdditionalParams() returns error? {
+    SubscriberServiceConfiguration config = {
+        target: ["http://127.0.0.1:9192/common/hub/additional/unsub", COMMON_TOPIC],
+        leaseSeconds: 36000,
+        callback: CALLBACK,
+        unsubscribeOnShutdown: true
+    };
+    config.additionalParams = {
+        "param1": "value1",
+        "param2": "value2"
+    };
+    config.additionalHeaders = {
+        "head1": "headValue1",
+        "head2": "headValue2"
+    };
     check unsubscribe(config, "https://sample.com/sub1");
 }
 
