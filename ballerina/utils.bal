@@ -41,11 +41,11 @@ isolated function retrieveSubscriptionRequest(string topicUrl, SubscriberService
         request.secret = secret;
     }
 
-    map<string>? additionalParams = config.additionalParams;
+    map<string>? additionalParams = config.customParams;
     if additionalParams is map<string> {
         request.additionalParams = additionalParams;
     }
-    map<string>? additionalHeaders = config.additionalHeaders;
+    map<string>? additionalHeaders = config.customHeaders;
     if additionalHeaders is map<string> {
         request.additionalHeaders = additionalHeaders;
     }
