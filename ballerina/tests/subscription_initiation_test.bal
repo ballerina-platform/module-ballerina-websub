@@ -151,11 +151,11 @@ isolated function testSubscriptionInitiationFailureWithHubAndTopic() returns err
 }
 isolated function testSubscriptionInitiationSuccessWithAdditionalParams() returns error? {
     SubscriberServiceConfiguration config = getServiceAnnotationConfig([ "http://127.0.0.1:9192/common/hub/additional", COMMON_TOPIC ]);
-    config.additionalParams = {
+    config.customParams = {
         "param1": "value1",
         "param2": "value2"
     };
-    config.additionalHeaders = {
+    config.customHeaders = {
         "head1": "headValue1",
         "head2": "headValue2"
     };
@@ -244,11 +244,11 @@ isolated function testUnSubscriptionInitiationSuccessWithAdditionalParams() retu
         callback: CALLBACK,
         unsubscribeOnShutdown: true
     };
-    config.additionalParams = {
+    config.customParams = {
         "param1": "value1",
         "param2": "value2"
     };
-    config.additionalHeaders = {
+    config.customHeaders = {
         "head1": "headValue1",
         "head2": "headValue2"
     };
