@@ -4,8 +4,15 @@ This file contains all the notable changes done to the Ballerina WebSub package 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
 ### Added
 - [Introduce new `ClientConfiguration` record to be used for `websub:SubscriptionClient` and `websub:DiscoveryService`](https://github.com/ballerina-platform/ballerina-standard-library/issues/4706)
+
+## [2.9.1] - 2023-09-14
+
+### Added
+- [Add support to send custom parameters in the subscription request](https://github.com/ballerina-platform/ballerina-standard-library/issues/4795)
 
 ## [2.5.0] - 2022-11-30
 
