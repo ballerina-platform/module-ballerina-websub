@@ -48,7 +48,8 @@ public isolated client class SubscriptionClient {
             returns SubscriptionChangeResponse|SubscriptionInitiationError {
         http:Client httpClient = self.httpClient;
         SubscriptionPayload payload = buildSubscriptionPayload(MODE_SUBSCRIBE, subscriptionRequest);
-        http:Response|error response = httpClient->post("", payload, mediaType = mime:APPLICATION_FORM_URLENCODED);
+        http:Response|error response = httpClient->post("", payload, 
+            headers = subscriptionRequest.customHeaders, mediaType = mime:APPLICATION_FORM_URLENCODED);
         return processHubResponse(self.url, MODE_SUBSCRIBE, subscriptionRequest.topic, response);
     }
 
@@ -89,6 +90,12 @@ isolated function buildSubscriptionPayload(string mode, SubscriptionChangeReques
         }
         if subscriptionReq.leaseSeconds != 0 {
             payload.hub\.lease_seconds = subscriptionReq.leaseSeconds.toString();
+        }
+        map<string>? customParams = subscriptionReq.customParams;
+        if customParams is map<string> {
+            foreach var ['key, value] in customParams.entries() {
+                payload['key] = value;
+            }
         }
     }
     return payload;
