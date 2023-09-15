@@ -56,17 +56,6 @@ service /common on new http:Listener(9192) {
         }
         check caller->respond();
     }
-
-    isolated resource function post hub/additional/unsub(http:Caller caller, http:Request request) returns error? {
-        map<string> params = check request.getFormParams();
-        foreach var ['key, _] in self.expectedAdditionalParams {
-            test:assertTrue(!params.hasKey('key), "unexpected additional parameter present");
-        }
-        foreach var [header, _] in self.expectedAdditionalHeaders {
-            test:assertTrue(!request.hasHeader(header), "unexpected additional header present");
-        }
-        check caller->respond();
-    }
 }
 
 isolated function getServiceAnnotationConfig(string|[string, string] target) returns SubscriberServiceConfiguration {
@@ -239,7 +228,7 @@ isolated function testUnSubscriptionInitiationDisable() returns error? {
 }
 isolated function testUnSubscriptionInitiationSuccessWithAdditionalParams() returns error? {
     SubscriberServiceConfiguration config = {
-        target: ["http://127.0.0.1:9192/common/hub/additional/unsub", COMMON_TOPIC],
+        target: ["http://127.0.0.1:9192/common/hub/additional", COMMON_TOPIC],
         leaseSeconds: 36000,
         callback: CALLBACK,
         unsubscribeOnShutdown: true
