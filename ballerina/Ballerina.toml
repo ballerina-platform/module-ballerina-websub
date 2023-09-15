@@ -1,7 +1,7 @@
 [package]
 org = "ballerina"
 name = "websub"
-version = "2.9.1"
+version = "2.9.2"
 authors = ["Ballerina"]
 keywords = ["websub", "subscriber", "service", "listener"]
 repository = "https://github.com/ballerina-platform/module-ballerina-websub"
@@ -15,5 +15,5 @@ graalvmCompatible = true
 [[platform.java11.dependency]]
 groupId = "io.ballerina.stdlib"
 artifactId = "websub-native"
-version = "2.9.1"
-path = "../native/build/libs/websub-native-2.9.1.jar"
+version = "2.9.2"
+path = "../native/build/libs/websub-native-2.9.2-SNAPSHOT.jar"
