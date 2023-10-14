@@ -34,6 +34,8 @@ import java.util.List;
  * {@code CodeActionUtil} contains utility functions related to code-actions.
  */
 public final class CodeActionUtil {
+    private CodeActionUtil() {}
+
     /**
      * Finds a node in syntax-tree by line-range.
      *
