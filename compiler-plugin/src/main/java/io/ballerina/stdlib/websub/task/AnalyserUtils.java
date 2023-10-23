@@ -47,6 +47,8 @@ import java.util.Optional;
  * {@code AnalyserUtils} contains utility functions required for {@code websub:SubscriberService} validation.
  */
 public final class AnalyserUtils {
+    private AnalyserUtils() {}
+
     public static void updateContext(SyntaxNodeAnalysisContext context, WebSubDiagnosticCodes errorCode,
                                      NodeLocation location, Object... args) {
         DiagnosticInfo diagnosticInfo = new DiagnosticInfo(

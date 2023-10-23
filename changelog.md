@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - [Introduce new `ClientConfiguration` record to be used for `websub:SubscriptionClient` and `websub:DiscoveryService`](https://github.com/ballerina-platform/ballerina-standard-library/issues/4706)
 
+### Changed
+- [Make some of the Java classes proper utility classes](https://github.com/ballerina-platform/ballerina-standard-library/issues/4927)
+
 ## [2.9.1] - 2023-09-14
 
 ### Added

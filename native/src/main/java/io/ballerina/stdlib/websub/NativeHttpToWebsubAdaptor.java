@@ -53,7 +53,9 @@ import static io.ballerina.stdlib.websub.Constants.SUBSCRIBER_CONFIG;
 /**
  * {@code NativeHttpToWebsubAdaptor} is a wrapper object used for service method execution.
  */
-public class NativeHttpToWebsubAdaptor {
+public final class NativeHttpToWebsubAdaptor {
+    private NativeHttpToWebsubAdaptor() {}
+
     public static void externInit(BObject adaptor, BObject service) {
         adaptor.addNativeData(SERVICE_OBJECT, service);
     }

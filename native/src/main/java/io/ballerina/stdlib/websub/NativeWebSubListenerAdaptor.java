@@ -36,7 +36,9 @@ import static io.ballerina.stdlib.websub.Constants.SUBSCRIBER_CONFIG;
 /**
  * {@code NativeWebSubListenerAdaptor} is a wrapper object used to save/retrieve native data related to WebSub Listener.
  */
-public class NativeWebSubListenerAdaptor {
+public final class NativeWebSubListenerAdaptor {
+    private NativeWebSubListenerAdaptor() {}
+
     public static void externAttach(BObject websubListener, BString servicePath,
                                     BObject subscriberService, BObject httpService,
                                     BMap<BString, Object> subscriberConfig) {

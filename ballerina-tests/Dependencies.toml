@@ -66,7 +66,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "http"
-version = "2.10.0"
+version = "2.10.3"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "auth"},
@@ -315,7 +315,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "websub"
-version = "2.10.0"
+version = "2.10.1"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "crypto"},
@@ -336,7 +336,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "websub_tests"
-version = "2.10.0"
+version = "2.10.1"
 dependencies = [
 	{org = "ballerina", name = "test"},
 	{org = "ballerina", name = "websub"}

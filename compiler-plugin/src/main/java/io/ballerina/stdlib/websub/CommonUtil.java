@@ -30,6 +30,8 @@ import static io.ballerina.stdlib.websub.task.AnalyserUtils.getQualifiedType;
  * {@code CommonUtil} contains common utility functions related to compiler-plugin.
  */
 public final class CommonUtil {
+    private CommonUtil() {}
+
     public static Optional<AnnotationSymbol> extractSubscriberServiceConfig(ServiceDeclarationSymbol service) {
         return service.annotations()
                 .stream()
