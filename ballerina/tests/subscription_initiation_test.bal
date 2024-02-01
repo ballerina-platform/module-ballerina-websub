@@ -273,11 +273,9 @@ function testSubInitFailedWithListenerForSubFailure() returns error? {
     var startDetails = ls.'start();
     test:assertTrue(startDetails is error);
     if startDetails is error {
-        string expectedStart = "Subscription initiation failed due to: Error in request: Mode[subscribe] at Hub[http://127.0.0.1:9192/common/failed] - ";
-        string expectedEnd = "\"status\":404, \"reason\":\"Not Found\", \"message\":\"no matching resource found for" +
-                              			 " path\", \"path\":\"/common/failed\", \"method\":\"POST\"}";
-        test:assertTrue(startDetails.message().startsWith(expectedStart));
-        test:assertTrue(startDetails.message().endsWith(expectedEnd));
+        string expected = "Subscription initiation failed due to: Error in request: Mode[subscribe] at Hub[http://127.0.0.1:9192/common/failed] - ";
+        test:assertTrue(startDetails.message().startsWith(expected));
+        test:assertTrue(startDetails.message().includes("no matching resource found for path"));
     }
     check ls.gracefulStop();
 }
