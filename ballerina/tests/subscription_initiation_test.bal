@@ -244,12 +244,11 @@ isolated function testUnSubscriptionInitiationSuccessWithAdditionalParams() retu
     check unsubscribe(config, "https://sample.com/sub1");
 }
 
-listener Listener ls = new (9100);
-
 @test:Config { 
     groups: ["subscriptionInitiation"]
 }
 function testSubInitFailedWithListenerForResourceDiscoveryFailure() returns error? {
+    Listener ls = check new (9500);
     var res = ls.attachWithConfig(websubServiceObj, getServiceAnnotationConfig(DISCOVERY_FAILURE_URL), "sub");
     if res is error {
         log:printError("[testSubInitFailedWithListenerForResourceDiscoveryFailure] error occurred ", 'error = res);
@@ -268,6 +267,7 @@ function testSubInitFailedWithListenerForResourceDiscoveryFailure() returns erro
     groups: ["subscriptionInitiation"]
 }
 function testSubInitFailedWithListenerForSubFailure() returns error? {
+    Listener ls = check new (9501);
     var res = ls.attachWithConfig(websubServiceObj, getServiceAnnotationConfig([ HUB_FAILURE_URL, COMMON_TOPIC ]), "sub");
     test:assertFalse(res is error);
     var startDetails = ls.'start();
