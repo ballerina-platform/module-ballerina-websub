@@ -206,13 +206,21 @@ This repository only contains the source code for the package.
 
 ### Set up the prerequisites
 
-* Download and install Java SE Development Kit (JDK) version 17 (from one of the following locations).
+1. Download and install Java SE Development Kit (JDK) version 17 (from one of the following locations).
 
    * [Oracle](https://www.oracle.com/java/technologies/downloads/)
    
    * [OpenJDK](https://adoptium.net/)
    
         > **Note:** Set the JAVA_HOME environment variable to the path name of the directory into which you installed JDK.
+
+2. Generate a Github access token with read package permissions, then set the following `env` variables:
+
+```sh
+export packageUser=<Your GitHub Username>
+export packagePAT=<GitHub Personal Access Token>
+```
+
      
 ### Build the source
 
