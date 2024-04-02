@@ -65,8 +65,6 @@ isolated function notifySubscriber(string mode) returns error? {
     }
 }
 
-listener Listener unsubscriptionTestListener = new (9102);
-
 SubscriberService unsubscriptionTestSubscriber = @SubscriberServiceConfig {
     target: ["http://127.0.0.1:9197/common/hub", "test"], 
     leaseSeconds: 36000,
@@ -87,12 +85,13 @@ service object {
     groups: ["unsubscriptionViaGracefulstop"]
 }
 function testUnsubscriptionOnGracefulStop() returns error? {
-    check unsubscriptionTestListener.attach(unsubscriptionTestSubscriber, "sub");
-    check unsubscriptionTestListener.'start();
+    Listener ls = check new (9102);
+    check ls.attach(unsubscriptionTestSubscriber, "sub");
+    check ls.'start();
     log:printInfo("[UNSUB_VER] Starting Subscriber");
     runtime:sleep(5);
     log:printInfo("[UNSUB_VER] Invoking graceful stop");
-    check unsubscriptionTestListener.gracefulStop();
+    check ls.gracefulStop();
     runtime:sleep(5);
     log:printInfo("[UNSUB_VER] Verifying shutdown");
     test:assertTrue(isVerified());
