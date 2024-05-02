@@ -18,16 +18,20 @@
 
 package io.ballerina.stdlib.websub.task;
 
+import io.ballerina.compiler.api.SemanticModel;
 import io.ballerina.compiler.api.symbols.Symbol;
 import io.ballerina.compiler.api.symbols.SymbolKind;
+import io.ballerina.compiler.api.symbols.TypeDescKind;
 import io.ballerina.compiler.api.symbols.TypeReferenceTypeSymbol;
 import io.ballerina.compiler.api.symbols.TypeSymbol;
+import io.ballerina.compiler.api.symbols.VariableSymbol;
 import io.ballerina.compiler.syntax.tree.ExplicitNewExpressionNode;
 import io.ballerina.compiler.syntax.tree.FunctionArgumentNode;
 import io.ballerina.compiler.syntax.tree.ImplicitNewExpressionNode;
 import io.ballerina.compiler.syntax.tree.ListenerDeclarationNode;
-import io.ballerina.compiler.syntax.tree.NodeLocation;
+import io.ballerina.compiler.syntax.tree.NamedArgumentNode;
 import io.ballerina.compiler.syntax.tree.PositionalArgumentNode;
+import io.ballerina.compiler.syntax.tree.RestArgumentNode;
 import io.ballerina.compiler.syntax.tree.SeparatedNodeList;
 import io.ballerina.compiler.syntax.tree.SyntaxKind;
 import io.ballerina.compiler.syntax.tree.TypeDescriptorNode;
@@ -70,7 +74,7 @@ public class ListenerInitAnalysisTask implements AnalysisTask<SyntaxNodeAnalysis
             return;
         }
         SeparatedNodeList<FunctionArgumentNode> functionArgs = node.parenthesizedArgList().arguments();
-        verifyListenerArgType(context, node.location(), functionArgs);
+        verifyListenerArgType(context, functionArgs);
     }
 
     private void validateImplicitNewListener(SyntaxNodeAnalysisContext context, ImplicitNewExpressionNode node) {
@@ -92,7 +96,7 @@ public class ListenerInitAnalysisTask implements AnalysisTask<SyntaxNodeAnalysis
         }
         if (node.parenthesizedArgList().isPresent()) {
             SeparatedNodeList<FunctionArgumentNode> functionArgs = node.parenthesizedArgList().get().arguments();
-            verifyListenerArgType(context, node.location(), functionArgs);
+            verifyListenerArgType(context, functionArgs);
         }
     }
 
@@ -107,17 +111,33 @@ public class ListenerInitAnalysisTask implements AnalysisTask<SyntaxNodeAnalysis
         return Optional.empty();
     }
 
-    private void verifyListenerArgType(SyntaxNodeAnalysisContext context, NodeLocation location,
+    private void verifyListenerArgType(SyntaxNodeAnalysisContext context,
                                        SeparatedNodeList<FunctionArgumentNode> functionArgs) {
         // two args are valid only if the first arg is numeric (i.e, port and config)
         if (functionArgs.size() > 1) {
-            PositionalArgumentNode firstArg = (PositionalArgumentNode) functionArgs.get(0);
-            FunctionArgumentNode secondArg = functionArgs.get(1);
-            SyntaxKind firstArgSyntaxKind = firstArg.expression().kind();
-            if (firstArgSyntaxKind != SyntaxKind.NUMERIC_LITERAL) {
-                WebSubDiagnosticCodes errorCode = WebSubDiagnosticCodes.WEBSUB_109;
-                updateContext(context, errorCode, secondArg.location());
+            Optional<Symbol> firstArgSymbolOpt = getFirstListenerArg(context.semanticModel(), functionArgs.get(0));
+            if (firstArgSymbolOpt.isEmpty()) {
+                return;
             }
+            Symbol firstArgSymbol = firstArgSymbolOpt.get();
+            if (SymbolKind.VARIABLE.equals(firstArgSymbol.kind())) {
+                VariableSymbol variable = (VariableSymbol) firstArgSymbol;
+                if (TypeDescKind.INT.equals(variable.typeDescriptor().typeKind())) {
+                    return;
+                }
+            }
+            FunctionArgumentNode secondArg = functionArgs.get(1);
+            updateContext(context, WebSubDiagnosticCodes.WEBSUB_109, secondArg.location());
+        }
+    }
+
+    private Optional<Symbol> getFirstListenerArg(SemanticModel semanticModel, FunctionArgumentNode firstArg) {
+        if (SyntaxKind.POSITIONAL_ARG.equals(firstArg.kind())) {
+            return semanticModel.symbol(((PositionalArgumentNode) firstArg).expression());
+        } else if (SyntaxKind.NAMED_ARG.equals(firstArg.kind())) {
+            return semanticModel.symbol(((NamedArgumentNode) firstArg).expression());
+        } else {
+            return semanticModel.symbol(((RestArgumentNode) firstArg).expression());
         }
     }
 }

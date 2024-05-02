@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- [`websub` compiler plugin does not allow listener port to be a pre-defined variable](https://github.com/ballerina-platform/ballerina-library/issues/6339)
+
+## [2.10.0] - 2023-09-18
+
 ### Added
 - [Introduce new `ClientConfiguration` record to be used for `websub:SubscriptionClient` and `websub:DiscoveryService`](https://github.com/ballerina-platform/ballerina-standard-library/issues/4706)
 
