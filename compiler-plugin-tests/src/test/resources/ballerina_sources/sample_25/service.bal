@@ -27,6 +27,26 @@ listener websub:Listener ln = check new(port, {
     }
 });
 
+listener websub:Listener ln2 = check new(listenTo = port, config = {
+    secureSocket: {
+        key: {
+            path: "tests/resources/ballerinaKeystore.pkcs12",
+            password: "ballerina"
+        }
+    }
+});
+
+listener websub:Listener ln3 = check new(listenTo = port);
+
+listener websub:Listener ln4 = check new(listenTo = 9090, config = {
+    secureSocket: {
+        key: {
+            path: "tests/resources/ballerinaKeystore.pkcs12",
+            password: "ballerina"
+        }
+    }
+});
+
 @websub:SubscriberServiceConfig {
 }
 service /sample on new websub:Listener(port, {
