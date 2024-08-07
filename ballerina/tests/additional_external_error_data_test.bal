@@ -15,11 +15,10 @@
 // under the License.
 
 import ballerina/log;
-import ballerina/http;   
-// import ballerina/io;
+import ballerina/http;
 import ballerina/test;
 
-listener Listener additionalErrorDetailsListener = new (9093);
+listener Listener additionalErrorDetailsListener = new (SUB_WITH_ADDITIONAL_ERRDETAILS_PORT);
 
 SubscriberService serviceWithAdditionalErrorDetails = @SubscriberServiceConfig {
     target: "http://0.0.0.0:9191/common/discovery",
@@ -61,7 +60,7 @@ function afterAdditionalErrorDetailsService() returns error? {
     check additionalErrorDetailsListener.gracefulStop();
 }
 
-http:Client subscriberServiceErrorDetailsClientEp = check new ("http://localhost:9093/subscriber");
+http:Client subscriberServiceErrorDetailsClientEp = check new (string `http://localhost:${SUB_WITH_ADDITIONAL_ERRDETAILS_PORT}/subscriber`);
 
 @test:Config { 
     groups: ["service-with-additional-details"]
