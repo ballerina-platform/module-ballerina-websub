@@ -49,7 +49,7 @@ SimpleWebsubService simpleSubscriberServiceInstace = new;
 @test:BeforeGroups { value:["manualConfigAttach"] }
 function beforeManualConfigAttachTest() returns error? {
     SubscriberServiceConfiguration config = {
-        target: "http://0.0.0.0:9191/common/discovery",
+        target: string `http://0.0.0.0:${COMMON_HUB_SVC_PORT}/common/discovery`,
         leaseSeconds: 36000,
         unsubscribeOnShutdown: false
     };

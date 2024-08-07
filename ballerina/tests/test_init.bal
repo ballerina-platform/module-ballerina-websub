@@ -17,12 +17,12 @@
 import ballerina/test;
 import ballerina/http;
 
-listener http:Listener simpleHttpServiceListener = new (9191);
+listener http:Listener simpleHttpServiceListener = new (COMMON_HUB_SVC_PORT);
 
 http:Service simpleHttpService = service object {
     isolated resource function get discovery(http:Caller caller, http:Request request) returns error? {
         http:Response response = new;
-        response.addHeader("Link", "<http://127.0.0.1:9191/common/hub>; rel=\"hub\"");
+        response.addHeader("Link", string `<http://127.0.0.1:${COMMON_HUB_SVC_PORT}/common/hub>; rel=\"hub\"`);
         response.addHeader("Link", "<https://sample.topic.com>; rel=\"self\"");
         check caller->respond(response);
     }

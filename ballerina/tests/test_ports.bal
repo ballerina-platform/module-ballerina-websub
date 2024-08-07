@@ -14,8 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-const int COMMON_HUB_SVC_PORT = 1;
-
+// Ports related to subscriber services
 const int BASE_PORT = 9400;
 const int BASIC_SUB_PORT = BASE_PORT + 1;
 const int SUB_WITH_DFLT_METHODS_PORT = BASE_PORT + 2;
@@ -32,3 +31,6 @@ const int ISOLATED_SUB_PORT = BASE_PORT + 12;
 const int SUB_WITH_RO_PARAMS_PORT = BASE_PORT + 13;
 const int SUB_INIT_RCS_DISCOVERY_PORT = BASE_PORT + 14;
 const int SUB_INIT_FAILURE_PORT = BASE_PORT + 15;
+
+// Ports related to hub services
+const int COMMON_HUB_SVC_PORT = 9500;

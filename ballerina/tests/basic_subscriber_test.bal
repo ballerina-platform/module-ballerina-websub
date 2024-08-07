@@ -21,7 +21,7 @@ import ballerina/mime;
 
 listener Listener basicSubscriberListener = new (BASIC_SUB_PORT);
 
-SubscriberService simpleSubscriberService = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, unsubscribeOnShutdown: false } 
+SubscriberService simpleSubscriberService = @SubscriberServiceConfig { target: string `http://0.0.0.0:${COMMON_HUB_SVC_PORT}/common/discovery`, leaseSeconds: 36000, unsubscribeOnShutdown: false } 
                               service object {
     isolated remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns Acknowledgement? {
         log:printDebug("onSubscriptionValidationDenied invoked");

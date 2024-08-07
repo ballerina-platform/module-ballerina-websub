@@ -20,7 +20,7 @@ import ballerina/http;
 
 listener Listener serviceWithDefaultImplListener = new (SUB_WITH_DFLT_METHODS_PORT);
 
-SubscriberService serviceWithDefaultImpl = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, secret: "Kslk30SNF2AChs2", unsubscribeOnShutdown: false } 
+SubscriberService serviceWithDefaultImpl = @SubscriberServiceConfig { target: string `http://0.0.0.0:${COMMON_HUB_SVC_PORT}/common/discovery`, leaseSeconds: 36000, secret: "Kslk30SNF2AChs2", unsubscribeOnShutdown: false } 
                               service object {
     isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {

@@ -21,7 +21,7 @@ import ballerina/test;
 listener Listener additionalErrorDetailsListener = new (SUB_WITH_ADDITIONAL_ERRDETAILS_PORT);
 
 SubscriberService serviceWithAdditionalErrorDetails = @SubscriberServiceConfig {
-    target: "http://0.0.0.0:9191/common/discovery",
+    target: string `http://0.0.0.0:${COMMON_HUB_SVC_PORT}/common/discovery`,
     leaseSeconds: 36000,
     unsubscribeOnShutdown: false
 } 
