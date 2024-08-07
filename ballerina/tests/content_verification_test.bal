@@ -65,7 +65,7 @@ isolated function isUrlEncodedContentVerified() returns boolean {
     secret: hashKey,
     unsubscribeOnShutdown: false
 } 
-service /subscriber on new Listener(9098) {
+service /subscriber on new Listener(CONTENT_VERIFY_SUB_PORT) {
     remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
         log:printInfo("[VERIFICATION] onEventNotification invoked ", contentDistributionMessage = event);
@@ -86,7 +86,7 @@ service /subscriber on new Listener(9098) {
     }
 }
 
-final http:Client contentVerificationClient = check new("http://localhost:9098/subscriber");
+final http:Client contentVerificationClient = check new(string `http://localhost:${CONTENT_VERIFY_SUB_PORT}/subscriber`);
 
 @test:Config {
     groups: ["contentVerification"]
