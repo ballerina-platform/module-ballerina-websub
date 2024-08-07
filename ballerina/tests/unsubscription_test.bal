@@ -51,13 +51,13 @@ isolated function getHubMode(http:Request request) returns string|error {
     return queryParams[HUB_MODE] ?: "";
 }
 
-final http:Client notificationClientEp = check  new(string `http://127.0.0.1:${UNSUB_SUB_PORT}/sub`);
+final http:Client verificationClientEp = check  new(string `http://127.0.0.1:${UNSUB_SUB_PORT}/sub`);
 
 isolated function notifySubscriber(string mode) returns error? {
     string challenge = uuid:createType4AsString();
     string queryParams = string`?${HUB_MODE}=${mode}&${HUB_TOPIC}=test&${HUB_CHALLENGE}=${challenge}&${HUB_LEASE_SECONDS}=100000`;
     log:printInfo("[UNSUB_VER] Sending verification: ", params = challenge);
-    string response = check notificationClientEp->get(queryParams);
+    string response = check verificationClientEp->get(queryParams);
     log:printInfo("[UNSUB_VER] Received verification", response = response);
     if challenge == response {
         log:printInfo("[UNSUB_VER] Updating verification status");

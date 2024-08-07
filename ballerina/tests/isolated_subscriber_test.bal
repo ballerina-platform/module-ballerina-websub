@@ -23,7 +23,7 @@ import ballerina/mime;
 string[] receivedMsgs = [];
 
 @SubscriberServiceConfig {}
-service /subscriber on new Listener(9103) {
+service /subscriber on new Listener(ISOLATED_SUB_PORT) {
     remote function onSubscriptionVerification(SubscriptionVerification msg) returns SubscriptionVerificationSuccess|SubscriptionVerificationError {
         if (msg.hubTopic == "test1") {
             return SUBSCRIPTION_VERIFICATION_ERROR;
@@ -46,7 +46,7 @@ service /subscriber on new Listener(9103) {
     }
 }
 
-http:Client isolatedSubTestClient = check new ("http://localhost:9103/subscriber");
+http:Client isolatedSubTestClient = check new (string `http://localhost:${ISOLATED_SUB_PORT}/subscriber`);
 
 @test:Config { 
     groups: ["isolatedSubscriber"]
