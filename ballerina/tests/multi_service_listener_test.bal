@@ -19,7 +19,7 @@ import ballerina/test;
 import ballerina/http;
 import ballerina/mime;
 
-listener Listener multiServiceListener = new(9096);
+listener Listener multiServiceListener = new(MULTIPLE_SUB_ATTACHED_PORT);
 
 @SubscriberServiceConfig {
     unsubscribeOnShutdown: false
@@ -73,8 +73,8 @@ service /subscriberTwo on multiServiceListener {
     }
 }
 
-http:Client clientForServiceOne = check new ("http://localhost:9096/subscriberOne");
-http:Client clientForServiceTwo = check new ("http://localhost:9096/subscriberTwo");
+http:Client clientForServiceOne = check new (string `http://localhost:${MULTIPLE_SUB_ATTACHED_PORT}/subscriberOne`);
+http:Client clientForServiceTwo = check new (string `http://localhost:${MULTIPLE_SUB_ATTACHED_PORT}/subscriberTwo`);
 
 @test:Config { 
     groups: ["multiServiceListener"]
