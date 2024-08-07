@@ -20,7 +20,7 @@ import ballerina/mime;
 import ballerina/http;
 
 @SubscriberServiceConfig {}
-service /subscriber on new Listener(9104) {
+service /subscriber on new Listener(SUB_WITH_RO_PARAMS_PORT) {
     isolated remote function onSubscriptionValidationDenied(readonly & SubscriptionDeniedError msg) returns Acknowledgement? {
         test:assertTrue(msg is readonly);
         return ACKNOWLEDGEMENT;
@@ -63,7 +63,7 @@ service /subscriber on new Listener(9104) {
     }
 }
 
-http:Client readonlyParamTestClient = check new ("http://localhost:9104/subscriber");
+http:Client readonlyParamTestClient = check new (string `http://localhost:${SUB_WITH_RO_PARAMS_PORT}/subscriber`);
 
 @test:Config {
     groups: ["subscriberWithReadonlyParams"]
