@@ -18,7 +18,7 @@ import ballerina/log;
 import ballerina/test;
 import ballerina/http;
 
-listener Listener serviceWithDefaultImplListener = new (9091);
+listener Listener serviceWithDefaultImplListener = new (SUB_WITH_DFLT_METHODS_PORT);
 
 SubscriberService serviceWithDefaultImpl = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, secret: "Kslk30SNF2AChs2", unsubscribeOnShutdown: false } 
                               service object {
@@ -45,7 +45,7 @@ function afterGroupTwo() returns error? {
     check serviceWithDefaultImplListener.gracefulStop();
 }
 
-http:Client serviceWithDefaultImplClientEp = check new("http://localhost:9091/subscriber");
+http:Client serviceWithDefaultImplClientEp = check new(string `http://localhost:${SUB_WITH_DFLT_METHODS_PORT}/subscriber`);
 
 @test:Config { 
     groups: ["defaultMethodImpl"]

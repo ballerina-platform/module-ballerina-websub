@@ -18,3 +18,4 @@ const int COMMON_HUB_SVC_PORT = 1;
 
 const int BASE_PORT = 9400;
 const int BASIC_SUB_PORT = BASE_PORT + 1;
+const int SUB_WITH_DFLT_METHODS_PORT = BASE_PORT + 2;
