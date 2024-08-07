@@ -28,7 +28,7 @@ ListenerConfiguration listenerConfigs = {
     }
 };
 
-listener Listener sslEnabledListener = new(9095, listenerConfigs);
+listener Listener sslEnabledListener = new(SSL_ENABLED_SUB_PORT, listenerConfigs);
 
 @SubscriberServiceConfig {
     unsubscribeOnShutdown: false
@@ -64,7 +64,7 @@ http:ClientConfiguration httpsConfig = {
         }
     }
 };
-http:Client sslEnabledClient = check new("https://localhost:9095/subscriber", httpsConfig);
+http:Client sslEnabledClient = check new(string `https://localhost:${SSL_ENABLED_SUB_PORT}/subscriber`, httpsConfig);
 
 @test:Config { 
     groups: ["sslEnabledSubscriber"]
