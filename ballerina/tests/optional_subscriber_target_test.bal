@@ -17,7 +17,7 @@
 import ballerina/log;
 import ballerina/test;
 
-listener Listener optionalTargetListener = new (9094);
+listener Listener optionalTargetListener = new (SUB_WITH_OPT_TARGET_PORT);
 
 SubscriberService optionalSubscriberTarget = @SubscriberServiceConfig { leaseSeconds: 36000, secret: "Kslk30SNF2AChs2", unsubscribeOnShutdown: false } 
                               service object {

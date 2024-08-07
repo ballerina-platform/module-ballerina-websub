@@ -43,13 +43,13 @@ isolated service class SimpleWebsubService {
     }
 }
 
-listener Listener manualConfigAttachListener = new (9097);
+listener Listener manualConfigAttachListener = new (MANUAL_SUB_ATTACH_PORT);
 SimpleWebsubService simpleSubscriberServiceInstace = new;
 
 @test:BeforeGroups { value:["manualConfigAttach"] }
 function beforeManualConfigAttachTest() returns error? {
     SubscriberServiceConfiguration config = {
-        target: "http://0.0.0.0:9191/common/discovery",
+        target: string `http://0.0.0.0:${COMMON_HUB_SVC_PORT}/common/discovery`,
         leaseSeconds: 36000,
         unsubscribeOnShutdown: false
     };
@@ -61,7 +61,7 @@ function afterManualConfigAttachTest() returns error? {
     check manualConfigAttachListener.gracefulStop();
 }
 
-http:Client manualConfigAttachClientEp = check new("http://localhost:9097/subscriber");
+http:Client manualConfigAttachClientEp = check new(string `http://localhost:${MANUAL_SUB_ATTACH_PORT}/subscriber`);
 
 @test:Config { 
     groups: ["manualConfigAttach"]

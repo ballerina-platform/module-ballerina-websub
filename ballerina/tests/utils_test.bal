@@ -65,7 +65,7 @@ isolated function testContentHashError() returns error? {
     }
 }
 
-SubscriberService validSubscriberServiceDeclaration = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, unsubscribeOnShutdown: false } 
+SubscriberService validSubscriberServiceDeclaration = @SubscriberServiceConfig { target: string `http://0.0.0.0:${COMMON_HUB_SVC_PORT}/common/discovery`, leaseSeconds: 36000, unsubscribeOnShutdown: false } 
                               service object {
     isolated remote function onEventNotification(ContentDistributionMessage event) 
                         returns Acknowledgement|SubscriptionDeletedError? {
@@ -331,7 +331,7 @@ isolated function retrieveInfrdListenerConfig(http:ListenerConfiguration config)
     };
 }
 
-listener Listener utilTestListener = new (9101);
+listener Listener utilTestListener = new (SUB_UTILS_PORT);
 
 @SubscriberServiceConfig{
     unsubscribeOnShutdown: false
@@ -378,7 +378,7 @@ service /utilTest2 on utilTestListener {
     }
 }
 
-final http:Client headerUtilTestClient1 = check new ("http://localhost:9101/utilTest1");
+final http:Client headerUtilTestClient1 = check new (string `http://localhost:${SUB_UTILS_PORT}/utilTest1`);
 
 @test:Config { 
     groups: ["requestHeader"]
@@ -424,7 +424,7 @@ isolated function testRequestHeaderRetrievalWithoutHeaderValue() returns error? 
     test:assertEquals(decodedPayload.get("Message"), "Header Not Found");
 }
 
-final http:Client headerUtilTestClient2 = check new ("http://localhost:9101/utilTest2");
+final http:Client headerUtilTestClient2 = check new (string `http://localhost:${SUB_UTILS_PORT}/utilTest2`);
 
 @test:Config { 
     groups: ["requestHeader"]

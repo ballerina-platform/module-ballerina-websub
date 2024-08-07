@@ -18,9 +18,9 @@ import ballerina/test;
 import ballerina/http;
 import ballerina/mime;
 
-listener Listener errorReturnsSubscriberListener = new (9099);
+listener Listener errorReturnsSubscriberListener = new (SUB_WITH_ERROR_RTRN_PORT);
 
-SubscriberService subscriberWithErrorReturns = @SubscriberServiceConfig { target: "http://0.0.0.0:9191/common/discovery", leaseSeconds: 36000, unsubscribeOnShutdown: false } 
+SubscriberService subscriberWithErrorReturns = @SubscriberServiceConfig { target: string `http://0.0.0.0:${COMMON_HUB_SVC_PORT}/common/discovery`, leaseSeconds: 36000, unsubscribeOnShutdown: false } 
                               service object {
     isolated remote function onSubscriptionValidationDenied(SubscriptionDeniedError msg) returns error? {
         return error ("Error occured while processing request");
@@ -45,7 +45,7 @@ function afterSubscriberWithErrorReturnsTest() returns error? {
     check errorReturnsSubscriberListener.gracefulStop();
 }
 
-http:Client SubscriberWithErrorReturnsClientEp = check new("http://localhost:9099/subscriber");
+http:Client SubscriberWithErrorReturnsClientEp = check new(string `http://localhost:${SUB_WITH_ERROR_RTRN_PORT}/subscriber`);
 
 @test:Config { 
     groups: ["subscriberWithErrorReturns"]
