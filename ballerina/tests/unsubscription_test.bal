@@ -51,7 +51,7 @@ isolated function getHubMode(http:Request request) returns string|error {
     return queryParams[HUB_MODE] ?: "";
 }
 
-final http:Client notificationClientEp = check  new("http://127.0.0.1:9102/sub");
+final http:Client notificationClientEp = check  new(string `http://127.0.0.1:${UNSUB_SUB_PORT}/sub`);
 
 isolated function notifySubscriber(string mode) returns error? {
     string challenge = uuid:createType4AsString();
@@ -85,7 +85,7 @@ service object {
     groups: ["unsubscriptionViaGracefulstop"]
 }
 function testUnsubscriptionOnGracefulStop() returns error? {
-    Listener ls = check new (9102);
+    Listener ls = check new (UNSUB_SUB_PORT);
     check ls.attach(unsubscriptionTestSubscriber, "sub");
     check ls.'start();
     log:printInfo("[UNSUB_VER] Starting Subscriber");
