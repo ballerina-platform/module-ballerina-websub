@@ -26,4 +26,8 @@
         <Method name="getContextHandler"/>
         <Bug pattern="MS_EXPOSE_REP"/>
     </Match>
+    <Match>
+        <Class name="io.ballerina.stdlib.websub.SubscriberCallback"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
 </FindBugsFilter>
