@@ -19,9 +19,7 @@
 package io.ballerina.stdlib.websub;
 
 import io.ballerina.runtime.api.Environment;
-import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.Module;
-import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.TypeTags;
 import io.ballerina.runtime.api.async.StrandMetadata;
 import io.ballerina.runtime.api.creators.ValueCreator;
@@ -41,6 +39,7 @@ import io.ballerina.runtime.api.values.BString;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 import static io.ballerina.stdlib.websub.Constants.HTTP_REQUEST;
 import static io.ballerina.stdlib.websub.Constants.ON_EVENT_NOTIFICATION;
@@ -143,22 +142,29 @@ public final class NativeHttpToWebsubAdaptor {
 
     private static Object invokeRemoteFunction(Environment env, BObject bSubscriberService, Object message,
                                                String parentFunctionName, String remoteFunctionName) {
-        Future balFuture = env.markAsync();
-        Module module = ModuleUtils.getModule();
-        StrandMetadata metadata = new StrandMetadata(module.getOrg(), module.getName(), module.getVersion(),
-                parentFunctionName);
-        Object[] args = new Object[]{message, true};
-        ObjectType serviceType = (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(bSubscriberService));
-        if (serviceType.isIsolated()
-                && serviceType.isIsolated(remoteFunctionName)) {
-            env.getRuntime().invokeMethodAsyncConcurrently(
-                    bSubscriberService, remoteFunctionName, null, metadata,
-                    new SubscriberCallback(balFuture, module), null, PredefinedTypes.TYPE_NULL, args);
-        } else {
-            env.getRuntime().invokeMethodAsyncSequentially(
-                    bSubscriberService, remoteFunctionName, null, metadata,
-                    new SubscriberCallback(balFuture, module), null, PredefinedTypes.TYPE_NULL, args);
-        }
-        return null;
+        return env.yieldAndRun(() -> {
+            CompletableFuture<Object> balFuture = new CompletableFuture<>();
+            Module module = ModuleUtils.getModule();
+            StrandMetadata metadata = new StrandMetadata(module.getOrg(), module.getName(), module.getVersion(),
+                    parentFunctionName);
+            Object[] args = new Object[]{message};
+            ObjectType serviceType = (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(bSubscriberService));
+            Object result;
+            try {
+                if (serviceType.isIsolated()
+                        && serviceType.isIsolated(remoteFunctionName)) {
+                    result = env.getRuntime().startIsolatedWorker(bSubscriberService,
+                            remoteFunctionName, null, metadata, null, args).get();
+                } else {
+                    result = env.getRuntime().startNonIsolatedWorker(bSubscriberService,
+                            remoteFunctionName, null, metadata, null, args).get();
+                }
+                ModuleUtils.notifySuccess(balFuture, result);
+                return ModuleUtils.getResult(balFuture);
+            } catch (BError bError) {
+                return ModuleUtils.notifyFailure(bError, module);
+            }
+        });
+
     }
 }
