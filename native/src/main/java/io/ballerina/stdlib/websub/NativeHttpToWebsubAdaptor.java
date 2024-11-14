@@ -20,14 +20,14 @@ package io.ballerina.stdlib.websub;
 
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Module;
-import io.ballerina.runtime.api.TypeTags;
-import io.ballerina.runtime.api.async.StrandMetadata;
+import io.ballerina.runtime.api.concurrent.StrandMetadata;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.IntersectionType;
 import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.types.ObjectType;
 import io.ballerina.runtime.api.types.Parameter;
 import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.types.TypeTags;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BArray;
@@ -145,20 +145,12 @@ public final class NativeHttpToWebsubAdaptor {
         return env.yieldAndRun(() -> {
             CompletableFuture<Object> balFuture = new CompletableFuture<>();
             Module module = ModuleUtils.getModule();
-            StrandMetadata metadata = new StrandMetadata(module.getOrg(), module.getName(), module.getVersion(),
-                    parentFunctionName);
             Object[] args = new Object[]{message};
             ObjectType serviceType = (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(bSubscriberService));
-            Object result;
+            boolean isIsolated = serviceType.isIsolated() && serviceType.isIsolated(remoteFunctionName);
+            StrandMetadata metadata = new StrandMetadata(isIsolated, null);
             try {
-                if (serviceType.isIsolated()
-                        && serviceType.isIsolated(remoteFunctionName)) {
-                    result = env.getRuntime().startIsolatedWorker(bSubscriberService,
-                            remoteFunctionName, null, metadata, null, args).get();
-                } else {
-                    result = env.getRuntime().startNonIsolatedWorker(bSubscriberService,
-                            remoteFunctionName, null, metadata, null, args).get();
-                }
+                Object result = env.getRuntime().callMethod(bSubscriberService, remoteFunctionName, metadata, args);
                 ModuleUtils.notifySuccess(balFuture, result);
                 return ModuleUtils.getResult(balFuture);
             } catch (BError bError) {
