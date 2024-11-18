@@ -36,6 +36,7 @@ import io.ballerina.projects.plugins.codeaction.DocumentEdit;
 import io.ballerina.tools.text.LinePosition;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -45,6 +46,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.ballerina.stdlib.websub.TestUtils.getEnvironmentBuilder;
+import static io.ballerina.stdlib.websub.TestUtils.getResourcePath;
 import static io.ballerina.stdlib.websub.TestUtils.isWithinRange;
 
 /**
@@ -53,13 +55,13 @@ import static io.ballerina.stdlib.websub.TestUtils.isWithinRange;
 public abstract class AbstractCodeActionTest {
     private static final Gson GSON = new Gson();
 
-//    @Test(dataProvider = "testDataProvider")
-//    public void testCodeActions(String srcFile, int line, int offset, String resultFile)
-//            throws IOException {
-//        Path srcPath = getResourcePath("ballerina_sources", getTestPackage(), srcFile);
-//        Path targetPath = getResourcePath("codeaction", getConfigDir(), resultFile);
-//        performTest(srcPath, LinePosition.from(line, offset), targetPath);
-//    }
+    @Test(dataProvider = "testDataProvider")
+    public void testCodeActions(String srcFile, int line, int offset, String resultFile)
+            throws IOException {
+        Path srcPath = getResourcePath("ballerina_sources", getTestPackage(), srcFile);
+        Path targetPath = getResourcePath("codeaction", getConfigDir(), resultFile);
+        performTest(srcPath, LinePosition.from(line, offset), targetPath);
+    }
 
     @DataProvider
     protected abstract Object[][] testDataProvider();
