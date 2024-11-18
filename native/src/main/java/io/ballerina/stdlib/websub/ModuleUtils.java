@@ -76,6 +76,9 @@ public class ModuleUtils {
     public static Object getResult(CompletableFuture<Object> balFuture) {
         try {
             return balFuture.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw ErrorCreator.createError(e);
         } catch (Throwable throwable) {
             throw ErrorCreator.createError(throwable);
         }
