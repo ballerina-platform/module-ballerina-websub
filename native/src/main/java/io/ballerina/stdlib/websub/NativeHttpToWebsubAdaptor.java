@@ -20,7 +20,6 @@ package io.ballerina.stdlib.websub;
 
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Module;
-import io.ballerina.runtime.api.concurrent.StrandMetadata;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.IntersectionType;
 import io.ballerina.runtime.api.types.MethodType;
@@ -147,10 +146,8 @@ public final class NativeHttpToWebsubAdaptor {
             Module module = ModuleUtils.getModule();
             Object[] args = new Object[]{message};
             ObjectType serviceType = (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(bSubscriberService));
-            boolean isIsolated = serviceType.isIsolated() && serviceType.isIsolated(remoteFunctionName);
-            StrandMetadata metadata = new StrandMetadata(isIsolated, null);
             try {
-                Object result = env.getRuntime().callMethod(bSubscriberService, remoteFunctionName, metadata, args);
+                Object result = env.getRuntime().callMethod(bSubscriberService, remoteFunctionName, null, args);
                 ModuleUtils.notifySuccess(balFuture, result);
                 return ModuleUtils.getResult(balFuture);
             } catch (BError bError) {
