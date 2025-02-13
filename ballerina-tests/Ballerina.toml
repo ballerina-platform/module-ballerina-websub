@@ -7,4 +7,4 @@ version = "2.13.0"
 graalvmCompatible = true
 
 [[platform.java21.dependency]]
-path = "../native/build/libs/websub-native-2.13.0-SNAPSHOT.jar"
+path = "../native/build/libs/websub-native-2.13.0.jar"
