@@ -86,8 +86,10 @@ isolated function processEventNotification(http:Caller caller, http:Request requ
     if !isVerifiedContent {
         return;
     }
-                                               
-    string contentType = request.getContentType();
+
+    string contentTypeValue = request.getContentType();
+    http:HeaderValue[] values = check http:parseHeader(contentTypeValue);                                          
+    string contentType = values[0].value;
     map<string|string[]> headers = retrieveRequestHeaders(request);
     ContentDistributionMessage? message = ();
 
