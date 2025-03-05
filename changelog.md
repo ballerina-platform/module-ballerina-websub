@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.13.1] - 2025-03-05
+
+### Fixed
+- [Content type is not properly resolved in received HTTP request for `onEventNotification`](https://github.com/ballerina-platform/ballerina-library/issues/7666)
+
+## [2.11.0] - 2024-05-03
+
 ### Fixed
 - [`websub` compiler plugin does not allow listener port to be a pre-defined variable](https://github.com/ballerina-platform/ballerina-library/issues/6339)
 
