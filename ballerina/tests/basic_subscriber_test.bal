@@ -134,7 +134,7 @@ function testOnEventNotificationSuccessForUrlEncoded() returns error? {
 }
 function testOnEventNotificationSuccessForJsonWithCharEncoding() returns error? {
     http:Request request = new;
-    json payload =  {"action": "publish", "mode": "remote-hub"};
+    json payload = {"action": "publish", "mode": "remote-hub"};
     request.setPayload(payload);
     check request.setContentType("application/json; charset=UTF-8");
     http:Response response = check httpClient->post("", request);
