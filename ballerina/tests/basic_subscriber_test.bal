@@ -128,3 +128,15 @@ function testOnEventNotificationSuccessForUrlEncoded() returns error? {
     http:Response response = check httpClient->post("", request);
     test:assertEquals(response.statusCode, 202);
 }
+
+@test:Config {
+    groups: ["simpleSubscriber"]
+}
+function testOnEventNotificationSuccessForJsonWithCharEncoding() returns error? {
+    http:Request request = new;
+    json payload = {"action": "publish", "mode": "remote-hub"};
+    request.setPayload(payload);
+    check request.setContentType("application/json; charset=UTF-8");
+    http:Response response = check httpClient->post("", request);
+    test:assertEquals(response.statusCode, 202);
+}
