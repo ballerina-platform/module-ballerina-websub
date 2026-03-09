@@ -481,7 +481,7 @@ isolated function testRetrieveHttpClientWithConfig() {
     http:ClientConfiguration httpsConfig = {
         secureSocket: {
             cert: {
-                path: "tests/resources/ballerinaTruststore.pkcs12",
+                path: "tests/resources/ballerinaTruststore.p12",
                 password: "ballerina"
             }
         }
