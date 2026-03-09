@@ -41,6 +41,11 @@ isolated class HttpToWebsubAdaptor {
         'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"
     } external;
 
+    isolated function callOnHubErrorMethod(InternalHubError msg)
+                                    returns Acknowledgement|error? = @java:Method {
+        'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"
+    } external;
+
     isolated function callOnEventNotificationMethod(ContentDistributionMessage msg, http:Request request)
                                     returns Acknowledgement|SubscriptionDeletedError|error? = @java:Method {
         'class: "io.ballerina.stdlib.websub.NativeHttpToWebsubAdaptor"

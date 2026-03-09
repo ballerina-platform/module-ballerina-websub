@@ -35,5 +35,6 @@ public interface Constants {
     String ON_SUBSCRIPTION_VERIFICATION = "onSubscriptionVerification";
     String ON_UNSUBSCRIPTION_VERIFICATION = "onUnsubscriptionVerification";
     String ON_SUBSCRIPTION_VALIDATION_DENIED = "onSubscriptionValidationDenied";
+    String ON_HUB_ERROR = "onHubError";
     String ON_EVENT_NOTIFICATION = "onEventNotification";
 }

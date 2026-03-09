@@ -42,6 +42,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static io.ballerina.stdlib.websub.Constants.HTTP_REQUEST;
 import static io.ballerina.stdlib.websub.Constants.ON_EVENT_NOTIFICATION;
+import static io.ballerina.stdlib.websub.Constants.ON_HUB_ERROR;
 import static io.ballerina.stdlib.websub.Constants.ON_SUBSCRIPTION_VALIDATION_DENIED;
 import static io.ballerina.stdlib.websub.Constants.ON_SUBSCRIPTION_VERIFICATION;
 import static io.ballerina.stdlib.websub.Constants.ON_UNSUBSCRIPTION_VERIFICATION;
@@ -103,6 +104,11 @@ public final class NativeHttpToWebsubAdaptor {
         BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
         return invokeRemoteFunction(env, serviceObj, message,
                 "callOnSubscriptionDeniedMethod", ON_SUBSCRIPTION_VALIDATION_DENIED);
+    }
+
+    public static Object callOnHubErrorMethod(Environment env, BObject adaptor, BError message) {
+        BObject serviceObj = (BObject) adaptor.getNativeData(SERVICE_OBJECT);
+        return invokeRemoteFunction(env, serviceObj, message, "callOnHubErrorMethod", ON_HUB_ERROR);
     }
 
     public static Object callOnEventNotificationMethod(Environment env, BObject adaptor,
