@@ -76,14 +76,14 @@ isolated service class HttpService {
                 if self.isSubscriptionValidationDeniedAvailable {
                     processSubscriptionDenial(caller, response, params, self.adaptor);
                 } else {
-                    log:printError("Subscription is denied by the hub");
+                    log:printError("Subscription is denied by the hub", reason = params.hubReason);
                     response.statusCode = http:STATUS_OK;
                     updateResponseBody(response, ACKNOWLEDGEMENT["body"], ACKNOWLEDGEMENT["headers"]);
                 }
             }
             MODE_HUB_ERROR => {
                 if self.isOnHubErrorAvailable {
-                    processSubscriptionDenial(caller, response, params, self.adaptor);
+                    processHubError(caller, response, params, self.adaptor);
                 } else {
                     log:printError("Error occurred while processing subscription request at the hub", reason = params.hubReason);
                     response.statusCode = http:STATUS_OK;
