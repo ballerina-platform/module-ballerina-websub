@@ -23,6 +23,10 @@ service /subscriber on new websub:Listener(9090) {
         return websub:ACKNOWLEDGEMENT;
     }
 
+    remote function onHubError(websub:InternalHubError msg) returns websub:Acknowledgement|error? {
+        return websub:ACKNOWLEDGEMENT;
+    }
+
     remote function onSubscriptionVerification(websub:SubscriptionVerification msg)
                             returns websub:SubscriptionVerificationSuccess|websub:SubscriptionVerificationError|error {
         if (msg.hubTopic == "test1") {
