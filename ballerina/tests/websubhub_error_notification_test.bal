@@ -1,4 +1,4 @@
-// Copyright (c) 2025, WSO2 LLC. (http://www.wso2.org).
+// Copyright (c) 2026, WSO2 LLC. (http://www.wso2.org).
 //
 // WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -52,11 +52,19 @@ function beforeHubNotificationSubscriberTest() returns error? {
 }
 function testOnHubError() returns error? {
     http:Response response = check hubNotifySubscriberEp->get("/?hub.mode=hub-error&hub.topic=http://example.com/topic&hub.reason=Broker+unavailable");
-    test:assertEquals(response.statusCode, 200);
+    test:assertEquals(response.statusCode, 200, "Received failure status, expected successful response");
     boolean onHubErrorInvoked = false;
     lock {
         onHubErrorInvoked = isOnHubErrorInvoked;
     }
     runtime:sleep(2.0);
     test:assertTrue(onHubErrorInvoked, "`onHubError` not invoked even though the notification was dispatched");
+}
+
+@test:Config { 
+    groups: ["hubErrorNotification"]
+}
+function testInvalidHubMode() returns error? {
+    http:Response response = check hubNotifySubscriberEp->get("/?hub.mode=internal-hub-error&hub.topic=http://example.com/topic&hub.reason=Broker+unavailable");
+    test:assertEquals(response.statusCode, 400, "Received success status, expected failure response");
 }
