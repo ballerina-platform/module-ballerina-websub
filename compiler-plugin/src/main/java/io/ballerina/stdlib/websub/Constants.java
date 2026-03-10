@@ -35,7 +35,7 @@ public interface Constants {
     String ON_EVENT_NOTIFICATION = "onEventNotification";
 
     String SUBSCRIPTION_DENIED_ERROR = "websub:SubscriptionDeniedError";
-    String INTERNAL_HUB_ERROR = "InternalHubError";
+    String INTERNAL_HUB_ERROR = "websub:InternalHubError";
     String SUBSCRIPTION_VERIFICATION = "websub:SubscriptionVerification";
     String UNSUBSCRIPTION_VERIFICATION = "websub:UnsubscriptionVerification";
     String CONTENT_DISTRIBUTION_MESSAGE = "websub:ContentDistributionMessage";
