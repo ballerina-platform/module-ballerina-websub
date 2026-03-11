@@ -53,11 +53,11 @@ function beforeHubNotificationSubscriberTest() returns error? {
 function testOnHubError() returns error? {
     http:Response response = check hubNotifySubscriberEp->get("/?hub.mode=hub-error&hub.topic=http://example.com/topic&hub.reason=Broker+unavailable");
     test:assertEquals(response.statusCode, 200, "Received failure status, expected successful response");
+    runtime:sleep(2.0);
     boolean onHubErrorInvoked = false;
     lock {
         onHubErrorInvoked = isOnHubErrorInvoked;
     }
-    runtime:sleep(2.0);
     test:assertTrue(onHubErrorInvoked, "`onHubError` not invoked even though the notification was dispatched");
 }
 
