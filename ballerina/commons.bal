@@ -26,6 +26,7 @@ const string HUB_SECRET = "hub.secret";
 const string MODE_SUBSCRIBE = "subscribe";
 const string MODE_UNSUBSCRIBE = "unsubscribe";
 const string MODE_DENIED = "denied";
+const string MODE_HUB_ERROR = "hub-error";
 
 const string ACCEPT_HEADER = "Accept";
 const string ACCEPT_LANGUAGE_HEADER = "Accept-Language";

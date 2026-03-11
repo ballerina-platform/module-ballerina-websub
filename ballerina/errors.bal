@@ -38,5 +38,8 @@ public type UnsubscriptionVerificationError distinct Error;
 # Represents a subscription-denied error.
 public type SubscriptionDeniedError distinct Error;
 
+# Represents an internal hub error occurred during subscription verification.
+public type InternalHubError distinct Error;
+
 # Represents the subscription-delete action from the `subscriber`.
 public type SubscriptionDeletedError distinct Error;

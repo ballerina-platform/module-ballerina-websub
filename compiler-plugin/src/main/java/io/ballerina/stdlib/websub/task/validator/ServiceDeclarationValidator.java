@@ -64,10 +64,13 @@ public class ServiceDeclarationValidator {
     static {
         allowedMethods = List.of(
                 Constants.ON_SUBSCRIPTION_VALIDATION_DENIED,
+                Constants.ON_HUB_ERROR,
                 Constants.ON_SUBSCRIPTION_VERIFICATION,
                 Constants.ON_UNSUBSCRIPTION_VERIFICATION,
                 Constants.ON_EVENT_NOTIFICATION);
         allowedParameterTypes = Map.of(
+                Constants.ON_HUB_ERROR,
+                Collections.singletonList(Constants.INTERNAL_HUB_ERROR),
                 Constants.ON_SUBSCRIPTION_VALIDATION_DENIED,
                 Collections.singletonList(Constants.SUBSCRIPTION_DENIED_ERROR),
                 Constants.ON_SUBSCRIPTION_VERIFICATION,
@@ -80,6 +83,8 @@ public class ServiceDeclarationValidator {
         allowedReturnTypes = Map.of(
                 Constants.ON_SUBSCRIPTION_VALIDATION_DENIED,
                 Collections.singletonList(Constants.ACKNOWLEDGEMENT),
+                Constants.ON_HUB_ERROR,
+                Collections.singletonList(Constants.ACKNOWLEDGEMENT),
                 Constants.ON_SUBSCRIPTION_VERIFICATION,
                 List.of(Constants.SUBSCRIPTION_VERIFICATION_SUCCESS, Constants.SUBSCRIPTION_VERIFICATION_ERROR),
                 Constants.ON_UNSUBSCRIPTION_VERIFICATION,
@@ -88,6 +93,7 @@ public class ServiceDeclarationValidator {
                 List.of(Constants.ACKNOWLEDGEMENT, Constants.SUBSCRIPTION_DELETED_ERROR)
         );
         methodsWithOptionalReturnTypes = List.of(
+                Constants.ON_HUB_ERROR,
                 Constants.ON_SUBSCRIPTION_VALIDATION_DENIED,
                 Constants.ON_EVENT_NOTIFICATION
         );

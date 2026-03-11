@@ -28,6 +28,7 @@ isolated service class HttpService {
     private final boolean isSubscriptionVerificationAvailable;
     private final boolean isUnsubscriptionVerificationAvailable;
     private final boolean isEventNotificationAvailable;
+    private final boolean isOnHubErrorAvailable;
     private boolean unsubscriptionVerified;
 
     isolated function init(HttpToWebsubAdaptor adaptor, string callback, string? secretKey) returns error? {
@@ -40,6 +41,7 @@ isolated service class HttpService {
         self.isSubscriptionVerificationAvailable = isMethodAvailable("onSubscriptionVerification", methodNames);
         self.isUnsubscriptionVerificationAvailable = isMethodAvailable("onUnsubscriptionVerification", methodNames);
         self.isEventNotificationAvailable = isMethodAvailable("onEventNotification", methodNames);
+        self.isOnHubErrorAvailable = isMethodAvailable("onHubError", methodNames);
     }
 
     isolated resource function post .(http:Caller caller, http:Request request) returns Error? {
@@ -74,7 +76,16 @@ isolated service class HttpService {
                 if self.isSubscriptionValidationDeniedAvailable {
                     processSubscriptionDenial(caller, response, params, self.adaptor);
                 } else {
-                    log:printError("Subscription is denied by the hub");
+                    log:printError("Subscription is denied by the hub", reason = params.hubReason);
+                    response.statusCode = http:STATUS_OK;
+                    updateResponseBody(response, ACKNOWLEDGEMENT["body"], ACKNOWLEDGEMENT["headers"]);
+                }
+            }
+            MODE_HUB_ERROR => {
+                if self.isOnHubErrorAvailable {
+                    processHubError(caller, response, params, self.adaptor);
+                } else {
+                    log:printError("Error occurred while processing subscription request at the hub", reason = params.hubReason);
                     response.statusCode = http:STATUS_OK;
                     updateResponseBody(response, ACKNOWLEDGEMENT["body"], ACKNOWLEDGEMENT["headers"]);
                 }

@@ -59,18 +59,13 @@ function beforeSimpleSubscriberTest() returns error? {
     check basicSubscriberListener.attach(simpleSubscriberService, "subscriber");
 }
 
-@test:AfterGroups { value:["simpleSubscriber"] }
-function afterSimpleSubscriberTest() returns error? {
-    check basicSubscriberListener.gracefulStop();
-}
-
-http:Client httpClient = check new (string `http://localhost:${BASIC_SUB_PORT}/subscriber`);
+http:Client baseSubscriberEndpoint = check new (string `http://localhost:${BASIC_SUB_PORT}/subscriber`);
 
 @test:Config { 
     groups: ["simpleSubscriber"]
 }
 function testOnSubscriptionValidation() returns error? {
-    http:Response response = check httpClient->get("/?hub.mode=denied&hub.reason=justToTest");
+    http:Response response = check baseSubscriberEndpoint->get("/?hub.mode=denied&hub.reason=justToTest");
     test:assertEquals(response.statusCode, 200);
 }
 
@@ -78,7 +73,7 @@ function testOnSubscriptionValidation() returns error? {
     groups: ["simpleSubscriber"]
  }
 function testOnIntentVerificationSuccess() returns error? {
-    http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234");
+    http:Response response = check baseSubscriberEndpoint->get("/?hub.mode=subscribe&hub.topic=test&hub.challenge=1234");
     test:assertEquals(response.statusCode, 200);
     test:assertEquals(response.getTextPayload(), "1234");
 }
@@ -87,7 +82,7 @@ function testOnIntentVerificationSuccess() returns error? {
     groups: ["simpleSubscriber"]
 }
 function testOnIntentVerificationFailure() returns error? {
-    http:Response response = check httpClient->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
+    http:Response response = check baseSubscriberEndpoint->get("/?hub.mode=subscribe&hub.topic=test1&hub.challenge=1234");
     test:assertEquals(response.statusCode, 404);
     string payload = check response.getTextPayload();
     map<string> responseBody = decodeResponseBody(payload);
@@ -102,7 +97,7 @@ function testOnEventNotificationSuccess() returns error? {
     json payload =  {"action": "publish", "mode": "remote-hub"};
     request.setPayload(payload);
 
-    http:Response response = check httpClient->post("/", request);
+    http:Response response = check baseSubscriberEndpoint->post("/", request);
     test:assertEquals(response.statusCode, 202);
 }
 
@@ -114,7 +109,7 @@ function testOnEventNotificationSuccessXml() returns error? {
     http:Request request = new;
     xml payload = xml `<body><action>publish</action></body>`;
     request.setPayload(payload);
-    http:Response response = check httpClient->post("/", request);
+    http:Response response = check baseSubscriberEndpoint->post("/", request);
     test:assertEquals(response.statusCode, 202);
 }
 
@@ -125,7 +120,7 @@ function testOnEventNotificationSuccessForUrlEncoded() returns error? {
     http:Request request = new;
     request.setTextPayload("param1=value1&param2=value2");
     check request.setContentType(mime:APPLICATION_FORM_URLENCODED);
-    http:Response response = check httpClient->post("", request);
+    http:Response response = check baseSubscriberEndpoint->post("", request);
     test:assertEquals(response.statusCode, 202);
 }
 
@@ -137,6 +132,6 @@ function testOnEventNotificationSuccessForJsonWithCharEncoding() returns error? 
     json payload = {"action": "publish", "mode": "remote-hub"};
     request.setPayload(payload);
     check request.setContentType("application/json; charset=UTF-8");
-    http:Response response = check httpClient->post("", request);
+    http:Response response = check baseSubscriberEndpoint->post("", request);
     test:assertEquals(response.statusCode, 202);
 }

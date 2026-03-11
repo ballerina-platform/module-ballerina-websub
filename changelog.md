@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [Introduce a mechanism to notify subscribers when there is an when invoking the `onSubscriptionIntentVerified` method on `hub`](https://github.com/ballerina-platform/ballerina-library/issues/8681)
+
 ## [2.13.1] - 2025-03-05
 
 ### Fixed

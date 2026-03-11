@@ -28,12 +28,14 @@ public interface Constants {
     String LISTENER_IDENTIFIER = "Listener";
     String SERVICE_ANNOTATION_NAME = "websub:SubscriberServiceConfig";
 
+    String ON_HUB_ERROR = "onHubError";
     String ON_SUBSCRIPTION_VALIDATION_DENIED = "onSubscriptionValidationDenied";
     String ON_SUBSCRIPTION_VERIFICATION = "onSubscriptionVerification";
     String ON_UNSUBSCRIPTION_VERIFICATION = "onUnsubscriptionVerification";
     String ON_EVENT_NOTIFICATION = "onEventNotification";
 
     String SUBSCRIPTION_DENIED_ERROR = "websub:SubscriptionDeniedError";
+    String INTERNAL_HUB_ERROR = "websub:InternalHubError";
     String SUBSCRIPTION_VERIFICATION = "websub:SubscriptionVerification";
     String UNSUBSCRIPTION_VERIFICATION = "websub:UnsubscriptionVerification";
     String CONTENT_DISTRIBUTION_MESSAGE = "websub:ContentDistributionMessage";

@@ -78,6 +78,19 @@ isolated function processSubscriptionDenial(http:Caller caller, http:Response re
     }
 }
 
+isolated function processHubError(http:Caller caller, http:Response response, 
+                                  RequestQueryParams params, HttpToWebsubAdaptor adaptor) {
+    var reason = params?.hubReason is () ? "" : <string>params?.hubReason;
+    InternalHubError message = error InternalHubError(reason);
+    Acknowledgement|error? result = adaptor.callOnHubErrorMethod(message);    
+    response.statusCode = http:STATUS_OK;
+    if result is () || result is error {
+        updateResponseBody(response, ACKNOWLEDGEMENT["body"], ACKNOWLEDGEMENT["headers"]);
+    } else {
+        updateResponseBody(response, result["body"], result["headers"]);
+    }    
+}
+
 isolated function processEventNotification(http:Caller caller, http:Request request, 
                                            http:Response response, HttpToWebsubAdaptor adaptor,
                                            string secretKey) returns error? {
