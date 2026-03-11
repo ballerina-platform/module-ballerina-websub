@@ -207,7 +207,7 @@ public type SubscriberService distinct service object {
     remote function onEventNotification(websub:ContentDistributionMessage event)
         returns websub:Acknowledgement|websub:SubscriptionDeletedError|error?;
 
-    // Sample GET request hub.mode=hub-error&hub.topic=test
+    // Sample GET request hub.mode=hub-error&hub.topic=test&hub.reason=broker+error
     // Sample 200 OK response or 4xx if there is an error on the received request
     remote function onHubError(websub:InternalHubError 'error) returns websub:Acknowledgement|error?;
 };
