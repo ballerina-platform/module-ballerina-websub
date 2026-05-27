@@ -29,6 +29,10 @@ allprojects {
     apply plugin: 'jacoco'
     apply plugin: 'maven-publish'
 
+    jacoco {
+        toolVersion = "${jacocoVersion}"
+    }
+
     repositories {
         mavenLocal()
 
@@ -60,6 +64,13 @@ allprojects {
 }
 
 subprojects {
+    plugins.withId('java') {
+        java {
+            toolchain {
+                languageVersion = JavaLanguageVersion.of(25)
+            }
+        }
+    }
 
     configurations {
         ballerinaStdLibs
@@ -112,7 +123,7 @@ release {
     }
 }
 
-task build {
+tasks.named('build') {
     dependsOn(':websub-native:build')
     dependsOn('websub-ballerina:build')
     dependsOn(':websub-compiler-plugin:build')
