@@ -194,7 +194,7 @@ function validateRequest(websub:ContentDistributionMessage event) returns boolea
 | onSubscriptionValidationDenied | Successfull acknowledgement|
 | onSubscriptionVerification | Subscription verification failure|
 | onUnsubscriptionVerification | Unsubscription verification failure|
-| onEventNotification | Successfull acknowledgement|
+| onEventNotification | Successful acknowledgement|
 
 ## Issues and projects 
 
