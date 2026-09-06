@@ -1,10 +1,11 @@
 ## Overview
 
-This module provides APIs for a WebSub Subscriber Service.
+This module provides APIs for a [WebSub](https://www.w3.org/TR/websub/) Subscriber Service, an implementation of the [WebSub Subscriber](https://www.w3.org/TR/websub/#subscriber) role that discovers a resource's hub and topic, subscribes to updates, and accepts content distribution requests.
 
-[**WebSub**](https://www.w3.org/TR/websub/) is a common mechanism for communication between publishers of any kind of Web content and their subscribers, based on HTTP webhooks. Subscription requests are relayed through hubs, which validate and verify the request. Hubs then distribute new and updated content to subscribers when it becomes available. WebSub was previously known as PubSubHubbub.
+## Key Features
 
-[**WebSub Subscriber**](https://www.w3.org/TR/websub/#subscriber) is an implementation that discovers the `hub` and `topic URL` of a given `resource URL`, subscribes to updates at the hub, and accepts content distribution requests from the `hub`.
+- WebSub Subscriber Service for subscribing to and receiving content updates
+- Automatic hub and topic URL discovery for a given resource URL
 
 ### Basic flow with WebSub
 
