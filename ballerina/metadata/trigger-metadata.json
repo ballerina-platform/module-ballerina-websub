@@ -1,0 +1,137 @@
+{
+  "version": "v1.0",
+
+  "listeners": [
+    {
+      "id": "$listener",
+      "doc": "Receives callback requests from the hub and dispatches each to the attached subscriber service.",
+      "type": { "name": "Listener" },
+      "services": ["$service"],
+      "multipleServicesAllowed": true,
+      "multipleServicesOfSameTypeAllowed": true
+    }
+  ],
+
+  "serviceTypes": [
+    {
+      "id": "$service",
+      "doc": "Represents a WebSub subscriber, receiving content distribution notifications and subscription lifecycle events from a hub.",
+      "type": { "name": "SubscriberService" },
+      "concrete": false,
+      "multipleListenersAllowed": true,
+      "annotations": ["$subscriberServiceConfig"],
+      "identifier": { "presence": "optional", "form": ["basePath"] },
+      "handlers": {
+        "backedByConcreteType": false,
+        "options": [
+          {
+            "id": "$service.onEventNotification",
+            "name": "onEventNotification",
+            "kind": "remote",
+            "doc": "Invoked when the hub delivers a content update for a topic this subscriber is subscribed to. This is the handler that does the actual work.",
+            "presence": "required",
+            "params": [
+              {
+                "id": "$service.onEventNotification.event",
+                "name": "event",
+                "doc": "The delivered content update, including its payload and the topic it came from.",
+                "type": { "name": "ContentDistributionMessage" },
+                "presence": "required"
+              }
+            ],
+            "returns": {
+              "id": "$service.onEventNotification.returns",
+              "type": [{ "name": "Acknowledgement" }, { "name": "SubscriptionDeletedError" }, { "name": "()", "builtin": true }]
+            }
+          },
+          {
+            "id": "$service.onSubscriptionVerification",
+            "name": "onSubscriptionVerification",
+            "kind": "remote",
+            "doc": "Invoked when the hub asks this subscriber to confirm an intent to subscribe. Return success to complete the subscription, or an error to reject it.",
+            "presence": "optional",
+            "params": [
+              {
+                "id": "$service.onSubscriptionVerification.msg",
+                "name": "msg",
+                "doc": "The hub's verification challenge for the pending subscription.",
+                "type": { "name": "SubscriptionVerification" },
+                "presence": "required"
+              }
+            ],
+            "returns": {
+              "id": "$service.onSubscriptionVerification.returns",
+              "type": [{ "name": "SubscriptionVerificationSuccess" }, { "name": "SubscriptionVerificationError" }]
+            }
+          },
+          {
+            "id": "$service.onUnsubscriptionVerification",
+            "name": "onUnsubscriptionVerification",
+            "kind": "remote",
+            "doc": "Invoked when the hub asks this subscriber to confirm an intent to unsubscribe.",
+            "presence": "optional",
+            "params": [
+              {
+                "id": "$service.onUnsubscriptionVerification.msg",
+                "name": "msg",
+                "doc": "The hub's verification challenge for the pending unsubscription.",
+                "type": { "name": "UnsubscriptionVerification" },
+                "presence": "required"
+              }
+            ],
+            "returns": {
+              "id": "$service.onUnsubscriptionVerification.returns",
+              "type": [{ "name": "UnsubscriptionVerificationSuccess" }, { "name": "UnsubscriptionVerificationError" }]
+            }
+          },
+          {
+            "id": "$service.onSubscriptionValidationDenied",
+            "name": "onSubscriptionValidationDenied",
+            "kind": "remote",
+            "doc": "Invoked when the hub refuses a subscription request outright, rather than proceeding to verification.",
+            "presence": "optional",
+            "params": [
+              {
+                "id": "$service.onSubscriptionValidationDenied.msg",
+                "name": "msg",
+                "doc": "The hub's stated reason for refusing the subscription.",
+                "type": { "name": "SubscriptionDeniedError" },
+                "presence": "required"
+              }
+            ],
+            "returns": {
+              "id": "$service.onSubscriptionValidationDenied.returns",
+              "type": [{ "name": "Acknowledgement" }, { "name": "()", "builtin": true }]
+            }
+          },
+          {
+            "id": "$service.onHubError",
+            "name": "onHubError",
+            "kind": "remote",
+            "doc": "Invoked when the hub reports a failure to this subscriber.",
+            "presence": "optional",
+            "params": [
+              {
+                "id": "$service.onHubError.err",
+                "name": "err",
+                "doc": "The failure the hub reported.",
+                "type": { "name": "InternalHubError" },
+                "presence": "required"
+              }
+            ],
+            "returns": { "id": "$service.onHubError.returns", "type": [{ "name": "Acknowledgement" }, { "name": "()", "builtin": true }] }
+          }
+        ]
+      }
+    }
+  ],
+
+  "annotations": [
+    {
+      "id": "$subscriberServiceConfig",
+      "type": { "name": "SubscriberServiceConfig" },
+      "attachPoint": "service",
+      "presence": "optional"
+    }
+  ]
+}
