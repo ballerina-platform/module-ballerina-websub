@@ -1,5 +1,4 @@
-Ballerina WebSub Library
-===================
+# Ballerina WebSub Library
 
   [![Build](https://github.com/ballerina-platform/module-ballerina-websub/actions/workflows/build-timestamped-master.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-websub/actions/workflows/build-timestamped-master.yml)
   [![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-websub/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-websub)
@@ -8,11 +7,9 @@ Ballerina WebSub Library
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-websub.svg)](https://github.com/ballerina-platform/module-ballerina-websub/commits/master)
   [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/websub.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fwebsub)
 
-This library provides APIs for a WebSub Subscriber Service.
+## Overview
 
-[**WebSub**](https://www.w3.org/TR/websub/) is a common mechanism for communication between publishers of any kind of Web content and their subscribers, based on HTTP webhooks. Subscription requests are relayed through hubs, which validate and verify the request. Hubs then distribute new and updated content to subscribers when it becomes available. WebSub was previously known as PubSubHubbub.
-
-[**WebSub Subscriber**](https://www.w3.org/TR/websub/#subscriber) is an implementation that discovers the `hub` and `topic URL` of a given `resource URL`, subscribes to updates at the hub, and accepts content distribution requests from the `hub`.
+This module provides APIs for a [WebSub](https://www.w3.org/TR/websub/) Subscriber Service, an implementation of the [WebSub Subscriber](https://www.w3.org/TR/websub/#subscriber) role that discovers a resource's hub and topic, subscribes to updates, and accepts content distribution requests.
 
 ### Basic flow with WebSub
 
@@ -260,7 +257,7 @@ Execute the commands below to build from source.
 
 ## Contribute to Ballerina
 
-As an open source project, Ballerina welcomes contributions from the community.
+As an open-source project, Ballerina welcomes contributions from the community.
 
 For more information, go to the [contribution guidelines](https://github.com/ballerina-platform/ballerina-lang/blob/master/CONTRIBUTING.md).
 
