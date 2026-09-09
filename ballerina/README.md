@@ -2,7 +2,7 @@
 
 This module provides APIs for a [WebSub](https://www.w3.org/TR/websub/) Subscriber Service, an implementation of the [WebSub Subscriber](https://www.w3.org/TR/websub/#subscriber) role that discovers a resource's hub and topic, subscribes to updates, and accepts content distribution requests.
 
-## Key Features
+### Key Features
 
 - WebSub Subscriber Service for subscribing to and receiving content updates
 - Automatic hub and topic URL discovery for a given resource URL
