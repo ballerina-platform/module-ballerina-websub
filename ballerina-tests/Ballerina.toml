@@ -1,10 +1,10 @@
 [package]
 org = "ballerina"
 name = "websub_tests"
-version = "2.15.1"
+version = "2.16.0"
 
-[platform.java21]
+[platform.java25]
 graalvmCompatible = true
 
-[[platform.java21.dependency]]
-path = "../native/build/libs/websub-native-2.15.1.jar"
+[[platform.java25.dependency]]
+path = "../native/build/libs/websub-native-2.16.0-SNAPSHOT.jar"
