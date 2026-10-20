@@ -1,0 +1,6 @@
+# ballerina:13 matches the constant HUB_SECRET = "hub.secret" (the WebSub form-parameter name, not a secret) and the
+# public API record field `SubscriptionChangeRequest.secret = ""` (empty means 'no secret'; renaming it is an API break).
+# ballerina:14 matches variables such as secretKey/configuredSecret that hold optional user-supplied secrets, and the
+# `auth` config forwarding. No credential literal is embedded in the library.
+[rule]
+exclude = ["ballerina:13", "ballerina:14"]
